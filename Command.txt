@@ -1,0 +1,16 @@
+﻿- Install and update dotnet ef tool
+	dotnet tool install --global dotnet-ef 
+	or  
+	dotnet tool update --global dotnet-ef
+
+- Create migrations to DB
+	Add-Migration -Name Initial-Create -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
+
+- Remove migration to DB
+	Remove-Migration -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
+
+- Update migration to DB
+	Update-Database -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
+
+- Drop DB
+	Drop-Database -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
