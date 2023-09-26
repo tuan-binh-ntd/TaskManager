@@ -11,6 +11,8 @@ namespace TaskManager.Infrastructure.Helper
         {
             CreateMap<AppUser, UserViewModel>().ReverseMap();
             CreateMap<AppUser, SignUpDto>().ReverseMap();
+
+            CreateMap<AppRole, AppRoleDto>().ReverseMap();
         }
     }
 }
