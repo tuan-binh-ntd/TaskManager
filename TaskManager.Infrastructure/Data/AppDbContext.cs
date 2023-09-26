@@ -14,6 +14,8 @@ namespace TaskManager.Infrastructure.Data
         {
         }
 
+        public DbSet<Project> Projects => Set<Project>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
