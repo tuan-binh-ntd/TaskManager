@@ -40,7 +40,7 @@ namespace TaskManager.API.Controllers
         [HttpPost("signin")]
         public async Task<IActionResult> SignIn(LoginDto loginDto)
         {
-            var user = await _userManager.Users.SingleOrDefaultAsync(x => x.UserName == loginDto.Username.ToLower());
+            var user = await _userManager.Users.SingleOrDefaultAsync(e => e.Email == loginDto.Email);
 
             if (user is null) return CustomResult("Invalid username", HttpStatusCode.Unauthorized);
 
