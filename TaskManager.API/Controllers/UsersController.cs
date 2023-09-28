@@ -60,7 +60,7 @@ namespace TaskManager.API.Controllers
         [HttpPost("signup")]
         public async Task<IActionResult> SignUp(SignUpDto signUpDto)
         {
-            if (await CheckUserExists(signUpDto.Username)) return CustomResult("Username is taken", HttpStatusCode.BadRequest);
+            if (await CheckUserExists(signUpDto.Email)) return CustomResult("Email is taken", HttpStatusCode.BadRequest);
 
             var user = _mapper.Map<AppUser>(signUpDto);
             user.UserName = signUpDto.Username.ToLower();
@@ -68,10 +68,6 @@ namespace TaskManager.API.Controllers
             var result = await _userManager.CreateAsync(user, signUpDto.Password);
 
             if (!result.Succeeded) return CustomResult(result.Errors, HttpStatusCode.BadRequest);
-
-            var roleResult = await _userManager.AddToRoleAsync(user, "Employee");
-
-            if (!roleResult.Succeeded) return CustomResult(result.Errors, HttpStatusCode.BadRequest);
 
             UserViewModel res = new()
             {
@@ -103,9 +99,9 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        private async Task<bool> CheckUserExists(string username)
+        private async Task<bool> CheckUserExists(string email)
         {
-            return await _userManager.Users.AnyAsync(x => x.UserName == username.ToLower());
+            return await _userManager.Users.AnyAsync(x => x.Email == email);
         }
     }
 }
