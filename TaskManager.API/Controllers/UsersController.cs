@@ -21,18 +21,21 @@ namespace TaskManager.API.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IJWTTokenService _jwtTokenService;
         private readonly IMapper _mapper;
+        private readonly IProjectService _projectService;
 
         public UsersController(
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
             IJWTTokenService jwtTokenService,
-            IMapper mapper
+            IMapper mapper,
+            IProjectService projectService
             )
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtTokenService = jwtTokenService;
             _mapper = mapper;
+            _projectService = projectService;
         }
 
 
@@ -42,7 +45,7 @@ namespace TaskManager.API.Controllers
         {
             var user = await _userManager.Users.SingleOrDefaultAsync(e => e.Email == loginDto.Email);
 
-            if (user is null) return CustomResult("Invalid username", HttpStatusCode.Unauthorized);
+            if (user is null) return CustomResult("Invalid email", HttpStatusCode.Unauthorized);
 
             var result = await _signInManager
                 .CheckPasswordSignInAsync(user, loginDto.Password, false);
@@ -56,14 +59,14 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        [AllowAnonymous]
-        [HttpPost("signup")]
+        [HttpPost("signup"), AllowAnonymous]
         public async Task<IActionResult> SignUp(SignUpDto signUpDto)
         {
-            if (await CheckUserExists(signUpDto.Email)) return CustomResult("Email is taken", HttpStatusCode.BadRequest);
+            if (await CheckEmailExists(signUpDto.Email)) return CustomResult("Email is taken", HttpStatusCode.BadRequest);
+            else if (await CheckUserNameExists(signUpDto.Username)) return CustomResult("Username is taken", HttpStatusCode.BadRequest);
 
             var user = _mapper.Map<AppUser>(signUpDto);
-            user.UserName = signUpDto.Username.ToLower();
+            user.UserName = signUpDto.Username;
 
             var result = await _userManager.CreateAsync(user, signUpDto.Password);
 
@@ -77,10 +80,17 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
+        [HttpGet("{email}"), AllowAnonymous]
+        public async Task<IActionResult> CheckEmail(string email)
+        {
+            if (await CheckEmailExists(email)) return CustomResult(new { Invalid = false }, HttpStatusCode.OK);
+            return CustomResult(new { Invalid = true }, HttpStatusCode.OK);
+        }
+
         [HttpGet("{username}"), AllowAnonymous]
         public async Task<IActionResult> CheckUsername(string username)
         {
-            if (await CheckUserExists(username)) return CustomResult(new { Invalid = false }, HttpStatusCode.OK);
+            if (await CheckUserNameExists(username)) return CustomResult(new { Invalid = false }, HttpStatusCode.OK);
             return CustomResult(new { Invalid = true }, HttpStatusCode.OK);
         }
 
@@ -99,9 +109,23 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        private async Task<bool> CheckUserExists(string email)
+        private async Task<bool> CheckEmailExists(string email)
         {
             return await _userManager.Users.AnyAsync(x => x.Email == email);
+        }
+
+        private async Task<bool> CheckUserNameExists(string username)
+        {
+            return await _userManager.Users.AnyAsync(x => x.UserName == username);
+        }
+
+        [HttpPost("{id}/projects")]
+        public async Task<IActionResult> CreateProject(Guid id, ProjectDto projectDto)
+        {
+            var project = _mapper.Map<Project>(projectDto);
+            project.LeaderId = id;
+            var result = await _projectService.CreateProject(project);
+            return CustomResult(_mapper.Map<ProjectViewModel>(result), HttpStatusCode.Created);
         }
     }
 }

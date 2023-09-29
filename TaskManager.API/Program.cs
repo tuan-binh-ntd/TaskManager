@@ -6,10 +6,12 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Infrastructure;
 using TaskManager.Infrastructure.Data;
 using TaskManager.Infrastructure.Helper;
+using TaskManager.Infrastructure.Repositories;
 using TaskManager.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -51,6 +53,9 @@ builder.Services.AddCors();
 
 // Start Declaration DI
 builder.Services.AddScoped<IJWTTokenService, JWTTokenService>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+builder.Services.AddScoped<IBacklogRepository, BacklogRepository>();
 // Add EmailService
 // End  Declaration DI
 

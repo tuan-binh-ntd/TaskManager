@@ -5,6 +5,7 @@
 
 - Create migrations to DB
 	Add-Migration -Name Initial-Create -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
+	Add-Migration -Name Add-Project-And-Backlog-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
 
 - Remove migration to DB
 	Remove-Migration -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
