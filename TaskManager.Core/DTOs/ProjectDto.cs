@@ -1,11 +1,13 @@
-﻿namespace TaskManager.Infrastructure.ViewModel
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TaskManager.Core.DTOs
 {
-    public class ProjectViewModel
+    public class ProjectDto
     {
-        public Guid Id { get; set; }
+        [Required]
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public Guid LeaderId { get; set; }
+        [Required]
         public string Code { get; set; } = string.Empty;
         public string AvatarUrl { get; set; } = string.Empty;
     }

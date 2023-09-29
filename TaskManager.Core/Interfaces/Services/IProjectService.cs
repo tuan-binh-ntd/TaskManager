@@ -1,4 +1,5 @@
-﻿using TaskManager.Core.Entities;
+﻿using TaskManager.Core.DTOs;
+using TaskManager.Core.ViewModel;
 
 namespace TaskManager.Core.Interfaces.Services
 {
@@ -7,6 +8,9 @@ namespace TaskManager.Core.Interfaces.Services
     /// </summary>
     public interface IProjectService
     {
-        Task<Project> CreateProject(Project project);
+        Task<IReadOnlyCollection<ProjectViewModel>> GetProjects();
+        Task<ProjectViewModel> Create(Guid userId, ProjectDto projectDto);
+        Task<ProjectViewModel> Update(Guid id, ProjectDto projectDto);
+        Task<bool> Delete(Guid id);
     }
 }

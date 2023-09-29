@@ -1,4 +1,4 @@
-﻿namespace TaskManager.Infrastructure.ViewModel
+﻿namespace TaskManager.Core.ViewModel
 {
     public class UserViewModel
     {

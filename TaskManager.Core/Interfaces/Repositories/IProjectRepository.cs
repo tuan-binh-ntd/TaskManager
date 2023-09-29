@@ -4,10 +4,10 @@ namespace TaskManager.Core.Interfaces.Repositories
 {
     public interface IProjectRepository : IRepository<Project>
     {
-        Task<IReadOnlyCollection<Project>> GetAllAsync();
-        Task<Project?> GetAsync(Guid id);
+        Task<IReadOnlyCollection<Project>> GetAll();
+        Task<Project?> GetById(Guid id);
         Project Add(Project project);
         void Update(Project project);
-        void DeleteAsync(Guid id);
+        void Delete(Guid id);
     }
 }

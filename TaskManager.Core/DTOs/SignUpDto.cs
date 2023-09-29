@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TaskManager.Infrastructure.DTOs
+namespace TaskManager.Core.DTOs
 {
     public class SignUpDto
     {

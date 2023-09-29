@@ -1,16 +1,18 @@
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using System.Reflection;
 using System.Text;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Infrastructure;
 using TaskManager.Infrastructure.Data;
-using TaskManager.Infrastructure.Helper;
 using TaskManager.Infrastructure.Repositories;
 using TaskManager.Infrastructure.Services;
 
@@ -46,7 +48,15 @@ builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection("
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 // Set AutoMapper
-builder.Services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
+//builder.Services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
+
+// Ser Mapster
+var typeAdapterConfig = TypeAdapterConfig.GlobalSettings;
+// scans the assembly and gets the IRegister, adding the registration to the TypeAdapterConfig
+typeAdapterConfig.Scan(Assembly.GetExecutingAssembly());
+// register the mapper as Singleton service for my application
+var mapperConfig = new Mapper(typeAdapterConfig);
+builder.Services.AddSingleton<IMapper>(mapperConfig);
 
 // CORS
 builder.Services.AddCors();
@@ -56,6 +66,8 @@ builder.Services.AddScoped<IJWTTokenService, JWTTokenService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IBacklogRepository, BacklogRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 // Add EmailService
 // End  Declaration DI
 
@@ -163,7 +175,7 @@ try
     var userManager = services.GetRequiredService<UserManager<AppUser>>();
     var roleManager = services.GetRequiredService<RoleManager<AppRole>>();
     await context.Database.MigrateAsync();
-    await Seeding.SeedUsers(userManager, roleManager, context);
+    await Seeding.SeedUsers(userManager, roleManager);
 }
 catch (Exception ex)
 {
