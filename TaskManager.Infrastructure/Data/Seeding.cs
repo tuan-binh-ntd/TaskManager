@@ -8,8 +8,7 @@ namespace TaskManager.Infrastructure.Data
     {
         public static async Task SeedUsers(
             UserManager<AppUser> userManager,
-            RoleManager<AppRole> roleManager,
-            AppDbContext appDbContext)
+            RoleManager<AppRole> roleManager)
         {
             if (await userManager.Users.AnyAsync()) return;
 
