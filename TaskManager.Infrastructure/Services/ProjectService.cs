@@ -1,6 +1,8 @@
-﻿using MapsterMapper;
+﻿using Mapster;
+using MapsterMapper;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Extensions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
@@ -69,6 +71,18 @@ namespace TaskManager.Infrastructure.Services
             //_projectRepository.Update(project);
             await _projectRepository.UnitOfWork.SaveChangesAsync();
             return _mapper.Map<ProjectViewModel>(project);
+        }
+
+        public async Task<IReadOnlyCollection<ProjectViewModel>> GetProjectsByFilter(Guid leaderId, GetProjectByFilterDto filter)
+        {
+            var roProjects = await _projectRepository.GetByLeaderId(leaderId);
+
+            var projects = roProjects
+                .WhereIf(string.IsNullOrWhiteSpace(filter.Name), p => p.Name.Contains(filter.Name))
+                .WhereIf(string.IsNullOrWhiteSpace(filter.Code), p => p.Code.Contains(filter.Code))
+                .ToList();
+
+            return _mapper.Adapt<IReadOnlyCollection<ProjectViewModel>>();
         }
     }
 }

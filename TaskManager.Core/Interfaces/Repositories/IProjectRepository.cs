@@ -9,5 +9,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         Project Add(Project project);
         void Update(Project project);
         void Delete(Guid id);
+        Task<IReadOnlyCollection<Project>> GetByLeaderId(Guid leaderId);
     }
 }
