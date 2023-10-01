@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using TaskManager.Core.Helper;
 
 namespace TaskManager.Core.Extensions
@@ -115,6 +116,15 @@ namespace TaskManager.Core.Extensions
             };
 
             return data;
+        }
+
+        public static IEnumerable<TSource> WhereIf<TSource>(this IEnumerable<TSource> source, bool condition, Func<TSource, bool> predicate)
+        {
+            if(condition)
+            {
+                return source.Where(predicate);
+            }
+            return source;
         }
     }
 }

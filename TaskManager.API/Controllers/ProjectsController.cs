@@ -14,12 +14,6 @@ namespace TaskManager.API.Controllers
         {
         }
 
-        //[HttpPost("{id}/user")]
-        //public async Task<IActionResult> AddUser(Guid id, )
-        //{
-
-
-        //    return CustomResult(role, HttpStatusCode.OK);
-        //}
+        
     }
 }

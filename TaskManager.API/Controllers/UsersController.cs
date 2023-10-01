@@ -124,5 +124,12 @@ namespace TaskManager.API.Controllers
             var result = await _projectService.Delete(projectId);
             return CustomResult(result, HttpStatusCode.OK);
         }
+
+        [HttpGet("{id}/projects")]
+        public async Task<IActionResult> GetProjectByFilter(Guid id, [FromQuery] GetProjectByFilterDto filter)
+        {
+            var result = await _projectService.GetProjectsByFilter(id, filter);
+            return CustomResult(result, HttpStatusCode.OK);
+        }
     }
 }

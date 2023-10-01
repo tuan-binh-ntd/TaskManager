@@ -42,5 +42,11 @@ namespace TaskManager.Infrastructure.Repositories
             var project = _context.Projects.SingleOrDefault(p => p.Id == id);
             _context.Projects.Remove(project!);
         }
+
+        public async Task<IReadOnlyCollection<Project>> GetByLeaderId(Guid leaderId)
+        {
+            var projects = await _context.Projects.Where(p => p.LeaderId == leaderId).ToListAsync();
+            return projects.AsReadOnly();
+        }
     }
 }
