@@ -10,7 +10,7 @@ using TaskManager.Core.ViewModel;
 namespace TaskManager.API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [Authorize]
     public class UsersController : BaseController
     {
