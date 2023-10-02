@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
 using TaskManager.Core.Helper;
 
 namespace TaskManager.Core.Extensions
@@ -120,11 +119,16 @@ namespace TaskManager.Core.Extensions
 
         public static IEnumerable<TSource> WhereIf<TSource>(this IEnumerable<TSource> source, bool condition, Func<TSource, bool> predicate)
         {
-            if(condition)
+            if (condition)
             {
                 return source.Where(predicate);
             }
             return source;
+        }
+
+        public static IEnumerable<TSource> PageBy<TSource>([NotNull] this IEnumerable<TSource> source, [NotNull] PaginationInput input)
+        {
+            return source.Skip(input.PageSize * (input.PageNum - 1)).Take(input.PageSize);
         }
     }
 }

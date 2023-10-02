@@ -39,7 +39,7 @@ namespace TaskManager.Infrastructure.Services
             return res.AsReadOnly();
         }
 
-        public async Task<ProjectViewModel> Create(Guid userId, ProjectDto projectDto)
+        public async Task<ProjectViewModel> Create(Guid userId, CreateProjectDto projectDto)
         {
             var project = _mapper.Map<Project>(projectDto);
             project.LeaderId = userId;
@@ -58,7 +58,7 @@ namespace TaskManager.Infrastructure.Services
             return _mapper.Map<ProjectViewModel>(project);
         }
 
-        public async Task<ProjectViewModel> Update(Guid id, ProjectDto projectDto)
+        public async Task<ProjectViewModel> Update(Guid id, UpdateProjectDto updateProjectDto)
         {
             Project? project = await _projectRepository.GetById(id);
             if (project is null)
@@ -67,8 +67,14 @@ namespace TaskManager.Infrastructure.Services
                 throw new ArgumentNullException(nameof(project));
 #pragma warning restore CA2208 // Instantiate argument exceptions correctly
             }
-            project = _mapper.Map<Project>(projectDto);
-            //_projectRepository.Update(project);
+
+            project.Name = updateProjectDto.Name!;
+            project.Code = updateProjectDto.Code!;
+            project.Description = updateProjectDto.Description!;
+            project.AvatarUrl = updateProjectDto.AvatarUrl!;
+            project.IsFavourite = (bool)updateProjectDto.IsFavourite!;
+
+            _projectRepository.Update(project);
             await _projectRepository.UnitOfWork.SaveChangesAsync();
             return _mapper.Map<ProjectViewModel>(project);
         }
@@ -76,13 +82,16 @@ namespace TaskManager.Infrastructure.Services
         public async Task<IReadOnlyCollection<ProjectViewModel>> GetProjectsByFilter(Guid leaderId, GetProjectByFilterDto filter)
         {
             var roProjects = await _projectRepository.GetByLeaderId(leaderId);
-
             var projects = roProjects
                 .WhereIf(string.IsNullOrWhiteSpace(filter.Name), p => p.Name.Contains(filter.Name))
                 .WhereIf(string.IsNullOrWhiteSpace(filter.Code), p => p.Code.Contains(filter.Code))
                 .ToList();
+            if (filter.PageSize is not default(int) || filter.PageSize is not default(int))
+            {
+                projects = projects.PageBy(filter).ToList();
+            }
 
-            return _mapper.Adapt<IReadOnlyCollection<ProjectViewModel>>();
+            return projects.Adapt<IReadOnlyCollection<ProjectViewModel>>();
         }
     }
 }

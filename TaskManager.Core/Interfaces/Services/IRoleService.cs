@@ -7,8 +7,8 @@ namespace TaskManager.Core.Interfaces.Services
     {
         Task<IReadOnlyCollection<RoleViewModel>> Gets();
         Task<RoleViewModel> Get(Guid id);
-        Task<RoleViewModel> Create(AppRoleDto appRoleDto);
-        Task<RoleViewModel> Update(Guid id, AppRoleDto appRoleDto);
+        Task<RoleViewModel> Create(CreateAppRoleDto appRoleDto);
+        Task<RoleViewModel> Update(Guid id, CreateAppRoleDto appRoleDto);
         Task<bool> Delete(Guid id);
     }
 }

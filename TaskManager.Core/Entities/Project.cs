@@ -11,6 +11,7 @@ namespace TaskManager.Core.Entities
         /// </summary>
         public string Code { get; set; } = string.Empty;
         public string AvatarUrl { get; set; } = string.Empty;
+        public bool IsFavourite { get; set; } = false;
 
         //Relationship
         public Backlog? Backlog { get; set; }
