@@ -2,7 +2,6 @@
 using MapsterMapper;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
-using TaskManager.Core.Extensions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
@@ -72,7 +71,7 @@ namespace TaskManager.Infrastructure.Services
             project.Code = updateProjectDto.Code!;
             project.Description = updateProjectDto.Description!;
             project.AvatarUrl = updateProjectDto.AvatarUrl!;
-            project.IsFavourite = (bool)updateProjectDto.IsFavourite!;
+            project.IsFavourite = updateProjectDto.IsFavourite;
 
             _projectRepository.Update(project);
             await _projectRepository.UnitOfWork.SaveChangesAsync();
@@ -81,17 +80,8 @@ namespace TaskManager.Infrastructure.Services
 
         public async Task<IReadOnlyCollection<ProjectViewModel>> GetProjectsByFilter(Guid leaderId, GetProjectByFilterDto filter)
         {
-            var roProjects = await _projectRepository.GetByLeaderId(leaderId);
-            var projects = roProjects
-                .WhereIf(string.IsNullOrWhiteSpace(filter.Name), p => p.Name.Contains(filter.Name))
-                .WhereIf(string.IsNullOrWhiteSpace(filter.Code), p => p.Code.Contains(filter.Code))
-                .ToList();
-            if (filter.PageSize is not default(int) || filter.PageSize is not default(int))
-            {
-                projects = projects.PageBy(filter).ToList();
-            }
-
-            return projects.Adapt<IReadOnlyCollection<ProjectViewModel>>();
+            var roProjects = await _projectRepository.GetByLeaderId(leaderId, filter);
+            return roProjects.Adapt<IReadOnlyCollection<ProjectViewModel>>();
         }
     }
 }

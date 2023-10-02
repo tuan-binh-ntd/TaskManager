@@ -1,4 +1,5 @@
-﻿using TaskManager.Core.Entities;
+﻿using TaskManager.Core.DTOs;
+using TaskManager.Core.Entities;
 
 namespace TaskManager.Core.Interfaces.Repositories
 {
@@ -9,6 +10,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         Project Add(Project project);
         void Update(Project project);
         void Delete(Guid id);
-        Task<IReadOnlyCollection<Project>> GetByLeaderId(Guid leaderId);
+        Task<IReadOnlyCollection<Project>> GetByLeaderId(Guid leaderId, GetProjectByFilterDto input = null!);
     }
 }

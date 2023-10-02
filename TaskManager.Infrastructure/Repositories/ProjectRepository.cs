@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Extensions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Infrastructure.Data;
 
@@ -43,9 +45,16 @@ namespace TaskManager.Infrastructure.Repositories
             _context.Projects.Remove(project!);
         }
 
-        public async Task<IReadOnlyCollection<Project>> GetByLeaderId(Guid leaderId)
+        public async Task<IReadOnlyCollection<Project>> GetByLeaderId(Guid leaderId, GetProjectByFilterDto input = null!)
         {
-            var projects = await _context.Projects.Where(p => p.LeaderId == leaderId).ToListAsync();
+            var query = _context.Projects.Where(p => p.LeaderId == leaderId)
+                .WhereIf(!string.IsNullOrWhiteSpace(input.Name), p => p.Name.Contains(input.Name))
+                .WhereIf(!string.IsNullOrWhiteSpace(input.Code), p => p.Code.Contains(input.Code));
+            if (input is not null)
+            {
+                query = query.PageBy(input);
+            }
+            var projects = await query.ToListAsync();
             return projects.AsReadOnly();
         }
     }

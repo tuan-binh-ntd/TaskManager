@@ -1,14 +1,17 @@
 using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using System.Net;
 using System.Reflection;
 using System.Text;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Extensions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Infrastructure;
@@ -46,11 +49,9 @@ builder.Services.Configure<IdentityOptions>(options =>
 builder.Services.AddOptions();
 builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection("ConnectionStrings"));
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 
-// Set AutoMapper
-//builder.Services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
-
-// Ser Mapster
+// Set Mapster
 var typeAdapterConfig = TypeAdapterConfig.GlobalSettings;
 // scans the assembly and gets the IRegister, adding the registration to the TypeAdapterConfig
 typeAdapterConfig.Scan(Assembly.GetExecutingAssembly());
@@ -68,6 +69,7 @@ builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IBacklogRepository, BacklogRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IPhotoService, PhotoService>();
 // Add EmailService
 // End  Declaration DI
 
@@ -148,7 +150,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 //});
 
 //Add MVC Lowercase URL
-builder.Services.AddRouting(options => options.LowercaseUrls = true);
+builder.Services.AddRouting(options =>
+{
+    options.LowercaseUrls = true;
+    options.LowercaseQueryStrings = false;
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -165,6 +171,69 @@ builder.Services.AddSwaggerGen(options =>
     });
 
 var app = builder.Build();
+
+if (app.Environment.IsProduction())
+{
+    app.UseExceptionHandler(errorApp =>
+    {
+        errorApp.Run(async context =>
+        {
+            var url = $"{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}{context.Request.QueryString}";
+            var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+            var logger = app.Services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(exceptionHandlerPathFeature?.Error, "Error url: {url}", url);
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+            if (context.Request.Path.ToString().Contains("/api/"))
+            {
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsync(new
+                {
+                    status = -1,
+                    msg = "Error on process your request."
+                }.ToJson());
+            }
+            else
+            {
+
+                context.Response.ContentType = "text/html";
+                await context.Response.WriteAsync("Internal server error.");
+            }
+        });
+    });
+
+
+    app.UseForwardedHeaders();
+}
+else
+{
+    app.UseExceptionHandler(errorApp =>
+    {
+        errorApp.Run(async context =>
+        {
+            var url = $"{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}{context.Request.QueryString}";
+            var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+            var logger = app.Services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(exceptionHandlerPathFeature?.Error, "Error url: {url}", url);
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            if (context.Request.Path.ToString().Contains("/api/"))
+            {
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsync(new
+                {
+                    status = -1,
+                    msg = "Error on process your request."
+                }.ToJson());
+            }
+            else
+            {
+
+                context.Response.ContentType = "text/html";
+                await context.Response.WriteAsync("Internal server error.");
+            }
+        });
+    });
+}
 
 // Seeding
 using var scope = app.Services.CreateScope();

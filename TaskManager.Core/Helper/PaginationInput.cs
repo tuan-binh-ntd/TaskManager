@@ -2,7 +2,14 @@
 {
     public class PaginationInput
     {
-        public int PageNum { get; set; } = default;
-        public int PageSize { get; set; } = default;
+#pragma warning disable IDE1006 // Naming Styles
+        public int pagenum { get; set; } = default;
+#pragma warning restore IDE1006 // Naming Styles
+#pragma warning disable IDE1006 // Naming Styles
+        public int pagesize { get; set; } = default;
+#pragma warning restore IDE1006 // Naming Styles
+#pragma warning disable IDE1006 // Naming Styles
+        public string sort { get; set; } = string.Empty;
+#pragma warning restore IDE1006 // Naming Styles
     }
 }

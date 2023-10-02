@@ -45,6 +45,12 @@ namespace TaskManager.Infrastructure.Services
         public async Task<RoleViewModel> Get(Guid id)
         {
             var role = await _roleManager.FindByIdAsync(id.ToString());
+            if (role is null)
+            {
+#pragma warning disable CA2208 // Instantiate argument exceptions correctly
+                throw new ArgumentNullException(nameof(role));
+#pragma warning restore CA2208 // Instantiate argument exceptions correctly
+            }
             return _mapper.Map<RoleViewModel>(role);
         }
 

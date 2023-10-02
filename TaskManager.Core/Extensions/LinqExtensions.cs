@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using TaskManager.Core.Helper;
 
@@ -67,7 +68,15 @@ namespace TaskManager.Core.Extensions
         /// <returns></returns>
         public static IQueryable<TSource> PageBy<TSource>([NotNull] this IQueryable<TSource> source, [NotNull] PaginationInput input)
         {
-            return source.Skip(input.PageSize * (input.PageNum - 1)).Take(input.PageSize);
+            if (input.pagenum is not default(int) || input.pagesize is not default(int))
+            {
+                source = source.Skip(input.pagesize * (input.pagenum - 1)).Take(input.pagesize);
+            }
+            if (!string.IsNullOrWhiteSpace(input.sort))
+            {
+                source = source.OrderBy(input.sort.Replace(":", " "));
+            }
+            return source;
         }
 
         /// <summary>
@@ -87,7 +96,7 @@ namespace TaskManager.Core.Extensions
             PaginationResult<TSource> data = new()
             {
                 TotalCount = totalCount,
-                TotalPage = Ceiling(input.PageSize, totalCount),
+                TotalPage = Ceiling(input.pagesize, totalCount),
                 Content = await source.ToListAsync(cancellationToken: cancellationToken)
             };
 
@@ -110,7 +119,7 @@ namespace TaskManager.Core.Extensions
             PaginationResult<TSource> data = new()
             {
                 TotalCount = totalCount,
-                TotalPage = Ceiling(input.PageSize, totalCount),
+                TotalPage = Ceiling(input.pagesize, totalCount),
                 Content = source.ToList()
             };
 
@@ -128,7 +137,11 @@ namespace TaskManager.Core.Extensions
 
         public static IEnumerable<TSource> PageBy<TSource>([NotNull] this IEnumerable<TSource> source, [NotNull] PaginationInput input)
         {
-            return source.Skip(input.PageSize * (input.PageNum - 1)).Take(input.PageSize);
+            if (input.pagenum is not default(int) || input.pagesize is not default(int))
+            {
+                return source.Skip(input.pagesize * (input.pagenum - 1)).Take(input.pagesize);
+            }
+            return source;
         }
     }
 }
