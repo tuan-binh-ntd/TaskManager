@@ -2,6 +2,7 @@
 {
     public class UserViewModel
     {
+        public Guid Id { get; set; } = Guid.Empty;
         public string Name { get; set; } = string.Empty;
         public string Department { get; set; } = string.Empty;
         public string Organization { get; set; } = string.Empty;
