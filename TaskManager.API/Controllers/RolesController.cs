@@ -36,14 +36,14 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(AppRoleDto appRoleDto)
+        public async Task<IActionResult> Create(CreateAppRoleDto appRoleDto)
         {
             var res = await _roleService.Create(appRoleDto);
             return CustomResult(res, HttpStatusCode.Created);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, AppRoleDto appRoleDto)
+        public async Task<IActionResult> Update(Guid id, CreateAppRoleDto appRoleDto)
         {
             var res = await _roleService.Update(id, appRoleDto);
             return CustomResult(res, HttpStatusCode.OK);

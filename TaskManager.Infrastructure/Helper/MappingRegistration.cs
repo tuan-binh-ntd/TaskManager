@@ -9,16 +9,20 @@ namespace TaskManager.Infrastructure.Helper
     {
         void IRegister.Register(TypeAdapterConfig config)
         {
+            // AppUser
             config.NewConfig<AppUser, UserViewModel>();
             config.NewConfig<AppUser, SignUpDto>();
 
-            config.NewConfig<AppRole, AppRoleDto>();
+            // AppRole
+            config.NewConfig<AppRole, CreateAppRoleDto>();
             config.NewConfig<AppRole, RoleViewModel>();
-            config.NewConfig<List<AppRole>, List<AppRoleDto>>();
+            config.NewConfig<List<AppRole>, List<CreateAppRoleDto>>();
 
-            config.NewConfig<Project, ProjectDto>();
+            // Project
+            config.NewConfig<Project, CreateProjectDto>();
             config.NewConfig<Project, ProjectViewModel>();
-            config.NewConfig<List<Project>, List<ProjectViewModel>>();
+            config.NewConfig<IReadOnlyCollection<Project>, IReadOnlyCollection<ProjectViewModel>>();
+            config.NewConfig<UpdateProjectDto, Project>();
         }
     }
 }

@@ -23,7 +23,7 @@ namespace TaskManager.Infrastructure.Services
             _roleManager = roleManager;
         }
 
-        public async Task<RoleViewModel> Create(AppRoleDto appRoleDto)
+        public async Task<RoleViewModel> Create(CreateAppRoleDto appRoleDto)
         {
             AppRole appRole = new()
             {
@@ -55,7 +55,7 @@ namespace TaskManager.Infrastructure.Services
             return roleViewModels.AsReadOnly();
         }
 
-        public async Task<RoleViewModel> Update(Guid id, AppRoleDto appRoleDto)
+        public async Task<RoleViewModel> Update(Guid id, CreateAppRoleDto appRoleDto)
         {
             AppRole? role = await _roleManager.FindByIdAsync(id.ToString());
             if (role is null)

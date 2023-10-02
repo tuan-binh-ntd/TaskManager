@@ -9,8 +9,8 @@ namespace TaskManager.Core.Interfaces.Services
     public interface IProjectService
     {
         Task<IReadOnlyCollection<ProjectViewModel>> GetProjects();
-        Task<ProjectViewModel> Create(Guid userId, ProjectDto projectDto);
-        Task<ProjectViewModel> Update(Guid id, ProjectDto projectDto);
+        Task<ProjectViewModel> Create(Guid userId, CreateProjectDto projectDto);
+        Task<ProjectViewModel> Update(Guid id, UpdateProjectDto updateProjectDto);
         Task<bool> Delete(Guid id);
         Task<IReadOnlyCollection<ProjectViewModel>> GetProjectsByFilter(Guid leaderId, GetProjectByFilterDto filter);
     }

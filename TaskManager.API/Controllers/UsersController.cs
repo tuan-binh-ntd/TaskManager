@@ -15,15 +15,12 @@ namespace TaskManager.API.Controllers
     public class UsersController : BaseController
     {
         private readonly IUserService _userService;
-        private readonly IProjectService _projectService;
 
         public UsersController(
-            IUserService userService,
-            IProjectService projectService
+            IUserService userService
             )
         {
             _userService = userService;
-            _projectService = projectService;
         }
 
 
@@ -75,13 +72,6 @@ namespace TaskManager.API.Controllers
             return CustomResult(new { Invalid = res }, HttpStatusCode.OK);
         }
 
-        //[HttpGet("{username}"), AllowAnonymous]
-        //public async Task<IActionResult> CheckUsername(string username)
-        //{
-        //    var res = await _userService.CheckUsernameExists(username);
-        //    return CustomResult(new { Invalid = res }, HttpStatusCode.OK);
-        //}
-
         [HttpPut("{id}")]
         public async Task<IActionResult> ChangePassword(string id, PasswordDto input)
         {
@@ -102,34 +92,6 @@ namespace TaskManager.API.Controllers
             {
                 return CustomResult(HttpStatusCode.NoContent);
             }
-        }
-
-        [HttpPost("{id}/projects")]
-        public async Task<IActionResult> CreateProject(Guid id, ProjectDto projectDto)
-        {
-            var res = await _projectService.Create(id, projectDto);
-            return CustomResult(res, HttpStatusCode.Created);
-        }
-
-        [HttpPut("{id}/projects/{projectId}")]
-        public async Task<IActionResult> UpdateProject(Guid projectId, ProjectDto projectDto)
-        {
-            var res = await _projectService.Update(projectId, projectDto);
-            return CustomResult(res, HttpStatusCode.OK);
-        }
-
-        [HttpDelete("{id}/projects/{projectId}")]
-        public async Task<IActionResult> DeleteProject(Guid projectId)
-        {
-            var result = await _projectService.Delete(projectId);
-            return CustomResult(result, HttpStatusCode.OK);
-        }
-
-        [HttpGet("{id}/projects")]
-        public async Task<IActionResult> GetProjectByFilter(Guid id, [FromQuery] GetProjectByFilterDto filter)
-        {
-            var result = await _projectService.GetProjectsByFilter(id, filter);
-            return CustomResult(result, HttpStatusCode.OK);
         }
     }
 }
