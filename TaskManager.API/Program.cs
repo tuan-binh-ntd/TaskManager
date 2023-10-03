@@ -244,7 +244,7 @@ try
     var userManager = services.GetRequiredService<UserManager<AppUser>>();
     var roleManager = services.GetRequiredService<RoleManager<AppRole>>();
     await context.Database.MigrateAsync();
-    await Seeding.SeedUsers(userManager, roleManager);
+    await Seeding.SeedUsers(userManager, roleManager, context);
 }
 catch (Exception ex)
 {

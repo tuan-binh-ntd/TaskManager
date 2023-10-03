@@ -17,11 +17,11 @@ namespace TaskManager.Infrastructure.Data.Config
                 .HasForeignKey(ur => ur.UserId)
                 .IsRequired();
 
-            //One to Many Relationship (AppUser, Project)
+            //Many to Many Relationship (AppUser, UserProject, Project)
             builder
-                .HasMany(u => u.Projects)
-                .WithOne(p => p.AppUser)
-                .HasForeignKey(p => p.LeaderId)
+                .HasMany(u => u.UserProjects)
+                .WithOne(p => p.User)
+                .HasForeignKey(p => p.UserId)
                 .IsRequired();
         }
     }

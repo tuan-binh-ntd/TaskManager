@@ -25,8 +25,11 @@ namespace TaskManager.Infrastructure.Data
         {
         }
 
-        public DbSet<Project> Projects { get; set; }
-        public DbSet<Backlog> Backlogs { get; set; }
+        public DbSet<Project> Projects => Set<Project>();
+        public DbSet<Backlog> Backlogs => Set<Backlog>();
+        public DbSet<UserProject> UserProjects => Set<UserProject>();
+        public DbSet<Sprint> Sprints => Set<Sprint>();
+        public DbSet<IssueType> IssueTypes => Set<IssueType>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

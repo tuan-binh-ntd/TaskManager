@@ -17,5 +17,6 @@ namespace TaskManager.Core.Entities
         public Backlog? Backlog { get; set; }
         public Guid LeaderId { get; set; }
         public AppUser? AppUser { get; set; }
+        public ICollection<UserProject>? UserProjects { get; set; }
     }
 }

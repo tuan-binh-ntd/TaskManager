@@ -12,6 +12,6 @@ namespace TaskManager.Core.Entities
         public string Location { get; set; } = string.Empty;
         // Relationship
         public ICollection<AppUserRole>? UserRoles { get; set; }
-        public ICollection<Project>? Projects { get; set; }
+        public ICollection<UserProject>? UserProjects { get; set; }
     }
 }
