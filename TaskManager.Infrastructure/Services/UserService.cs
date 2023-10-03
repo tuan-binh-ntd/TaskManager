@@ -1,4 +1,5 @@
-﻿using MapsterMapper;
+﻿using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.DTOs;
@@ -88,6 +89,12 @@ namespace TaskManager.Infrastructure.Services
             UserViewModel res = _mapper.Map<UserViewModel>(user);
 
             return res;
+        }
+
+        public async Task<IReadOnlyCollection<UserViewModel>> Gets()
+        {
+            var users = await _userManager.Users.ToListAsync();
+            return users.Adapt<IReadOnlyCollection<UserViewModel>>();
         }
     }
 }

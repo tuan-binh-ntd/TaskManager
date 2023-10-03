@@ -48,8 +48,8 @@ namespace TaskManager.Infrastructure.Repositories
         public async Task<IReadOnlyCollection<Project>> GetByLeaderId(Guid leaderId, GetProjectByFilterDto input = null!)
         {
             var query = _context.Projects.Where(p => p.LeaderId == leaderId)
-                .WhereIf(!string.IsNullOrWhiteSpace(input.Name), p => p.Name.Contains(input.Name))
-                .WhereIf(!string.IsNullOrWhiteSpace(input.Code), p => p.Code.Contains(input.Code));
+                .WhereIf(!string.IsNullOrWhiteSpace(input.name), p => p.Name.Contains(input.name))
+                .WhereIf(!string.IsNullOrWhiteSpace(input.code), p => p.Code.Contains(input.code));
             if (input is not null)
             {
                 query = query.PageBy(input);

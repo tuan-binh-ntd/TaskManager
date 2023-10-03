@@ -1,4 +1,5 @@
 ﻿using TaskManager.Core.DTOs;
+using TaskManager.Core.ViewModel;
 
 namespace TaskManager.Core.Interfaces.Services
 {
@@ -9,5 +10,6 @@ namespace TaskManager.Core.Interfaces.Services
         Task<bool> CheckEmailExists(string email);
         Task<bool> CheckUsernameExists(string username);
         Task<object?> ChangePassword(string id, PasswordDto passwordDto);
+        Task<IReadOnlyCollection<UserViewModel>> Gets();
     }
 }

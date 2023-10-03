@@ -93,5 +93,12 @@ namespace TaskManager.API.Controllers
                 return CustomResult(HttpStatusCode.NoContent);
             }
         }
+
+        [HttpGet, AllowAnonymous]
+        public async Task<IActionResult> Gets()
+        {
+            var res = await _userService.Gets();
+            return CustomResult(res, HttpStatusCode.OK);
+        }
     }
 }
