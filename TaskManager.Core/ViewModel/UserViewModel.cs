@@ -9,7 +9,7 @@
         public string AvatarUrl { get; set; } = string.Empty;
         public string JobTitle { get; set; } = string.Empty;
         public string Location { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
+        public string? Email { get; set; } = string.Empty;
         public string Token { get; set; } = string.Empty;
     }
 }
