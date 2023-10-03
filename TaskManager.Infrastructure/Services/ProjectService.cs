@@ -41,7 +41,19 @@ namespace TaskManager.Infrastructure.Services
         public async Task<ProjectViewModel> Create(Guid userId, CreateProjectDto projectDto)
         {
             var project = _mapper.Map<Project>(projectDto);
-            project.LeaderId = userId;
+
+            UserProject userProject = new()
+            {
+                UserId = userId,
+                ProjectId = project.Id,
+                Role = "Leader"
+            };
+
+            project.UserProjects = new List<UserProject>()
+            {
+                userProject
+            };
+
             _projectRepository.Add(project);
             await _projectRepository.UnitOfWork.SaveChangesAsync();
 

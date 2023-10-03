@@ -47,7 +47,8 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<Project>> GetByLeaderId(Guid leaderId, GetProjectByFilterDto input = null!)
         {
-            var query = _context.Projects.Where(p => p.LeaderId == leaderId)
+            var query = _context.Projects
+                .Include(e => e.UserProjects.Where(e => e.UserId == leaderId))
                 .WhereIf(!string.IsNullOrWhiteSpace(input.name), p => p.Name.Contains(input.name))
                 .WhereIf(!string.IsNullOrWhiteSpace(input.code), p => p.Code.Contains(input.code));
             if (input is not null)

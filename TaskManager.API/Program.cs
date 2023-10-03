@@ -70,6 +70,7 @@ builder.Services.AddScoped<IBacklogRepository, BacklogRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
+builder.Services.AddScoped<IUserProjectRepository, UserProjectRepository>();
 // Add EmailService
 // End  Declaration DI
 
