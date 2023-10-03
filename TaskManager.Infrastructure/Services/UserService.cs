@@ -62,7 +62,9 @@ namespace TaskManager.Infrastructure.Services
             UserViewModel res = new()
             {
                 Name = user.UserName,
-                Token = await _jwtTokenService.CreateToken(user)
+                Token = await _jwtTokenService.CreateToken(user),
+                Id = user.Id,
+                Email = user.Email,
             };
             return res;
         }
