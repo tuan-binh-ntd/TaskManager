@@ -101,5 +101,11 @@ namespace TaskManager.Infrastructure.Services
             var project = await _projectRepository.GetById(projectId);
             return project.Adapt<ProjectViewModel>();
         }
+
+        public async Task<ProjectViewModel> Get(string projectCode)
+        {
+            var project = await _projectRepository.GetById(projectCode);
+            return project.Adapt<ProjectViewModel>();
+        }
     }
 }

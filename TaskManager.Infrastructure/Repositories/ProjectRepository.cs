@@ -29,6 +29,12 @@ namespace TaskManager.Infrastructure.Repositories
             return project;
         }
 
+        public async Task<Project?> GetByCode(string code)
+        {
+            var project = await _context.Projects.SingleOrDefaultAsync(p => p.Code == code);
+            return project;
+        }
+
         public Project Add(Project project)
         {
             return _context.Projects.Add(project).Entity;
