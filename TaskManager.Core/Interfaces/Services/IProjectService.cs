@@ -13,5 +13,6 @@ namespace TaskManager.Core.Interfaces.Services
         Task<ProjectViewModel> Update(Guid id, UpdateProjectDto updateProjectDto);
         Task<bool> Delete(Guid id);
         Task<IReadOnlyCollection<ProjectViewModel>> GetProjectsByFilter(Guid leaderId, GetProjectByFilterDto filter);
+        Task<ProjectViewModel> Get(Guid projectId);
     }
 }

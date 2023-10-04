@@ -95,5 +95,11 @@ namespace TaskManager.Infrastructure.Services
             var roProjects = await _projectRepository.GetByLeaderId(leaderId, filter);
             return roProjects.Adapt<IReadOnlyCollection<ProjectViewModel>>();
         }
+
+        public async Task<ProjectViewModel> Get(Guid projectId)
+        {
+            var project = await _projectRepository.GetById(projectId);
+            return project.Adapt<ProjectViewModel>();
+        }
     }
 }
