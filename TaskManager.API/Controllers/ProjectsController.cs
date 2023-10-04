@@ -54,17 +54,17 @@ namespace TaskManager.API.Controllers
         {
             var result = await _projectService.Get(projectId);
             return CustomResult(result, HttpStatusCode.OK);
-        }*/
+        }
 
-        //[HttpGet("{code}"), AllowAnonymous]
-        //public async Task<IActionResult> Get(string code)
-        //{
-        //    var result = await _projectService.Get(code);
-        //    if (result is null)
-        //    {
-        //        return CustomResult(result, HttpStatusCode.NoContent);
-        //    }
-        //    return CustomResult(result, HttpStatusCode.OK);
-        //}
+        [HttpGet("{code}"), AllowAnonymous]
+        public async Task<IActionResult> Get(string code)
+        {
+            var result = await _projectService.Get(code);
+            if (result is null)
+            {
+                return CustomResult(result, HttpStatusCode.NoContent);
+            }
+            return CustomResult(result, HttpStatusCode.OK);
+        }
     }
 }
