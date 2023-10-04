@@ -95,18 +95,19 @@ namespace TaskManager.Infrastructure.Services
             if (paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))
             {
                 var pagedProjects = await _projectRepository.GetByUserId(userId, filter, paginationInput);
+                var projects = ToProjectViewModels(pagedProjects.Content!);
                 var res = new PaginationResult<ProjectViewModel>()
                 {
                     TotalCount = pagedProjects.TotalCount,
                     TotalPage = pagedProjects.TotalPage,
-                    Content = ToProjectViewModels(pagedProjects.Content!)
+                    Content = projects.Where(p => p.Leader!.Id == userId).ToList()
                 };
                 return res;
             }
             else
             {
                 var res = await _projectRepository.GetByUserId(userId, filter);
-                return ToProjectViewModels(res!);
+                return ToProjectViewModels(res!).Where(p => p.Leader!.Id == userId).ToList();
             }
         }
 

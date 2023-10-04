@@ -61,7 +61,7 @@ namespace TaskManager.Infrastructure.Repositories
         public async Task<PaginationResult<Project>> GetByUserId(Guid userId, GetProjectByFilterDto filter, PaginationInput paginationInput)
         {
             var query = _context.Projects
-                .Include(e => e.UserProjects!.Where(e => e.UserId == userId))
+                .Include(e => e.UserProjects!)
                 .ThenInclude(up => up.User)
                 .WhereIf(!string.IsNullOrWhiteSpace(filter.name), p => p.Name.Contains(filter.name))
                 .WhereIf(!string.IsNullOrWhiteSpace(filter.code), p => p.Code.Contains(filter.code));
@@ -82,7 +82,7 @@ namespace TaskManager.Infrastructure.Repositories
         public async Task<IReadOnlyCollection<Project>> GetByUserId(Guid userId, GetProjectByFilterDto filter)
         {
             var query = _context.Projects
-                .Include(e => e.UserProjects!.Where(e => e.UserId == userId))
+                .Include(e => e.UserProjects!)
                 .ThenInclude(up => up.User)
                 .WhereIf(!string.IsNullOrWhiteSpace(filter.name), p => p.Name.Contains(filter.name))
                 .WhereIf(!string.IsNullOrWhiteSpace(filter.code), p => p.Code.Contains(filter.code));
