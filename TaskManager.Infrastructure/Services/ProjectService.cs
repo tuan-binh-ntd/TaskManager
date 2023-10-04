@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using MapsterMapper;
+using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Helper;
@@ -35,7 +36,7 @@ namespace TaskManager.Infrastructure.Services
         public async Task<IReadOnlyCollection<ProjectViewModel>> GetProjects()
         {
             var projects = await _projectRepository.GetAll();
-            return ToProjectViewModels(projects);
+            return await ToProjectViewModels(projects);
         }
 
         public async Task<ProjectViewModel> Create(Guid userId, CreateProjectDto projectDto)
@@ -95,26 +96,25 @@ namespace TaskManager.Infrastructure.Services
             if (paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))
             {
                 var pagedProjects = await _projectRepository.GetByUserId(userId, filter, paginationInput);
-                var projects = ToProjectViewModels(pagedProjects.Content!);
                 var res = new PaginationResult<ProjectViewModel>()
                 {
                     TotalCount = pagedProjects.TotalCount,
                     TotalPage = pagedProjects.TotalPage,
-                    Content = projects.Where(p => p.Leader!.Id == userId).ToList()
+                    Content = await ToProjectViewModels(pagedProjects.Content!)
                 };
                 return res;
             }
             else
             {
                 var res = await _projectRepository.GetByUserId(userId, filter);
-                return ToProjectViewModels(res!).Where(p => p.Leader!.Id == userId).ToList();
+                return await ToProjectViewModels(res);
             }
         }
 
         public async Task<ProjectViewModel> Get(Guid projectId)
         {
             var project = await _projectRepository.GetById(projectId);
-            return ToProjectViewModel(project);
+            return project.Adapt<ProjectViewModel>();
         }
 
         public async Task<ProjectViewModel> AddMember(AddMemberToProjectDto addMemberToProjectDto)
@@ -141,23 +141,27 @@ namespace TaskManager.Infrastructure.Services
             _projectRepository.Update(project);
             await _projectRepository.UnitOfWork.SaveChangesAsync();
 
-            return ToProjectViewModel(project);
+            return project.Adapt<ProjectViewModel>();
         }
 
         #region Private Method
-        private ProjectViewModel ToProjectViewModel(Project project)
+        private async Task<ProjectViewModel> ToProjectViewModel(Project project)
         {
-            return project.ToViewModel();
+            var members = await _projectRepository.GetMembers(project.Id);
+            var projectViewModel = project.Adapt<ProjectViewModel>();
+            projectViewModel.Leader = members.Where(m => m.Role == CoreConstants.LeaderRole).SingleOrDefault();
+            projectViewModel.Members = members.Where(m => m.Role != CoreConstants.LeaderRole).ToList();
+            return projectViewModel;
         }
 
-        private IReadOnlyCollection<ProjectViewModel> ToProjectViewModels(IReadOnlyCollection<Project> projects)
+        private async Task<IReadOnlyCollection<ProjectViewModel>> ToProjectViewModels(IReadOnlyCollection<Project> projects)
         {
             var projectViewModels = new List<ProjectViewModel>();
             if (projects.Any())
             {
                 foreach (var item in projects)
                 {
-                    var projectViewModel = ToProjectViewModel(item);
+                    var projectViewModel = await ToProjectViewModel(item);
                     projectViewModels.Add(projectViewModel);
                 }
                 return projectViewModels.AsReadOnly();

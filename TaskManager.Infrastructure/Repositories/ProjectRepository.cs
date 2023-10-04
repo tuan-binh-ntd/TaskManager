@@ -60,11 +60,16 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<PaginationResult<Project>> GetByUserId(Guid userId, GetProjectByFilterDto filter, PaginationInput paginationInput)
         {
-            var query = _context.Projects
-                .Include(e => e.UserProjects!)
-                .ThenInclude(up => up.User)
-                .WhereIf(!string.IsNullOrWhiteSpace(filter.name), p => p.Name.Contains(filter.name))
-                .WhereIf(!string.IsNullOrWhiteSpace(filter.code), p => p.Code.Contains(filter.code));
+            //var query = _context.Projects
+            //    .Include(e => e.UserProjects!)
+            //    .ThenInclude(up => up.User)
+            //    .WhereIf(!string.IsNullOrWhiteSpace(filter.name), p => p.Name.Contains(filter.name))
+            //    .WhereIf(!string.IsNullOrWhiteSpace(filter.code), p => p.Code.Contains(filter.code));
+
+            var query = from u in _context.Users.Where(u => u.Id == userId)
+                         join up in _context.UserProjects on u.Id equals up.UserId
+                         join p in _context.Projects on up.ProjectId equals p.Id
+                         select p;
 
             int totalCount = await query.CountAsync();
 

@@ -67,5 +67,12 @@ namespace TaskManager.API.Controllers
             }
             return CustomResult(result, HttpStatusCode.OK);
         }
+
+        [HttpPost("members:add")]
+        public async Task<IActionResult> AddMember([FromBody] AddMemberToProjectDto addMemberToProjectDto)
+        {
+            var res = await _projectService.AddMember(addMemberToProjectDto);
+            return CustomResult(res, HttpStatusCode.OK);
+        }
     }
 }

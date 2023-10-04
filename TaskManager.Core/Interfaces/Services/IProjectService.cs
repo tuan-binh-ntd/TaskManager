@@ -16,5 +16,6 @@ namespace TaskManager.Core.Interfaces.Services
         Task<object> GetProjectsByFilter(Guid userId, GetProjectByFilterDto filter, PaginationInput paginationInput);
         Task<ProjectViewModel> Get(Guid projectId);
         Task<ProjectViewModel?> Get(string code);
+        Task<ProjectViewModel> AddMember(AddMemberToProjectDto addMemberToProjectDto);
     }
 }
