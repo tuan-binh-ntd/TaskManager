@@ -7,6 +7,7 @@ namespace TaskManager.Core.Interfaces.Repositories
     {
         Task<IReadOnlyCollection<Project>> GetAll();
         Task<Project?> GetById(Guid id);
+        Task<Project?> GetByCode(string code);
         Project Add(Project project);
         void Update(Project project);
         void Delete(Guid id);

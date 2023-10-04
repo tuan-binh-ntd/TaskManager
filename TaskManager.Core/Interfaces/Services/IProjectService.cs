@@ -14,5 +14,6 @@ namespace TaskManager.Core.Interfaces.Services
         Task<bool> Delete(Guid id);
         Task<IReadOnlyCollection<ProjectViewModel>> GetProjectsByFilter(Guid leaderId, GetProjectByFilterDto filter);
         Task<ProjectViewModel> Get(Guid projectId);
+        Task<ProjectViewModel> Get(string projectCode);
     }
 }
