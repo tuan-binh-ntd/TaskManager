@@ -133,11 +133,8 @@ namespace TaskManager.Infrastructure.Services
                 Role = addMemberToProjectDto.Role
             };
 
-            project.UserProjects = new List<UserProject>
-            {
-                userProject
-            };
-
+            project.UserProjects!.Add(userProject);
+                
             _projectRepository.Update(project);
             await _projectRepository.UnitOfWork.SaveChangesAsync();
 
