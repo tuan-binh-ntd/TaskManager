@@ -1,6 +1,5 @@
 ﻿using Mapster;
 using MapsterMapper;
-using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Helper;
@@ -36,7 +35,7 @@ namespace TaskManager.Infrastructure.Services
         public async Task<IReadOnlyCollection<ProjectViewModel>> GetProjects()
         {
             var projects = await _projectRepository.GetAll();
-            return await ToProjectViewModels(projects);
+            return ToProjectViewModels(projects);
         }
 
         public async Task<ProjectViewModel> Create(Guid userId, CreateProjectDto projectDto)
@@ -91,31 +90,30 @@ namespace TaskManager.Infrastructure.Services
             return _mapper.Map<ProjectViewModel>(project);
         }
 
-        public async Task<object> GetProjectsByFilter(Guid userId, GetProjectByFilterDto filter)
+        public async Task<object> GetProjectsByFilter(Guid userId, GetProjectByFilterDto filter, PaginationInput paginationInput)
         {
-            var roProjects = await _projectRepository.GetByUserId(userId, filter);
-            if (roProjects is PaginationResult<Project> pagedProjects)
+            if (paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))
             {
-                return new PaginationResult<ProjectViewModel>()
+                var pagedProjects = await _projectRepository.GetByUserId(userId, filter, paginationInput);
+                var res = new PaginationResult<ProjectViewModel>()
                 {
                     TotalCount = pagedProjects.TotalCount,
                     TotalPage = pagedProjects.TotalPage,
-                    Content = await ToProjectViewModels(pagedProjects.Content!)
+                    Content = ToProjectViewModels(pagedProjects.Content!)
                 };
-
+                return res;
             }
-            else if (roProjects is IReadOnlyCollection<Project> projects)
+            else
             {
-                return await ToProjectViewModels(projects);
-
+                var res = await _projectRepository.GetByUserId(userId, filter);
+                return ToProjectViewModels(res!);
             }
-            return default!;
         }
 
         public async Task<ProjectViewModel> Get(Guid projectId)
         {
             var project = await _projectRepository.GetById(projectId);
-            return await ToProjectViewModel(project);
+            return ToProjectViewModel(project);
         }
 
         public async Task<ProjectViewModel> AddMember(AddMemberToProjectDto addMemberToProjectDto)
@@ -142,31 +140,23 @@ namespace TaskManager.Infrastructure.Services
             _projectRepository.Update(project);
             await _projectRepository.UnitOfWork.SaveChangesAsync();
 
-            return await ToProjectViewModel(project);
+            return ToProjectViewModel(project);
         }
 
         #region Private Method
-
-        private async Task<ProjectViewModel> ToProjectViewModel(Project project)
+        private ProjectViewModel ToProjectViewModel(Project project)
         {
-            var members = await _projectRepository.GetMembers(project.Id);
-            var leader = members.Where(m => m.Role == CoreConstants.LeaderRole).SingleOrDefault();
-
-            var projectViewModel = project.Adapt<ProjectViewModel>();
-            projectViewModel.Leader = leader;
-            projectViewModel.Members = members.Where(m => m.Role != CoreConstants.LeaderRole).ToList();
-
-            return projectViewModel;
+            return project.ToViewModel();
         }
 
-        private async Task<IReadOnlyCollection<ProjectViewModel>> ToProjectViewModels(IReadOnlyCollection<Project> projects)
+        private IReadOnlyCollection<ProjectViewModel> ToProjectViewModels(IReadOnlyCollection<Project> projects)
         {
             var projectViewModels = new List<ProjectViewModel>();
             if (projects.Any())
             {
                 foreach (var item in projects)
                 {
-                    var projectViewModel = await ToProjectViewModel(item);
+                    var projectViewModel = ToProjectViewModel(item);
                     projectViewModels.Add(projectViewModel);
                 }
                 return projectViewModels.AsReadOnly();

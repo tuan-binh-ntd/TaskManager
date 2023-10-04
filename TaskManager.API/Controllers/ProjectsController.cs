@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TaskManager.Core.DTOs;
+using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Services;
 
 namespace TaskManager.API.Controllers
@@ -22,9 +23,9 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpGet, AllowAnonymous]
-        public async Task<IActionResult> GetProjectByFilter(Guid id, [FromQuery] GetProjectByFilterDto filter)
+        public async Task<IActionResult> GetProjectByFilter(Guid id, [FromQuery] GetProjectByFilterDto filter, [FromQuery] PaginationInput paginationInput)
         {
-            var result = await _projectService.GetProjectsByFilter(id, filter);
+            var result = await _projectService.GetProjectsByFilter(id, filter, paginationInput);
             return CustomResult(result, HttpStatusCode.OK);
         }
 

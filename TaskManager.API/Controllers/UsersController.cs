@@ -24,8 +24,7 @@ namespace TaskManager.API.Controllers
         }
 
 
-        [AllowAnonymous]
-        [HttpPost("signin")]
+        [HttpPost("signin"), AllowAnonymous]
         public async Task<IActionResult> SignIn(LoginDto loginDto)
         {
             var res = await _userService.SignIn(loginDto);
@@ -94,7 +93,7 @@ namespace TaskManager.API.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpGet, AllowAnonymous]
         public async Task<IActionResult> Gets()
         {
             var res = await _userService.Gets();

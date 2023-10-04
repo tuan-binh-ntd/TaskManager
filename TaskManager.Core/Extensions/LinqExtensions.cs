@@ -68,7 +68,7 @@ namespace TaskManager.Core.Extensions
         /// <returns></returns>
         public static IQueryable<TSource> PageBy<TSource>([NotNull] this IQueryable<TSource> source, [NotNull] PaginationInput input)
         {
-            if (input.pagenum is not default(int) || input.pagesize is not default(int))
+            if (input.pagenum is not default(int) && input.pagesize is not default(int))
             {
                 source = source.Skip(input.pagesize * (input.pagenum - 1)).Take(input.pagesize);
             }

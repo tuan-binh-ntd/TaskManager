@@ -1,8 +1,6 @@
-﻿using TaskManager.Core.Helper;
-
-namespace TaskManager.Core.DTOs
+﻿namespace TaskManager.Core.DTOs
 {
-    public class GetProjectByFilterDto : PaginationInput
+    public class GetProjectByFilterDto
     {
 #pragma warning disable IDE1006 // Naming Styles
         public string code { get; set; } = string.Empty;

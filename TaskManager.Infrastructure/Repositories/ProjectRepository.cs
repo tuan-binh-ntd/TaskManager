@@ -19,19 +19,9 @@ namespace TaskManager.Infrastructure.Repositories
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task<IReadOnlyCollection<Project>> GetAll()
+        private static int Ceiling(int pageSize, int totalCount)
         {
-            var projects = await _context.Projects.ToListAsync();
-            return projects.AsReadOnly();
-        }
-
-        public async Task<Project> GetById(Guid id)
-        {
-            var project = await _context.Projects
-                .Include(p => p.UserProjects!)
-                .ThenInclude(up => up.User)
-                .SingleOrDefaultAsync(p => p.Id == id);
-            return project!;
+            return (int)Math.Ceiling((decimal)totalCount / pageSize);
         }
 
         public Project Add(Project project)
@@ -50,29 +40,52 @@ namespace TaskManager.Infrastructure.Repositories
             _context.Projects.Remove(project!);
         }
 
-        public async Task<object> GetByUserId(Guid userId, GetProjectByFilterDto input = null!)
+        public async Task<IReadOnlyCollection<Project>> GetAll()
+        {
+            var projects = await _context.Projects
+                .Include(p => p.UserProjects!)
+                .ThenInclude(up => up.User)
+                .ToListAsync();
+            return projects.AsReadOnly();
+        }
+
+        public async Task<Project> GetById(Guid id)
+        {
+            var project = await _context.Projects
+                .Include(p => p.UserProjects!)
+                .ThenInclude(up => up.User)
+                .SingleOrDefaultAsync(p => p.Id == id);
+            return project!;
+        }
+
+        public async Task<PaginationResult<Project>> GetByUserId(Guid userId, GetProjectByFilterDto filter, PaginationInput paginationInput)
         {
             var query = _context.Projects
                 .Include(e => e.UserProjects!.Where(e => e.UserId == userId))
-                .WhereIf(!string.IsNullOrWhiteSpace(input.name), p => p.Name.Contains(input.name))
-                .WhereIf(!string.IsNullOrWhiteSpace(input.code), p => p.Code.Contains(input.code));
+                .ThenInclude(up => up.User)
+                .WhereIf(!string.IsNullOrWhiteSpace(filter.name), p => p.Name.Contains(filter.name))
+                .WhereIf(!string.IsNullOrWhiteSpace(filter.code), p => p.Code.Contains(filter.code));
 
-            if (input.pagenum is not default(int) || input.pagesize is not default(int))
+            int totalCount = await query.CountAsync();
+
+            query = query.PageBy(paginationInput);
+
+            PaginationResult<Project> data = new()
             {
-                int totalCount = await query.CountAsync();
+                TotalCount = totalCount,
+                TotalPage = Ceiling(paginationInput.pagesize, totalCount),
+                Content = await query.ToListAsync()
+            };
+            return data;
+        }
 
-                query = query.PageBy(input);
-
-                PaginationResult<Project> data = new()
-                {
-                    TotalCount = totalCount,
-                    TotalPage = Ceiling(input.pagesize, totalCount),
-                    Content = await query.ToListAsync()
-                };
-
-                return data;
-
-            }
+        public async Task<IReadOnlyCollection<Project>> GetByUserId(Guid userId, GetProjectByFilterDto filter)
+        {
+            var query = _context.Projects
+                .Include(e => e.UserProjects!.Where(e => e.UserId == userId))
+                .ThenInclude(up => up.User)
+                .WhereIf(!string.IsNullOrWhiteSpace(filter.name), p => p.Name.Contains(filter.name))
+                .WhereIf(!string.IsNullOrWhiteSpace(filter.code), p => p.Code.Contains(filter.code));
             var projects = await query.ToListAsync();
             return projects.AsReadOnly();
         }
@@ -94,11 +107,6 @@ namespace TaskManager.Infrastructure.Repositories
                                      Role = up.Role
                                  }).ToListAsync();
             return members.AsReadOnly();
-        }
-
-        private static int Ceiling(int pageSize, int totalCount)
-        {
-            return (int)Math.Ceiling((decimal)totalCount / pageSize);
         }
 
         public async Task<Project?> GetByCode(string code)

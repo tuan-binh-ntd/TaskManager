@@ -1,5 +1,6 @@
 ﻿using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Helper;
 using TaskManager.Core.ViewModel;
 
 namespace TaskManager.Core.Interfaces.Repositories
@@ -11,7 +12,8 @@ namespace TaskManager.Core.Interfaces.Repositories
         Project Add(Project project);
         void Update(Project project);
         void Delete(Guid id);
-        Task<object> GetByUserId(Guid userId, GetProjectByFilterDto input = null!);
+        Task<PaginationResult<Project>> GetByUserId(Guid userId, GetProjectByFilterDto filter, PaginationInput paginationInput);
+        Task<IReadOnlyCollection<Project>> GetByUserId(Guid userId, GetProjectByFilterDto input);
         Task<IReadOnlyCollection<UserViewModel>> GetMembers(Guid projectId);
         Task<Project?> GetByCode(string code);
     }
