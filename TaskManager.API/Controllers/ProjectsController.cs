@@ -50,12 +50,12 @@ namespace TaskManager.API.Controllers
             return CustomResult(result, HttpStatusCode.OK);
         }
 
-        [HttpGet("{projectId}"), AllowAnonymous]
+       /* [HttpGet("{projectId}"), AllowAnonymous]
         public async Task<IActionResult> Get(Guid projectId)
         {
             var result = await _projectService.Get(projectId);
             return CustomResult(result, HttpStatusCode.OK);
-        }
+        }*/
 
         [HttpGet("{code}"), AllowAnonymous]
         public async Task<IActionResult> Get(string code)
