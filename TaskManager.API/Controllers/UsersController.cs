@@ -94,7 +94,7 @@ namespace TaskManager.API.Controllers
             }
         }
 
-        [HttpGet, AllowAnonymous]
+        [HttpGet]
         public async Task<IActionResult> Gets()
         {
             var res = await _userService.Gets();

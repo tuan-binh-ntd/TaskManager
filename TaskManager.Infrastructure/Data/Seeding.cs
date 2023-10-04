@@ -66,7 +66,6 @@ namespace TaskManager.Infrastructure.Data
                 Email = "admin@gmail.com",
             };
 
-
             await userManager.CreateAsync(admin, "Abcd1234!");
             await userManager.AddToRolesAsync(admin, new[] { "Admin", "Employee" });
         }

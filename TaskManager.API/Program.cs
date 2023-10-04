@@ -1,5 +1,3 @@
-using Mapster;
-using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
@@ -8,8 +6,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Net;
-using System.Reflection;
 using System.Text;
+using TaskManager.API.Configurations;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Extensions;
 using TaskManager.Core.Interfaces.Repositories;
@@ -52,12 +50,7 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSet
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 
 // Set Mapster
-var typeAdapterConfig = TypeAdapterConfig.GlobalSettings;
-// scans the assembly and gets the IRegister, adding the registration to the TypeAdapterConfig
-typeAdapterConfig.Scan(Assembly.GetExecutingAssembly());
-// register the mapper as Singleton service for my application
-var mapperConfig = new Mapper(typeAdapterConfig);
-builder.Services.AddSingleton<IMapper>(mapperConfig);
+builder.Services.AddMapster(); // From the configuration file
 
 // CORS
 builder.Services.AddCors();

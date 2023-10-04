@@ -1,6 +1,11 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Mapster;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using TaskManager.Core.Core;
+using TaskManager.Core.DTOs;
+using TaskManager.Core.Entities;
+using TaskManager.Core.ViewModel;
 
 namespace TaskManager.Core.Extensions
 {
@@ -51,5 +56,95 @@ namespace TaskManager.Core.Extensions
             return MyRegex().Replace(name, (match) => match.Value.Replace("_", "").ToUpper());
         }
 
+        /// <summary>
+        /// Base Data Transfer Object for model mapping.
+        /// </summary>
+        /// <typeparam name="TEntity">The type of the Entity.</typeparam>
+        /// <typeparam name="TViewModel">The type of the ViewModel.</typeparam>
+        public abstract class BaseDto<TViewModel, TEntity> : IRegister
+            where TViewModel : class, new()
+            where TEntity : class, new()
+        {
+            /// <summary>
+            /// Configuration of type adapter.
+            /// </summary>
+            private TypeAdapterConfig? Config { get; set; }
+
+            /// <summary>
+            /// Adds custom mappings to the configuration.
+            /// </summary>
+            public virtual void AddCustomMappings() { }
+
+            /// <summary>
+            /// Sets custom mappings for entity to viewmodel.
+            /// </summary>
+            /// <returns>The type adapter setter.</returns>
+            protected TypeAdapterSetter<TViewModel, TEntity> SetCustomMappings() => Config!.ForType<TViewModel, TEntity>();
+
+            /// <summary>
+            /// Sets custom mappings for viewmodel to entity.
+            /// </summary>
+            /// <returns>The type adapter setter.</returns>
+            protected TypeAdapterSetter<TEntity, TViewModel> SetCustomMappingsReverse() => Config!.ForType<TEntity, TViewModel>();
+
+            /// <summary>
+            /// Registers the type adapter configuration and adds custom mappings.
+            /// </summary>
+            /// <param name="config">The configuration of the type adapter.</param>
+            public void Register(TypeAdapterConfig config)
+            {
+                Config = config;
+                AddCustomMappings();
+
+                // AppUser
+                config.NewConfig<AppUser, UserViewModel>();
+                config.NewConfig<AppUser, SignUpDto>();
+
+                // AppRole
+                config.NewConfig<AppRole, CreateAppRoleDto>();
+                config.NewConfig<AppRole, RoleViewModel>();
+                config.NewConfig<List<AppRole>, List<CreateAppRoleDto>>();
+
+                // Project
+                config.NewConfig<Project, CreateProjectDto>();
+                config.NewConfig<Project, ProjectViewModel>();
+                config.NewConfig<IReadOnlyCollection<Project>, IReadOnlyCollection<ProjectViewModel>>();
+                config.NewConfig<UpdateProjectDto, Project>();
+
+                config.ForType<AppUser, UserViewModel>().Map(dest => dest.Role, src => src.UserRoles!.Where(ur => ur.UserId == src.Id).Select(ur => ur.Role).FirstOrDefault());
+                config.ForType<Project, ProjectViewModel>()
+                    .Map(dest => dest.Leader, src => src.UserProjects!.Where(up => up.Role == CoreConstants.LeaderRole).Select(up => up.User).FirstOrDefault())
+                    .Map(dest => dest.Members, src => src.UserProjects!.Where(up => up.Role != CoreConstants.LeaderRole).Select(up => up.User).ToList());
+            }
+
+            /// <summary>
+            /// Maps Entity to an existing ViewModel.
+            /// </summary>
+            /// <returns>The Model.</returns>
+            public TEntity ToEntity()
+            {
+                return this.Adapt<TEntity>();
+            }
+
+            /// <summary>
+            /// Maps Entity to an existing ViewModel.
+            /// </summary>
+            /// <param name="model">The existing ViewModel instance to be updated.</param>
+            /// <returns>The updated Model instance.</returns>
+            public TEntity ToEntity(TEntity model)
+            {
+                return (this as TViewModel).Adapt(model);
+            }
+
+            /// <summary>
+            /// Maps a ViewModel to a Entity.
+            /// </summary>
+            /// <param name="model">The ViewModel to be mapped.</param>
+            /// <returns>The DTO.</returns>
+            public TViewModel ToViewModel(TEntity model)
+            {
+                return model.Adapt<TViewModel>();
+            }
+        }
     }
 }
