@@ -10,19 +10,33 @@ namespace TaskManager.Infrastructure.Services
     public class IssueService : IIssueService
     {
         private readonly IIssueRepository _issueRepository;
+        private readonly IIssueHistoryRepository _issueHistoryRepository;
 
         public IssueService(
-            IIssueRepository issueRepository
+            IIssueRepository issueRepository,
+            IIssueHistoryRepository issueHistoryRepository
             )
         {
             _issueRepository = issueRepository;
+            _issueHistoryRepository = issueHistoryRepository;
         }
 
         public async Task<IssueViewModel> CreateIssue(CreateIssueDto createIssueDto)
         {
             var issue = createIssueDto.Adapt<Issue>();
+
             var issueVM = _issueRepository.Add(issue);
             await _issueRepository.UnitOfWork.SaveChangesAsync();
+
+            var issueHis = new IssueHistory
+            {
+                Name = "created the Issue",
+                CreatorUserId = createIssueDto.CreatorUserId,
+                IssueId = issue.Id,
+            };
+
+            _issueHistoryRepository.Add(issueHis);
+            await _issueHistoryRepository.UnitOfWork.SaveChangesAsync();
             return issueVM;
         }
 

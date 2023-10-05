@@ -30,6 +30,8 @@
     public class IssueHistoryViewModel
     {
         public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+
         public Guid CreatorUserId { get; set; }
         public string Content { get; set; } = string.Empty;
         public DateTime CreationTime { get; set; }
