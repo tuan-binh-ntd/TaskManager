@@ -56,14 +56,26 @@ builder.Services.AddMapster(); // From the configuration file
 builder.Services.AddCors();
 
 // Start Declaration DI
-builder.Services.AddScoped<IJWTTokenService, JWTTokenService>();
-builder.Services.AddScoped<IProjectService, ProjectService>();
+// Repositories
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IBacklogRepository, BacklogRepository>();
+builder.Services.AddScoped<IUserProjectRepository, UserProjectRepository>();
+builder.Services.AddScoped<IIssueRepository, IssueRepository>();
+builder.Services.AddScoped<IIssueTypeRepository, IssueTypeRepository>();
+builder.Services.AddScoped<IIssueHistoryRepository, IssueHistoryRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
+builder.Services.AddScoped<IIssueDetailRepository, IssueDetailRepository>();
+builder.Services.AddScoped<ISprintRepository, SprintRepository>();
+
+// Services
+builder.Services.AddScoped<IJWTTokenService, JWTTokenService>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
-builder.Services.AddScoped<IUserProjectRepository, UserProjectRepository>();
+builder.Services.AddScoped<ISprintService, SprintService>();
+builder.Services.AddScoped<IIssueService, IssueService>();
 // Add EmailService
 // End  Declaration DI
 
