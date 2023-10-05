@@ -9,5 +9,6 @@ namespace TaskManager.Core.Entities
         //Relationship
         public Guid ProjectId { get; set; }
         public Project? Project { get; set; }
+        public ICollection<Issue>? Issues { get; set; }
     }
 }

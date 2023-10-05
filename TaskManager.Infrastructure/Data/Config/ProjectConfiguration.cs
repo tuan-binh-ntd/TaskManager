@@ -14,6 +14,11 @@ namespace TaskManager.Infrastructure.Data.Config
                 .WithOne(p => p.Project)
                 .HasForeignKey(p => p.ProjectId)
                 .IsRequired();
+
+            //Add Unique Constraint for Code Col
+            builder
+                .HasIndex(p => p.Code)
+                .IsUnique();
         }
     }
 }

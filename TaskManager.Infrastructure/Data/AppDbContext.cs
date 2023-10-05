@@ -30,6 +30,11 @@ namespace TaskManager.Infrastructure.Data
         public DbSet<UserProject> UserProjects => Set<UserProject>();
         public DbSet<Sprint> Sprints => Set<Sprint>();
         public DbSet<IssueType> IssueTypes => Set<IssueType>();
+        public DbSet<Issue> Issues => Set<Issue>();
+        public DbSet<IssueHistory> IssueHistories => Set<IssueHistory>();
+        public DbSet<Comment> Comments => Set<Comment>();
+        public DbSet<Attachment> Attachments => Set<Attachment>();
+        public DbSet<IssueDetail> IssueDetails => Set<IssueDetail>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

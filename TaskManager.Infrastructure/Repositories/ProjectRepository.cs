@@ -62,12 +62,12 @@ namespace TaskManager.Infrastructure.Repositories
         {
 
             var query = from u in _context.Users
-                         join up in _context.UserProjects.Where(up => up.UserId == userId) on u.Id equals up.UserId
-                         join p in _context.Projects
-                         .WhereIf(!string.IsNullOrWhiteSpace(filter.name), p => p.Name.Contains(filter.name))
-                         .WhereIf(!string.IsNullOrWhiteSpace(filter.code), p => p.Code.Contains(filter.code))
-                         on up.ProjectId equals p.Id
-                         select p;
+                        join up in _context.UserProjects.Where(up => up.UserId == userId) on u.Id equals up.UserId
+                        join p in _context.Projects
+                        .WhereIf(!string.IsNullOrWhiteSpace(filter.name), p => p.Name.Contains(filter.name))
+                        .WhereIf(!string.IsNullOrWhiteSpace(filter.code), p => p.Code.Contains(filter.code))
+                        on up.ProjectId equals p.Id
+                        select p;
 
             int totalCount = await query.CountAsync();
 

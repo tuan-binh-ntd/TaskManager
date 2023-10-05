@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskManager.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using TaskManager.Infrastructure.Data;
 namespace TaskManager.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231005032508_Add-Many-Tbl")]
+    partial class AddManyTbl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -485,15 +488,10 @@ namespace TaskManager.Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid?>("ProjectId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
                         .IsUnique();
-
-                    b.HasIndex("ProjectId");
 
                     b.ToTable("IssueTypes");
                 });
@@ -737,15 +735,6 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.Navigation("Issue");
                 });
 
-            modelBuilder.Entity("TaskManager.Core.Entities.IssueType", b =>
-                {
-                    b.HasOne("TaskManager.Core.Entities.Project", "Project")
-                        .WithMany("IssueTypes")
-                        .HasForeignKey("ProjectId");
-
-                    b.Navigation("Project");
-                });
-
             modelBuilder.Entity("TaskManager.Core.Entities.Sprint", b =>
                 {
                     b.HasOne("TaskManager.Core.Entities.Project", "Project")
@@ -812,8 +801,6 @@ namespace TaskManager.Infrastructure.Data.Migrations
             modelBuilder.Entity("TaskManager.Core.Entities.Project", b =>
                 {
                     b.Navigation("Backlog");
-
-                    b.Navigation("IssueTypes");
 
                     b.Navigation("UserProjects");
                 });

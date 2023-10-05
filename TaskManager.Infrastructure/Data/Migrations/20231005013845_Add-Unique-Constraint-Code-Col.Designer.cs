@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskManager.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using TaskManager.Infrastructure.Data;
 namespace TaskManager.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231005013845_Add-Unique-Constraint-Code-Col")]
+    partial class AddUniqueConstraintCodeCol
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -243,36 +246,6 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.ToTable("AspNetUserRoles", (string)null);
                 });
 
-            modelBuilder.Entity("TaskManager.Core.Entities.Attachment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("IssueId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Link")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ModificationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IssueId");
-
-                    b.ToTable("Attachments");
-                });
-
             modelBuilder.Entity("TaskManager.Core.Entities.Backlog", b =>
                 {
                     b.Property<Guid>("Id")
@@ -300,167 +273,6 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.ToTable("Backlogs");
                 });
 
-            modelBuilder.Entity("TaskManager.Core.Entities.Comment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CreatorUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsEdited")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("IssueId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("ModificationTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IssueId");
-
-                    b.ToTable("Comments");
-                });
-
-            modelBuilder.Entity("TaskManager.Core.Entities.Issue", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("BacklogId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CompleteDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DueDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("IssueTypeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("ModificationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("ParentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Priority")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("SprintId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Voted")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Watcher")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BacklogId");
-
-                    b.HasIndex("IssueTypeId");
-
-                    b.HasIndex("SprintId");
-
-                    b.ToTable("Issues");
-                });
-
-            modelBuilder.Entity("TaskManager.Core.Entities.IssueDetail", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("AssigneeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("IssueId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Label")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ModificationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("ReporterId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("StoryPointEstimate")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IssueId")
-                        .IsUnique();
-
-                    b.ToTable("IssueDetails");
-                });
-
-            modelBuilder.Entity("TaskManager.Core.Entities.IssueHistory", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CreatorUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("IssueId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("ModificationTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IssueId");
-
-                    b.ToTable("IssueHistories");
-                });
-
             modelBuilder.Entity("TaskManager.Core.Entities.IssueType", b =>
                 {
                     b.Property<Guid>("Id")
@@ -483,17 +295,9 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<Guid?>("ProjectId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.HasIndex("ProjectId");
 
                     b.ToTable("IssueTypes");
                 });
@@ -659,17 +463,6 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TaskManager.Core.Entities.Attachment", b =>
-                {
-                    b.HasOne("TaskManager.Core.Entities.Issue", "Issue")
-                        .WithMany("Attachments")
-                        .HasForeignKey("IssueId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Issue");
-                });
-
             modelBuilder.Entity("TaskManager.Core.Entities.Backlog", b =>
                 {
                     b.HasOne("TaskManager.Core.Entities.Project", "Project")
@@ -677,71 +470,6 @@ namespace TaskManager.Infrastructure.Data.Migrations
                         .HasForeignKey("TaskManager.Core.Entities.Backlog", "ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Project");
-                });
-
-            modelBuilder.Entity("TaskManager.Core.Entities.Comment", b =>
-                {
-                    b.HasOne("TaskManager.Core.Entities.Issue", "Issue")
-                        .WithMany("Comments")
-                        .HasForeignKey("IssueId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Issue");
-                });
-
-            modelBuilder.Entity("TaskManager.Core.Entities.Issue", b =>
-                {
-                    b.HasOne("TaskManager.Core.Entities.Backlog", "Backlog")
-                        .WithMany("Issues")
-                        .HasForeignKey("BacklogId");
-
-                    b.HasOne("TaskManager.Core.Entities.IssueType", "IssueType")
-                        .WithMany("Issues")
-                        .HasForeignKey("IssueTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TaskManager.Core.Entities.Sprint", "Sprint")
-                        .WithMany("Issues")
-                        .HasForeignKey("SprintId");
-
-                    b.Navigation("Backlog");
-
-                    b.Navigation("IssueType");
-
-                    b.Navigation("Sprint");
-                });
-
-            modelBuilder.Entity("TaskManager.Core.Entities.IssueDetail", b =>
-                {
-                    b.HasOne("TaskManager.Core.Entities.Issue", "Issue")
-                        .WithOne("IssueDetail")
-                        .HasForeignKey("TaskManager.Core.Entities.IssueDetail", "IssueId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Issue");
-                });
-
-            modelBuilder.Entity("TaskManager.Core.Entities.IssueHistory", b =>
-                {
-                    b.HasOne("TaskManager.Core.Entities.Issue", "Issue")
-                        .WithMany("IssueHistories")
-                        .HasForeignKey("IssueId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Issue");
-                });
-
-            modelBuilder.Entity("TaskManager.Core.Entities.IssueType", b =>
-                {
-                    b.HasOne("TaskManager.Core.Entities.Project", "Project")
-                        .WithMany("IssueTypes")
-                        .HasForeignKey("ProjectId");
 
                     b.Navigation("Project");
                 });
@@ -788,39 +516,11 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.Navigation("UserRoles");
                 });
 
-            modelBuilder.Entity("TaskManager.Core.Entities.Backlog", b =>
-                {
-                    b.Navigation("Issues");
-                });
-
-            modelBuilder.Entity("TaskManager.Core.Entities.Issue", b =>
-                {
-                    b.Navigation("Attachments");
-
-                    b.Navigation("Comments");
-
-                    b.Navigation("IssueDetail");
-
-                    b.Navigation("IssueHistories");
-                });
-
-            modelBuilder.Entity("TaskManager.Core.Entities.IssueType", b =>
-                {
-                    b.Navigation("Issues");
-                });
-
             modelBuilder.Entity("TaskManager.Core.Entities.Project", b =>
                 {
                     b.Navigation("Backlog");
 
-                    b.Navigation("IssueTypes");
-
                     b.Navigation("UserProjects");
-                });
-
-            modelBuilder.Entity("TaskManager.Core.Entities.Sprint", b =>
-                {
-                    b.Navigation("Issues");
                 });
 #pragma warning restore 612, 618
         }
