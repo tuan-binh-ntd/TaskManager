@@ -53,7 +53,7 @@ namespace TaskManager.Infrastructure.Services
             else if (await CheckUsernameExists(signUpDto.Username)) return "Username is taken";
 
             var user = _mapper.Map<AppUser>(signUpDto);
-            user.UserName = signUpDto.Username;
+            user.Name = signUpDto.Username;
 
             var result = await _userManager.CreateAsync(user, signUpDto.Password);
 
