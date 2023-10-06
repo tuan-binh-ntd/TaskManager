@@ -70,7 +70,7 @@ namespace TaskManager.Infrastructure.Services
 
         public async Task<ProjectViewModel> Create(Guid userId, CreateProjectDto projectDto)
         {
-            var project = _mapper.Map<Project>(projectDto);
+            var project = projectDto.Adapt<Project>();
             project.AvatarUrl = "https://bs-uploads.toptal.io/blackfish-uploads/components/skill_page/content/logo_file/logo/195649/JIRA_logo-e5a9c767df8a60eb2d242a356ce3fdca.jpg";
             UserProject userProject = new()
             {

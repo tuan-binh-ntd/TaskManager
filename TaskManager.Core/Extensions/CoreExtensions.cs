@@ -105,7 +105,7 @@ namespace TaskManager.Core.Extensions
                 config.NewConfig<List<AppRole>, List<CreateAppRoleDto>>().IgnoreNullValues(true);
 
                 // Project
-                config.NewConfig<Project, CreateProjectDto>().IgnoreNullValues(true);
+                config.NewConfig<Project, CreateProjectDto>();
                 config.NewConfig<Project, ProjectViewModel>().IgnoreNullValues(true);
                 config.NewConfig<IReadOnlyCollection<Project>, IReadOnlyCollection<ProjectViewModel>>();
             }

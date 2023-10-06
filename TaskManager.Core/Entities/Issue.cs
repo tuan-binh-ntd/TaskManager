@@ -8,7 +8,7 @@ namespace TaskManager.Core.Entities
         //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         //public override Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
+        public string? Description { get; set; } = string.Empty;
         public DateTime? CompleteDate { get; set; }
         public string Priority { get; set; } = string.Empty;
         public string Watcher { get; set; } = string.Empty;
