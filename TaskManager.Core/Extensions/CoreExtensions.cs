@@ -2,7 +2,6 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.ViewModel;
@@ -110,11 +109,6 @@ namespace TaskManager.Core.Extensions
                 config.NewConfig<Project, ProjectViewModel>();
                 config.NewConfig<IReadOnlyCollection<Project>, IReadOnlyCollection<ProjectViewModel>>();
                 config.NewConfig<UpdateProjectDto, Project>();
-
-                config.ForType<AppUser, UserViewModel>().Map(dest => dest.Role, src => src.UserRoles!.Where(ur => ur.UserId == src.Id).Select(ur => ur.Role).FirstOrDefault());
-                config.ForType<Project, ProjectViewModel>()
-                    .Map(dest => dest.Leader, src => src.UserProjects!.Where(up => up.Role == CoreConstants.LeaderRole).Select(up => up.User).FirstOrDefault())
-                    .Map(dest => dest.Members, src => src.UserProjects!.Where(up => up.Role != CoreConstants.LeaderRole).Select(up => up.User).ToList());
             }
 
             /// <summary>
