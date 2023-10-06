@@ -36,11 +36,19 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.Created);
         }
 
-        [HttpPut("{projectId}")]
-        public async Task<IActionResult> UpdateProject(Guid projectId, UpdateProjectDto updateProjectDto)
+        [HttpPut("{projectId}"), AllowAnonymous]
+        public async Task<IActionResult> UpdateProject(Guid id, Guid projectId, UpdateProjectDto updateProjectDto)
         {
-            var res = await _projectService.Update(projectId, updateProjectDto);
-            return CustomResult(res, HttpStatusCode.OK);
+            if (updateProjectDto.LeaderId is null)
+            {
+                var res = await _projectService.Update(projectId, updateProjectDto);
+                return CustomResult(res, HttpStatusCode.OK);
+            }
+            else
+            {
+                var res = await _projectService.ChangeLeader(userId: id, projectId, updateProjectDto);
+                return CustomResult(res, HttpStatusCode.OK);
+            }
         }
 
         [HttpDelete("{projectId}")]
@@ -50,12 +58,12 @@ namespace TaskManager.API.Controllers
             return CustomResult(result, HttpStatusCode.OK);
         }
 
-       /* [HttpGet("{projectId}"), AllowAnonymous]
-        public async Task<IActionResult> Get(Guid projectId)
-        {
-            var result = await _projectService.Get(projectId);
-            return CustomResult(result, HttpStatusCode.OK);
-        }*/
+        /* [HttpGet("{projectId}"), AllowAnonymous]
+         public async Task<IActionResult> Get(Guid projectId)
+         {
+             var result = await _projectService.Get(projectId);
+             return CustomResult(result, HttpStatusCode.OK);
+         }*/
 
         [HttpGet("{code}"), AllowAnonymous]
         public async Task<IActionResult> Get(string code)

@@ -195,13 +195,12 @@ if (app.Environment.IsProduction())
                 context.Response.ContentType = "application/json";
                 await context.Response.WriteAsync(new
                 {
-                    status = -1,
-                    msg = "Error on process your request."
+                    status = 500,
+                    message = "Something went wrong."
                 }.ToJson());
             }
             else
             {
-
                 context.Response.ContentType = "text/html";
                 await context.Response.WriteAsync("Internal server error.");
             }
@@ -227,13 +226,12 @@ else
                 context.Response.ContentType = "application/json";
                 await context.Response.WriteAsync(new
                 {
-                    status = -1,
-                    msg = "Error on process your request."
+                    status = 500,
+                    message = "Something went wrong."
                 }.ToJson());
             }
             else
             {
-
                 context.Response.ContentType = "text/html";
                 await context.Response.WriteAsync("Internal server error.");
             }
