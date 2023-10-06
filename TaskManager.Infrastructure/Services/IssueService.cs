@@ -49,18 +49,7 @@ namespace TaskManager.Infrastructure.Services
                 throw new ArgumentNullException(nameof(issue));
 #pragma warning restore CA2208 // Instantiate argument exceptions correctly
             }
-            issue.Name = updateIssueDto.Name;
-            issue.Description = updateIssueDto.Description;
-            issue.CompleteDate = updateIssueDto.CompleteDate;
-            issue.Priority = updateIssueDto.Priority;
-            issue.Watcher = updateIssueDto.Watcher;
-            issue.Voted = updateIssueDto.Voted;
-            issue.StartDate = updateIssueDto.StartDate;
-            issue.DueDate = updateIssueDto.DueDate;
-            issue.ParentId = updateIssueDto.ParentId;
-            issue.BacklogId = issue.BacklogId;
-            issue.SprintId = issue.SprintId;
-            issue.IssueTypeId = issue.IssueTypeId;
+            issue = updateIssueDto.Adapt(issue);
             _issueRepository.Update(issue);
             await _issueRepository.UnitOfWork.SaveChangesAsync();
             return issue.Adapt<IssueViewModel>();

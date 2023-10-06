@@ -109,12 +109,7 @@ namespace TaskManager.Infrastructure.Services
 #pragma warning restore CA2208 // Instantiate argument exceptions correctly
             }
 
-            project.Name = string.IsNullOrWhiteSpace(updateProjectDto.Name) ? project.Name : updateProjectDto.Name;
-            project.Code = string.IsNullOrWhiteSpace(updateProjectDto.Code) ? project.Code : updateProjectDto.Code;
-            project.Description = string.IsNullOrWhiteSpace(updateProjectDto.Description) ? project.Description : updateProjectDto.Description;
-            project.AvatarUrl = string.IsNullOrWhiteSpace(updateProjectDto.AvatarUrl) ? project.AvatarUrl : updateProjectDto.AvatarUrl;
-            project.IsFavourite = updateProjectDto.IsFavourite;
-
+            project = updateProjectDto.Adapt(project);
             if (updateProjectDto.LeaderId is Guid newLeaderId && newLeaderId != userId)
             {
                 var oldLeader = _userProjectRepository.Get(projectId, userId);
@@ -209,40 +204,5 @@ namespace TaskManager.Infrastructure.Services
             }
             return await ToProjectViewModel(project);
         }
-
-        //public async Task<ProjectViewModel> ChangeLeader(Guid userId, Guid projectId, UpdateProjectDto updateProjectDto)
-        //{
-        //    Project? project = await _projectRepository.GetById(projectId);
-        //    if (updateProjectDto.LeaderId is Guid newLeaderId)
-        //    {
-        //        var oldLeader = _userProjectRepository.Get(projectId, userId);
-        //        if (oldLeader is not null)
-        //        {
-        //            var existsNewLeader = _userProjectRepository.Get(projectId, newLeaderId);
-        //            if (existsNewLeader is not null)
-        //            {
-        //                existsNewLeader.Role = CoreConstants.LeaderRole;
-        //                oldLeader.Role = "Member";
-        //                _userProjectRepository.Update(oldLeader);
-        //                _userProjectRepository.Update(existsNewLeader);
-        //            }
-        //            else
-        //            {
-        //                var newLeader = new UserProject
-        //                {
-        //                    ProjectId = oldLeader.ProjectId,
-        //                    UserId = newLeaderId,
-        //                    Role = CoreConstants.LeaderRole
-        //                };
-        //                oldLeader.Role = "Member";
-        //                _userProjectRepository.Add(newLeader);
-        //                _userProjectRepository.Update(oldLeader);
-        //            }
-        //            await _userProjectRepository.UnitOfWork.SaveChangesAsync();
-        //        }
-        //    }
-
-        //    return await ToProjectViewModel(project);
-        //}
     }
 }

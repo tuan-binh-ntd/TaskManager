@@ -90,30 +90,24 @@ namespace TaskManager.Core.Extensions
             /// Registers the type adapter configuration and adds custom mappings.
             /// </summary>
             /// <param name="config">The configuration of the type adapter.</param>
-            public void Register(TypeAdapterConfig config)
+            public virtual void Register(TypeAdapterConfig config)
             {
                 Config = config;
                 AddCustomMappings();
 
                 // AppUser
-                config.NewConfig<AppUser, UserViewModel>();
-                config.NewConfig<AppUser, SignUpDto>();
+                config.NewConfig<AppUser, UserViewModel>().IgnoreNullValues(true);
+                config.NewConfig<AppUser, SignUpDto>().IgnoreNullValues(true);
 
                 // AppRole
-                config.NewConfig<AppRole, CreateAppRoleDto>();
-                config.NewConfig<AppRole, RoleViewModel>();
-                config.NewConfig<List<AppRole>, List<CreateAppRoleDto>>();
+                config.NewConfig<AppRole, CreateAppRoleDto>().IgnoreNullValues(true);
+                config.NewConfig<AppRole, RoleViewModel>().IgnoreNullValues(true);
+                config.NewConfig<List<AppRole>, List<CreateAppRoleDto>>().IgnoreNullValues(true);
 
                 // Project
-                config.NewConfig<Project, CreateProjectDto>();
-                config.NewConfig<Project, ProjectViewModel>();
+                config.NewConfig<Project, CreateProjectDto>().IgnoreNullValues(true);
+                config.NewConfig<Project, ProjectViewModel>().IgnoreNullValues(true);
                 config.NewConfig<IReadOnlyCollection<Project>, IReadOnlyCollection<ProjectViewModel>>();
-                config.NewConfig<UpdateProjectDto, Project>();
-
-                //config.ForType<AppUser, UserViewModel>().Map(dest => dest.Role, src => src.UserRoles!.Where(ur => ur.UserId == src.Id).Select(ur => ur.Role).FirstOrDefault());
-                //config.ForType<Project, ProjectViewModel>()
-                //    .Map(dest => dest.Leader, src => src.UserProjects!.Where(up => up.Role == CoreConstants.LeaderRole).Select(up => up.User).FirstOrDefault())
-                //    .Map(dest => dest.Members, src => src.UserProjects!.Where(up => up.Role != CoreConstants.LeaderRole).Select(up => up.User).ToList());
             }
 
             /// <summary>

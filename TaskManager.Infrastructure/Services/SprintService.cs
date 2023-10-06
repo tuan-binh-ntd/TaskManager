@@ -35,10 +35,7 @@ namespace TaskManager.Infrastructure.Services
                 throw new ArgumentNullException(nameof(sprint));
 #pragma warning restore CA2208 // Instantiate argument exceptions correctly
             }
-            sprint.Name = updateSprintDto.Name;
-            sprint.StartDate = updateSprintDto.StartDate;
-            sprint.EndDate = updateSprintDto.EndDate;
-            sprint.Goal = updateSprintDto.Goal;
+            sprint = updateSprintDto.Adapt(sprint);
             _sprintRepository.Update(sprint);
             await _sprintRepository.UnitOfWork.SaveChangesAsync();
             return sprint.Adapt<SprintViewModel>();

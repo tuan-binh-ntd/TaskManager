@@ -19,11 +19,6 @@ namespace TaskManager.Infrastructure.Repositories
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        private static int Ceiling(int pageSize, int totalCount)
-        {
-            return (int)Math.Ceiling((decimal)totalCount / pageSize);
-        }
-
         public Project Add(Project project)
         {
             return _context.Projects.Add(project).Entity;
@@ -69,17 +64,7 @@ namespace TaskManager.Infrastructure.Repositories
                         on up.ProjectId equals p.Id
                         select p;
 
-            int totalCount = await query.CountAsync();
-
-            query = query.PageBy(paginationInput);
-
-            PaginationResult<Project> data = new()
-            {
-                TotalCount = totalCount,
-                TotalPage = Ceiling(paginationInput.pagesize, totalCount),
-                Content = await query.ToListAsync()
-            };
-            return data;
+            return await query.Pagination(paginationInput);
         }
 
         public async Task<IReadOnlyCollection<Project>> GetByUserId(Guid userId, GetProjectByFilterDto filter)

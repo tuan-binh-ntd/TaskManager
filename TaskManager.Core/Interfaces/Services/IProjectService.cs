@@ -17,6 +17,5 @@ namespace TaskManager.Core.Interfaces.Services
         Task<ProjectViewModel> Get(Guid projectId);
         Task<ProjectViewModel?> Get(string code);
         Task<ProjectViewModel> AddMember(AddMemberToProjectDto addMemberToProjectDto);
-        //Task<ProjectViewModel> ChangeLeader(Guid userId, Guid projectId, UpdateProjectDto updateProjectDto);
     }
 }
