@@ -29,7 +29,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(result, HttpStatusCode.OK);
         }
 
-        [HttpPost]
+        [HttpPost, AllowAnonymous]
         public async Task<IActionResult> CreateProject(Guid id, CreateProjectDto createProjectDto)
         {
             var res = await _projectService.Create(id, createProjectDto);
@@ -39,16 +39,18 @@ namespace TaskManager.API.Controllers
         [HttpPut("{projectId}"), AllowAnonymous]
         public async Task<IActionResult> UpdateProject(Guid id, Guid projectId, UpdateProjectDto updateProjectDto)
         {
-            if (updateProjectDto.LeaderId is null)
-            {
-                var res = await _projectService.Update(projectId, updateProjectDto);
-                return CustomResult(res, HttpStatusCode.OK);
-            }
-            else
-            {
-                var res = await _projectService.ChangeLeader(userId: id, projectId, updateProjectDto);
-                return CustomResult(res, HttpStatusCode.OK);
-            }
+            //if (updateProjectDto.LeaderId is null)
+            //{
+            //    var res = await _projectService.Update(userId: id, projectId, updateProjectDto);
+            //    return CustomResult(res, HttpStatusCode.OK);
+            //}
+            //else
+            //{
+            //    var res = await _projectService.ChangeLeader(userId: id, projectId, updateProjectDto);
+            //    return CustomResult(res, HttpStatusCode.OK);
+            //}
+            var res = await _projectService.Update(userId: id, projectId, updateProjectDto);
+            return CustomResult(res, HttpStatusCode.OK);
         }
 
         [HttpDelete("{projectId}")]

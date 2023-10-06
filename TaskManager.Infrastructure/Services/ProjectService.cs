@@ -30,6 +30,32 @@ namespace TaskManager.Infrastructure.Services
             _mapper = mapper;
         }
 
+        #region Private Method
+        private async Task<ProjectViewModel> ToProjectViewModel(Project project)
+        {
+            var members = await _projectRepository.GetMembers(project.Id);
+            var projectViewModel = _mapper.Map<ProjectViewModel>(project);
+            projectViewModel.Leader = members.Where(m => m.Role == CoreConstants.LeaderRole).SingleOrDefault();
+            projectViewModel.Members = members.Where(m => m.Role != CoreConstants.LeaderRole).ToList();
+            return projectViewModel;
+        }
+
+        private async Task<IReadOnlyCollection<ProjectViewModel>> ToProjectViewModels(IReadOnlyCollection<Project> projects)
+        {
+            var projectViewModels = new List<ProjectViewModel>();
+            if (projects.Any())
+            {
+                foreach (var item in projects)
+                {
+                    var projectViewModel = await ToProjectViewModel(item);
+                    projectViewModels.Add(projectViewModel);
+                }
+                return projectViewModels.AsReadOnly();
+            }
+            return projectViewModels;
+        }
+        #endregion
+
         public async Task<bool> Delete(Guid id)
         {
             _projectRepository.Delete(id);
@@ -70,12 +96,12 @@ namespace TaskManager.Infrastructure.Services
             _backlogRepository.Add(backlog);
             await _backlogRepository.UnitOfWork.SaveChangesAsync();
 
-            return _mapper.Map<ProjectViewModel>(project);
+            return await ToProjectViewModel(project);
         }
 
-        public async Task<ProjectViewModel> Update(Guid id, UpdateProjectDto updateProjectDto)
+        public async Task<ProjectViewModel> Update(Guid userId, Guid projectId, UpdateProjectDto updateProjectDto)
         {
-            Project? project = await _projectRepository.GetById(id);
+            Project? project = await _projectRepository.GetById(projectId);
             if (project is null)
             {
 #pragma warning disable CA2208 // Instantiate argument exceptions correctly
@@ -89,9 +115,39 @@ namespace TaskManager.Infrastructure.Services
             project.AvatarUrl = string.IsNullOrWhiteSpace(updateProjectDto.AvatarUrl) ? project.AvatarUrl : updateProjectDto.AvatarUrl;
             project.IsFavourite = updateProjectDto.IsFavourite;
 
+            if (updateProjectDto.LeaderId is Guid newLeaderId && newLeaderId != userId)
+            {
+                var oldLeader = _userProjectRepository.Get(projectId, userId);
+                if (oldLeader is not null)
+                {
+                    var existsNewLeader = _userProjectRepository.Get(projectId, newLeaderId);
+
+                    if (existsNewLeader is not null)
+                    {
+                        existsNewLeader.Role = CoreConstants.LeaderRole;
+                        oldLeader.Role = "Member";
+                        _userProjectRepository.Update(oldLeader);
+                        _userProjectRepository.Update(existsNewLeader);
+                    }
+                    else
+                    {
+                        var newLeader = new UserProject
+                        {
+                            ProjectId = oldLeader.ProjectId,
+                            UserId = newLeaderId,
+                            Role = CoreConstants.LeaderRole
+                        };
+                        oldLeader.Role = "Member";
+                        _userProjectRepository.Add(newLeader);
+                        _userProjectRepository.Update(oldLeader);
+                    }
+                    await _userProjectRepository.UnitOfWork.SaveChangesAsync();
+                }
+            }
+
             _projectRepository.Update(project);
             await _projectRepository.UnitOfWork.SaveChangesAsync();
-            return _mapper.Map<ProjectViewModel>(project);
+            return await ToProjectViewModel(project);
         }
 
         public async Task<object> GetProjectsByFilter(Guid userId, GetProjectByFilterDto filter, PaginationInput paginationInput)
@@ -144,31 +200,6 @@ namespace TaskManager.Infrastructure.Services
             return project.Adapt<ProjectViewModel>();
         }
 
-        #region Private Method
-        private async Task<ProjectViewModel> ToProjectViewModel(Project project)
-        {
-            var members = await _projectRepository.GetMembers(project.Id);
-            var projectViewModel = _mapper.Map<ProjectViewModel>(project);
-            projectViewModel.Leader = members.Where(m => m.Role == CoreConstants.LeaderRole).SingleOrDefault();
-            projectViewModel.Members = members.Where(m => m.Role != CoreConstants.LeaderRole).ToList();
-            return projectViewModel;
-        }
-
-        private async Task<IReadOnlyCollection<ProjectViewModel>> ToProjectViewModels(IReadOnlyCollection<Project> projects)
-        {
-            var projectViewModels = new List<ProjectViewModel>();
-            if (projects.Any())
-            {
-                foreach (var item in projects)
-                {
-                    var projectViewModel = await ToProjectViewModel(item);
-                    projectViewModels.Add(projectViewModel);
-                }
-                return projectViewModels.AsReadOnly();
-            }
-            return projectViewModels;
-        }
-
         public async Task<ProjectViewModel?> Get(string code)
         {
             var project = await _projectRepository.GetByCode(code);
@@ -179,41 +210,39 @@ namespace TaskManager.Infrastructure.Services
             return await ToProjectViewModel(project);
         }
 
-        public async Task<ProjectViewModel> ChangeLeader(Guid userId, Guid projectId, UpdateProjectDto updateProjectDto)
-        {
-            Project? project = await _projectRepository.GetById(projectId);
-            if (updateProjectDto.LeaderId is Guid newLeaderId)
-            {
-                var oldLeader = _userProjectRepository.Get(projectId, userId);
-                if (oldLeader is not null)
-                {
-                    var existsNewLeader = _userProjectRepository.Get(projectId, newLeaderId);
-                    if (existsNewLeader is not null)
-                    {
-                        existsNewLeader.Role = CoreConstants.LeaderRole;
-                        oldLeader.Role = "Member";
-                        _userProjectRepository.Update(oldLeader);
-                        _userProjectRepository.Update(existsNewLeader);
+        //public async Task<ProjectViewModel> ChangeLeader(Guid userId, Guid projectId, UpdateProjectDto updateProjectDto)
+        //{
+        //    Project? project = await _projectRepository.GetById(projectId);
+        //    if (updateProjectDto.LeaderId is Guid newLeaderId)
+        //    {
+        //        var oldLeader = _userProjectRepository.Get(projectId, userId);
+        //        if (oldLeader is not null)
+        //        {
+        //            var existsNewLeader = _userProjectRepository.Get(projectId, newLeaderId);
+        //            if (existsNewLeader is not null)
+        //            {
+        //                existsNewLeader.Role = CoreConstants.LeaderRole;
+        //                oldLeader.Role = "Member";
+        //                _userProjectRepository.Update(oldLeader);
+        //                _userProjectRepository.Update(existsNewLeader);
+        //            }
+        //            else
+        //            {
+        //                var newLeader = new UserProject
+        //                {
+        //                    ProjectId = oldLeader.ProjectId,
+        //                    UserId = newLeaderId,
+        //                    Role = CoreConstants.LeaderRole
+        //                };
+        //                oldLeader.Role = "Member";
+        //                _userProjectRepository.Add(newLeader);
+        //                _userProjectRepository.Update(oldLeader);
+        //            }
+        //            await _userProjectRepository.UnitOfWork.SaveChangesAsync();
+        //        }
+        //    }
 
-                    }
-                    else
-                    {
-                        var newLeader = new UserProject
-                        {
-                            ProjectId = oldLeader.ProjectId,
-                            UserId = newLeaderId,
-                            Role = CoreConstants.LeaderRole
-                        };
-                        oldLeader.Role = "Member";
-                        _userProjectRepository.Add(newLeader);
-                        _userProjectRepository.Update(oldLeader);
-                    }
-                    await _userProjectRepository.UnitOfWork.SaveChangesAsync();
-                }
-            }
-
-            return await ToProjectViewModel(project);
-        }
-        #endregion
+        //    return await ToProjectViewModel(project);
+        //}
     }
 }
