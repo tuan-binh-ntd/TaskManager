@@ -145,7 +145,7 @@ namespace TaskManager.Infrastructure.Services
         private async Task<ProjectViewModel> ToProjectViewModel(Project project)
         {
             var members = await _projectRepository.GetMembers(project.Id);
-            var projectViewModel = project.Adapt<ProjectViewModel>();
+            var projectViewModel = _mapper.Map<ProjectViewModel>(project);
             projectViewModel.Leader = members.Where(m => m.Role == CoreConstants.LeaderRole).SingleOrDefault();
             projectViewModel.Members = members.Where(m => m.Role != CoreConstants.LeaderRole).ToList();
             return projectViewModel;
@@ -173,7 +173,7 @@ namespace TaskManager.Infrastructure.Services
             {
                 return null;
             }
-            return project.Adapt<ProjectViewModel>();
+            return await ToProjectViewModel(project);
         }
         #endregion
     }
