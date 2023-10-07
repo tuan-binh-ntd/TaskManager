@@ -9,6 +9,6 @@ namespace TaskManager.Core.Interfaces.Services
         Task<RoleViewModel> Get(Guid id);
         Task<RoleViewModel> Create(CreateAppRoleDto appRoleDto);
         Task<RoleViewModel> Update(Guid id, CreateAppRoleDto appRoleDto);
-        Task<bool> Delete(Guid id);
+        Task<Guid> Delete(Guid id);
     }
 }

@@ -60,7 +60,7 @@ namespace TaskManager.Infrastructure.Services
         {
             _projectRepository.Delete(id);
             await _projectRepository.UnitOfWork.SaveChangesAsync();
-            return (id);
+            return id;
         }
 
         public async Task<IReadOnlyCollection<ProjectViewModel>> GetProjects()

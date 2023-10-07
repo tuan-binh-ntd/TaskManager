@@ -103,20 +103,14 @@ namespace TaskManager.API.Controllers
         //[HttpDelete, AllowAnonymous]
         //public async Task<IActionResult> Test()
         //{
-        //    using SftpClient client = new("localhost", 2222, "foo", "pass");
+        //    using SftpClient client = new("127.0.0.1", 2222, "binh", "pass");
         //    try
         //    {
         //        client.Connect();
         //        if (client.IsConnected)
         //        {
-        //            client.CreateDirectory("/images");
-        //            client.UploadFile(File.OpenRead("./files/portrait.jpg"), "/images/portrait.jpg");
-        //            Console.WriteLine("Directory listing:");
-
-        //            foreach (var sftpFile in client.ListDirectory("/images"))
-        //            {
-        //                Console.WriteLine($"\t{sftpFile.FullName}");
-        //            }
+        //            client.ChangeDirectory("/upload");
+        //            client.UploadFile(System.IO.File.OpenRead("C:\\Users\\enetv\\Downloads\\QUANG ICH_CHITIETDOISOAT gui tren sFTP.xlsx"), "\\home\\binh\\upload\\QUANG ICH_CHITIETDOISOAT gui tren sFTP.xlsx");
         //            client.Disconnect();
         //        }
         //    }
