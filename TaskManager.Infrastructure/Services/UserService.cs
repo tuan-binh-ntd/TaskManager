@@ -53,6 +53,7 @@ namespace TaskManager.Infrastructure.Services
 
             var user = _mapper.Map<AppUser>(signUpDto);
             user.UserName = signUpDto.Email;
+            user.Name = signUpDto.Name;
 
             var result = await _userManager.CreateAsync(user, signUpDto.Password);
 

@@ -56,10 +56,11 @@ namespace TaskManager.Infrastructure.Services
         }
         #endregion
 
-        public async Task<bool> Delete(Guid id)
+        public async Task<Guid> Delete(Guid id)
         {
             _projectRepository.Delete(id);
-            return (await _projectRepository.UnitOfWork.SaveChangesAsync() > 0);
+            await _projectRepository.UnitOfWork.SaveChangesAsync();
+            return (id);
         }
 
         public async Task<IReadOnlyCollection<ProjectViewModel>> GetProjects()
