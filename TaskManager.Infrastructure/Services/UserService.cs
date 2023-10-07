@@ -50,10 +50,9 @@ namespace TaskManager.Infrastructure.Services
         public async Task<object> SignUp(SignUpDto signUpDto)
         {
             if (await CheckEmailExists(signUpDto.Email)) return "Email is taken";
-            else if (await CheckUsernameExists(signUpDto.Username)) return "Username is taken";
 
             var user = _mapper.Map<AppUser>(signUpDto);
-            user.UserName = signUpDto.Username;
+            user.UserName = signUpDto.Email;
 
             var result = await _userManager.CreateAsync(user, signUpDto.Password);
 
@@ -61,7 +60,6 @@ namespace TaskManager.Infrastructure.Services
 
             UserViewModel res = new()
             {
-                Name = user.UserName,
                 Token = await _jwtTokenService.CreateToken(user),
                 Id = user.Id,
                 Email = user.Email,

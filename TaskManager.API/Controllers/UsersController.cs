@@ -99,5 +99,44 @@ namespace TaskManager.API.Controllers
             var res = await _userService.Gets();
             return CustomResult(res, HttpStatusCode.OK);
         }
+
+        //[HttpDelete, AllowAnonymous]
+        //public async Task<IActionResult> Test()
+        //{
+        //    using SftpClient client = new("localhost", 2222, "foo", "pass");
+        //    try
+        //    {
+        //        client.Connect();
+        //        if (client.IsConnected)
+        //        {
+        //            client.CreateDirectory("/images");
+        //            client.UploadFile(File.OpenRead("./files/portrait.jpg"), "/images/portrait.jpg");
+        //            Console.WriteLine("Directory listing:");
+
+        //            foreach (var sftpFile in client.ListDirectory("/images"))
+        //            {
+        //                Console.WriteLine($"\t{sftpFile.FullName}");
+        //            }
+        //            client.Disconnect();
+        //        }
+        //    }
+        //    catch (Exception e) when (e is SshConnectionException || e is SocketException || e is ProxyException)
+        //    {
+        //        Console.WriteLine($"Error connecting to server: {e.Message}");
+        //    }
+        //    catch (SshAuthenticationException e)
+        //    {
+        //        Console.WriteLine($"Failed to authenticate: {e.Message}");
+        //    }
+        //    catch (SftpPermissionDeniedException e)
+        //    {
+        //        Console.WriteLine($"Operation denied by the server: {e.Message}");
+        //    }
+        //    catch (SshException e)
+        //    {
+        //        Console.WriteLine($"Sftp Error: {e.Message}");
+        //    }
+        //    return CustomResult();
+        //}
     }
 }
