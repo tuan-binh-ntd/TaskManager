@@ -33,13 +33,13 @@ namespace TaskManager.Infrastructure.Services
             return _mapper.Map<RoleViewModel>(appRole);
         }
 
-        public async Task<bool> Delete(Guid id)
+        public async Task<Guid> Delete(Guid id)
         {
             var role = await _roleManager.FindByIdAsync(id.ToString());
             Guard.Against.Null(role, nameof(role));
             var result = await _roleManager.DeleteAsync(role);
 
-            return result.Succeeded;
+            return result.Succeeded ? id : Guid.Empty;
         }
 
         public async Task<RoleViewModel> Get(Guid id)

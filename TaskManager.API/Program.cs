@@ -207,7 +207,13 @@ if (app.Environment.IsProduction())
     });
 
 
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("swagger/v1/swagger.yaml", "API V1");
+    });
     app.UseForwardedHeaders();
+    app.UseHttpsRedirection();
 }
 else
 {

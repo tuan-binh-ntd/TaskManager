@@ -12,7 +12,7 @@ namespace TaskManager.Core.Interfaces.Services
         Task<IReadOnlyCollection<ProjectViewModel>> GetProjects();
         Task<ProjectViewModel> Create(Guid userId, CreateProjectDto projectDto);
         Task<ProjectViewModel> Update(Guid userId, Guid projectId, UpdateProjectDto updateProjectDto);
-        Task<bool> Delete(Guid id);
+        Task<Guid> Delete(Guid id);
         Task<object> GetProjectsByFilter(Guid userId, GetProjectByFilterDto filter, PaginationInput paginationInput);
         Task<ProjectViewModel> Get(Guid projectId);
         Task<ProjectViewModel?> Get(string code);
