@@ -94,9 +94,9 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpGet, AllowAnonymous]
-        public async Task<IActionResult> Gets()
+        public async Task<IActionResult> Gets([FromQuery] GetUserByFilterDto filter)
         {
-            var res = await _userService.Gets();
+            var res = await _userService.Gets(filter);
             return CustomResult(res, HttpStatusCode.OK);
         }
 

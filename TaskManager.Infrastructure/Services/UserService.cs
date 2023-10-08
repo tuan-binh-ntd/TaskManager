@@ -92,9 +92,14 @@ namespace TaskManager.Infrastructure.Services
             return res;
         }
 
-        public async Task<IReadOnlyCollection<UserViewModel>> Gets()
+        public async Task<IReadOnlyCollection<UserViewModel>> Gets(GetUserByFilterDto filter)
         {
             var users = await _userManager.Users.ToListAsync();
+            if(filter.Name != null)
+            {
+                users = users.Where(users => users.Name.ToLower().Trim().
+                Contains(filter.Name.ToLower().Trim())).ToList();
+            }
             return users.Adapt<IReadOnlyCollection<UserViewModel>>();
         }
     }
