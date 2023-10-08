@@ -34,9 +34,11 @@ namespace TaskManager.Infrastructure.Services
         private async Task<ProjectViewModel> ToProjectViewModel(Project project)
         {
             var members = await _projectRepository.GetMembers(project.Id);
+            var backlog = await _projectRepository.GetBacklog(project.Id);
             var projectViewModel = _mapper.Map<ProjectViewModel>(project);
             projectViewModel.Leader = members.Where(m => m.Role == CoreConstants.LeaderRole).SingleOrDefault();
             projectViewModel.Members = members.Where(m => m.Role != CoreConstants.LeaderRole).ToList();
+            projectViewModel.Backlog = backlog;
             return projectViewModel;
         }
 

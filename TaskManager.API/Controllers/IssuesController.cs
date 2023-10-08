@@ -20,9 +20,9 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateIssueDto createIssueDto)
+        public async Task<IActionResult> Create(Guid sprintId, CreateIssueDto createIssueDto)
         {
-            var res = await _issueService.CreateIssue(createIssueDto);
+            var res = await _issueService.CreateIssue(createIssueDto, sprintId: sprintId, null);
             return CustomResult(res, HttpStatusCode.Created);
         }
 

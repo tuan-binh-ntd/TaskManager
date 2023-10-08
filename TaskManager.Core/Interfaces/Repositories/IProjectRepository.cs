@@ -16,5 +16,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         Task<IReadOnlyCollection<Project>> GetByUserId(Guid userId, GetProjectByFilterDto input);
         Task<IReadOnlyCollection<UserViewModel>> GetMembers(Guid projectId);
         Task<Project?> GetByCode(string code);
+        Task<BacklogViewModel> GetBacklog(Guid projectId);
     }
 }

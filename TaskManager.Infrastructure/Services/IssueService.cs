@@ -21,9 +21,18 @@ namespace TaskManager.Infrastructure.Services
             _issueHistoryRepository = issueHistoryRepository;
         }
 
-        public async Task<IssueViewModel> CreateIssue(CreateIssueDto createIssueDto)
+        public async Task<IssueViewModel> CreateIssue(CreateIssueDto createIssueDto, Guid? sprintId = null, Guid? backlogId = null)
         {
             var issue = createIssueDto.Adapt<Issue>();
+
+            if (sprintId is not null)
+            {
+                issue.SprintId = sprintId;
+            }
+            else
+            {
+                issue.BacklogId = backlogId;
+            }
 
             var issueVM = _issueRepository.Add(issue);
             await _issueRepository.UnitOfWork.SaveChangesAsync();

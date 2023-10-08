@@ -105,5 +105,16 @@ namespace TaskManager.Infrastructure.Repositories
             var project = await _context.Projects.SingleOrDefaultAsync(p => p.Code == code);
             return project;
         }
+
+        public async Task<BacklogViewModel> GetBacklog(Guid projectId)
+        {
+            var backlog = await (from b in _context.Backlogs.Where(e => e.ProjectId == projectId)
+                                 select new BacklogViewModel
+                                 {
+                                     Id = b.Id,
+                                     Name = b.Name,
+                                 }).FirstOrDefaultAsync();
+            return backlog!;
+        }
     }
 }

@@ -15,9 +15,7 @@ namespace TaskManager.Core.DTOs
         public DateTime? StartDate { get; set; }
         public DateTime? DueDate { get; set; }
         public Guid? ParentId { get; set; }
-        public Guid? SprintId { get; set; }
         public Guid IssueTypeId { get; set; }
-        public Guid? BacklogId { get; set; }
         public Guid CreatorUserId { get; set; }
     }
 
