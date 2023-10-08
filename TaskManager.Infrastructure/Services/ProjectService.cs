@@ -15,18 +15,21 @@ namespace TaskManager.Infrastructure.Services
         private readonly IBacklogRepository _backlogRepository;
         private readonly IProjectRepository _projectRepository;
         private readonly IUserProjectRepository _userProjectRepository;
+        private readonly ISprintRepository _sprintRepository;
         private readonly IMapper _mapper;
 
         public ProjectService(
             IBacklogRepository backlogRepository,
             IProjectRepository projectRepository,
             IUserProjectRepository userProjectRepository,
+            ISprintRepository sprintRepository,
             IMapper mapper
             )
         {
             _backlogRepository = backlogRepository;
             _projectRepository = projectRepository;
             _userProjectRepository = userProjectRepository;
+            _sprintRepository = sprintRepository;
             _mapper = mapper;
         }
 
@@ -34,11 +37,23 @@ namespace TaskManager.Infrastructure.Services
         private async Task<ProjectViewModel> ToProjectViewModel(Project project)
         {
             var members = await _projectRepository.GetMembers(project.Id);
-            var backlog = await _projectRepository.GetBacklog(project.Id);
+            var backlog = await _backlogRepository.GetBacklog(project.Id);
+            var issueForBacklog = await _backlogRepository.GetIssues(backlog.Id);
+            backlog.Issues = issueForBacklog.ToList();
+            var sprints = await _sprintRepository.GetSprintByProjectId(project.Id);
+            if (sprints.Any())
+            {
+                foreach (var sprint in sprints)
+                {
+                    var issues = await _sprintRepository.GetIssues(sprint.Id);
+                    sprint.Issues = issues.ToList();
+                }
+            }
             var projectViewModel = _mapper.Map<ProjectViewModel>(project);
             projectViewModel.Leader = members.Where(m => m.Role == CoreConstants.LeaderRole).SingleOrDefault();
             projectViewModel.Members = members.Where(m => m.Role != CoreConstants.LeaderRole).ToList();
             projectViewModel.Backlog = backlog;
+            projectViewModel.Sprints = sprints.ToList();
             return projectViewModel;
         }
 

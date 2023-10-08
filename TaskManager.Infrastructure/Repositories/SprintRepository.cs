@@ -43,5 +43,35 @@ namespace TaskManager.Infrastructure.Repositories
         {
             return _context.Sprints.SingleOrDefault(e => e.Id == id);
         }
+
+        public async Task<IReadOnlyCollection<IssueViewModel>> GetIssues(Guid sprintId)
+        {
+            var issues = await (from i in _context.Issues.Where(e => e.SprintId == sprintId)
+                                join it in _context.IssueTypes on i.IssueTypeId equals it.Id
+                                select new IssueViewModel
+                                {
+                                    Id = i.Id,
+                                    Name = i.Name,
+                                    Description = i.Description,
+                                    CreationTime = i.CreationTime,
+                                    CompleteDate    = i.CreationTime,
+                                    Priority = i.Priority,
+                                    Voted = i.Voted,
+                                    Watcher = i.Watcher,
+                                    StartDate = i.StartDate,
+                                    DueDate = i.DueDate,
+                                    SprintId = i.SprintId,
+                                    ParentId = i.ParentId,
+                                    BacklogId = i.BacklogId,
+                                    IssueType = it.Adapt<IssueTypeViewModel>()
+                                }).ToListAsync();
+            return issues.AsReadOnly();
+        }
+
+        public async Task<IReadOnlyCollection<SprintViewModel>> GetSprintByProjectId(Guid projectId)
+        {
+            var sprints = await _context.Sprints.Where(e => e.ProjectId == projectId).ProjectToType<SprintViewModel>().ToListAsync();
+            return sprints.AsReadOnly();    
+        }
     }
 }

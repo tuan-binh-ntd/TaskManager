@@ -1,4 +1,6 @@
-﻿namespace TaskManager.Core.ViewModel
+﻿using TaskManager.Core.Entities;
+
+namespace TaskManager.Core.ViewModel
 {
     public class IssueViewModel
     {
@@ -12,15 +14,11 @@
         public string Voted { get; set; } = string.Empty;
         public DateTime? StartDate { get; set; }
         public DateTime? DueDate { get; set; }
-
-        //Relationship
-        //public Guid? ParentId { get; set; }
-        //public Guid? SprintId { get; set; }
-        //public Sprint? Sprint { get; set; }
-        //public Guid IssueTypeId { get; set; }
-        //public IssueType? IssueType { get; set; }
-        //public Guid? BacklogId { get; set; }
-        //public Backlog? Backlog { get; set; }
+        public Guid? ParentId { get; set; }
+        public Guid? SprintId { get; set; }
+        public Guid IssueTypeId { get; set; }
+        public IssueTypeViewModel? IssueType { get; set; }
+        public Guid? BacklogId { get; set; }
         //public ICollection<IssueHistory>? IssueHistories { get; set; }
         //public ICollection<Comment>? Comments { get; set; }
         //public ICollection<Attachment>? Attachments { get; set; }

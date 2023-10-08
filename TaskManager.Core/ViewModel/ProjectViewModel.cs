@@ -11,11 +11,13 @@
         public UserViewModel? Leader { get; set; }
         public ICollection<UserViewModel>? Members { get; set; }
         public BacklogViewModel? Backlog{ get; set; }
+        public ICollection<SprintViewModel>? Sprints { get; set; }
     }
 
     public class BacklogViewModel
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
+        public ICollection<IssueViewModel>? Issues { get; set; }
     }
 }
