@@ -181,14 +181,20 @@ namespace TaskManager.Infrastructure.Services
                 throw new ArgumentNullException(nameof(project));
 #pragma warning restore CA2208 // Instantiate argument exceptions correctly
             }
-            var userProject = new UserProject()
-            {
-                ProjectId = addMemberToProjectDto.ProjectId,
-                UserId = addMemberToProjectDto.UserId,
-                Role = addMemberToProjectDto.Role
-            };
 
-            project.UserProjects!.Add(userProject);
+            if(addMemberToProjectDto.Members is not null && addMemberToProjectDto.Members.Any())
+            {
+                foreach(var item in addMemberToProjectDto.Members)
+                {
+                    var userProject = new UserProject()
+                    {
+                        ProjectId = addMemberToProjectDto.ProjectId,
+                        UserId = item.UserId,
+                        Role = item.Role
+                    };
+                    project.UserProjects!.Add(userProject);
+                }
+            }
 
             _projectRepository.Update(project);
             await _projectRepository.UnitOfWork.SaveChangesAsync();

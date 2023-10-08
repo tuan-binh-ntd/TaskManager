@@ -54,9 +54,17 @@ namespace TaskManager.Infrastructure.Services
             await _issueRepository.UnitOfWork.SaveChangesAsync();
             return issue.Adapt<IssueViewModel>();
         }
-        //public Task<IReadOnlyCollection<IssueDetailViewModel>> GetBySprintId(Guid sprintId)
-        //{
-        //    var issues = _issueRepository.Gets();
-        //}
+
+        public async Task<IReadOnlyCollection<IssueViewModel>> GetBySprintId(Guid sprintId)
+        {
+            var issues = await _issueRepository.GetIssueBySprintId(sprintId);
+            return issues.Adapt<IReadOnlyCollection<IssueViewModel>>();
+        }
+
+        public async Task<IReadOnlyCollection<IssueViewModel>> GetByBacklogId(Guid backlogId)
+        {
+            var issues = await _issueRepository.GetIssueByBacklogId(backlogId);
+            return issues.Adapt<IReadOnlyCollection<IssueViewModel>>();
+        }
     }
 }
