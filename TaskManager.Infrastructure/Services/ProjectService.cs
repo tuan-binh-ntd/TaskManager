@@ -199,7 +199,7 @@ namespace TaskManager.Infrastructure.Services
             _projectRepository.Update(project);
             await _projectRepository.UnitOfWork.SaveChangesAsync();
 
-            return project.Adapt<ProjectViewModel>();
+            return await ToProjectViewModel(project);
         }
 
         public async Task<ProjectViewModel?> Get(string code)
