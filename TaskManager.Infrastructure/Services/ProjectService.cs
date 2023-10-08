@@ -190,7 +190,7 @@ namespace TaskManager.Infrastructure.Services
                     {
                         ProjectId = addMemberToProjectDto.ProjectId,
                         UserId = item.UserId,
-                        Role = item.Role
+                        Role = addMemberToProjectDto.Role
                     };
                     project.UserProjects!.Add(userProject);
                 }
