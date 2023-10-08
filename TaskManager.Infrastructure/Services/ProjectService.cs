@@ -182,14 +182,14 @@ namespace TaskManager.Infrastructure.Services
 #pragma warning restore CA2208 // Instantiate argument exceptions correctly
             }
 
-            if(addMemberToProjectDto.Members is not null && addMemberToProjectDto.Members.Any())
+            if(addMemberToProjectDto.UserIds  is not null && addMemberToProjectDto.UserIds.Any())
             {
-                foreach(var item in addMemberToProjectDto.Members)
+                foreach(var userId in addMemberToProjectDto.UserIds)
                 {
                     var userProject = new UserProject()
                     {
                         ProjectId = addMemberToProjectDto.ProjectId,
-                        UserId = item.UserId,
+                        UserId = userId,
                         Role = addMemberToProjectDto.Role
                     };
                     project.UserProjects!.Add(userProject);
