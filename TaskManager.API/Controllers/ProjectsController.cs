@@ -22,21 +22,21 @@ namespace TaskManager.API.Controllers
             _projectService = projectService;
         }
 
-        [HttpGet, AllowAnonymous]
+        [HttpGet]
         public async Task<IActionResult> GetProjectByFilter(Guid id, [FromQuery] GetProjectByFilterDto filter, [FromQuery] PaginationInput paginationInput)
         {
             var result = await _projectService.GetProjectsByFilter(id, filter, paginationInput);
             return CustomResult(result, HttpStatusCode.OK);
         }
 
-        [HttpPost, AllowAnonymous]
+        [HttpPost]
         public async Task<IActionResult> CreateProject(Guid id, CreateProjectDto createProjectDto)
         {
             var res = await _projectService.Create(id, createProjectDto);
             return CustomResult(res, HttpStatusCode.Created);
         }
 
-        [HttpPut("{projectId}"), AllowAnonymous]
+        [HttpPut("{projectId}")]
         public async Task<IActionResult> UpdateProject(Guid id, Guid projectId, UpdateProjectDto updateProjectDto)
         {
             var res = await _projectService.Update(userId: id, projectId, updateProjectDto);
@@ -57,7 +57,7 @@ namespace TaskManager.API.Controllers
              return CustomResult(result, HttpStatusCode.OK);
          }*/
 
-        [HttpGet("{code}"), AllowAnonymous]
+        [HttpGet("{code}")]
         public async Task<IActionResult> Get(string code)
         {
             var result = await _projectService.Get(code);
@@ -72,6 +72,13 @@ namespace TaskManager.API.Controllers
         public async Task<IActionResult> AddMember([FromBody] AddMemberToProjectDto addMemberToProjectDto)
         {
             var res = await _projectService.AddMember(addMemberToProjectDto);
+            return CustomResult(res, HttpStatusCode.OK);
+        }
+
+        [HttpPatch("{projectId}")]
+        public async Task<IActionResult> Update(Guid projectId, UpdateProjectDto updateProjectDto)
+        {
+            var res = await _projectService.Update(userId: Guid.Empty, projectId, updateProjectDto);
             return CustomResult(res, HttpStatusCode.OK);
         }
     }

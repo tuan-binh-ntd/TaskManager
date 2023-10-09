@@ -28,7 +28,7 @@ namespace TaskManager.API.Controllers
         public async Task<IActionResult> Create(Guid projectId, [FromBody] CreateIssueTypeDto createIssueTypeDto)
         {
             var res = await _issueTypeService.CreateIssueType(projectId, createIssueTypeDto);
-            return CustomResult(res, HttpStatusCode.OK);
+            return CustomResult(res, HttpStatusCode.Created);
         }
 
         [HttpPut("{issueTypeId}")]
