@@ -26,6 +26,7 @@ namespace TaskManager.Infrastructure.Services
         {
             var issueType = _mapper.Map<IssueType>(createIssueTypeDto);
             issueType.ProjectId = projectId;
+            issueType.Level = 2;
             var issueTypeViewModel = _issueTypeRepository.Add(issueType);
             await _issueTypeRepository.UnitOfWork.SaveChangesAsync();
             return issueTypeViewModel;
