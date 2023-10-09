@@ -39,7 +39,5 @@ namespace TaskManager.API.Controllers
             var res = await _issueService.GetBySprintId(sprintId);
             return CustomResult(res, HttpStatusCode.OK);
         }
-
-        
     }
 }

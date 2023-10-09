@@ -1,5 +1,4 @@
 ﻿using CoreApiResponse;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TaskManager.Core.DTOs;
@@ -18,17 +17,17 @@ namespace TaskManager.API.Controllers
             _issueService = issueService;
         }
 
-        [HttpGet("{id}/issues")]
+        [HttpGet("{backlogId}/issues")]
         public async Task<IActionResult> GetByBacklogId(Guid backlogId)
         {
             var res = await _issueService.GetByBacklogId(backlogId);
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        [HttpPost("{id}/issues")]
-        public async Task<IActionResult> GetByBacklogId(Guid id, CreateIssueDto createIssueDto)
+        [HttpPost("{backlogId}/issues")]
+        public async Task<IActionResult> GetByBacklogId(Guid backlogId, CreateIssueDto createIssueDto)
         {
-            var res = await _issueService.CreateIssue(createIssueDto, sprintId: null, backlogId: id);
+            var res = await _issueService.CreateIssue(createIssueDto, sprintId: null, backlogId: backlogId);
             return CustomResult(res, HttpStatusCode.Created);
         }
     }
