@@ -16,6 +16,7 @@ namespace TaskManager.Infrastructure.Services
         private readonly IProjectRepository _projectRepository;
         private readonly IUserProjectRepository _userProjectRepository;
         private readonly ISprintRepository _sprintRepository;
+        private readonly IIssueTypeRepository _issueTypeRepository;
         private readonly IMapper _mapper;
 
         public ProjectService(
@@ -23,6 +24,7 @@ namespace TaskManager.Infrastructure.Services
             IProjectRepository projectRepository,
             IUserProjectRepository userProjectRepository,
             ISprintRepository sprintRepository,
+            IIssueTypeRepository issueTypeRepository,
             IMapper mapper
             )
         {
@@ -30,6 +32,7 @@ namespace TaskManager.Infrastructure.Services
             _projectRepository = projectRepository;
             _userProjectRepository = userProjectRepository;
             _sprintRepository = sprintRepository;
+            _issueTypeRepository = issueTypeRepository;
             _mapper = mapper;
         }
 
@@ -41,6 +44,7 @@ namespace TaskManager.Infrastructure.Services
             var issueForBacklog = await _backlogRepository.GetIssues(backlog.Id);
             backlog.Issues = issueForBacklog.ToList();
             var sprints = await _sprintRepository.GetSprintByProjectId(project.Id);
+            var issueTypes = await _issueTypeRepository.GetsByProjectId(project.Id);
             if (sprints.Any())
             {
                 foreach (var sprint in sprints)
@@ -54,6 +58,7 @@ namespace TaskManager.Infrastructure.Services
             projectViewModel.Members = members.Where(m => m.Role != CoreConstants.LeaderRole).ToList();
             projectViewModel.Backlog = backlog;
             projectViewModel.Sprints = sprints.ToList();
+            projectViewModel.IssueTypes = issueTypes.ToList();
             return projectViewModel;
         }
 
@@ -199,9 +204,9 @@ namespace TaskManager.Infrastructure.Services
 #pragma warning restore CA2208 // Instantiate argument exceptions correctly
             }
 
-            if(addMemberToProjectDto.UserIds  is not null && addMemberToProjectDto.UserIds.Any())
+            if (addMemberToProjectDto.UserIds is not null && addMemberToProjectDto.UserIds.Any())
             {
-                foreach(var userId in addMemberToProjectDto.UserIds)
+                foreach (var userId in addMemberToProjectDto.UserIds)
                 {
                     var userProject = new UserProject()
                     {

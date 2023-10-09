@@ -10,5 +10,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         void Update(IssueType issueType);
         void Delete(Guid id);
         Task<IReadOnlyCollection<IssueTypeViewModel>> GetsByProjectId(Guid projectId);
+        Task<IssueType> Get(Guid id);
     }
 }

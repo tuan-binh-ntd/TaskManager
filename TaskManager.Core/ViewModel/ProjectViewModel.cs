@@ -10,8 +10,9 @@
         public bool IsFavourite { get; set; } = false;
         public UserViewModel? Leader { get; set; }
         public ICollection<UserViewModel>? Members { get; set; }
-        public BacklogViewModel? Backlog{ get; set; }
+        public BacklogViewModel? Backlog { get; set; }
         public ICollection<SprintViewModel>? Sprints { get; set; }
+        public ICollection<IssueTypeViewModel>? IssueTypes { get; set; }
     }
 
     public class BacklogViewModel

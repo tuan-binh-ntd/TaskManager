@@ -1,6 +1,7 @@
 ﻿using CoreApiResponse;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using TaskManager.Core.DTOs;
 using TaskManager.Core.Interfaces.Services;
 
 namespace TaskManager.API.Controllers
@@ -20,6 +21,13 @@ namespace TaskManager.API.Controllers
         public async Task<IActionResult> Gets(Guid projectId)
         {
             var res = await _issueTypeService.GetIssueTypesByProjectId(projectId);
+            return CustomResult(res, HttpStatusCode.OK);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(Guid projectId, [FromBody] CreateIssueTypeDto createIssueTypeDto)
+        {
+            var res = await _issueTypeService.CreateIssueType(projectId, createIssueTypeDto);
             return CustomResult(res, HttpStatusCode.OK);
         }
     }

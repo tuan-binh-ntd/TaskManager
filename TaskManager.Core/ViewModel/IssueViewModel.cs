@@ -1,6 +1,4 @@
-﻿using TaskManager.Core.Entities;
-
-namespace TaskManager.Core.ViewModel
+﻿namespace TaskManager.Core.ViewModel
 {
     public class IssueViewModel
     {
@@ -9,9 +7,9 @@ namespace TaskManager.Core.ViewModel
         public string? Description { get; set; } = string.Empty;
         public DateTime CreationTime { get; set; }
         public DateTime? CompleteDate { get; set; }
-        public string Priority { get; set; } = string.Empty;
-        public string Watcher { get; set; } = string.Empty;
-        public string Voted { get; set; } = string.Empty;
+        public string? Priority { get; set; } = string.Empty;
+        public string? Watcher { get; set; } = string.Empty;
+        public string? Voted { get; set; } = string.Empty;
         public DateTime? StartDate { get; set; }
         public DateTime? DueDate { get; set; }
         public Guid? ParentId { get; set; }

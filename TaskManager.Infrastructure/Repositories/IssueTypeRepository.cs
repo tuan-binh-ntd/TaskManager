@@ -59,5 +59,12 @@ namespace TaskManager.Infrastructure.Repositories
                 }).ToListAsync();
             return issueTypes.AsReadOnly();
         }
+
+        public async Task<IssueType> Get(Guid id)
+        {
+            var issueType = await _context.IssueTypes.
+                Where(e => e.Id == id).SingleOrDefaultAsync();
+            return issueType!;
+        }
     }
 }
