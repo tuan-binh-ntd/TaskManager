@@ -75,6 +75,7 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<ISprintService, SprintService>();
 builder.Services.AddScoped<IIssueService, IssueService>();
+builder.Services.AddScoped<IIssueTypeService, IssueTypeService>();
 // Add EmailService
 // End  Declaration DI
 

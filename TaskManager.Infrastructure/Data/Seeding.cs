@@ -18,27 +18,32 @@ namespace TaskManager.Infrastructure.Data
                 new IssueType()
                 {
                     Name = "Epic",
-                    Description = "Epics track collections of related bugs, stories, and tasks."
+                    Description = "Epics track collections of related bugs, stories, and tasks.",
+                    Level = 1,
                 },
                 new IssueType()
                 {
                     Name = "Bug",
-                    Description = "Bugs track problems or errors."
+                    Description = "Bugs track problems or errors.",
+                    Level = 2,
                 },
                 new IssueType()
                 {
                     Name = "Story",
-                    Description = "Stories track functionality or features expressed as user goals."
+                    Description = "Stories track functionality or features expressed as user goals.",
+                    Level = 2,
                 },
                 new IssueType()
                 {
                     Name = "Task",
-                    Description = "Tasks track small, distinct pieces of work."
+                    Description = "Tasks track small, distinct pieces of work.",
+                    Level = 2,
                 },
                 new IssueType()
                 {
                     Name = "Subtask",
-                    Description = "Subtasks track small pieces of work that are part of a larger task."
+                    Description = "Subtasks track small pieces of work that are part of a larger task.",
+                    Level = 3,
                 }
             };
 

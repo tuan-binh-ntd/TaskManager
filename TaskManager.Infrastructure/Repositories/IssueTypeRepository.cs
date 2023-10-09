@@ -36,6 +36,7 @@ namespace TaskManager.Infrastructure.Repositories
                 Name = e.Name,
                 Description = e.Description,
                 Icon = e.Icon,
+                Level = e.Level,
             }).ToListAsync();
             return issueTypes.AsReadOnly();
         }
@@ -43,6 +44,20 @@ namespace TaskManager.Infrastructure.Repositories
         public void Update(IssueType issueType)
         {
             _context.Entry(issueType).State = EntityState.Modified;
+        }
+
+        public async Task<IReadOnlyCollection<IssueTypeViewModel>> GetsByProjectId(Guid projectId)
+        {
+            var issueTypes = await _context.IssueTypes.
+                Where(e => e.ProjectId == projectId || e.ProjectId == null).Select(e => new IssueTypeViewModel()
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    Description = e.Description,
+                    Icon = e.Icon,
+                    Level = e.Level,
+                }).ToListAsync();
+            return issueTypes.AsReadOnly();
         }
     }
 }
