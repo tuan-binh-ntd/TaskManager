@@ -39,5 +39,12 @@ namespace TaskManager.API.Controllers
             var res = await _issueService.GetBySprintId(sprintId);
             return CustomResult(res, HttpStatusCode.OK);
         }
+
+        [HttpPost(":name")]
+        public async Task<IActionResult> CreateIssueByName(Guid sprintId, CreateIssueByNameDto createIssueByNameDto)
+        {
+            var res = await _issueService.CreateIssueByName(createIssueByNameDto, sprintId: sprintId, null);
+            return CustomResult(res, HttpStatusCode.Created);
+        }
     }
 }

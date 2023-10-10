@@ -25,9 +25,16 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPost("{backlogId}/issues")]
-        public async Task<IActionResult> GetByBacklogId(Guid backlogId, CreateIssueDto createIssueDto)
+        public async Task<IActionResult> CreateIssue(Guid backlogId, CreateIssueDto createIssueDto)
         {
             var res = await _issueService.CreateIssue(createIssueDto, sprintId: null, backlogId: backlogId);
+            return CustomResult(res, HttpStatusCode.Created);
+        }
+
+        [HttpPost("{backlogId}/issues:name")]
+        public async Task<IActionResult> CreateIssueByName(Guid backlogId, CreateIssueByNameDto createIssueByNameDto)
+        {
+            var res = await _issueService.CreateIssueByName(createIssueByNameDto, sprintId: null, backlogId: backlogId);
             return CustomResult(res, HttpStatusCode.Created);
         }
     }

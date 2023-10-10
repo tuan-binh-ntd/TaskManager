@@ -9,5 +9,7 @@ namespace TaskManager.Core.Interfaces.Services
         Task<IssueViewModel> UpdateIssue(Guid id, UpdateIssueDto updateIssueDto);
         Task<IReadOnlyCollection<IssueViewModel>> GetBySprintId(Guid sprintId);
         Task<IReadOnlyCollection<IssueViewModel>> GetByBacklogId(Guid backlogId);
+        Task<IssueViewModel> CreateIssueByName(CreateIssueByNameDto createIssueByNameDto, Guid? sprintId = default, Guid? backlogId = default);
+
     }
 }

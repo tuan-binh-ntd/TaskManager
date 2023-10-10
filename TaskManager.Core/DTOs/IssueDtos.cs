@@ -57,4 +57,11 @@ namespace TaskManager.Core.DTOs
                 .IgnoreNullValues(true);
         }
     }
+
+    public class CreateIssueByNameDto
+    {
+        public string Name { get; set; } = string.Empty;
+        public Guid IssueTypeId { get; set; }
+        public Guid CreatorUserId { get; set; }
+    }
 }

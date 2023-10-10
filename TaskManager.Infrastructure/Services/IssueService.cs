@@ -11,14 +11,17 @@ namespace TaskManager.Infrastructure.Services
     {
         private readonly IIssueRepository _issueRepository;
         private readonly IIssueHistoryRepository _issueHistoryRepository;
+        private readonly IIssueDetailRepository _issueDetailRepository;
 
         public IssueService(
             IIssueRepository issueRepository,
-            IIssueHistoryRepository issueHistoryRepository
+            IIssueHistoryRepository issueHistoryRepository,
+            IIssueDetailRepository issueDetailRepository
             )
         {
             _issueRepository = issueRepository;
             _issueHistoryRepository = issueHistoryRepository;
+            _issueDetailRepository = issueDetailRepository;
         }
 
         public async Task<IssueViewModel> CreateIssue(CreateIssueDto createIssueDto, Guid? sprintId = null, Guid? backlogId = null)
@@ -36,6 +39,17 @@ namespace TaskManager.Infrastructure.Services
 
             var issueVM = _issueRepository.Add(issue);
             await _issueRepository.UnitOfWork.SaveChangesAsync();
+
+            var issueDetail = new IssueDetail()
+            {
+                ReporterId = createIssueDto.CreatorUserId,
+                StoryPointEstimate = 0,
+                Label = string.Empty,
+                IssueId = issue.Id,
+            };
+
+            _issueDetailRepository.Add(issueDetail);
+            await _issueDetailRepository.UnitOfWork.SaveChangesAsync();
 
             var issueHis = new IssueHistory
             {
@@ -74,6 +88,49 @@ namespace TaskManager.Infrastructure.Services
         {
             var issues = await _issueRepository.GetIssueByBacklogId(backlogId);
             return issues.Adapt<IReadOnlyCollection<IssueViewModel>>();
+        }
+
+        public async Task<IssueViewModel> CreateIssueByName(CreateIssueByNameDto createIssueByNameDto, Guid? sprintId = null, Guid? backlogId = null)
+        {
+            var issue = new Issue()
+            { 
+                Name = createIssueByNameDto.Name,
+                IssueTypeId = createIssueByNameDto.IssueTypeId,
+            };
+
+            if (sprintId is not null)
+            {
+                issue.SprintId = sprintId;
+            }
+            else
+            {
+                issue.BacklogId = backlogId;
+            }
+
+            var issueVM = _issueRepository.Add(issue);
+            await _issueRepository.UnitOfWork.SaveChangesAsync();
+
+            var issueDetail = new IssueDetail()
+            {
+                ReporterId = createIssueByNameDto.CreatorUserId,
+                StoryPointEstimate = 0,
+                Label = string.Empty,
+                IssueId = issue.Id,
+            };
+
+            _issueDetailRepository.Add(issueDetail);
+            await _issueDetailRepository.UnitOfWork.SaveChangesAsync();
+
+            var issueHis = new IssueHistory
+            {
+                Name = "created the Issue",
+                CreatorUserId = createIssueByNameDto.CreatorUserId,
+                IssueId = issue.Id,
+            };
+
+            _issueHistoryRepository.Add(issueHis);
+            await _issueHistoryRepository.UnitOfWork.SaveChangesAsync();
+            return issueVM;
         }
     }
 }

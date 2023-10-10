@@ -15,7 +15,6 @@ namespace TaskManager.Core.Entities
         public string? Voted { get; set; } = string.Empty;
         public DateTime? StartDate { get; set; }
         public DateTime? DueDate { get; set; }
-        public Guid CreatorUserId { get; set; }
         //Relationship
         public Guid? ParentId { get; set; }
         public Guid? SprintId { get; set; }
