@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using MapsterMapper;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
@@ -12,16 +13,19 @@ namespace TaskManager.Infrastructure.Services
         private readonly IIssueRepository _issueRepository;
         private readonly IIssueHistoryRepository _issueHistoryRepository;
         private readonly IIssueDetailRepository _issueDetailRepository;
+        private readonly IMapper _mapper;
 
         public IssueService(
             IIssueRepository issueRepository,
             IIssueHistoryRepository issueHistoryRepository,
-            IIssueDetailRepository issueDetailRepository
+            IIssueDetailRepository issueDetailRepository,
+            IMapper mapper
             )
         {
             _issueRepository = issueRepository;
             _issueHistoryRepository = issueHistoryRepository;
             _issueDetailRepository = issueDetailRepository;
+            _mapper = mapper;
         }
 
         public async Task<IssueViewModel> CreateIssue(CreateIssueDto createIssueDto, Guid? sprintId = null, Guid? backlogId = null)
@@ -37,8 +41,9 @@ namespace TaskManager.Infrastructure.Services
                 issue.BacklogId = backlogId;
             }
 
-            var issueVM = _issueRepository.Add(issue);
+            _issueRepository.Add(issue);
             await _issueRepository.UnitOfWork.SaveChangesAsync();
+            var issueVM = _mapper.Map<IssueViewModel>(issue);
 
             var issueDetail = new IssueDetail()
             {
@@ -107,8 +112,9 @@ namespace TaskManager.Infrastructure.Services
                 issue.BacklogId = backlogId;
             }
 
-            var issueVM = _issueRepository.Add(issue);
+            _issueRepository.Add(issue);
             await _issueRepository.UnitOfWork.SaveChangesAsync();
+            var issueVM = _mapper.Map<IssueViewModel>(issue);
 
             var issueDetail = new IssueDetail()
             {

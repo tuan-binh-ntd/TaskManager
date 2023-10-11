@@ -6,7 +6,7 @@ namespace TaskManager.Core.Interfaces.Repositories
     public interface IIssueRepository : IRepository<Issue>
     {
         Task<IReadOnlyCollection<IssueViewModel>> Gets();
-        IssueViewModel Add(Issue issue);
+        Issue Add(Issue issue);
         void Update(Issue issue);
         void Delete(Guid id);
         Issue? Get(Guid id);

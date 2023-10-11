@@ -17,9 +17,9 @@ namespace TaskManager.Infrastructure.Repositories
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public IssueViewModel Add(Issue issue)
+        public Issue Add(Issue issue)
         {
-            return _context.Issues.Add(issue).Entity.Adapt<IssueViewModel>();
+            return _context.Issues.Add(issue).Entity;
         }
 
         public void Delete(Guid id)
