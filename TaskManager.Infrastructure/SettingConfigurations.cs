@@ -37,4 +37,12 @@
         public string? ApiKey { get; set; }
         public string? ApiSecret { get; set; }
     }
+
+    public class SftpServerSettings
+    {
+        public string Localhost { get; set; } = string.Empty;
+        public int Port { get; set; } = 2222;
+        public string UserName { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
 }

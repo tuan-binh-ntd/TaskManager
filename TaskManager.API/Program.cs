@@ -47,6 +47,7 @@ builder.Services.AddOptions();
 builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection("ConnectionStrings"));
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+builder.Services.Configure<SftpServerSettings>(builder.Configuration.GetSection("SftpServerSettings"));
 
 // Set Mapster
 builder.Services.AddMapster(); // From the configuration file
@@ -76,6 +77,7 @@ builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<ISprintService, SprintService>();
 builder.Services.AddScoped<IIssueService, IssueService>();
 builder.Services.AddScoped<IIssueTypeService, IssueTypeService>();
+builder.Services.AddScoped<IUploadFileService, UploadFileService>();
 // Add EmailService
 // End  Declaration DI
 
@@ -208,11 +210,11 @@ if (app.Environment.IsProduction())
     });
 
 
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("swagger/v1/swagger.yaml", "API V1");
-    });
+    //app.UseSwagger();
+    //app.UseSwaggerUI(c =>
+    //{
+    //    c.SwaggerEndpoint("swagger/v1/swagger.yaml", "API V1");
+    //});
     app.UseForwardedHeaders();
     app.UseHttpsRedirection();
 }
@@ -263,11 +265,11 @@ catch (Exception ex)
 }
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+//}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 

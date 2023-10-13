@@ -15,12 +15,15 @@ namespace TaskManager.API.Controllers
     public class UsersController : BaseController
     {
         private readonly IUserService _userService;
+        private readonly IUploadFileService _uploadFileService;
 
         public UsersController(
-            IUserService userService
+            IUserService userService,
+            IUploadFileService uploadFileService
             )
         {
             _userService = userService;
+            _uploadFileService = uploadFileService;
         }
 
 
@@ -100,37 +103,11 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        //[HttpDelete, AllowAnonymous]
-        //public async Task<IActionResult> Test()
-        //{
-        //    using SftpClient client = new("127.0.0.1", 2222, "binh", "pass");
-        //    try
-        //    {
-        //        client.Connect();
-        //        if (client.IsConnected)
-        //        {
-        //            client.ChangeDirectory("/upload");
-        //            client.UploadFile(System.IO.File.OpenRead("C:\\Users\\enetv\\Downloads\\QUANG ICH_CHITIETDOISOAT gui tren sFTP.xlsx"), "\\home\\binh\\upload\\QUANG ICH_CHITIETDOISOAT gui tren sFTP.xlsx");
-        //            client.Disconnect();
-        //        }
-        //    }
-        //    catch (Exception e) when (e is SshConnectionException || e is SocketException || e is ProxyException)
-        //    {
-        //        Console.WriteLine($"Error connecting to server: {e.Message}");
-        //    }
-        //    catch (SshAuthenticationException e)
-        //    {
-        //        Console.WriteLine($"Failed to authenticate: {e.Message}");
-        //    }
-        //    catch (SftpPermissionDeniedException e)
-        //    {
-        //        Console.WriteLine($"Operation denied by the server: {e.Message}");
-        //    }
-        //    catch (SshException e)
-        //    {
-        //        Console.WriteLine($"Sftp Error: {e.Message}");
-        //    }
-        //    return CustomResult();
-        //}
+        [HttpDelete, AllowAnonymous]
+        public IActionResult Test(IFormFile file)
+        {
+            var res = _uploadFileService.UploadFile(file);
+            return CustomResult(res);
+        }
     }
 }
