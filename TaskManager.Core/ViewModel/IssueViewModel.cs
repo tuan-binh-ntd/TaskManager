@@ -17,10 +17,10 @@
         public Guid IssueTypeId { get; set; }
         public IssueTypeViewModel? IssueType { get; set; }
         public Guid? BacklogId { get; set; }
-        //public ICollection<IssueHistory>? IssueHistories { get; set; }
-        //public ICollection<Comment>? Comments { get; set; }
-        //public ICollection<Attachment>? Attachments { get; set; }
-        //public IssueDetail? IssueDetail { get; set; }
+        public ICollection<IssueHistoryViewModel>? IssueHistories { get; set; }
+        public ICollection<CommentViewModel>? Comments { get; set; }
+        public ICollection<AttachmentViewModel>? Attachments { get; set; }
+        public IssueDetailViewModel? IssueDetail { get; set; }
     }
 
     public class IssueHistoryViewModel

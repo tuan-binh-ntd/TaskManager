@@ -44,27 +44,17 @@ namespace TaskManager.Infrastructure.Repositories
             return _context.Sprints.SingleOrDefault(e => e.Id == id);
         }
 
-        public async Task<IReadOnlyCollection<IssueViewModel>> GetIssues(Guid sprintId)
+        public async Task<IReadOnlyCollection<Issue>> GetIssues(Guid sprintId)
         {
-            var issues = await (from i in _context.Issues.Where(e => e.SprintId == sprintId)
-                                join it in _context.IssueTypes on i.IssueTypeId equals it.Id
-                                select new IssueViewModel
-                                {
-                                    Id = i.Id,
-                                    Name = i.Name,
-                                    Description = i.Description,
-                                    CreationTime = i.CreationTime,
-                                    CompleteDate    = i.CreationTime,
-                                    Priority = i.Priority,
-                                    Voted = i.Voted,
-                                    Watcher = i.Watcher,
-                                    StartDate = i.StartDate,
-                                    DueDate = i.DueDate,
-                                    SprintId = i.SprintId,
-                                    ParentId = i.ParentId,
-                                    BacklogId = i.BacklogId,
-                                    IssueType = it.Adapt<IssueTypeViewModel>()
-                                }).ToListAsync();
+            var issues = await _context.Issues
+                .Where(i => i.SprintId == sprintId)
+                .Include(i => i.Sprint)
+                .Include(i => i.IssueType)
+                .Include(i => i.IssueDetail)
+                .Include(i => i.IssueHistories)
+                .Include(i => i.Comments)
+                .Include(i => i.Attachments)
+                .ToListAsync();
             return issues.AsReadOnly();
         }
 

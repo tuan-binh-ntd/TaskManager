@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using MapsterMapper;
+using System.Xml.Linq;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
@@ -27,6 +28,48 @@ namespace TaskManager.Infrastructure.Services
             _issueDetailRepository = issueDetailRepository;
             _mapper = mapper;
         }
+
+        #region Private Method
+        private IReadOnlyCollection<IssueViewModel> ToIssueViewModels(IReadOnlyCollection<Issue> issues)
+        {
+            var issueViewModels = new List<IssueViewModel>();
+            if(issues.Any())
+            {
+                foreach(var issue in issues)
+                {
+                    var issueViewModel = ToIssueViewModel(issue);
+                    issueViewModels.Add(issueViewModel);
+                }
+            }
+            return issueViewModels.AsReadOnly();
+        }
+
+        private IssueViewModel ToIssueViewModel(Issue issue)
+        {
+            var issueViewModel = _mapper.Map<IssueViewModel>(issue);
+            if(issue.IssueDetail is not null)
+            {
+                var issueDetail = _mapper.Map<IssueDetailViewModel>(issue.IssueDetail);
+                issueViewModel.IssueDetail = issueDetail;
+            }
+            if(issue.IssueHistories is not null && issue.IssueHistories.Any())
+            {
+                var issueHistories = _mapper.Map<ICollection<IssueHistoryViewModel>>(issue.IssueHistories);
+                issueViewModel.IssueHistories = issueHistories;
+            }
+            if(issue.Comments is not null && issue.Comments.Any())
+            {
+                var comments = _mapper.Map<ICollection<CommentViewModel>>(issue.Comments);
+                issueViewModel.Comments = comments;
+            }
+            if (issue.Attachments is not null && issue.Attachments.Any())
+            {
+                var attachments = _mapper.Map<ICollection<AttachmentViewModel>>(issue.Attachments);
+                issueViewModel.Attachments = attachments;
+            }
+            return issueViewModel;
+        }
+        #endregion
 
         public async Task<IssueViewModel> CreateIssue(CreateIssueDto createIssueDto, Guid? sprintId = null, Guid? backlogId = null)
         {
@@ -86,13 +129,13 @@ namespace TaskManager.Infrastructure.Services
         public async Task<IReadOnlyCollection<IssueViewModel>> GetBySprintId(Guid sprintId)
         {
             var issues = await _issueRepository.GetIssueBySprintId(sprintId);
-            return issues.Adapt<IReadOnlyCollection<IssueViewModel>>();
+            return ToIssueViewModels(issues);
         }
 
         public async Task<IReadOnlyCollection<IssueViewModel>> GetByBacklogId(Guid backlogId)
         {
             var issues = await _issueRepository.GetIssueByBacklogId(backlogId);
-            return issues.Adapt<IReadOnlyCollection<IssueViewModel>>();
+            return ToIssueViewModels(issues);
         }
 
         public async Task<IssueViewModel> CreateIssueByName(CreateIssueByNameDto createIssueByNameDto, Guid? sprintId = null, Guid? backlogId = null)

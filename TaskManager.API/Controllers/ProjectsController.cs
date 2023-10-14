@@ -22,7 +22,7 @@ namespace TaskManager.API.Controllers
             _projectService = projectService;
         }
 
-        [HttpGet]
+        [HttpGet, AllowAnonymous]
         public async Task<IActionResult> GetProjectByFilter(Guid id, [FromQuery] GetProjectByFilterDto filter, [FromQuery] PaginationInput paginationInput)
         {
             var result = await _projectService.GetProjectsByFilter(id, filter, paginationInput);
