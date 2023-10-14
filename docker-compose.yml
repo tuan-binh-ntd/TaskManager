@@ -21,22 +21,22 @@ services:
         - D:\sftp-upload:/home/binh/upload
     networks:
       - taskmanager-net
-  # mssql:
-  #   container_name: taskmanager.sql-server
-  #   image: mcr.microsoft.com/mssql/server:2022-latest+
-  #   restart: always
-  #   environment:
-  #     ACCEPT_EULA: "Y"
-  #     SA_PASSWORD: "Thistimeisover1!"
-  #   ports:
-  #     - 5433:1433
-  #   networks:
-  #     - taskmanager-net
+  mssql:
+    container_name: taskmanager.sql-server
+    image: mcr.microsoft.com/mssql/server:2022-latest+
+    restart: always
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Thistimeisover1!"
+    ports:
+      - 5433:1433
+    networks:
+      - taskmanager-net
   frontend:
     container_name: taskmanager.front-end
     build: ./front-end/TaskManager
     volumes:
-      - './front-end/TaskManager/:/app'
+      - './front-end/TaskManager:/app'
       - '/app/node_modules'
     ports:
       - 3000:3000
