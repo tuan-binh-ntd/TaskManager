@@ -31,7 +31,8 @@ namespace TaskManager.Infrastructure.Services
                 Name = $"{projectConfiguration.Code} {sprintIndex}",
                 StartDate = null,
                 EndDate = null,
-                Goal = string.Empty
+                Goal = string.Empty,
+                ProjectId = projectId,
             };
             _sprintRepository.Add(sprint);
             var result = await _sprintRepository.UnitOfWork.SaveChangesAsync();
