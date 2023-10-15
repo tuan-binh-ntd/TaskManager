@@ -63,5 +63,6 @@ namespace TaskManager.Core.DTOs
         public string Name { get; set; } = string.Empty;
         public Guid IssueTypeId { get; set; }
         public Guid CreatorUserId { get; set; }
+        public Guid ProjectId { get; set; }
     }
 }

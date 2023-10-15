@@ -14,18 +14,21 @@ namespace TaskManager.Infrastructure.Services
         private readonly IIssueRepository _issueRepository;
         private readonly IIssueHistoryRepository _issueHistoryRepository;
         private readonly IIssueDetailRepository _issueDetailRepository;
+        private readonly IProjectConfigurationRepository _projectConfigurationRepository;
         private readonly IMapper _mapper;
 
         public IssueService(
             IIssueRepository issueRepository,
             IIssueHistoryRepository issueHistoryRepository,
             IIssueDetailRepository issueDetailRepository,
+            IProjectConfigurationRepository projectConfigurationRepository,
             IMapper mapper
             )
         {
             _issueRepository = issueRepository;
             _issueHistoryRepository = issueHistoryRepository;
             _issueDetailRepository = issueDetailRepository;
+            _projectConfigurationRepository = projectConfigurationRepository;
             _mapper = mapper;
         }
 
@@ -140,10 +143,14 @@ namespace TaskManager.Infrastructure.Services
 
         public async Task<IssueViewModel> CreateIssueByName(CreateIssueByNameDto createIssueByNameDto, Guid? sprintId = null, Guid? backlogId = null)
         {
+            var projectConfiguration = _projectConfigurationRepository.GetByProjectId(createIssueByNameDto.ProjectId);
+            int issueIndex = projectConfiguration.IssueCode++;
+
             var issue = new Issue()
             { 
                 Name = createIssueByNameDto.Name,
                 IssueTypeId = createIssueByNameDto.IssueTypeId,
+                Code = $"{projectConfiguration.Code}-{issueIndex}"
             };
 
             if (sprintId is not null)
@@ -179,6 +186,11 @@ namespace TaskManager.Infrastructure.Services
 
             _issueHistoryRepository.Add(issueHis);
             await _issueHistoryRepository.UnitOfWork.SaveChangesAsync();
+
+            projectConfiguration.IssueCode = issueIndex;
+            _projectConfigurationRepository.Update(projectConfiguration);
+            await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
+
             return issueVM;
         }
     }
