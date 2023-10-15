@@ -53,5 +53,12 @@ namespace TaskManager.API.Controllers
             var res = await _issueService.UpdateIssue(id, updateIssueDto);
             return CustomResult(res, HttpStatusCode.OK);
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var res = await _issueService.DeleteIssue(id);
+            return CustomResult(res, HttpStatusCode.OK);
+        }
     }
 }

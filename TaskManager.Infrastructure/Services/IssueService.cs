@@ -193,5 +193,11 @@ namespace TaskManager.Infrastructure.Services
 
             return issueVM;
         }
+
+        public Task<Guid> DeleteIssue(Guid id)
+        {
+            _issueRepository.Delete(id);
+            return Task.FromResult(id);
+        }
     }
 }
