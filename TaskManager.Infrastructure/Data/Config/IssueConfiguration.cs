@@ -30,6 +30,11 @@ namespace TaskManager.Infrastructure.Data.Config
                 .HasOne(i => i.IssueDetail)
                 .WithOne(ih => ih.Issue)
                 .IsRequired();
+
+            //Add Unique Constraint for Code Col
+            builder
+                .HasIndex(p => p.Code)
+                .IsUnique();
         }
     }
 }
