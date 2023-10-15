@@ -19,6 +19,10 @@ namespace TaskManager.Infrastructure.Data.Config
             builder
                 .HasIndex(p => p.Code)
                 .IsUnique();
+
+            builder
+                .HasOne(p => p.ProjectConfiguration)
+                .WithOne(pg => pg.Project);
         }
     }
 }

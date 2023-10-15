@@ -67,6 +67,7 @@ builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
 builder.Services.AddScoped<IIssueDetailRepository, IssueDetailRepository>();
 builder.Services.AddScoped<ISprintRepository, SprintRepository>();
+builder.Services.AddScoped<IProjectConfigurationRepository, ProjectConfigurationRepository>();
 
 // Services
 builder.Services.AddScoped<IJWTTokenService, JWTTokenService>();

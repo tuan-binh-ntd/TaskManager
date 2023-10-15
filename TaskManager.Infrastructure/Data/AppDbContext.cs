@@ -35,6 +35,7 @@ namespace TaskManager.Infrastructure.Data
         public DbSet<Comment> Comments => Set<Comment>();
         public DbSet<Attachment> Attachments => Set<Attachment>();
         public DbSet<IssueDetail> IssueDetails => Set<IssueDetail>();
+        public DbSet<ProjectConfiguration> ProjectConfigurations => Set<ProjectConfiguration>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

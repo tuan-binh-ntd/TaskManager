@@ -7,5 +7,6 @@ namespace TaskManager.Core.Interfaces.Services
     {
         Task<SprintViewModel> CreateSprint(CreateSprintDto createSprintDto);
         Task<SprintViewModel> UpdateSprint(Guid id, UpdateSprintDto updateSprintDto);
+        Task<SprintViewModel> CreateNoFieldSprint(Guid projectId);
     }
 }

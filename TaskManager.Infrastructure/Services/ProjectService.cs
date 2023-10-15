@@ -17,6 +17,7 @@ namespace TaskManager.Infrastructure.Services
         private readonly IUserProjectRepository _userProjectRepository;
         private readonly ISprintRepository _sprintRepository;
         private readonly IIssueTypeRepository _issueTypeRepository;
+        private readonly IProjectConfigurationRepository _projectConfigurationRepository;
         private readonly IMapper _mapper;
 
         public ProjectService(
@@ -25,6 +26,7 @@ namespace TaskManager.Infrastructure.Services
             IUserProjectRepository userProjectRepository,
             ISprintRepository sprintRepository,
             IIssueTypeRepository issueTypeRepository,
+            IProjectConfigurationRepository projectConfigurationRepository,
             IMapper mapper
             )
         {
@@ -33,6 +35,7 @@ namespace TaskManager.Infrastructure.Services
             _userProjectRepository = userProjectRepository;
             _sprintRepository = sprintRepository;
             _issueTypeRepository = issueTypeRepository;
+            _projectConfigurationRepository = projectConfigurationRepository;
             _mapper = mapper;
         }
 
@@ -158,6 +161,17 @@ namespace TaskManager.Infrastructure.Services
 
             _backlogRepository.Add(backlog);
             await _backlogRepository.UnitOfWork.SaveChangesAsync();
+
+            ProjectConfiguration projectConfiguration = new()
+            {
+                ProjectId = project.Id,
+                IssueCode = 1,
+                SprintCode = 1,
+                Code = project.Code
+            };
+
+            _projectConfigurationRepository.Add(projectConfiguration);
+            await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
 
             return await ToProjectViewModel(project);
         }

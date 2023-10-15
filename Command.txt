@@ -20,6 +20,7 @@
 	Add-Migration -Name Drop-CreatorUserId-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
 	Add-Migration -Name Add-Code-Col-To-Issue-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
 	Add-Migration -Name Add-Unique-Constranits-To-Issue-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
+	Add-Migration -Name Add-ProjectConfiguration-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
 
 - Remove migration to DB
 	Remove-Migration -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API

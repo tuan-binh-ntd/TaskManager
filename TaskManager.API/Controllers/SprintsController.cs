@@ -32,5 +32,12 @@ namespace TaskManager.API.Controllers
             var res = await _sprintService.UpdateSprint(id, updateSprintDto);
             return CustomResult(res, HttpStatusCode.OK);
         }
+
+        [HttpPost("{:no-field}")]
+        public async Task<IActionResult> Create(Guid projectId)
+        {
+            var res = await _sprintService.CreateNoFieldSprint(projectId);
+            return CustomResult(res, HttpStatusCode.Created);
+        }
     }
 }

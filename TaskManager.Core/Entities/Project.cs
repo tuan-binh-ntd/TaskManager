@@ -16,6 +16,7 @@ namespace TaskManager.Core.Entities
         public Backlog? Backlog { get; set; }
         public ICollection<UserProject>? UserProjects { get; set; }
         public ICollection<IssueType>? IssueTypes { get; set; }
+        public ProjectConfiguration? ProjectConfiguration { get; set; }
 
         public ProjectViewModel ToViewModel()
         {
