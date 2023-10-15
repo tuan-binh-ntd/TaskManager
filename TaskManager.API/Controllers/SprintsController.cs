@@ -39,5 +39,12 @@ namespace TaskManager.API.Controllers
             var res = await _sprintService.CreateNoFieldSprint(projectId);
             return CustomResult(res, HttpStatusCode.Created);
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var res = await _sprintService.DeleteSprint(id);
+            return CustomResult(res, HttpStatusCode.NotFound);
+        }
     }
 }

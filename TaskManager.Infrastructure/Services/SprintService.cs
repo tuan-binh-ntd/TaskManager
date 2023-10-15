@@ -28,7 +28,7 @@ namespace TaskManager.Infrastructure.Services
 
             Sprint sprint = new()
             {
-                Name = $"{projectConfiguration.Code} {sprintIndex}",
+                Name = $"{projectConfiguration.Code} Sprint {sprintIndex}",
                 StartDate = null,
                 EndDate = null,
                 Goal = string.Empty,
@@ -52,6 +52,12 @@ namespace TaskManager.Infrastructure.Services
             var sprintVM = _sprintRepository.Add(sprint);
             await _sprintRepository.UnitOfWork.SaveChangesAsync();
             return sprintVM;
+        }
+
+        public Task<Guid> DeleteSprint(Guid id)
+        {
+            _sprintRepository.Delete(id);
+            return Task.FromResult(id);
         }
 
         public async Task<SprintViewModel> UpdateSprint(Guid id, UpdateSprintDto updateSprintDto)
