@@ -36,6 +36,11 @@ namespace TaskManager.Infrastructure.Data
         public DbSet<Attachment> Attachments => Set<Attachment>();
         public DbSet<IssueDetail> IssueDetails => Set<IssueDetail>();
         public DbSet<ProjectConfiguration> ProjectConfigurations => Set<ProjectConfiguration>();
+        public DbSet<StatusCategory> StatusCategories => Set<StatusCategory>();
+        public DbSet<Status> Statuses => Set<Status>();
+        public DbSet<Transition> Transitions => Set<Transition>();
+        public DbSet<Workflow> Workflows => Set<Workflow>();
+        public DbSet<WorkflowIssueType> WorkflowIssueTypes => Set<WorkflowIssueType>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

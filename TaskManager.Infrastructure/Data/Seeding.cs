@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using TaskManager.Core.Core;
 using TaskManager.Core.Entities;
 
 namespace TaskManager.Infrastructure.Data
@@ -11,8 +12,39 @@ namespace TaskManager.Infrastructure.Data
             RoleManager<AppRole> roleManager,
             AppDbContext appDbContext)
         {
-            if (await appDbContext.IssueTypes.AnyAsync()) return;
+            if (await appDbContext.StatusCategories.AnyAsync()) return;
+            var statusCategories = new List<StatusCategory>
+            {
+                new StatusCategory()
+                {
+                    Name = "To-do status",
+                    Color = "#dddddd",
+                    Code = CoreConstants.ToDoCode
+                },
+                new StatusCategory()
+                {
+                    Name = "In-progress status",
+                    Color = "#45b6fe",
+                    Code = CoreConstants.InProgressCode
+                },
+                new StatusCategory()
+                {
+                    Name = "Done status",
+                    Color = "#b4d3b2",
+                    Code = CoreConstants.DoneCode
+                },
+                new StatusCategory()
+                {
+                    Name ="Hide status",
+                    Color = "#26282A",
+                    Code = CoreConstants.HideCode
+                }
+            };
 
+            await appDbContext.StatusCategories.AddRangeAsync(statusCategories);
+            await appDbContext.SaveChangesAsync();
+
+            if (await appDbContext.IssueTypes.AnyAsync()) return;
             var issueTypes = new List<IssueType>()
             {
                 new IssueType()

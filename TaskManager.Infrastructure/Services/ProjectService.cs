@@ -18,6 +18,10 @@ namespace TaskManager.Infrastructure.Services
         private readonly ISprintRepository _sprintRepository;
         private readonly IIssueTypeRepository _issueTypeRepository;
         private readonly IProjectConfigurationRepository _projectConfigurationRepository;
+        private readonly IStatusCategoryRepository _statusCategoryRepository;
+        private readonly IStatusRepository _statusRepository;
+        private readonly ITransitionRepository _transitionRepository;
+        private readonly IWorkflowRepository _workflowRepository;
         private readonly IMapper _mapper;
 
         public ProjectService(
@@ -27,6 +31,10 @@ namespace TaskManager.Infrastructure.Services
             ISprintRepository sprintRepository,
             IIssueTypeRepository issueTypeRepository,
             IProjectConfigurationRepository projectConfigurationRepository,
+            IStatusCategoryRepository statusCategoryRepository,
+            IStatusRepository statusRepository,
+            ITransitionRepository transitionRepository,
+            IWorkflowRepository workflowRepository,
             IMapper mapper
             )
         {
@@ -36,6 +44,10 @@ namespace TaskManager.Infrastructure.Services
             _sprintRepository = sprintRepository;
             _issueTypeRepository = issueTypeRepository;
             _projectConfigurationRepository = projectConfigurationRepository;
+            _statusCategoryRepository = statusCategoryRepository;
+            _statusRepository = statusRepository;
+            _transitionRepository = transitionRepository;
+            _workflowRepository = workflowRepository;
             _mapper = mapper;
         }
 
@@ -119,6 +131,164 @@ namespace TaskManager.Infrastructure.Services
             }
             return projectViewModels;
         }
+
+        private async Task CreateStatusForProject(Project project)
+        {
+            // Define default status for project
+            var statusCategories = _statusCategoryRepository.Gets();
+
+            var startStatus = new Status()
+            {
+                Name = CoreConstants.StartStatusName,
+                ProjectId = project.Id,
+                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.HideCode).Select(e => e.Id).FirstOrDefault()
+            };
+
+            var anyStatus = new Status()
+            {
+                Name = CoreConstants.AnyStatusName,
+                ProjectId = project.Id,
+                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.HideCode).Select(e => e.Id).FirstOrDefault()
+            };
+
+            var todoStatus = new Status()
+            {
+                Name = "TO DO",
+                ProjectId = project.Id,
+                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.ToDoCode).Select(e => e.Id).FirstOrDefault()
+            };
+
+            var inProgressStatus = new Status()
+            {
+                Name = "IN PROGRESS",
+                ProjectId = project.Id,
+                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.InProgressCode).Select(e => e.Id).FirstOrDefault()
+            };
+
+            var doneStatus = new Status()
+            {
+                Name = "DONE",
+                ProjectId = project.Id,
+                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.DoneCode).Select(e => e.Id).FirstOrDefault()
+            };
+
+            var statuses = new List<Status>()
+            {
+                startStatus, todoStatus, doneStatus, inProgressStatus, anyStatus
+            };
+
+            _statusRepository.AddRange(statuses);
+            await _statusRepository.UnitOfWork.SaveChangesAsync();
+
+            // Define default workflow for project
+
+            // Create transition
+            var createTransition = new Transition()
+            {
+                Name = "Create",
+                FromStatusId = startStatus.Id,
+                ToStatusId = todoStatus.Id,
+                ProjectId = project.Id,
+            };
+
+            // Create transition
+            var workingTransition = new Transition()
+            {
+                Name = "Working",
+                FromStatusId = todoStatus.Id,
+                ToStatusId = inProgressStatus.Id,
+                ProjectId = project.Id,
+            };
+
+            // Create transition
+            var doneTransition = new Transition()
+            {
+                Name = "Done",
+                FromStatusId = inProgressStatus.Id,
+                ToStatusId = doneStatus.Id,
+                ProjectId = project.Id,
+            };
+
+            // Any Transition
+            var anyToTodoTransition = new Transition()
+            {
+                Name = "Any status moving to \"To Do\"",
+                FromStatusId = anyStatus.Id,
+                ToStatusId = todoStatus.Id,
+                ProjectId = project.Id,
+            };
+
+            var anyToInProgressTransition = new Transition()
+            {
+                Name = "Any status moving to \"In Progress\"",
+                FromStatusId = anyStatus.Id,
+                ToStatusId = inProgressStatus.Id,
+                ProjectId = project.Id,
+            };
+
+            var anyToDoneTransition = new Transition()
+            {
+                Name = "Any status moving to \"Done\"",
+                FromStatusId = anyStatus.Id,
+                ToStatusId = doneStatus.Id,
+                ProjectId = project.Id,
+            };
+
+            var transitions = new List<Transition>()
+            {
+                createTransition, workingTransition, doneTransition, anyToTodoTransition, anyToInProgressTransition, anyToDoneTransition
+            };
+
+            _transitionRepository.AddRange(transitions);
+            await _transitionRepository.UnitOfWork.SaveChangesAsync();
+        }
+
+        private async Task CreateWorkflowForProject(Project project)
+        {
+            var workflow = new Workflow()
+            {
+                Name = $"Workflow of {project.Name}",
+                ProjectId = project.Id,
+            };
+
+            var issueTypes = await _issueTypeRepository.GetsByProjectId(project.Id);
+            workflow.WorkflowIssueTypes = new List<WorkflowIssueType>();
+            foreach (var item in issueTypes)
+            {
+                var WorkflowIssueType = new WorkflowIssueType()
+                {
+                    IssueTypeId = item.Id,
+                    WorkflowId = workflow.Id,
+                };
+                workflow.WorkflowIssueTypes.Add(WorkflowIssueType);
+            }
+
+            _workflowRepository.Add(workflow);
+            await _workflowRepository.UnitOfWork.SaveChangesAsync();
+        }
+
+        private async Task CreateBacklogAndProjectConfigurationForProject(Project project)
+        {
+            Backlog backlog = new()
+            {
+                Name = project.Name,
+                ProjectId = project.Id
+            };
+
+            _backlogRepository.Add(backlog);
+            await _backlogRepository.UnitOfWork.SaveChangesAsync();
+
+            ProjectConfiguration projectConfiguration = new()
+            {
+                ProjectId = project.Id,
+                IssueCode = 1,
+                SprintCode = 1,
+                Code = project.Code
+            };
+
+            _projectConfigurationRepository.Add(projectConfiguration);
+            await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
+        }
         #endregion
 
         public async Task<Guid> Delete(Guid id)
@@ -153,25 +323,11 @@ namespace TaskManager.Infrastructure.Services
             _projectRepository.Add(project);
             await _projectRepository.UnitOfWork.SaveChangesAsync();
 
-            Backlog backlog = new()
-            {
-                Name = project.Name,
-                ProjectId = project.Id
-            };
+            await CreateBacklogAndProjectConfigurationForProject(project);
 
-            _backlogRepository.Add(backlog);
-            await _backlogRepository.UnitOfWork.SaveChangesAsync();
+            await CreateStatusForProject(project);
 
-            ProjectConfiguration projectConfiguration = new()
-            {
-                ProjectId = project.Id,
-                IssueCode = 1,
-                SprintCode = 1,
-                Code = project.Code
-            };
-
-            _projectConfigurationRepository.Add(projectConfiguration);
-            await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
+            await CreateWorkflowForProject(project);
 
             return await ToProjectViewModel(project);
         }

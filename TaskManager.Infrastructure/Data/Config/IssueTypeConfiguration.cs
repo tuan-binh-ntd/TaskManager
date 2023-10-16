@@ -17,6 +17,12 @@ namespace TaskManager.Infrastructure.Data.Config
                 .WithMany(p => p.IssueTypes)
                 .HasForeignKey(it => it.ProjectId)
                 .IsRequired(false);
+
+            builder
+               .HasMany(w => w.WorkflowIssueTypes)
+               .WithOne(wi => wi.IssueType)
+               .HasForeignKey(wi => wi.IssueTypeId)
+               .IsRequired();
         }
     }
 }

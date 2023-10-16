@@ -68,6 +68,10 @@ builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
 builder.Services.AddScoped<IIssueDetailRepository, IssueDetailRepository>();
 builder.Services.AddScoped<ISprintRepository, SprintRepository>();
 builder.Services.AddScoped<IProjectConfigurationRepository, ProjectConfigurationRepository>();
+builder.Services.AddScoped<IStatusRepository, StatusRepository>();
+builder.Services.AddScoped<IStatusCategoryRepository, StatusCategoryRepository>();
+builder.Services.AddScoped<ITransitionRepository, TransitionRepository>();
+builder.Services.AddScoped<IWorkflowRepository, WorkflowRepository>();
 
 // Services
 builder.Services.AddScoped<IJWTTokenService, JWTTokenService>();
