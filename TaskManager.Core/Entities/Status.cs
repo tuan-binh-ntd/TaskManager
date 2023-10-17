@@ -10,6 +10,6 @@ namespace TaskManager.Core.Entities
         public Project? Project { get; set; }
         public Guid StatusCategoryId { get; set; }
         public StatusCategory? StatusCategory { get; set; }
-        //public ICollection<Issue>? Issues { get; set; }
+        public ICollection<Issue>? Issues { get; set; }
     }
 }

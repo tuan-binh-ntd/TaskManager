@@ -28,7 +28,7 @@ namespace TaskManager.Core.Entities
         public ICollection<Comment>? Comments { get; set; }
         public ICollection<Attachment>? Attachments { get; set; }
         public IssueDetail? IssueDetail { get; set; }
-        //public Guid StatusId { get; set; }
-        //public Status? Status { get; set; }
+        public Guid? StatusId { get; set; }
+        public Status? Status { get; set; }
     }
 }

@@ -20,11 +20,11 @@ namespace TaskManager.Infrastructure.Data.Config
                 .HasForeignKey(s => s.ProjectId)
                 .IsRequired(false);
 
-            //builder
-            //    .HasMany(s => s.Issues)
-            //    .WithOne(i => i.Status)
-            //    .HasForeignKey(i => i.StatusId)
-            //    .IsRequired();
+            builder
+                .HasMany(s => s.Issues)
+                .WithOne(i => i.Status)
+                .HasForeignKey(i => i.StatusId)
+                .IsRequired(false);
         }
     }
 }

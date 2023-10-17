@@ -41,5 +41,11 @@ namespace TaskManager.Infrastructure.Repositories
             var statuses = await _context.Statuses.Where(s => s.ProjectId == projectId).ToListAsync();
             return statuses.AsReadOnly();
         }
+
+        public async Task<Status> GetById(Guid id)
+        {
+            var status = await _context.Statuses.Where(s => s.Id == id).FirstOrDefaultAsync();
+            return status!;
+        }
     }
 }
