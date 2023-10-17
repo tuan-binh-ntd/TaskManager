@@ -46,5 +46,12 @@ namespace TaskManager.API.Controllers
             var res = await _sprintService.DeleteSprint(id);
             return CustomResult(res, HttpStatusCode.NotFound);
         }
+
+        [HttpPut("{id}:start")]
+        public async Task<IActionResult> Start(Guid projectId, Guid id, UpdateSprintDto updateSprintDto)
+        {
+            var res = await _sprintService.StartSprint(projectId, sprintId: id, updateSprintDto);
+            return CustomResult(res, HttpStatusCode.OK);
+        }
     }
 }

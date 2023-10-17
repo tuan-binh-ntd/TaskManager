@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using MapsterMapper;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
@@ -11,14 +12,26 @@ namespace TaskManager.Infrastructure.Services
     {
         private readonly ISprintRepository _sprintRepository;
         private readonly IProjectConfigurationRepository _projectConfigurationRepository;
+        private readonly IIssueRepository _issueRepository;
+        private readonly IStatusRepository _statusRepository;
+        private readonly ITransitionRepository _transitionRepository;
+        private readonly IMapper _mapper;
 
         public SprintService(
             ISprintRepository sprintRepository,
-            IProjectConfigurationRepository projectConfigurationRepository
+            IProjectConfigurationRepository projectConfigurationRepository,
+            IIssueRepository issueRepository,
+            IStatusRepository statusRepository,
+            ITransitionRepository transitionRepository,
+            IMapper mapper
             )
         {
             _sprintRepository = sprintRepository;
             _projectConfigurationRepository = projectConfigurationRepository;
+            _issueRepository = issueRepository;
+            _statusRepository = statusRepository;
+            _transitionRepository = transitionRepository;
+            _mapper = mapper;
         }
 
         public async Task<SprintViewModel> CreateNoFieldSprint(Guid projectId)
@@ -58,6 +71,27 @@ namespace TaskManager.Infrastructure.Services
         {
             _sprintRepository.Delete(id);
             return Task.FromResult(id);
+        }
+
+        public async Task<SprintViewModel> StartSprint(Guid projectId, Guid sprintId, UpdateSprintDto updateSprintDto)
+        {
+            var sprint = _sprintRepository.Get(sprintId);
+            sprint = updateSprintDto.Adapt(sprint);
+            _sprintRepository.Update(sprint!);
+            await _sprintRepository.UnitOfWork.SaveChangesAsync();
+
+            var issues = await _sprintRepository.GetIssues(sprintId);
+            var createTransition = _transitionRepository.GetCreateTransitionByProjectId(projectId);
+            foreach (var issue in issues)
+            {
+                issue.StatusId = createTransition.ToStatusId;
+            }
+            _issueRepository.UpdateRange(issues);
+            await _issueRepository.UnitOfWork.SaveChangesAsync();
+
+            var sprintViewModel = _mapper.Map<SprintViewModel>(sprint!);
+            sprintViewModel.Issues = _mapper.Map<ICollection<IssueViewModel>>(issues);
+            return sprintViewModel;
         }
 
         public async Task<SprintViewModel> UpdateSprint(Guid id, UpdateSprintDto updateSprintDto)

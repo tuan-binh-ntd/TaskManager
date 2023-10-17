@@ -11,5 +11,7 @@ namespace TaskManager.Core.Interfaces.Repositories
         void Delete(Guid id);
         Task<IReadOnlyCollection<IssueTypeViewModel>> GetsByProjectId(Guid projectId);
         Task<IssueType> Get(Guid id);
+        Task<IssueType> GetSubtask();
+        Task<IssueType> GetEpic();
     }
 }

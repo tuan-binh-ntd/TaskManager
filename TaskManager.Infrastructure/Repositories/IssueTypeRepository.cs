@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
+using TaskManager.Core.Core;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.ViewModel;
@@ -64,6 +65,20 @@ namespace TaskManager.Infrastructure.Repositories
         {
             var issueType = await _context.IssueTypes.
                 Where(e => e.Id == id).SingleOrDefaultAsync();
+            return issueType!;
+        }
+
+        public async Task<IssueType> GetSubtask()
+        {
+            var issueType = await _context.IssueTypes.
+               Where(e => e.Name == CoreConstants.SubTaskName).SingleOrDefaultAsync();
+            return issueType!;
+        }
+
+        public async Task<IssueType> GetEpic()
+        {
+            var issueType = await _context.IssueTypes.
+               Where(e => e.Name == CoreConstants.EpicName).SingleOrDefaultAsync();
             return issueType!;
         }
     }

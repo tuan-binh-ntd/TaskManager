@@ -187,7 +187,7 @@ namespace TaskManager.Infrastructure.Services
             // Create transition
             var createTransition = new Transition()
             {
-                Name = "Create",
+                Name = CoreConstants.CreateTransitionName,
                 FromStatusId = startStatus.Id,
                 ToStatusId = todoStatus.Id,
                 ProjectId = project.Id,
@@ -196,7 +196,7 @@ namespace TaskManager.Infrastructure.Services
             // Create transition
             var workingTransition = new Transition()
             {
-                Name = "Working",
+                Name = CoreConstants.WorkingTransitionName,
                 FromStatusId = todoStatus.Id,
                 ToStatusId = inProgressStatus.Id,
                 ProjectId = project.Id,
@@ -205,7 +205,7 @@ namespace TaskManager.Infrastructure.Services
             // Create transition
             var doneTransition = new Transition()
             {
-                Name = "Done",
+                Name = CoreConstants.FinishedTransitionName,
                 FromStatusId = inProgressStatus.Id,
                 ToStatusId = doneStatus.Id,
                 ProjectId = project.Id,

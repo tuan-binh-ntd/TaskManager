@@ -8,5 +8,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         void Update(Transition transition);
         void Delete(Guid id);
         void AddRange(ICollection<Transition> transitions);
+        Transition GetCreateTransitionByProjectId(Guid projectId);
     }
 }

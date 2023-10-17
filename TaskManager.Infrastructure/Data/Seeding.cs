@@ -49,31 +49,31 @@ namespace TaskManager.Infrastructure.Data
             {
                 new IssueType()
                 {
-                    Name = "Epic",
+                    Name = CoreConstants.EpicName,
                     Description = "Epics track collections of related bugs, stories, and tasks.",
                     Level = 1,
                 },
                 new IssueType()
                 {
-                    Name = "Bug",
+                    Name = CoreConstants.BugName,
                     Description = "Bugs track problems or errors.",
                     Level = 2,
                 },
                 new IssueType()
                 {
-                    Name = "Story",
+                    Name = CoreConstants.StoryName,
                     Description = "Stories track functionality or features expressed as user goals.",
                     Level = 2,
                 },
                 new IssueType()
                 {
-                    Name = "Task",
+                    Name = CoreConstants.TaskName,
                     Description = "Tasks track small, distinct pieces of work.",
                     Level = 2,
                 },
                 new IssueType()
                 {
-                    Name = "Subtask",
+                    Name = CoreConstants.SubTaskName,
                     Description = "Subtasks track small pieces of work that are part of a larger task.",
                     Level = 3,
                 }

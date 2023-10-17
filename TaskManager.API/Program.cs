@@ -83,6 +83,7 @@ builder.Services.AddScoped<ISprintService, SprintService>();
 builder.Services.AddScoped<IIssueService, IssueService>();
 builder.Services.AddScoped<IIssueTypeService, IssueTypeService>();
 builder.Services.AddScoped<IUploadFileService, UploadFileService>();
+builder.Services.AddScoped<IStatusService, StatusService>();
 // Add EmailService
 // End  Declaration DI
 

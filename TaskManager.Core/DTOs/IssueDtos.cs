@@ -65,4 +65,19 @@ namespace TaskManager.Core.DTOs
         public Guid CreatorUserId { get; set; }
         public Guid ProjectId { get; set; }
     }
+
+    public class CreateChildIssueDto
+    {
+        public string Name { get; set; } = string.Empty;
+        public Guid CreatorUserId { get; set; }
+        public Guid ProjectId { get; set; }
+        public Guid ParentId { get; set; }
+    }
+
+    public class CreateEpicDto
+    {
+        public string Name { get; set; } = string.Empty;
+        public Guid CreatorUserId { get; set; }
+        public Guid ProjectId { get; set; }
+    }
 }

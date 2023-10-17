@@ -1,5 +1,4 @@
-﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.ViewModel;
@@ -82,6 +81,25 @@ namespace TaskManager.Infrastructure.Repositories
                 .Include(i => i.Attachments)
                 .ToListAsync();
             return issues.AsReadOnly();
+        }
+
+        public void UpdateRange(IReadOnlyCollection<Issue> issues)
+        {
+            _context.Issues.UpdateRange(issues);
+        }
+
+        public async Task<IReadOnlyCollection<Issue>> GetChildIssues(Guid parentId)
+        {
+            var childIssues = await _context.Issues
+                .Where(i => i.ParentId == parentId)
+                .Include(i => i.Backlog)
+                .Include(i => i.IssueType)
+                .Include(i => i.IssueDetail)
+                .Include(i => i.IssueHistories)
+                .Include(i => i.Comments)
+                .Include(i => i.Attachments)
+                .ToListAsync();
+            return childIssues.AsReadOnly();
         }
     }
 }

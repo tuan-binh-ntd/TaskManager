@@ -14,6 +14,7 @@ namespace TaskManager.Infrastructure.Services
         private readonly IIssueHistoryRepository _issueHistoryRepository;
         private readonly IIssueDetailRepository _issueDetailRepository;
         private readonly IProjectConfigurationRepository _projectConfigurationRepository;
+        private readonly IIssueTypeRepository _issueTypeRepository;
         private readonly IMapper _mapper;
 
         public IssueService(
@@ -21,6 +22,7 @@ namespace TaskManager.Infrastructure.Services
             IIssueHistoryRepository issueHistoryRepository,
             IIssueDetailRepository issueDetailRepository,
             IProjectConfigurationRepository projectConfigurationRepository,
+            IIssueTypeRepository issueTypeRepository,
             IMapper mapper
             )
         {
@@ -28,6 +30,7 @@ namespace TaskManager.Infrastructure.Services
             _issueHistoryRepository = issueHistoryRepository;
             _issueDetailRepository = issueDetailRepository;
             _projectConfigurationRepository = projectConfigurationRepository;
+            _issueTypeRepository = issueTypeRepository;
             _mapper = mapper;
         }
 
@@ -198,6 +201,114 @@ namespace TaskManager.Infrastructure.Services
             _issueRepository.Delete(id);
             await _issueRepository.UnitOfWork.SaveChangesAsync();
             return id;
+        }
+
+        public async Task<ChildIssueViewModel> CreateChildIssue(CreateChildIssueDto createChildIssueDto)
+        {
+            var projectConfiguration = _projectConfigurationRepository.GetByProjectId(createChildIssueDto.ProjectId);
+            int issueIndex = projectConfiguration.IssueCode + 1;
+
+            var issueType = await _issueTypeRepository.GetSubtask();
+
+            var issue = new Issue()
+            {
+                Name = createChildIssueDto.Name,
+                IssueTypeId = issueType.Id,
+                Code = $"{projectConfiguration.Code}-{issueIndex}",
+                ParentId = createChildIssueDto.ParentId,
+            };
+
+            _issueRepository.Add(issue);
+            await _issueRepository.UnitOfWork.SaveChangesAsync();
+            var issueVM = _mapper.Map<ChildIssueViewModel>(issue);
+
+            var issueDetail = new IssueDetail()
+            {
+                ReporterId = createChildIssueDto.CreatorUserId,
+                StoryPointEstimate = 0,
+                Label = string.Empty,
+                IssueId = issue.Id,
+            };
+
+            _issueDetailRepository.Add(issueDetail);
+            await _issueDetailRepository.UnitOfWork.SaveChangesAsync();
+
+            var issueHis = new IssueHistory
+            {
+                Name = "created the Issue",
+                CreatorUserId = createChildIssueDto.CreatorUserId,
+                IssueId = issue.Id,
+            };
+
+            _issueHistoryRepository.Add(issueHis);
+            await _issueHistoryRepository.UnitOfWork.SaveChangesAsync();
+
+            projectConfiguration.IssueCode = issueIndex;
+            _projectConfigurationRepository.Update(projectConfiguration);
+            await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
+
+            return issueVM;
+        }
+
+        public async Task<IssueViewModel> AddEpic(Guid issueId, Guid epicId)
+        {
+            var issue = _issueRepository.Get(issueId);
+            if (issue is null)
+            {
+#pragma warning disable CA2208 // Instantiate argument exceptions correctly
+                throw new ArgumentNullException(nameof(issue));
+#pragma warning restore CA2208 // Instantiate argument exceptions correctly
+            }
+            issue.ParentId = epicId;
+            _issueRepository.Update(issue);
+            await _issueRepository.UnitOfWork.SaveChangesAsync();
+            return issue.Adapt<IssueViewModel>();
+        }
+
+        public async Task<EpicViewModel> CreateEpic(CreateEpicDto createEpicDto)
+        {
+            var projectConfiguration = _projectConfigurationRepository.GetByProjectId(createEpicDto.ProjectId);
+            int issueIndex = projectConfiguration.IssueCode + 1;
+
+            var issueType = await _issueTypeRepository.GetEpic();
+
+            var issue = new Issue()
+            {
+                Name = createEpicDto.Name,
+                IssueTypeId = issueType.Id,
+                Code = $"{projectConfiguration.Code}-{issueIndex}",
+            };
+
+            _issueRepository.Add(issue);
+            await _issueRepository.UnitOfWork.SaveChangesAsync();
+            var issueVM = _mapper.Map<EpicViewModel>(issue);
+
+            var issueDetail = new IssueDetail()
+            {
+                ReporterId = createEpicDto.CreatorUserId,
+                StoryPointEstimate = 0,
+                Label = string.Empty,
+                IssueId = issue.Id,
+            };
+
+            _issueDetailRepository.Add(issueDetail);
+            await _issueDetailRepository.UnitOfWork.SaveChangesAsync();
+
+            var issueHis = new IssueHistory
+            {
+                Name = "created the Issue",
+                CreatorUserId = createEpicDto.CreatorUserId,
+                IssueId = issue.Id,
+            };
+
+            _issueHistoryRepository.Add(issueHis);
+            await _issueHistoryRepository.UnitOfWork.SaveChangesAsync();
+
+            projectConfiguration.IssueCode = issueIndex;
+            _projectConfigurationRepository.Update(projectConfiguration);
+            await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
+
+            return issueVM;
         }
     }
 }
