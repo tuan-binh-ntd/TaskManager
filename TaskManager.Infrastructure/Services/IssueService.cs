@@ -1,6 +1,5 @@
 ﻿using Mapster;
 using MapsterMapper;
-using System.Xml.Linq;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
@@ -36,9 +35,9 @@ namespace TaskManager.Infrastructure.Services
         private IReadOnlyCollection<IssueViewModel> ToIssueViewModels(IReadOnlyCollection<Issue> issues)
         {
             var issueViewModels = new List<IssueViewModel>();
-            if(issues.Any())
+            if (issues.Any())
             {
-                foreach(var issue in issues)
+                foreach (var issue in issues)
                 {
                     var issueViewModel = ToIssueViewModel(issue);
                     issueViewModels.Add(issueViewModel);
@@ -50,17 +49,17 @@ namespace TaskManager.Infrastructure.Services
         private IssueViewModel ToIssueViewModel(Issue issue)
         {
             var issueViewModel = _mapper.Map<IssueViewModel>(issue);
-            if(issue.IssueDetail is not null)
+            if (issue.IssueDetail is not null)
             {
                 var issueDetail = _mapper.Map<IssueDetailViewModel>(issue.IssueDetail);
                 issueViewModel.IssueDetail = issueDetail;
             }
-            if(issue.IssueHistories is not null && issue.IssueHistories.Any())
+            if (issue.IssueHistories is not null && issue.IssueHistories.Any())
             {
                 var issueHistories = _mapper.Map<ICollection<IssueHistoryViewModel>>(issue.IssueHistories);
                 issueViewModel.IssueHistories = issueHistories;
             }
-            if(issue.Comments is not null && issue.Comments.Any())
+            if (issue.Comments is not null && issue.Comments.Any())
             {
                 var comments = _mapper.Map<ICollection<CommentViewModel>>(issue.Comments);
                 issueViewModel.Comments = comments;
@@ -144,10 +143,10 @@ namespace TaskManager.Infrastructure.Services
         public async Task<IssueViewModel> CreateIssueByName(CreateIssueByNameDto createIssueByNameDto, Guid? sprintId = null, Guid? backlogId = null)
         {
             var projectConfiguration = _projectConfigurationRepository.GetByProjectId(createIssueByNameDto.ProjectId);
-            int issueIndex = projectConfiguration.IssueCode++;
+            int issueIndex = projectConfiguration.IssueCode + 1;
 
             var issue = new Issue()
-            { 
+            {
                 Name = createIssueByNameDto.Name,
                 IssueTypeId = createIssueByNameDto.IssueTypeId,
                 Code = $"{projectConfiguration.Code}-{issueIndex}"

@@ -10,7 +10,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public StatusCategoryRepository(AppDbContext context)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context);
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         public IReadOnlyCollection<StatusCategory> Gets()

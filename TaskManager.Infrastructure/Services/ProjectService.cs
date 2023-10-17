@@ -100,6 +100,7 @@ namespace TaskManager.Infrastructure.Services
             backlog.Issues = ToIssueViewModels(issueForBacklog).ToList();
             var sprints = await _sprintRepository.GetSprintByProjectId(project.Id);
             var issueTypes = await _issueTypeRepository.GetsByProjectId(project.Id);
+            var statuses = await _statusRepository.GetByProjectId(project.Id);
             if (sprints.Any())
             {
                 foreach (var sprint in sprints)
@@ -114,6 +115,7 @@ namespace TaskManager.Infrastructure.Services
             projectViewModel.Backlog = backlog;
             projectViewModel.Sprints = sprints.ToList();
             projectViewModel.IssueTypes = issueTypes.ToList();
+            projectViewModel.Statuses = statuses.Adapt<ICollection<StatusViewModel>>();
             return projectViewModel;
         }
 
@@ -281,8 +283,8 @@ namespace TaskManager.Infrastructure.Services
             ProjectConfiguration projectConfiguration = new()
             {
                 ProjectId = project.Id,
-                IssueCode = 1,
-                SprintCode = 1,
+                IssueCode = 0,
+                SprintCode = 0,
                 Code = project.Code
             };
 

@@ -24,7 +24,7 @@ namespace TaskManager.Infrastructure.Services
         public async Task<SprintViewModel> CreateNoFieldSprint(Guid projectId)
         {
             var projectConfiguration = _projectConfigurationRepository.GetByProjectId(projectId);
-            int sprintIndex = projectConfiguration.SprintCode++;
+            int sprintIndex = projectConfiguration.SprintCode + 1;
 
             Sprint sprint = new()
             {
@@ -37,7 +37,7 @@ namespace TaskManager.Infrastructure.Services
             _sprintRepository.Add(sprint);
             var result = await _sprintRepository.UnitOfWork.SaveChangesAsync();
 
-            if(result > 0)
+            if (result > 0)
             {
                 projectConfiguration.SprintCode = sprintIndex;
                 _projectConfigurationRepository.Update(projectConfiguration);

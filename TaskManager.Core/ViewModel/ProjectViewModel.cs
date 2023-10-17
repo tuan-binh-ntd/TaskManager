@@ -13,6 +13,7 @@
         public BacklogViewModel? Backlog { get; set; }
         public ICollection<SprintViewModel>? Sprints { get; set; }
         public ICollection<IssueTypeViewModel>? IssueTypes { get; set; }
+        public ICollection<StatusViewModel>? Statuses { get; set; }
     }
 
     public class BacklogViewModel
@@ -20,5 +21,11 @@
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public ICollection<IssueViewModel>? Issues { get; set; }
+    }
+
+    public class StatusViewModel
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 }

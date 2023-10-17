@@ -35,5 +35,11 @@ namespace TaskManager.Infrastructure.Repositories
         {
             _context.Statuses.AddRange(statuses);
         }
+
+        public async Task<IReadOnlyCollection<Status>> GetByProjectId(Guid projectId)
+        {
+            var statuses = await _context.Statuses.Where(s => s.ProjectId == projectId).ToListAsync();
+            return statuses.AsReadOnly();
+        }
     }
 }

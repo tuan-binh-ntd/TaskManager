@@ -8,5 +8,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         void Update(Status status);
         void Delete(Guid id);
         void AddRange(ICollection<Status> statuses);
+        Task<IReadOnlyCollection<Status>> GetByProjectId(Guid projectId);
     }
 }
