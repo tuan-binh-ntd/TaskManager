@@ -69,6 +69,9 @@ namespace TaskManager.Infrastructure.Services
 
         public async Task<Guid> DeleteSprint(Guid id)
         {
+            var issues = await _sprintRepository.GetIssues(id);
+            _issueRepository.DeleteRange(issues);
+            await _issueRepository.UnitOfWork.SaveChangesAsync();
             _sprintRepository.Delete(id);
             await _sprintRepository.UnitOfWork.SaveChangesAsync();
             return id;

@@ -101,5 +101,10 @@ namespace TaskManager.Infrastructure.Repositories
                 .ToListAsync();
             return childIssues.AsReadOnly();
         }
+
+        public void DeleteRange(IReadOnlyCollection<Issue> issues)
+        {
+            _context.Issues.RemoveRange(issues);
+        }
     }
 }

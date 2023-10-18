@@ -14,5 +14,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         Task<IReadOnlyCollection<Issue>> GetIssueByBacklogId(Guid backlogId);
         void UpdateRange(IReadOnlyCollection<Issue> issues);
         Task<IReadOnlyCollection<Issue>> GetChildIssues(Guid parentId);
+        void DeleteRange(IReadOnlyCollection<Issue> issues);
     }
 }
