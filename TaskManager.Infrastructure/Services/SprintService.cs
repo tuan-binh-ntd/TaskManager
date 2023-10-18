@@ -67,10 +67,11 @@ namespace TaskManager.Infrastructure.Services
             return sprintVM;
         }
 
-        public Task<Guid> DeleteSprint(Guid id)
+        public async Task<Guid> DeleteSprint(Guid id)
         {
             _sprintRepository.Delete(id);
-            return Task.FromResult(id);
+            await _sprintRepository.UnitOfWork.SaveChangesAsync();
+            return id;
         }
 
         public async Task<SprintViewModel> StartSprint(Guid projectId, Guid sprintId, UpdateSprintDto updateSprintDto)
