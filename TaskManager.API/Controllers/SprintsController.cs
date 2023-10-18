@@ -44,7 +44,7 @@ namespace TaskManager.API.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             var res = await _sprintService.DeleteSprint(id);
-            return CustomResult(res, HttpStatusCode.NotFound);
+            return CustomResult(res, HttpStatusCode.OK);
         }
 
         [HttpPut("{id}:start")]
