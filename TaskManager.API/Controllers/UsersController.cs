@@ -16,14 +16,17 @@ namespace TaskManager.API.Controllers
     {
         private readonly IUserService _userService;
         private readonly IUploadFileService _uploadFileService;
+        private readonly ILogger<UsersController> _logger;
 
         public UsersController(
             IUserService userService,
-            IUploadFileService uploadFileService
+            IUploadFileService uploadFileService,
+            ILogger<UsersController> logger
             )
         {
             _userService = userService;
             _uploadFileService = uploadFileService;
+            _logger = logger;
         }
 
 
@@ -103,11 +106,11 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        [HttpDelete, AllowAnonymous]
-        public IActionResult Test(IFormFile file)
-        {
-            var res = _uploadFileService.UploadFile(file);
-            return CustomResult(res);
-        }
+        //[HttpDelete, AllowAnonymous]
+        //public IActionResult Test(IFormFile file)
+        //{
+        //    var res = _uploadFileService.UploadFile(file);
+        //    return CustomResult(res);
+        //}
     }
 }

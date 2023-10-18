@@ -48,6 +48,7 @@ builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection("
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 builder.Services.Configure<SftpServerSettings>(builder.Configuration.GetSection("SftpServerSettings"));
+builder.Services.Configure<ElasticConfigurationSettings>(builder.Configuration.GetSection("ElasticConfigurationSettings"));
 
 // Set Mapster
 builder.Services.AddMapster(); // From the configuration file
@@ -184,6 +185,10 @@ builder.Services.AddSwaggerGen(options =>
         options.OperationFilter<SecurityRequirementsOperationFilter>();
     });
 
+// Add Logging
+//builder.Services.AddElasticSearchLogging();
+//builder.Host.UseSerilog();
+
 var app = builder.Build();
 
 if (app.Environment.IsProduction())
@@ -215,12 +220,6 @@ if (app.Environment.IsProduction())
         });
     });
 
-
-    //app.UseSwagger();
-    //app.UseSwaggerUI(c =>
-    //{
-    //    c.SwaggerEndpoint("swagger/v1/swagger.yaml", "API V1");
-    //});
     app.UseForwardedHeaders();
     app.UseHttpsRedirection();
 }
@@ -270,10 +269,6 @@ catch (Exception ex)
     logger.LogError(ex, "An error occurred during migration");
 }
 
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//}
 app.UseSwagger();
 app.UseSwaggerUI();
 
