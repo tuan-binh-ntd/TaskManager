@@ -31,6 +31,8 @@ namespace TaskManager.API.Controllers
 
 
         [HttpPost("signin"), AllowAnonymous]
+        [ProducesResponseType(typeof(UserViewModel), (int)HttpStatusCode.OK)]
+        [ProducesErrorResponseType(typeof(string))]
         public async Task<IActionResult> SignIn(LoginDto loginDto)
         {
             var res = await _userService.SignIn(loginDto);
@@ -49,6 +51,8 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPost("signup"), AllowAnonymous]
+        [ProducesResponseType(typeof(UserViewModel), (int)HttpStatusCode.OK)]
+        [ProducesErrorResponseType(typeof(IEnumerable<IdentityError>))]
         public async Task<IActionResult> SignUp(SignUpDto signUpDto)
         {
             var res = await _userService.SignUp(signUpDto);
@@ -71,6 +75,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpGet("{email}"), AllowAnonymous]
+        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> CheckEmail(string email)
         {
             var res = await _userService.CheckEmailExists(email);
@@ -78,6 +83,8 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(UserViewModel), (int)HttpStatusCode.OK)]
+        [ProducesErrorResponseType(typeof(IEnumerable<IdentityError>))]
         public async Task<IActionResult> ChangePassword(string id, PasswordDto input)
         {
             var res = await _userService.ChangePassword(id, input);
@@ -100,6 +107,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpGet, AllowAnonymous]
+        [ProducesResponseType(typeof(IReadOnlyCollection<UserViewModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Gets([FromQuery] GetUserByFilterDto filter)
         {
             var res = await _userService.Gets(filter);

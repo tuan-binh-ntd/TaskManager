@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Interfaces.Services;
+using TaskManager.Core.ViewModel;
 
 namespace TaskManager.API.Controllers
 {
@@ -18,6 +19,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(IReadOnlyCollection<IssueTypeViewModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Gets(Guid projectId)
         {
             var res = await _issueTypeService.GetIssueTypesByProjectId(projectId);
@@ -25,6 +27,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(IssueTypeViewModel), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> Create(Guid projectId, [FromBody] CreateIssueTypeDto createIssueTypeDto)
         {
             var res = await _issueTypeService.CreateIssueType(projectId, createIssueTypeDto);
@@ -32,6 +35,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPut("{issueTypeId}")]
+        [ProducesResponseType(typeof(IssueTypeViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Update(Guid issueTypeId, [FromBody] UpdateIssueTypeDto updateIssueTypeDto)
         {
             var res = await _issueTypeService.UpdateIssueType(issueTypeId, updateIssueTypeDto);

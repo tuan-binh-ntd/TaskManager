@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Interfaces.Services;
+using TaskManager.Core.ViewModel;
 
 namespace TaskManager.API.Controllers
 {
@@ -22,6 +23,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(IReadOnlyCollection<RoleViewModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Gets()
         {
             var res = await _roleService.Gets();
@@ -29,6 +31,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(RoleViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Get(Guid id)
         {
             var res = await _roleService.Get(id);
@@ -36,6 +39,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(RoleViewModel), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> Create(CreateAppRoleDto appRoleDto)
         {
             var res = await _roleService.Create(appRoleDto);
@@ -43,6 +47,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(RoleViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Update(Guid id, CreateAppRoleDto appRoleDto)
         {
             var res = await _roleService.Update(id, appRoleDto);
@@ -50,6 +55,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var res = await _roleService.Delete(id);

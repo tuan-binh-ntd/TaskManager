@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Interfaces.Services;
+using TaskManager.Core.ViewModel;
 
 namespace TaskManager.API.Controllers
 {
@@ -20,6 +21,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(IssueViewModel), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> Create(Guid sprintId, CreateIssueDto createIssueDto)
         {
             var res = await _issueService.CreateIssue(createIssueDto, sprintId: sprintId, null);
@@ -27,6 +29,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(IssueViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Update(Guid id, UpdateIssueDto updateIssueDto)
         {
             var res = await _issueService.UpdateIssue(id, updateIssueDto);
@@ -34,6 +37,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(IReadOnlyCollection<IssueViewModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetBySprintId(Guid sprintId)
         {
             var res = await _issueService.GetBySprintId(sprintId);
@@ -41,6 +45,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPost(":name")]
+        [ProducesResponseType(typeof(IssueViewModel), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> CreateIssueByName(Guid sprintId, CreateIssueByNameDto createIssueByNameDto)
         {
             var res = await _issueService.CreateIssueByName(createIssueByNameDto, sprintId: sprintId, null);
@@ -48,6 +53,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPatch("{id}")]
+        [ProducesResponseType(typeof(IssueViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Patch(Guid id, UpdateIssueDto updateIssueDto)
         {
             var res = await _issueService.UpdateIssue(id, updateIssueDto);
@@ -55,6 +61,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var res = await _issueService.DeleteIssue(id);

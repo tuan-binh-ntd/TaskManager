@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Interfaces.Services;
+using TaskManager.Core.ViewModel;
 
 namespace TaskManager.API.Controllers
 {
@@ -18,6 +19,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpGet("{backlogId}/issues")]
+        [ProducesResponseType(typeof(IReadOnlyCollection<IssueViewModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetByBacklogId(Guid backlogId)
         {
             var res = await _issueService.GetByBacklogId(backlogId);
@@ -25,6 +27,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPost("{backlogId}/issues")]
+        [ProducesResponseType(typeof(IssueViewModel), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> CreateIssue(Guid backlogId, CreateIssueDto createIssueDto)
         {
             var res = await _issueService.CreateIssue(createIssueDto, sprintId: null, backlogId: backlogId);
@@ -32,6 +35,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPost("{backlogId}/issues/:name")]
+        [ProducesResponseType(typeof(IssueViewModel), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> CreateIssueByName(Guid backlogId, CreateIssueByNameDto createIssueByNameDto)
         {
             var res = await _issueService.CreateIssueByName(createIssueByNameDto, sprintId: null, backlogId: backlogId);
@@ -39,6 +43,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPatch("{backlogId}/issues/{id}")]
+        [ProducesResponseType(typeof(IssueViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Patch(Guid id, UpdateIssueDto updateIssueDto)
         {
             var res = await _issueService.UpdateIssue(id, updateIssueDto);

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Interfaces.Services;
+using TaskManager.Core.ViewModel;
 
 namespace TaskManager.API.Controllers
 {
@@ -18,6 +19,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(StatusViewModel), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> Create(CreateStatusDto createStatusDto)
         {
             var res = await _statusService.Create(createStatusDto);
@@ -25,6 +27,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(StatusViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Update(Guid id, UpdateStatusDto updateStatusDto)
         {
             var res = await _statusService.Update(id, updateStatusDto);
@@ -32,6 +35,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var res = await _statusService.Delete(id);

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Interfaces.Services;
+using TaskManager.Core.ViewModel;
 
 namespace TaskManager.API.Controllers
 {
@@ -20,6 +21,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(SprintViewModel), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> Create(CreateSprintDto createSprintDto)
         {
             var res = await _sprintService.CreateSprint(createSprintDto);
@@ -27,6 +29,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(SprintViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Update(Guid id, UpdateSprintDto updateSprintDto)
         {
             var res = await _sprintService.UpdateSprint(id, updateSprintDto);
@@ -34,6 +37,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPost(":no-field")]
+        [ProducesResponseType(typeof(SprintViewModel), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> Create(Guid projectId)
         {
             var res = await _sprintService.CreateNoFieldSprint(projectId);
@@ -41,6 +45,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var res = await _sprintService.DeleteSprint(id);
@@ -48,6 +53,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPut("{id}:start")]
+        [ProducesResponseType(typeof(SprintViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Start(Guid projectId, Guid id, UpdateSprintDto updateSprintDto)
         {
             var res = await _sprintService.StartSprint(projectId, sprintId: id, updateSprintDto);
