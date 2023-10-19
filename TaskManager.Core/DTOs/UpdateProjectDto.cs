@@ -12,6 +12,7 @@ namespace TaskManager.Core.DTOs
         public string? AvatarUrl { get; set; }
         public bool IsFavourite { get; set; }
         public Guid? LeaderId { get; set; }
+        public Guid? DefaultAssigneeId { get; set; }
 
         public override void Register(TypeAdapterConfig config)
         {

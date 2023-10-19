@@ -8,6 +8,10 @@ namespace TaskManager.Core.Entities
         public int IssueCode { get; set; }
         public int SprintCode { get; set; }
         public string Code { get; set; } = string.Empty;
+        /// <summary>
+        /// Default assginee when create a issue
+        /// </summary>
+        public Guid? DefaultAssigneeId { get; set; }
         //Relationship
         public Project? Project { get; set; }
     }

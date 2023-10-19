@@ -52,6 +52,7 @@ namespace TaskManager.Infrastructure.Services
         private IssueViewModel ToIssueViewModel(Issue issue)
         {
             var issueViewModel = _mapper.Map<IssueViewModel>(issue);
+
             if (issue.IssueDetail is not null)
             {
                 var issueDetail = _mapper.Map<IssueDetailViewModel>(issue.IssueDetail);
@@ -91,14 +92,13 @@ namespace TaskManager.Infrastructure.Services
 
             _issueRepository.Add(issue);
             await _issueRepository.UnitOfWork.SaveChangesAsync();
-            var issueVM = _mapper.Map<IssueViewModel>(issue);
 
             var issueDetail = new IssueDetail()
             {
                 ReporterId = createIssueDto.CreatorUserId,
                 StoryPointEstimate = 0,
                 Label = string.Empty,
-                IssueId = issue.Id,
+                IssueId = issue.Id
             };
 
             _issueDetailRepository.Add(issueDetail);
@@ -113,7 +113,7 @@ namespace TaskManager.Infrastructure.Services
 
             _issueHistoryRepository.Add(issueHis);
             await _issueHistoryRepository.UnitOfWork.SaveChangesAsync();
-            return issueVM;
+            return ToIssueViewModel(issue);
         }
 
         public async Task<IssueViewModel> UpdateIssue(Guid id, UpdateIssueDto updateIssueDto)
@@ -166,7 +166,6 @@ namespace TaskManager.Infrastructure.Services
 
             _issueRepository.Add(issue);
             await _issueRepository.UnitOfWork.SaveChangesAsync();
-            var issueVM = _mapper.Map<IssueViewModel>(issue);
 
             var issueDetail = new IssueDetail()
             {
@@ -174,6 +173,7 @@ namespace TaskManager.Infrastructure.Services
                 StoryPointEstimate = 0,
                 Label = string.Empty,
                 IssueId = issue.Id,
+                AssigneeId = projectConfiguration.DefaultAssigneeId
             };
 
             _issueDetailRepository.Add(issueDetail);
@@ -193,7 +193,7 @@ namespace TaskManager.Infrastructure.Services
             _projectConfigurationRepository.Update(projectConfiguration);
             await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
 
-            return issueVM;
+            return ToIssueViewModel(issue);
         }
 
         public async Task<Guid> DeleteIssue(Guid id)

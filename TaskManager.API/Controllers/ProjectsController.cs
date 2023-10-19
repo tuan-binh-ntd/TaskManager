@@ -30,7 +30,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(result, HttpStatusCode.OK);
         }
 
-        [HttpPost]
+        [HttpPost, AllowAnonymous]
         [ProducesResponseType(typeof(ProjectViewModel), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> CreateProject(Guid id, CreateProjectDto createProjectDto)
         {

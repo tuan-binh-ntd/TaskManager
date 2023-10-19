@@ -375,6 +375,10 @@ namespace TaskManager.Infrastructure.Services
                 }
             }
 
+            var projectConfiguration = _projectConfigurationRepository.GetByProjectId(projectId);
+            projectConfiguration.DefaultAssigneeId = updateProjectDto.DefaultAssigneeId;
+            await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
+
             _projectRepository.Update(project);
             await _projectRepository.UnitOfWork.SaveChangesAsync();
             return await ToProjectViewModel(project);
