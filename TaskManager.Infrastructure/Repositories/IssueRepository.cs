@@ -106,5 +106,14 @@ namespace TaskManager.Infrastructure.Repositories
         {
             _context.Issues.RemoveRange(issues);
         }
+
+        public void LoadEntitiesRelationship(Issue issue)
+        {
+            _context.Entry(issue).Reference(i => i.IssueType).Load();
+            _context.Entry(issue).Reference(i => i.IssueDetail).Load();
+            _context.Entry(issue).Collection(i => i.Attachments!).Load();
+            _context.Entry(issue).Collection(i => i.IssueHistories!).Load();
+            _context.Entry(issue).Collection(i => i.Comments!).Load();
+        }
     }
 }

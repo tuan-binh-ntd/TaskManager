@@ -15,5 +15,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         void UpdateRange(IReadOnlyCollection<Issue> issues);
         Task<IReadOnlyCollection<Issue>> GetChildIssues(Guid parentId);
         void DeleteRange(IReadOnlyCollection<Issue> issues);
+        void LoadEntitiesRelationship(Issue issue);
     }
 }
