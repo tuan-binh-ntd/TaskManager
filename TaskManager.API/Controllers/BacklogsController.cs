@@ -31,7 +31,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.Created);
         }
 
-        [HttpPost("{backlogId}/issues:name")]
+        [HttpPost("{backlogId}/issues/:name")]
         public async Task<IActionResult> CreateIssueByName(Guid backlogId, CreateIssueByNameDto createIssueByNameDto)
         {
             var res = await _issueService.CreateIssueByName(createIssueByNameDto, sprintId: null, backlogId: backlogId);
