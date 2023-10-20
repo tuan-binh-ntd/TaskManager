@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TaskManager.Core.Core;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Infrastructure.Data;
@@ -38,7 +39,9 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<Status>> GetByProjectId(Guid projectId)
         {
-            var statuses = await _context.Statuses.Where(s => s.ProjectId == projectId).ToListAsync();
+            var statuses = await (from s in _context.Statuses.Where(s => s.ProjectId == projectId)
+                                  join sc in _context.StatusCategories.Where(sc => sc.Code != CoreConstants.HideCode) on s.StatusCategoryId equals sc.Id
+                                  select s).ToListAsync();
             return statuses.AsReadOnly();
         }
 
