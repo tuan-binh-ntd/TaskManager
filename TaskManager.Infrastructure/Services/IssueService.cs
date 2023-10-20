@@ -15,6 +15,7 @@ namespace TaskManager.Infrastructure.Services
         private readonly IIssueDetailRepository _issueDetailRepository;
         private readonly IProjectConfigurationRepository _projectConfigurationRepository;
         private readonly IIssueTypeRepository _issueTypeRepository;
+        private readonly ITransitionRepository _transitionRepository;
         private readonly IMapper _mapper;
 
         public IssueService(
@@ -23,6 +24,7 @@ namespace TaskManager.Infrastructure.Services
             IIssueDetailRepository issueDetailRepository,
             IProjectConfigurationRepository projectConfigurationRepository,
             IIssueTypeRepository issueTypeRepository,
+            ITransitionRepository transitionRepository,
             IMapper mapper
             )
         {
@@ -31,6 +33,7 @@ namespace TaskManager.Infrastructure.Services
             _issueDetailRepository = issueDetailRepository;
             _projectConfigurationRepository = projectConfigurationRepository;
             _issueTypeRepository = issueTypeRepository;
+            _transitionRepository = transitionRepository;
             _mapper = mapper;
         }
 
@@ -148,12 +151,14 @@ namespace TaskManager.Infrastructure.Services
         {
             var projectConfiguration = _projectConfigurationRepository.GetByProjectId(createIssueByNameDto.ProjectId);
             int issueIndex = projectConfiguration.IssueCode + 1;
+            var createTransition = _transitionRepository.GetCreateTransitionByProjectId(createIssueByNameDto.ProjectId);
 
             var issue = new Issue()
             {
                 Name = createIssueByNameDto.Name,
                 IssueTypeId = createIssueByNameDto.IssueTypeId,
-                Code = $"{projectConfiguration.Code}-{issueIndex}"
+                Code = $"{projectConfiguration.Code}-{issueIndex}",
+                StatusId = createTransition.ToStatusId
             };
 
             if (sprintId is not null)
