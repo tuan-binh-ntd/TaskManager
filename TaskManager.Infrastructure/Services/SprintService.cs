@@ -46,6 +46,8 @@ namespace TaskManager.Infrastructure.Services
                 EndDate = null,
                 Goal = string.Empty,
                 ProjectId = projectId,
+                IsStart = false,
+                IsComplete = false,
             };
             _sprintRepository.Add(sprint);
             var result = await _sprintRepository.UnitOfWork.SaveChangesAsync();
@@ -81,6 +83,7 @@ namespace TaskManager.Infrastructure.Services
         {
             var sprint = _sprintRepository.Get(sprintId);
             sprint = updateSprintDto.Adapt(sprint);
+            sprint!.IsStart = true;
             _sprintRepository.Update(sprint!);
             await _sprintRepository.UnitOfWork.SaveChangesAsync();
 
