@@ -41,7 +41,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IssueDetail> GetById(Guid id)
         {
-            var issueDetail = await _context.IssueDetails.Where(i => i.Id == id).FirstOrDefaultAsync();
+            var issueDetail = await _context.IssueDetails.Where(i => i.IssueId == id).FirstOrDefaultAsync();
             return issueDetail!;
         }
     }
