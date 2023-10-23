@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using Swashbuckle.AspNetCore.Filters;
 using System.Net;
 using System.Text;
@@ -186,8 +187,8 @@ builder.Services.AddSwaggerGen(options =>
     });
 
 // Add Logging
-//builder.Services.AddElasticSearchLogging();
-//builder.Host.UseSerilog();
+builder.Services.AddElasticSearchLogging();
+builder.Host.UseSerilog();
 
 var app = builder.Build();
 
