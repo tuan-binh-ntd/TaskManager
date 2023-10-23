@@ -20,7 +20,7 @@ namespace TaskManager.Core.DTOs
 
             config.NewConfig<UpdateProjectDto, Project>()
                 .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Name), dest => dest.Name)
-                .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Description), dest => dest.Description)
+                .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Description), dest => dest.Description!)
                 .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Code), dest => dest.Code)
                 .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.AvatarUrl), dest => dest.AvatarUrl)
                 .Ignore(dest => dest.Id)
