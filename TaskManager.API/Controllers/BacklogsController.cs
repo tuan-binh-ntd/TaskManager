@@ -50,12 +50,12 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        [HttpGet("{backlogId}/issues/{id}")]
-        [ProducesResponseType(typeof(IssueViewModel), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> GetById(Guid id)
-        {
-            var res = await _issueService.GetById(id);
-            return CustomResult(res, HttpStatusCode.OK);
-        }
+        //[HttpGet("{backlogId}/issues/{id}")]
+        //[ProducesResponseType(typeof(IssueViewModel), (int)HttpStatusCode.OK)]
+        //public async Task<IActionResult> GetById(Guid id)
+        //{
+        //    var res = await _issueService.GetById(id);
+        //    return CustomResult(res, HttpStatusCode.OK);
+        //}
     }
 }

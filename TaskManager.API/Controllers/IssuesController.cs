@@ -7,7 +7,7 @@ using TaskManager.Core.ViewModel;
 
 namespace TaskManager.API.Controllers
 {
-    [Route("api/sprints/{sprintId}/[controller]")]
+    //[Route("api/sprints/{sprintId}/[controller]")]
     [ApiController]
     public class IssuesController : BaseController
     {
@@ -20,7 +20,7 @@ namespace TaskManager.API.Controllers
             _issueService = issueService;
         }
 
-        [HttpPost]
+        [HttpPost("api/sprints/{sprintId}/[controller]")]
         [ProducesResponseType(typeof(IssueViewModel), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> Create(Guid sprintId, CreateIssueDto createIssueDto)
         {
@@ -28,7 +28,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.Created);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("api/sprints/{sprintId}/[controller]/{id}")]
         [ProducesResponseType(typeof(IssueViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Update(Guid id, UpdateIssueDto updateIssueDto)
         {
@@ -36,7 +36,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        [HttpGet]
+        [HttpGet("api/sprints/{sprintId}/[controller]")]
         [ProducesResponseType(typeof(IReadOnlyCollection<IssueViewModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetBySprintId(Guid sprintId)
         {
@@ -44,7 +44,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        [HttpPost(":name")]
+        [HttpPost("api/sprints/{sprintId}/[controller]/:name")]
         [ProducesResponseType(typeof(IssueViewModel), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> CreateIssueByName(Guid sprintId, CreateIssueByNameDto createIssueByNameDto)
         {
@@ -52,7 +52,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.Created);
         }
 
-        [HttpPatch("{id}")]
+        [HttpPatch("api/sprints/{sprintId}/[controller]/{id}")]
         [ProducesResponseType(typeof(IssueViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Patch(Guid id, UpdateIssueDto updateIssueDto)
         {
@@ -60,7 +60,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("api/sprints/{sprintId}/[controller]/{id}")]
         [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -68,7 +68,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("api/[controller]/{id}")]
         [ProducesResponseType(typeof(IssueViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetById(Guid id)
         {
