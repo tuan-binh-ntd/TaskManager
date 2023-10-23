@@ -50,9 +50,10 @@ namespace TaskManager.Infrastructure.Repositories
             _context.Entry(issue).State = EntityState.Modified;
         }
 
-        public Issue? Get(Guid id)
+        public async Task<Issue> Get(Guid id)
         {
-            return _context.Issues.SingleOrDefault(e => e.Id == id);
+            var issue = await _context.Issues.SingleOrDefaultAsync(e => e.Id == id);
+            return issue!;
         }
 
         public async Task<IReadOnlyCollection<Issue>> GetIssueBySprintId(Guid sprintId)

@@ -132,7 +132,7 @@ namespace TaskManager.Infrastructure.Services
 
         public async Task<IssueViewModel> UpdateIssue(Guid id, UpdateIssueDto updateIssueDto)
         {
-            var issue = _issueRepository.Get(id);
+            var issue = await _issueRepository.Get(id);
             if (issue is null)
             {
 #pragma warning disable CA2208 // Instantiate argument exceptions correctly
@@ -275,7 +275,7 @@ namespace TaskManager.Infrastructure.Services
 
         public async Task<IssueViewModel> AddEpic(Guid issueId, Guid epicId)
         {
-            var issue = _issueRepository.Get(issueId);
+            var issue = await _issueRepository.Get(issueId);
             if (issue is null)
             {
 #pragma warning disable CA2208 // Instantiate argument exceptions correctly
@@ -332,6 +332,12 @@ namespace TaskManager.Infrastructure.Services
             await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
 
             return epicViewModel;
+        }
+
+        public async Task<IssueViewModel> GetById(Guid id)
+        {
+            var issue = await _issueRepository.Get(id);
+            return ToIssueViewModel(issue!);
         }
     }
 }

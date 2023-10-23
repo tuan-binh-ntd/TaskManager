@@ -31,7 +31,7 @@ namespace TaskManager.Core.Interfaces.Repositories
         /// </summary>
         /// <param name="id">Id of issue entity</param>
         /// <returns>Issue entity</returns>
-        Issue? Get(Guid id);
+        Task<Issue> Get(Guid id);
         /// <summary>
         /// Get all issue for sprint
         /// </summary>
