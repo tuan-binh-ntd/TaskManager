@@ -9,5 +9,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         IssueDetailViewModel Add(IssueDetail issueDetail);
         void Update(IssueDetail issueDetail);
         void Delete(Guid id);
+        Task<IssueDetail> GetById(Guid id);
     }
 }

@@ -33,6 +33,7 @@ namespace TaskManager.Core.DTOs
         public Guid? SprintId { get; set; }
         public Guid? IssueTypeId { get; set; }
         public Guid? BacklogId { get; set; }
+        public Guid? AssigneeId { get; set; }
 
         public override void Register(TypeAdapterConfig config)
         {

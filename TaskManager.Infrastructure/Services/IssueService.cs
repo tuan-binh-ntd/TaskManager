@@ -77,6 +77,16 @@ namespace TaskManager.Infrastructure.Services
                 var attachments = _mapper.Map<ICollection<AttachmentViewModel>>(issue.Attachments);
                 issueViewModel.Attachments = attachments;
             }
+            if (issue.IssueType is not null)
+            {
+                var issueType = _mapper.Map<IssueTypeViewModel>(issue.IssueType);
+                issueViewModel.IssueType = issueType;
+            }
+            if (issue.Status is not null)
+            {
+                var status = _mapper.Map<StatusViewModel>(issue.Status);
+                issueViewModel.Status = status;
+            }
             return issueViewModel;
         }
         #endregion
@@ -132,7 +142,14 @@ namespace TaskManager.Infrastructure.Services
             issue = updateIssueDto.Adapt(issue);
             _issueRepository.Update(issue);
             await _issueRepository.UnitOfWork.SaveChangesAsync();
-            return issue.Adapt<IssueViewModel>();
+
+            var issueDetail = await _issueDetailRepository.GetById(id);
+            if (updateIssueDto.AssigneeId is not null)
+            {
+                issueDetail.AssigneeId = updateIssueDto.AssigneeId;
+            }
+            await _issueDetailRepository.UnitOfWork.SaveChangesAsync();
+            return ToIssueViewModel(issue);
         }
 
         public async Task<IReadOnlyCollection<IssueViewModel>> GetBySprintId(Guid sprintId)
@@ -268,7 +285,7 @@ namespace TaskManager.Infrastructure.Services
             issue.ParentId = epicId;
             _issueRepository.Update(issue);
             await _issueRepository.UnitOfWork.SaveChangesAsync();
-            return issue.Adapt<IssueViewModel>();
+            return ToIssueViewModel(issue);
         }
 
         public async Task<EpicViewModel> CreateEpic(CreateEpicDto createEpicDto)
@@ -287,7 +304,7 @@ namespace TaskManager.Infrastructure.Services
 
             _issueRepository.Add(issue);
             await _issueRepository.UnitOfWork.SaveChangesAsync();
-            var issueVM = _mapper.Map<EpicViewModel>(issue);
+            var epicViewModel = _mapper.Map<EpicViewModel>(issue);
 
             var issueDetail = new IssueDetail()
             {
@@ -314,7 +331,7 @@ namespace TaskManager.Infrastructure.Services
             _projectConfigurationRepository.Update(projectConfiguration);
             await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
 
-            return issueVM;
+            return epicViewModel;
         }
     }
 }

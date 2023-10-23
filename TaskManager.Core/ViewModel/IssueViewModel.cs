@@ -15,14 +15,14 @@
         public DateTime? DueDate { get; set; }
         public Guid? ParentId { get; set; }
         public Guid? SprintId { get; set; }
-        public Guid IssueTypeId { get; set; }
-        public IssueTypeViewModel? IssueType { get; set; }
         public Guid? BacklogId { get; set; }
+        public IssueTypeViewModel? IssueType { get; set; }
         public ICollection<IssueHistoryViewModel>? IssueHistories { get; set; }
         public ICollection<CommentViewModel>? Comments { get; set; }
         public ICollection<AttachmentViewModel>? Attachments { get; set; }
         public IssueDetailViewModel? IssueDetail { get; set; }
         public ICollection<ChildIssueViewModel>? ChildIssues { get; set; }
+        public StatusViewModel? Status { get; set; }
     }
 
     public class IssueHistoryViewModel
@@ -74,13 +74,13 @@
         public DateTime? DueDate { get; set; }
         public Guid? ParentId { get; set; }
         public Guid? SprintId { get; set; }
-        public Guid IssueTypeId { get; set; }
-        public IssueTypeViewModel? IssueType { get; set; }
         public Guid? BacklogId { get; set; }
+        public IssueTypeViewModel? IssueType { get; set; }
         public ICollection<IssueHistoryViewModel>? IssueHistories { get; set; }
         public ICollection<CommentViewModel>? Comments { get; set; }
         public ICollection<AttachmentViewModel>? Attachments { get; set; }
         public IssueDetailViewModel? IssueDetail { get; set; }
+        public StatusViewModel? Status { get; set; }
     }
 
     public class EpicViewModel
@@ -98,12 +98,12 @@
         public DateTime? DueDate { get; set; }
         public Guid? ParentId { get; set; }
         public Guid? SprintId { get; set; }
-        public Guid IssueTypeId { get; set; }
-        public IssueTypeViewModel? IssueType { get; set; }
         public Guid? BacklogId { get; set; }
+        public IssueTypeViewModel? IssueType { get; set; }
         public ICollection<IssueHistoryViewModel>? IssueHistories { get; set; }
         public ICollection<CommentViewModel>? Comments { get; set; }
         public ICollection<AttachmentViewModel>? Attachments { get; set; }
         public IssueDetailViewModel? IssueDetail { get; set; }
+        public StatusViewModel? Status { get; set; }
     }
 }

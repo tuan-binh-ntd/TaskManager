@@ -114,6 +114,7 @@ namespace TaskManager.Infrastructure.Repositories
             _context.Entry(issue).Collection(i => i.Attachments!).Load();
             _context.Entry(issue).Collection(i => i.IssueHistories!).Load();
             _context.Entry(issue).Collection(i => i.Comments!).Load();
+            _context.Entry(issue).Reference(i => i.Status).Load();
         }
     }
 }
