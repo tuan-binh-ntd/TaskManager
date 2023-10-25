@@ -24,6 +24,7 @@
         public IssueDetailViewModel? IssueDetail { get; set; }
         public ICollection<ChildIssueViewModel>? ChildIssues { get; set; }
         public StatusViewModel? Status { get; set; }
+
     }
 
     public class IssueHistoryViewModel

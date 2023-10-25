@@ -22,6 +22,7 @@ namespace TaskManager.Infrastructure.Services
         private readonly IStatusRepository _statusRepository;
         private readonly ITransitionRepository _transitionRepository;
         private readonly IWorkflowRepository _workflowRepository;
+        private readonly IIssueRepository _issueRepository;
         private readonly IMapper _mapper;
 
         public ProjectService(
@@ -35,6 +36,7 @@ namespace TaskManager.Infrastructure.Services
             IStatusRepository statusRepository,
             ITransitionRepository transitionRepository,
             IWorkflowRepository workflowRepository,
+            IIssueRepository issueRepository,
             IMapper mapper
             )
         {
@@ -48,6 +50,7 @@ namespace TaskManager.Infrastructure.Services
             _statusRepository = statusRepository;
             _transitionRepository = transitionRepository;
             _workflowRepository = workflowRepository;
+            _issueRepository = issueRepository;
             _mapper = mapper;
         }
 
@@ -68,7 +71,9 @@ namespace TaskManager.Infrastructure.Services
 
         private IssueViewModel ToIssueViewModel(Issue issue)
         {
+            _issueRepository.LoadEntitiesRelationship(issue);
             var issueViewModel = _mapper.Map<IssueViewModel>(issue);
+
             if (issue.IssueDetail is not null)
             {
                 var issueDetail = _mapper.Map<IssueDetailViewModel>(issue.IssueDetail);
@@ -88,6 +93,16 @@ namespace TaskManager.Infrastructure.Services
             {
                 var attachments = _mapper.Map<ICollection<AttachmentViewModel>>(issue.Attachments);
                 issueViewModel.Attachments = attachments;
+            }
+            if (issue.IssueType is not null)
+            {
+                var issueType = _mapper.Map<IssueTypeViewModel>(issue.IssueType);
+                issueViewModel.IssueType = issueType;
+            }
+            if (issue.Status is not null)
+            {
+                var status = _mapper.Map<StatusViewModel>(issue.Status);
+                issueViewModel.Status = status;
             }
             return issueViewModel;
         }

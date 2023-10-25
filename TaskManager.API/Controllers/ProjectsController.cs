@@ -61,7 +61,7 @@ namespace TaskManager.API.Controllers
              return CustomResult(result, HttpStatusCode.OK);
          }*/
 
-        [HttpGet("{code}")]
+        [HttpGet("{code}"), AllowAnonymous]
         [ProducesResponseType(typeof(ProjectViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Get(string code)
         {
