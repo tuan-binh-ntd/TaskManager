@@ -12,6 +12,31 @@ namespace TaskManager.Infrastructure.Data
             RoleManager<AppRole> roleManager,
             AppDbContext appDbContext)
         {
+            if (await appDbContext.Priorities.AnyAsync()) return;
+            var priorities = new List<Priority>()
+            {
+                new Priority()
+                {
+                    Name = CoreConstants.NormalName,
+                },
+                new Priority()
+                {
+                    Name = CoreConstants.MediumName,
+                },
+                new Priority()
+                {
+                    Name = CoreConstants.HighName,
+                },
+                new Priority()
+                {
+                    Name = CoreConstants.UrgentName,
+                }
+            };
+
+            appDbContext.Priorities.AddRange(priorities);
+            await appDbContext.SaveChangesAsync();
+
+
             if (await appDbContext.StatusCategories.AnyAsync()) return;
             var statusCategories = new List<StatusCategory>
             {

@@ -11,7 +11,6 @@ namespace TaskManager.Core.Entities
         public string Code { get; set; } = string.Empty;
         public string? Description { get; set; } = string.Empty;
         public DateTime? CompleteDate { get; set; }
-        public string? Priority { get; set; } = string.Empty;
         public string? Watcher { get; set; } = string.Empty;
         public string? Voted { get; set; } = string.Empty;
         public DateTime? StartDate { get; set; }
@@ -30,5 +29,7 @@ namespace TaskManager.Core.Entities
         public IssueDetail? IssueDetail { get; set; }
         public Guid? StatusId { get; set; }
         public Status? Status { get; set; }
+        public Guid? PriorityId { get; set; }
+        public Priority? Priority { get; set; }
     }
 }

@@ -112,7 +112,7 @@ namespace TaskManager.Infrastructure.Services
                 ReporterId = createIssueDto.CreatorUserId,
                 StoryPointEstimate = 0,
                 Label = string.Empty,
-                IssueId = issue.Id
+                IssueId = issue.Id,
             };
 
             _issueDetailRepository.Add(issueDetail);
@@ -175,7 +175,8 @@ namespace TaskManager.Infrastructure.Services
                 Name = createIssueByNameDto.Name,
                 IssueTypeId = createIssueByNameDto.IssueTypeId,
                 Code = $"{projectConfiguration.Code}-{issueIndex}",
-                StatusId = createTransition.ToStatusId
+                StatusId = createTransition.ToStatusId,
+                PriorityId = projectConfiguration.DefaultPriorityId
             };
 
             if (sprintId is not null)
@@ -196,7 +197,7 @@ namespace TaskManager.Infrastructure.Services
                 StoryPointEstimate = 0,
                 Label = string.Empty,
                 IssueId = issue.Id,
-                AssigneeId = projectConfiguration.DefaultAssigneeId
+                AssigneeId = projectConfiguration.DefaultAssigneeId,
             };
 
             _issueDetailRepository.Add(issueDetail);
@@ -239,6 +240,7 @@ namespace TaskManager.Infrastructure.Services
                 IssueTypeId = issueType.Id,
                 Code = $"{projectConfiguration.Code}-{issueIndex}",
                 ParentId = createChildIssueDto.ParentId,
+                PriorityId = projectConfiguration.DefaultPriorityId
             };
 
             _issueRepository.Add(issue);
@@ -251,6 +253,7 @@ namespace TaskManager.Infrastructure.Services
                 StoryPointEstimate = 0,
                 Label = string.Empty,
                 IssueId = issue.Id,
+                AssigneeId = projectConfiguration.DefaultAssigneeId,
             };
 
             _issueDetailRepository.Add(issueDetail);

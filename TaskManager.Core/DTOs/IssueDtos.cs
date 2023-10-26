@@ -24,7 +24,6 @@ namespace TaskManager.Core.DTOs
         public string? Name { get; set; }
         public string? Description { get; set; }
         public DateTime? CompleteDate { get; set; }
-        public string? Priority { get; set; }
         public string? Watcher { get; set; }
         public string? Voted { get; set; }
         public DateTime? StartDate { get; set; }
@@ -35,6 +34,7 @@ namespace TaskManager.Core.DTOs
         public Guid? BacklogId { get; set; }
         public Guid? AssigneeId { get; set; }
         public Guid? StatusId { get; set; }
+        public Guid? PriorityId { get; set; }
 
         public override void Register(TypeAdapterConfig config)
         {
@@ -44,7 +44,7 @@ namespace TaskManager.Core.DTOs
                 .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Name), dest => dest.Name)
                 .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Description), dest => dest.Description!)
                 .IgnoreIf((src, dest) => src.CompleteDate == null, dest => dest.CompleteDate!)
-                .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Priority), dest => dest.Priority!)
+                .IgnoreIf((src, dest) => src.PriorityId == null, dest => dest.PriorityId!)
                 .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Watcher), dest => dest.Watcher!)
                 .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Voted), dest => dest.Voted!)
                 .IgnoreIf((src, dest) => src.StartDate == null, dest => dest.StartDate!)

@@ -36,7 +36,7 @@ namespace TaskManager.Infrastructure.Repositories
                 Description = e.Description,
                 CreationTime = e.CreationTime,
                 CompleteDate = e.CompleteDate,
-                Priority = e.Priority,
+                PriorityId = e.PriorityId,
                 Watcher = e.Watcher,
                 Voted = e.Voted,
                 StartDate = e.StartDate,

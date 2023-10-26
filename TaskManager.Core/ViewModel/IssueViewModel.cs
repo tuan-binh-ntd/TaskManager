@@ -8,7 +8,7 @@
         public string? Description { get; set; } = string.Empty;
         public DateTime CreationTime { get; set; }
         public DateTime? CompleteDate { get; set; }
-        public string? Priority { get; set; } = string.Empty;
+        public Guid? PriorityId { get; set; }
         public string? Watcher { get; set; } = string.Empty;
         public string? Voted { get; set; } = string.Empty;
         public DateTime? StartDate { get; set; }

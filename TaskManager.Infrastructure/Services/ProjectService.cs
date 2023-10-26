@@ -173,21 +173,21 @@ namespace TaskManager.Infrastructure.Services
 
             var todoStatus = new Status()
             {
-                Name = "TO DO",
+                Name = CoreConstants.TodoStatusName,
                 ProjectId = project.Id,
                 StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.ToDoCode).Select(e => e.Id).FirstOrDefault()
             };
 
             var inProgressStatus = new Status()
             {
-                Name = "IN PROGRESS",
+                Name = CoreConstants.InProgresstatusName,
                 ProjectId = project.Id,
                 StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.InProgressCode).Select(e => e.Id).FirstOrDefault()
             };
 
             var doneStatus = new Status()
             {
-                Name = "DONE",
+                Name = CoreConstants.DoneStatusName,
                 ProjectId = project.Id,
                 StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.DoneCode).Select(e => e.Id).FirstOrDefault()
             };
@@ -289,6 +289,7 @@ namespace TaskManager.Infrastructure.Services
 
         private async Task CreateBacklogAndProjectConfigurationForProject(Project project)
         {
+            var normalPriority = await _priorityRepository.GetNormal();
             Backlog backlog = new()
             {
                 Name = project.Name,
@@ -303,41 +304,12 @@ namespace TaskManager.Infrastructure.Services
                 ProjectId = project.Id,
                 IssueCode = 0,
                 SprintCode = 0,
-                Code = project.Code
+                Code = project.Code,
+                DefaultPriorityId = normalPriority.Id,
             };
 
             _projectConfigurationRepository.Add(projectConfiguration);
             await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
-        }
-
-        private async Task CreatePriorityForProject(Project project)
-        {
-            var priorities = new List<Priority>()
-            {
-                new Priority()
-                {
-                    Name = "Normal",
-                    ProjectId = project.Id
-                },
-                new Priority()
-                {
-                    Name = "Medium",
-                    ProjectId = project.Id
-                },
-                new Priority()
-                {
-                    Name = "High",
-                    ProjectId = project.Id
-                },
-                new Priority()
-                {
-                    Name = "Urgent",
-                    ProjectId = project.Id
-                },
-            };
-
-            _priorityRepository.AddRange(priorities);
-            await _priorityRepository.UnitOfWork.SaveChangesAsync();
         }
         #endregion
 
@@ -378,8 +350,6 @@ namespace TaskManager.Infrastructure.Services
             await CreateStatusForProject(project);
 
             await CreateWorkflowForProject(project);
-
-            await CreatePriorityForProject(project);
 
             return await ToProjectViewModel(project);
         }

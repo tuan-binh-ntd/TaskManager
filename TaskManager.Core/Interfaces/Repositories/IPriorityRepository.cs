@@ -10,5 +10,7 @@ namespace TaskManager.Core.Interfaces.Repositories
         void AddRange(IReadOnlyCollection<Priority> priorities);
         void Update(Priority priority);
         void Delete(Guid id);
+        Task<Priority> GetNormal();
+
     }
 }

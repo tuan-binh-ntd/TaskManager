@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TaskManager.Core.Core;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Infrastructure.Data;
@@ -46,6 +47,12 @@ namespace TaskManager.Infrastructure.Repositories
         public void Update(Priority priority)
         {
             _context.Entry(priority).State = EntityState.Modified;
+        }
+
+        public async Task<Priority> GetNormal()
+        {
+            var priority = await _context.Priorities.FirstOrDefaultAsync(p => p.Name == CoreConstants.NormalName);
+            return priority!;
         }
     }
 }
