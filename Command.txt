@@ -25,6 +25,8 @@
 	Add-Migration -Name Add-StatusId-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
 	Add-Migration -Name Add-DefaultAssigneeId-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
 	Add-Migration -Name Add-IsStart-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
+	Add-Migration -Name Add-Team-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
+	Add-Migration -Name Add-Priority-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
 
 - Remove migration to DB
 	Remove-Migration -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API

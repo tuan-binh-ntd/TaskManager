@@ -13,5 +13,6 @@ namespace TaskManager.Core.Entities
         // Relationship
         public ICollection<AppUserRole>? UserRoles { get; set; }
         public ICollection<UserProject>? UserProjects { get; set; }
+        public ICollection<UserTeam>? UserTeams { get; set; }
     }
 }

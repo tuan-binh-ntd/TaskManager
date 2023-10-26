@@ -23,6 +23,7 @@ namespace TaskManager.Infrastructure.Services
         private readonly ITransitionRepository _transitionRepository;
         private readonly IWorkflowRepository _workflowRepository;
         private readonly IIssueRepository _issueRepository;
+        private readonly IPriorityRepository _priorityRepository;
         private readonly IMapper _mapper;
 
         public ProjectService(
@@ -37,6 +38,7 @@ namespace TaskManager.Infrastructure.Services
             ITransitionRepository transitionRepository,
             IWorkflowRepository workflowRepository,
             IIssueRepository issueRepository,
+            IPriorityRepository priorityRepository,
             IMapper mapper
             )
         {
@@ -51,6 +53,7 @@ namespace TaskManager.Infrastructure.Services
             _transitionRepository = transitionRepository;
             _workflowRepository = workflowRepository;
             _issueRepository = issueRepository;
+            _priorityRepository = priorityRepository;
             _mapper = mapper;
         }
 
@@ -306,6 +309,36 @@ namespace TaskManager.Infrastructure.Services
             _projectConfigurationRepository.Add(projectConfiguration);
             await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
         }
+
+        private async Task CreatePriorityForProject(Project project)
+        {
+            var priorities = new List<Priority>()
+            {
+                new Priority()
+                {
+                    Name = "Normal",
+                    ProjectId = project.Id
+                },
+                new Priority()
+                {
+                    Name = "Medium",
+                    ProjectId = project.Id
+                },
+                new Priority()
+                {
+                    Name = "High",
+                    ProjectId = project.Id
+                },
+                new Priority()
+                {
+                    Name = "Urgent",
+                    ProjectId = project.Id
+                },
+            };
+
+            _priorityRepository.AddRange(priorities);
+            await _priorityRepository.UnitOfWork.SaveChangesAsync();
+        }
         #endregion
 
         public async Task<Guid> Delete(Guid id)
@@ -345,6 +378,8 @@ namespace TaskManager.Infrastructure.Services
             await CreateStatusForProject(project);
 
             await CreateWorkflowForProject(project);
+
+            await CreatePriorityForProject(project);
 
             return await ToProjectViewModel(project);
         }

@@ -12,6 +12,7 @@ namespace TaskManager.Core.Entities
         /// Default assginee when create a issue
         /// </summary>
         public Guid? DefaultAssigneeId { get; set; }
+        public Guid? DefaultPriorityId { get; set; }
         //Relationship
         public Project? Project { get; set; }
     }

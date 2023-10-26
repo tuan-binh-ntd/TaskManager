@@ -23,6 +23,12 @@ namespace TaskManager.Infrastructure.Data.Config
             builder
                 .HasOne(p => p.ProjectConfiguration)
                 .WithOne(pg => pg.Project);
+
+            builder
+                .HasMany(p => p.Priorities)
+                .WithOne(p => p.Project)
+                .HasForeignKey(p => p.ProjectId)
+                .IsRequired();
         }
     }
 }

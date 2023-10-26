@@ -41,6 +41,9 @@ namespace TaskManager.Infrastructure.Data
         public DbSet<Transition> Transitions => Set<Transition>();
         public DbSet<Workflow> Workflows => Set<Workflow>();
         public DbSet<WorkflowIssueType> WorkflowIssueTypes => Set<WorkflowIssueType>();
+        public DbSet<UserTeam> UserTeams => Set<UserTeam>();
+        public DbSet<Team> Teams => Set<Team>();
+        public DbSet<Priority> Priorities => Set<Priority>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -18,5 +18,6 @@ namespace TaskManager.Core.Entities
         public ICollection<Status>? Statuses { get; set; }
         public ICollection<Transition>? Transitions { get; set; }
         public Workflow? Workflow { get; set; }
+        public ICollection<Priority>? Priorities { get; set; }
     }
 }

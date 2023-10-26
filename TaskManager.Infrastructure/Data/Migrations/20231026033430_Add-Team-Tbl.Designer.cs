@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskManager.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using TaskManager.Infrastructure.Data;
 namespace TaskManager.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231026033430_Add-Team-Tbl")]
+    partial class AddTeamTbl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -512,36 +515,6 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.ToTable("IssueTypes");
                 });
 
-            modelBuilder.Entity("TaskManager.Core.Entities.Priority", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ModificationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("Priorities");
-                });
-
             modelBuilder.Entity("TaskManager.Core.Entities.Project", b =>
                 {
                     b.Property<Guid>("Id")
@@ -594,9 +567,6 @@ namespace TaskManager.Infrastructure.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<Guid?>("DefaultAssigneeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("DefaultPriorityId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("IssueCode")
@@ -1041,17 +1011,6 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("TaskManager.Core.Entities.Priority", b =>
-                {
-                    b.HasOne("TaskManager.Core.Entities.Project", "Project")
-                        .WithMany("Priorities")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-                });
-
             modelBuilder.Entity("TaskManager.Core.Entities.ProjectConfiguration", b =>
                 {
                     b.HasOne("TaskManager.Core.Entities.Project", "Project")
@@ -1224,8 +1183,6 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.Navigation("Backlog");
 
                     b.Navigation("IssueTypes");
-
-                    b.Navigation("Priorities");
 
                     b.Navigation("ProjectConfiguration");
 

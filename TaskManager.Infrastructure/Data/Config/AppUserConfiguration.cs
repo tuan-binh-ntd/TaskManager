@@ -23,6 +23,13 @@ namespace TaskManager.Infrastructure.Data.Config
                 .WithOne(p => p.User)
                 .HasForeignKey(p => p.UserId)
                 .IsRequired();
+
+            //Many to Many Relationship (AppUser, UserTeam, Team)
+            builder
+                .HasMany(u => u.UserTeams)
+                .WithOne(p => p.User)
+                .HasForeignKey(p => p.UserId)
+                .IsRequired();
         }
     }
 }

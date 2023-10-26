@@ -74,6 +74,8 @@ builder.Services.AddScoped<IStatusRepository, StatusRepository>();
 builder.Services.AddScoped<IStatusCategoryRepository, StatusCategoryRepository>();
 builder.Services.AddScoped<ITransitionRepository, TransitionRepository>();
 builder.Services.AddScoped<IWorkflowRepository, WorkflowRepository>();
+builder.Services.AddScoped<ITeamRepository, TeamRepository>();
+builder.Services.AddScoped<IPriorityRepository, PriorityRepository>();
 
 // Services
 builder.Services.AddScoped<IJWTTokenService, JWTTokenService>();
@@ -86,6 +88,8 @@ builder.Services.AddScoped<IIssueService, IssueService>();
 builder.Services.AddScoped<IIssueTypeService, IssueTypeService>();
 builder.Services.AddScoped<IUploadFileService, UploadFileService>();
 builder.Services.AddScoped<IStatusService, StatusService>();
+builder.Services.AddScoped<ITeamService, TeamService>();
+builder.Services.AddScoped<IPriorityService, PriorityService>();
 // Add EmailService
 // End  Declaration DI
 
