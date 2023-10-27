@@ -40,7 +40,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<Priority>> GetByProjectId(Guid projectId)
         {
-            var priorities = await _context.Priorities.Where(p => p.ProjectId == projectId).ToListAsync();
+            var priorities = await _context.Priorities.Where(p => p.ProjectId == projectId && p.ProjectId == null).ToListAsync();
             return priorities!;
         }
 
