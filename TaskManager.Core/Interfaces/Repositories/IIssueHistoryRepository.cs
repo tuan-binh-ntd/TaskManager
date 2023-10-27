@@ -9,5 +9,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         IssueHistoryViewModel Add(IssueHistory issueHistory);
         void Update(IssueHistory issueHistory);
         void Delete(Guid id);
+        Task<IReadOnlyCollection<IssueHistory>> GetByIssueId(Guid issueId);
     }
 }

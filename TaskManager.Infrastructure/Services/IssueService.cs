@@ -350,5 +350,11 @@ namespace TaskManager.Infrastructure.Services
             var issue = await _issueRepository.Get(id);
             return ToIssueViewModel(issue!);
         }
+
+        public async Task<IReadOnlyCollection<IssueHistoryViewModel>> GetHistoriesByIssueId(Guid issueId)
+        {
+            var issueHistories = await _issueHistoryRepository.GetByIssueId(issueId);
+            return _mapper.Map<IReadOnlyCollection<IssueHistoryViewModel>>(issueHistories);
+        }
     }
 }

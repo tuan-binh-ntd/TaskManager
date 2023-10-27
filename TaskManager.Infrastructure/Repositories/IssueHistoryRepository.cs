@@ -45,5 +45,11 @@ namespace TaskManager.Infrastructure.Repositories
         {
             _context.Entry(issueHistory).State = EntityState.Modified;
         }
+
+        public async Task<IReadOnlyCollection<IssueHistory>> GetByIssueId(Guid issueId)
+        {
+            var issueHistories = await _context.IssueHistories.Where(ih => ih.IssueId == issueId).ToListAsync();
+            return issueHistories.AsReadOnly();
+        }
     }
 }
