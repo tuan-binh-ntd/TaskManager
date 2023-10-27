@@ -10,5 +10,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         void AddRange(ICollection<Status> statuses);
         Task<IReadOnlyCollection<Status>> GetByProjectId(Guid projectId);
         Task<Status> GetById(Guid id);
+        Task<Status> GetUnreleasedStatus(Guid projectId);
     }
 }

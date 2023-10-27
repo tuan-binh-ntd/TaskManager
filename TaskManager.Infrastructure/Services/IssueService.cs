@@ -144,7 +144,14 @@ namespace TaskManager.Infrastructure.Services
             await _issueRepository.UnitOfWork.SaveChangesAsync();
 
             var issueDetail = await _issueDetailRepository.GetById(id);
-            issueDetail.StoryPointEstimate = updateIssueDto.StoryPointEstimate;
+            if (updateIssueDto.StoryPointEstimate is not null)
+            {
+                issueDetail.StoryPointEstimate = (int)updateIssueDto.StoryPointEstimate;
+            }
+            if (updateIssueDto.ReporterId is not null)
+            {
+                issueDetail.ReporterId = (Guid)updateIssueDto.ReporterId;
+            }
             if (updateIssueDto.AssigneeId is not null)
             {
                 issueDetail.AssigneeId = updateIssueDto.AssigneeId;

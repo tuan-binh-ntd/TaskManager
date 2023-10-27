@@ -50,5 +50,11 @@ namespace TaskManager.Infrastructure.Repositories
             var status = await _context.Statuses.Where(s => s.Id == id).FirstOrDefaultAsync();
             return status!;
         }
+
+        public async Task<Status> GetUnreleasedStatus(Guid projectId)
+        {
+            var status = await _context.Statuses.Where(e => e.Name == CoreConstants.UnreleasedStatusName && e.ProjectId == projectId).FirstOrDefaultAsync();
+            return status!;
+        }
     }
 }

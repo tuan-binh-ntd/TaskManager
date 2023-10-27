@@ -12,6 +12,18 @@ namespace TaskManager.Infrastructure.Data
             RoleManager<AppRole> roleManager,
             AppDbContext appDbContext)
         {
+            var versionStatusCategory = await appDbContext.StatusCategories.Where(e => e.Code == CoreConstants.VersionCode).FirstOrDefaultAsync();
+
+            if (versionStatusCategory is not null) return;
+            appDbContext.StatusCategories.Add(new StatusCategory()
+            {
+                Name = "Version status",
+                Color = "#26282A",
+                Code = CoreConstants.VersionCode
+            });
+
+            await appDbContext.SaveChangesAsync();
+
             if (await appDbContext.Priorities.AnyAsync()) return;
             var priorities = new List<Priority>()
             {
@@ -63,7 +75,7 @@ namespace TaskManager.Infrastructure.Data
                     Name ="Hide status",
                     Color = "#26282A",
                     Code = CoreConstants.HideCode
-                }
+                },
             };
 
             await appDbContext.StatusCategories.AddRangeAsync(statusCategories);

@@ -66,5 +66,7 @@ namespace TaskManager.Core.Interfaces.Repositories
         /// </summary>
         /// <param name="issue">Issue entity</param>
         void LoadEntitiesRelationship(Issue issue);
+
+        Task<IReadOnlyCollection<Issue>> GetByIds(IReadOnlyCollection<Guid> ids);
     }
 }

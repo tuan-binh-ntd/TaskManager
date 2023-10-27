@@ -117,5 +117,11 @@ namespace TaskManager.Infrastructure.Repositories
             _context.Entry(issue).Collection(i => i.Comments!).Load();
             _context.Entry(issue).Reference(i => i.Status).Load();
         }
+
+        public async Task<IReadOnlyCollection<Issue>> GetByIds(IReadOnlyCollection<Guid> ids)
+        {
+            var issues = await _context.Issues.Where(e => ids.Contains(e.Id)).ToListAsync();
+            return issues.AsReadOnly();
+        }
     }
 }

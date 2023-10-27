@@ -35,6 +35,12 @@ namespace TaskManager.Infrastructure.Data.Config
             builder
                 .HasIndex(p => p.Code)
                 .IsUnique();
+
+            builder
+                .HasOne(i => i.Version)
+                .WithMany(v => v.Issues)
+                .HasForeignKey(i => i.VersionId)
+                .IsRequired(false);
         }
     }
 }

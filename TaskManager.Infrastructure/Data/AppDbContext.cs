@@ -7,6 +7,7 @@ using System.Reflection;
 using TaskManager.Core.Core;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
+using Version = TaskManager.Core.Entities.Version;
 
 namespace TaskManager.Infrastructure.Data
 {
@@ -44,6 +45,7 @@ namespace TaskManager.Infrastructure.Data
         public DbSet<UserTeam> UserTeams => Set<UserTeam>();
         public DbSet<Team> Teams => Set<Team>();
         public DbSet<Priority> Priorities => Set<Priority>();
+        public DbSet<Version> Versions => Set<Version>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -192,9 +192,30 @@ namespace TaskManager.Infrastructure.Services
                 StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.DoneCode).Select(e => e.Id).FirstOrDefault()
             };
 
+            var unreleasedStatus = new Status()
+            {
+                Name = CoreConstants.UnreleasedStatusName,
+                ProjectId = project.Id,
+                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.VersionCode).Select(e => e.Id).FirstOrDefault()
+            };
+
+            var releasedStatus = new Status()
+            {
+                Name = CoreConstants.ReleasedStatusName,
+                ProjectId = project.Id,
+                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.VersionCode).Select(e => e.Id).FirstOrDefault()
+            };
+
+            var archivedStatus = new Status()
+            {
+                Name = CoreConstants.ArchivedStatusName,
+                ProjectId = project.Id,
+                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.VersionCode).Select(e => e.Id).FirstOrDefault()
+            };
+
             var statuses = new List<Status>()
             {
-                startStatus, todoStatus, doneStatus, inProgressStatus, anyStatus
+                startStatus, todoStatus, doneStatus, inProgressStatus, anyStatus, unreleasedStatus, releasedStatus, archivedStatus,
             };
 
             _statusRepository.AddRange(statuses);

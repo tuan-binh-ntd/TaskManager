@@ -35,7 +35,9 @@ namespace TaskManager.Core.DTOs
         public Guid? AssigneeId { get; set; }
         public Guid? StatusId { get; set; }
         public Guid? PriorityId { get; set; }
-        public int StoryPointEstimate { get; set; }
+        public int? StoryPointEstimate { get; set; }
+        public Guid? VersionId { get; set; }
+        public Guid? ReporterId { get; set; }
 
         public override void Register(TypeAdapterConfig config)
         {
@@ -54,6 +56,7 @@ namespace TaskManager.Core.DTOs
                 .IgnoreIf((src, dest) => src.SprintId == null, dest => dest.SprintId!)
                 .IgnoreIf((src, dest) => src.IssueTypeId == null, dest => dest.IssueTypeId!)
                 .IgnoreIf((src, dest) => src.BacklogId == null, dest => dest.BacklogId!)
+                .IgnoreIf((src, dest) => src.VersionId == null, dest => dest.VersionId!)
                 .Ignore(dest => dest.Id)
                 .Ignore(dest => dest.CreationTime)
                 .Ignore(dest => dest.ModificationTime!)
