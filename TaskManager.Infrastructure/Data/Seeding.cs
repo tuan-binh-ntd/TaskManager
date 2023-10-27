@@ -29,19 +29,33 @@ namespace TaskManager.Infrastructure.Data
             {
                 new Priority()
                 {
-                    Name = CoreConstants.NormalName,
+                    Name = CoreConstants.LowestName,
+                    Description = "Trivial problem with little or no impact on progress.",
+                    Color = "#999999"
+                },
+                new Priority()
+                {
+                    Name = CoreConstants.LowName,
+                    Description = "Minor problem or easily worked around.",
+                    Color = "#707070"
                 },
                 new Priority()
                 {
                     Name = CoreConstants.MediumName,
+                    Description = "Has the potential to affect progress.",
+                    Color = "#f79232"
                 },
                 new Priority()
                 {
                     Name = CoreConstants.HighName,
+                    Description = "Serious problem that could block progress.",
+                    Color = "#f15C75"
                 },
                 new Priority()
                 {
-                    Name = CoreConstants.UrgentName,
+                    Name = CoreConstants.HighestName,
+                    Description = "This problem will block progress.",
+                    Color = "#d04437"
                 }
             };
 

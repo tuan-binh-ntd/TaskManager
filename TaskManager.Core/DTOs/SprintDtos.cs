@@ -29,7 +29,7 @@ namespace TaskManager.Core.DTOs
                 .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Name), dest => dest.Name)
                 .IgnoreIf((src, dest) => src.StartDate == null, dest => dest.StartDate!)
                 .IgnoreIf((src, dest) => src.EndDate == null, dest => dest.EndDate!)
-                .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Goal), dest => dest.Goal)
+                .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Goal), dest => dest.Goal!)
                 .IgnoreIf((src, dest) => src.ProjectId == null, dest => dest.ProjectId!)
                 .Ignore(dest => dest.Id)
                 .Ignore(dest => dest.CreationTime)

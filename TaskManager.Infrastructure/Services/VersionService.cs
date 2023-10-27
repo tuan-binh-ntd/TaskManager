@@ -27,19 +27,19 @@ namespace TaskManager.Infrastructure.Services
         }
 
         #region PrivateMethod
-        private async Task<IReadOnlyCollection<VersionViewModel>> ToVersionViewModels(IReadOnlyCollection<Version> versions)
-        {
-            var versionViewModels = new List<VersionViewModel>();
-            if (versions.Any())
-            {
-                foreach (var version in versions)
-                {
-                    var versionViewModel = await ToVersionViewModel(version);
-                    versionViewModels.Add(versionViewModel);
-                }
-            }
-            return versionViewModels;
-        }
+        //private async Task<IReadOnlyCollection<VersionViewModel>> ToVersionViewModels(IReadOnlyCollection<Version> versions)
+        //{
+        //    var versionViewModels = new List<VersionViewModel>();
+        //    if (versions.Any())
+        //    {
+        //        foreach (var version in versions)
+        //        {
+        //            var versionViewModel = await ToVersionViewModel(version);
+        //            versionViewModels.Add(versionViewModel);
+        //        }
+        //    }
+        //    return versionViewModels;
+        //}
         private Task<VersionViewModel> ToVersionViewModel(Version version)
         {
             var versionViewModel = _mapper.Map<VersionViewModel>(version);
@@ -99,7 +99,9 @@ namespace TaskManager.Infrastructure.Services
             var version = await _versionRepository.GetById(id);
             if (version is null)
             {
+#pragma warning disable CA2208 // Instantiate argument exceptions correctly
                 throw new ArgumentNullException(nameof(version));
+#pragma warning restore CA2208 // Instantiate argument exceptions correctly
             }
 
             version = _mapper.Map<Version>(updateVersionDto);

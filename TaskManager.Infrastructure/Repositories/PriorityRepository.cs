@@ -51,7 +51,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<Priority> GetNormal()
         {
-            var priority = await _context.Priorities.FirstOrDefaultAsync(p => p.Name == CoreConstants.NormalName);
+            var priority = await _context.Priorities.FirstOrDefaultAsync(p => p.Name == CoreConstants.LowestName);
             return priority!;
         }
     }

@@ -88,7 +88,9 @@ namespace TaskManager.Infrastructure.Services
             var team = await _teamRepository.GetById(id);
             if (team is null)
             {
+#pragma warning disable CA2208 // Instantiate argument exceptions correctly
                 throw new ArgumentNullException(nameof(team));
+#pragma warning restore CA2208 // Instantiate argument exceptions correctly
             }
             team = _mapper.Map<Team>(updateTeamDto);
             _teamRepository.Update(team);
@@ -101,7 +103,9 @@ namespace TaskManager.Infrastructure.Services
             var team = await _teamRepository.GetById(addMemberToTeamDto.TeamId);
             if (team is null)
             {
+#pragma warning disable CA2208 // Instantiate argument exceptions correctly
                 throw new ArgumentNullException(nameof(team));
+#pragma warning restore CA2208 // Instantiate argument exceptions correctly
             }
             _teamRepository.LoadEntitiesRelationship(team);
 
@@ -116,9 +120,13 @@ namespace TaskManager.Infrastructure.Services
                             TeamId = team.Id,
                             UserId = item
                         };
+                        team.UserTeams.Add(userTeam);
                     }
                 }
             }
+
+            _teamRepository.Update(team);
+            await _teamRepository.UnitOfWork.SaveChangesAsync();
 
             return await ToTeamViewModel(team);
         }

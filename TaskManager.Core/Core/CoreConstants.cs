@@ -33,9 +33,10 @@
         public const string TaskName = "Task";
         public const string SubTaskName = "Subtask";
         // Priority
-        public const string NormalName = "Normal";
+        public const string LowestName = "Lowest";
+        public const string LowName = "Low";
         public const string MediumName = "Medium";
         public const string HighName = "High";
-        public const string UrgentName = "Urgent";
+        public const string HighestName = "Highest";
     }
 }
