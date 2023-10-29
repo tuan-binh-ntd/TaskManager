@@ -119,6 +119,7 @@ namespace TaskManager.Infrastructure.Services
             var sprints = await _sprintRepository.GetSprintByProjectId(project.Id);
             var issueTypes = await _issueTypeRepository.GetsByProjectId(project.Id);
             var statuses = await _statusRepository.GetByProjectId(project.Id);
+            var epics = await _issueRepository.GetEpicByProjectId(project.Id);
             if (sprints.Any())
             {
                 foreach (var sprint in sprints)
@@ -134,6 +135,7 @@ namespace TaskManager.Infrastructure.Services
             projectViewModel.Sprints = sprints.ToList();
             projectViewModel.IssueTypes = issueTypes.ToList();
             projectViewModel.Statuses = statuses.Adapt<ICollection<StatusViewModel>>();
+            projectViewModel.Epics = _mapper.Map<ICollection<EpicViewModel>>(epics);
             return projectViewModel;
         }
 

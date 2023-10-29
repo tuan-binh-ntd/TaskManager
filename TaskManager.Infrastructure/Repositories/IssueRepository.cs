@@ -123,5 +123,11 @@ namespace TaskManager.Infrastructure.Repositories
             var issues = await _context.Issues.Where(e => ids.Contains(e.Id)).ToListAsync();
             return issues.AsReadOnly();
         }
+
+        public async Task<IReadOnlyCollection<Issue>> GetEpicByProjectId(Guid projectId)
+        {
+            var epics = await _context.Issues.Where(e => e.SprintId == null && e.BacklogId == null && e.ProjectId == projectId).ToListAsync();
+            return epics.AsReadOnly();
+        }
     }
 }

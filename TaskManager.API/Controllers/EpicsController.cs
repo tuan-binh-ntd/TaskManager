@@ -7,7 +7,7 @@ using TaskManager.Core.ViewModel;
 
 namespace TaskManager.API.Controllers
 {
-    [Route("api/projects/[controller]")]
+    [Route("api/projects/{projectId}/[controller]")]
     [ApiController]
     public class EpicsController : BaseController
     {
@@ -25,5 +25,8 @@ namespace TaskManager.API.Controllers
             var res = await _issueService.CreateEpic(createEpicDto);
             return CustomResult(res, HttpStatusCode.Created);
         }
+
+        //[HttpGet]
+        //[ProducesResponseType(typeof())]
     }
 }

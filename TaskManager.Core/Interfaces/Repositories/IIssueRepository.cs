@@ -68,5 +68,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         void LoadEntitiesRelationship(Issue issue);
 
         Task<IReadOnlyCollection<Issue>> GetByIds(IReadOnlyCollection<Guid> ids);
+        Task<IReadOnlyCollection<Issue>> GetEpicByProjectId(Guid projectId);
     }
 }

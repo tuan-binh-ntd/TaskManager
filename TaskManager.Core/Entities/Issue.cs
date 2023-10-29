@@ -33,5 +33,6 @@ namespace TaskManager.Core.Entities
         public Priority? Priority { get; set; }
         public Guid? VersionId { get; set; }
         public Version? Version { get; set; }
+        public Guid? ProjectId { get; set; }
     }
 }

@@ -14,6 +14,7 @@
         public ICollection<SprintViewModel>? Sprints { get; set; }
         public ICollection<IssueTypeViewModel>? IssueTypes { get; set; }
         public ICollection<StatusViewModel>? Statuses { get; set; }
+        public ICollection<EpicViewModel>? Epics { get; set; }
     }
 
     public class BacklogViewModel

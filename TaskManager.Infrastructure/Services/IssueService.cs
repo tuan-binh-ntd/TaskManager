@@ -314,6 +314,7 @@ namespace TaskManager.Infrastructure.Services
                 Name = createEpicDto.Name,
                 IssueTypeId = issueType.Id,
                 Code = $"{projectConfiguration.Code}-{issueIndex}",
+                ProjectId = createEpicDto.ProjectId
             };
 
             _issueRepository.Add(issue);
