@@ -86,4 +86,43 @@ namespace TaskManager.Core.DTOs
         public Guid CreatorUserId { get; set; }
         public Guid ProjectId { get; set; }
     }
+
+    public class UpdateEpicDto : BaseDto<UpdateEpicDto, Issue>
+    {
+        public string? Name { get; set; }
+        public string? Description { get; set; }
+        public DateTime? CompleteDate { get; set; }
+        public string? Watcher { get; set; }
+        public string? Voted { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? DueDate { get; set; }
+        public Guid? ParentId { get; set; }
+        public Guid? AssigneeId { get; set; }
+        public Guid? StatusId { get; set; }
+        public Guid? PriorityId { get; set; }
+        public int? StoryPointEstimate { get; set; }
+        public Guid? VersionId { get; set; }
+        public Guid? ReporterId { get; set; }
+
+        public override void Register(TypeAdapterConfig config)
+        {
+            base.Register(config);
+
+            config.NewConfig<UpdateEpicDto, Issue>()
+                .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Name), dest => dest.Name)
+                .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Description), dest => dest.Description!)
+                .IgnoreIf((src, dest) => src.CompleteDate == null, dest => dest.CompleteDate!)
+                .IgnoreIf((src, dest) => src.PriorityId == null, dest => dest.PriorityId!)
+                .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Watcher), dest => dest.Watcher!)
+                .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Voted), dest => dest.Voted!)
+                .IgnoreIf((src, dest) => src.StartDate == null, dest => dest.StartDate!)
+                .IgnoreIf((src, dest) => src.DueDate == null, dest => dest.DueDate!)
+                .IgnoreIf((src, dest) => src.ParentId == null, dest => dest.ParentId!)
+                .IgnoreIf((src, dest) => src.VersionId == null, dest => dest.VersionId!)
+                .Ignore(dest => dest.Id)
+                .Ignore(dest => dest.CreationTime)
+                .Ignore(dest => dest.ModificationTime!)
+                .IgnoreNullValues(true);
+        }
+    }
 }

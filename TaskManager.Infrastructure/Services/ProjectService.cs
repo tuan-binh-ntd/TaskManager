@@ -135,7 +135,7 @@ namespace TaskManager.Infrastructure.Services
             projectViewModel.Sprints = sprints.ToList();
             projectViewModel.IssueTypes = issueTypes.ToList();
             projectViewModel.Statuses = statuses.Adapt<ICollection<StatusViewModel>>();
-            projectViewModel.Epics = _mapper.Map<ICollection<EpicViewModel>>(epics);
+            projectViewModel.Epics = ToEpicViewModels(epics).ToList();
             return projectViewModel;
         }
 
@@ -333,6 +333,58 @@ namespace TaskManager.Infrastructure.Services
 
             _projectConfigurationRepository.Add(projectConfiguration);
             await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
+        }
+
+        private IReadOnlyCollection<EpicViewModel> ToEpicViewModels(IReadOnlyCollection<Issue> issues)
+        {
+            var epicViewModels = new List<EpicViewModel>();
+            if (issues.Any())
+            {
+                foreach (var issue in issues)
+                {
+                    var epicViewModel = ToEpicViewModel(issue);
+                    epicViewModels.Add(epicViewModel);
+                }
+            }
+            return epicViewModels.AsReadOnly();
+        }
+
+        private EpicViewModel ToEpicViewModel(Issue issue)
+        {
+            _issueRepository.LoadEntitiesRelationship(issue);
+            var epicViewModel = _mapper.Map<EpicViewModel>(issue);
+
+            if (issue.IssueDetail is not null)
+            {
+                var issueDetail = _mapper.Map<IssueDetailViewModel>(issue.IssueDetail);
+                epicViewModel.IssueDetail = issueDetail;
+            }
+            if (issue.IssueHistories is not null && issue.IssueHistories.Any())
+            {
+                var issueHistories = _mapper.Map<ICollection<IssueHistoryViewModel>>(issue.IssueHistories);
+                epicViewModel.IssueHistories = issueHistories;
+            }
+            if (issue.Comments is not null && issue.Comments.Any())
+            {
+                var comments = _mapper.Map<ICollection<CommentViewModel>>(issue.Comments);
+                epicViewModel.Comments = comments;
+            }
+            if (issue.Attachments is not null && issue.Attachments.Any())
+            {
+                var attachments = _mapper.Map<ICollection<AttachmentViewModel>>(issue.Attachments);
+                epicViewModel.Attachments = attachments;
+            }
+            if (issue.IssueType is not null)
+            {
+                var issueType = _mapper.Map<IssueTypeViewModel>(issue.IssueType);
+                epicViewModel.IssueType = issueType;
+            }
+            if (issue.Status is not null)
+            {
+                var status = _mapper.Map<StatusViewModel>(issue.Status);
+                epicViewModel.Status = status;
+            }
+            return epicViewModel;
         }
         #endregion
 

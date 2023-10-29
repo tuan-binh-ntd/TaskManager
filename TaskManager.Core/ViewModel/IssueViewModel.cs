@@ -100,8 +100,9 @@
         public DateTime? StartDate { get; set; }
         public DateTime? DueDate { get; set; }
         public Guid? ParentId { get; set; }
-        public Guid? SprintId { get; set; }
-        public Guid? BacklogId { get; set; }
+        public Guid IssueTypeId { get; set; }
+        public Guid StatusId { get; set; }
+        public Guid? PriorityId { get; set; }
         public IssueTypeViewModel? IssueType { get; set; }
         public ICollection<IssueHistoryViewModel>? IssueHistories { get; set; }
         public ICollection<CommentViewModel>? Comments { get; set; }

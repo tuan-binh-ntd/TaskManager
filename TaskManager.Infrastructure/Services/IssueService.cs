@@ -366,5 +366,35 @@ namespace TaskManager.Infrastructure.Services
             var comments = await _commentRepository.GetByIssueId(issueId);
             return _mapper.Map<IReadOnlyCollection<CommentViewModel>>(comments);
         }
+
+        public async Task<IssueViewModel> UpdateEpic(Guid id, UpdateEpicDto updateEpicDto)
+        {
+            var epic = await _issueRepository.Get(id);
+            if (epic is null)
+            {
+#pragma warning disable CA2208 // Instantiate argument exceptions correctly
+                throw new ArgumentNullException(nameof(epic));
+#pragma warning restore CA2208 // Instantiate argument exceptions correctly
+            }
+            epic = updateEpicDto.Adapt(epic);
+            _issueRepository.Update(epic);
+            await _issueRepository.UnitOfWork.SaveChangesAsync();
+
+            var issueDetail = await _issueDetailRepository.GetById(id);
+            if (updateEpicDto.StoryPointEstimate is not null)
+            {
+                issueDetail.StoryPointEstimate = (int)updateEpicDto.StoryPointEstimate;
+            }
+            if (updateEpicDto.ReporterId is not null)
+            {
+                issueDetail.ReporterId = (Guid)updateEpicDto.ReporterId;
+            }
+            if (updateEpicDto.AssigneeId is not null)
+            {
+                issueDetail.AssigneeId = updateEpicDto.AssigneeId;
+            }
+            await _issueDetailRepository.UnitOfWork.SaveChangesAsync();
+            return ToIssueViewModel(epic);
+        }
     }
 }
