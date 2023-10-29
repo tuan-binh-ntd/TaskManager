@@ -69,5 +69,7 @@ namespace TaskManager.Core.Interfaces.Repositories
 
         Task<IReadOnlyCollection<Issue>> GetByIds(IReadOnlyCollection<Guid> ids);
         Task<IReadOnlyCollection<Issue>> GetEpicByProjectId(Guid projectId);
+        Task<IReadOnlyCollection<Issue>> GetChildIssueOfEpic(Guid epicId);
+        Task<IReadOnlyCollection<Issue>> GetChildIssueOfIssue(Guid issueId);
     }
 }

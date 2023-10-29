@@ -109,5 +109,6 @@
         public ICollection<AttachmentViewModel>? Attachments { get; set; }
         public IssueDetailViewModel? IssueDetail { get; set; }
         public StatusViewModel? Status { get; set; }
+        public ICollection<IssueViewModel>? ChildIssues { get; set; }
     }
 }

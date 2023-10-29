@@ -129,5 +129,17 @@ namespace TaskManager.Infrastructure.Repositories
             var epics = await _context.Issues.Where(e => e.SprintId == null && e.BacklogId == null && e.ProjectId == projectId).ToListAsync();
             return epics.AsReadOnly();
         }
+
+        public async Task<IReadOnlyCollection<Issue>> GetChildIssueOfEpic(Guid epicId)
+        {
+            var childIssues = await _context.Issues.Where(e => e.ParentId == epicId).ToListAsync();
+            return childIssues.AsReadOnly();
+        }
+
+        public async Task<IReadOnlyCollection<Issue>> GetChildIssueOfIssue(Guid issueId)
+        {
+            var epics = await _context.Issues.Where(e => e.ParentId == issueId).ToListAsync();
+            return epics.AsReadOnly();
+        }
     }
 }

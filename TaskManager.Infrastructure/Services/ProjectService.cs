@@ -335,12 +335,12 @@ namespace TaskManager.Infrastructure.Services
             await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
         }
 
-        private IReadOnlyCollection<EpicViewModel> ToEpicViewModels(IReadOnlyCollection<Issue> issues)
+        private IReadOnlyCollection<EpicViewModel> ToEpicViewModels(IReadOnlyCollection<Issue> epics)
         {
             var epicViewModels = new List<EpicViewModel>();
-            if (issues.Any())
+            if (epics.Any())
             {
-                foreach (var issue in issues)
+                foreach (var issue in epics)
                 {
                     var epicViewModel = ToEpicViewModel(issue);
                     epicViewModels.Add(epicViewModel);
@@ -349,40 +349,45 @@ namespace TaskManager.Infrastructure.Services
             return epicViewModels.AsReadOnly();
         }
 
-        private EpicViewModel ToEpicViewModel(Issue issue)
+        private EpicViewModel ToEpicViewModel(Issue epic)
         {
-            _issueRepository.LoadEntitiesRelationship(issue);
-            var epicViewModel = _mapper.Map<EpicViewModel>(issue);
+            _issueRepository.LoadEntitiesRelationship(epic);
+            var epicViewModel = _mapper.Map<EpicViewModel>(epic);
 
-            if (issue.IssueDetail is not null)
+            if (epic.IssueDetail is not null)
             {
-                var issueDetail = _mapper.Map<IssueDetailViewModel>(issue.IssueDetail);
+                var issueDetail = _mapper.Map<IssueDetailViewModel>(epic.IssueDetail);
                 epicViewModel.IssueDetail = issueDetail;
             }
-            if (issue.IssueHistories is not null && issue.IssueHistories.Any())
+            if (epic.IssueHistories is not null && epic.IssueHistories.Any())
             {
-                var issueHistories = _mapper.Map<ICollection<IssueHistoryViewModel>>(issue.IssueHistories);
+                var issueHistories = _mapper.Map<ICollection<IssueHistoryViewModel>>(epic.IssueHistories);
                 epicViewModel.IssueHistories = issueHistories;
             }
-            if (issue.Comments is not null && issue.Comments.Any())
+            if (epic.Comments is not null && epic.Comments.Any())
             {
-                var comments = _mapper.Map<ICollection<CommentViewModel>>(issue.Comments);
+                var comments = _mapper.Map<ICollection<CommentViewModel>>(epic.Comments);
                 epicViewModel.Comments = comments;
             }
-            if (issue.Attachments is not null && issue.Attachments.Any())
+            if (epic.Attachments is not null && epic.Attachments.Any())
             {
-                var attachments = _mapper.Map<ICollection<AttachmentViewModel>>(issue.Attachments);
+                var attachments = _mapper.Map<ICollection<AttachmentViewModel>>(epic.Attachments);
                 epicViewModel.Attachments = attachments;
             }
-            if (issue.IssueType is not null)
+            if (epic.IssueType is not null)
             {
-                var issueType = _mapper.Map<IssueTypeViewModel>(issue.IssueType);
+                var issueType = _mapper.Map<IssueTypeViewModel>(epic.IssueType);
                 epicViewModel.IssueType = issueType;
             }
-            if (issue.Status is not null)
+            if (epic.Status is not null)
             {
-                var status = _mapper.Map<StatusViewModel>(issue.Status);
+                var status = _mapper.Map<StatusViewModel>(epic.Status);
                 epicViewModel.Status = status;
+            }
+            var childIssues = _issueRepository.GetChildIssueOfEpic(epic.Id).Result;
+            if(childIssues.Any())
+            {
+                epicViewModel.ChildIssues = _mapper.Map<ICollection<IssueViewModel>>(childIssues);
             }
             return epicViewModel;
         }
