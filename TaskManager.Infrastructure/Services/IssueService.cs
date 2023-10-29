@@ -16,6 +16,7 @@ namespace TaskManager.Infrastructure.Services
         private readonly IProjectConfigurationRepository _projectConfigurationRepository;
         private readonly IIssueTypeRepository _issueTypeRepository;
         private readonly ITransitionRepository _transitionRepository;
+        private readonly ICommentRepository _commentRepository;
         private readonly IMapper _mapper;
 
         public IssueService(
@@ -25,6 +26,7 @@ namespace TaskManager.Infrastructure.Services
             IProjectConfigurationRepository projectConfigurationRepository,
             IIssueTypeRepository issueTypeRepository,
             ITransitionRepository transitionRepository,
+            ICommentRepository commentRepository,
             IMapper mapper
             )
         {
@@ -34,6 +36,7 @@ namespace TaskManager.Infrastructure.Services
             _projectConfigurationRepository = projectConfigurationRepository;
             _issueTypeRepository = issueTypeRepository;
             _transitionRepository = transitionRepository;
+            _commentRepository = commentRepository;
             _mapper = mapper;
         }
 
@@ -355,6 +358,12 @@ namespace TaskManager.Infrastructure.Services
         {
             var issueHistories = await _issueHistoryRepository.GetByIssueId(issueId);
             return _mapper.Map<IReadOnlyCollection<IssueHistoryViewModel>>(issueHistories);
+        }
+
+        public async Task<IReadOnlyCollection<CommentViewModel>> GetCommentsByIssueId(Guid issueId)
+        {
+            var comments = await _commentRepository.GetByIssueId(issueId);
+            return _mapper.Map<IReadOnlyCollection<CommentViewModel>>(comments);
         }
     }
 }

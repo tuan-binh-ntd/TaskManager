@@ -16,5 +16,6 @@ namespace TaskManager.Core.Interfaces.Services
         Task<EpicViewModel> CreateEpic(CreateEpicDto createEpicDto);
         Task<IssueViewModel> GetById(Guid id);
         Task<IReadOnlyCollection<IssueHistoryViewModel>> GetHistoriesByIssueId(Guid issueId);
+        Task<IReadOnlyCollection<CommentViewModel>> GetCommentsByIssueId(Guid issueId);
     }
 }
