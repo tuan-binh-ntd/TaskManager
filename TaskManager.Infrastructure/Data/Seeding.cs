@@ -50,19 +50,6 @@ namespace TaskManager.Infrastructure.Data
             appDbContext.Priorities.AddRange(priorities);
             await appDbContext.SaveChangesAsync();
 
-            var versionStatusCategory = await appDbContext.StatusCategories.Where(e => e.Code == CoreConstants.VersionCode).FirstOrDefaultAsync();
-
-            if (versionStatusCategory is not null) return;
-            appDbContext.StatusCategories.Add(new StatusCategory()
-            {
-                Name = "Version status",
-                Color = "#26282A",
-                Code = CoreConstants.VersionCode
-            });
-
-            await appDbContext.SaveChangesAsync();
-
-
             if (await appDbContext.StatusCategories.AnyAsync()) return;
             var statusCategories = new List<StatusCategory>
             {
@@ -93,6 +80,18 @@ namespace TaskManager.Infrastructure.Data
             };
 
             await appDbContext.StatusCategories.AddRangeAsync(statusCategories);
+            await appDbContext.SaveChangesAsync();
+
+            var versionStatusCategory = await appDbContext.StatusCategories.Where(e => e.Code == CoreConstants.VersionCode).FirstOrDefaultAsync();
+
+            if (versionStatusCategory is not null) return;
+            appDbContext.StatusCategories.Add(new StatusCategory()
+            {
+                Name = "Version status",
+                Color = "#26282A",
+                Code = CoreConstants.VersionCode
+            });
+
             await appDbContext.SaveChangesAsync();
 
             if (await appDbContext.IssueTypes.AnyAsync()) return;
