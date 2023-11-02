@@ -29,7 +29,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public UserProject? Get(Guid projectId, Guid userId)
         {
-            return _context.UserProjects.Where(e => e.ProjectId == projectId && e.UserId == userId).FirstOrDefault();
+            return _context.UserProjects.AsNoTracking().Where(e => e.ProjectId == projectId && e.UserId == userId).FirstOrDefault();
         }
     }
 }

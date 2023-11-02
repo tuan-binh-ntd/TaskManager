@@ -12,6 +12,82 @@ namespace TaskManager.Infrastructure.Data
             RoleManager<AppRole> roleManager,
             AppDbContext appDbContext)
         {
+            if (await appDbContext.IssueEvents.AnyAsync()) return;
+            var issueEvemts = new List<IssueEvent>()
+            {
+                new IssueEvent()
+                {
+                    Name = "Issue Created (System)"
+                },
+                new IssueEvent()
+                {
+                    Name = "Issue Updated (System)"
+                },
+                new IssueEvent()
+                {
+                    Name = "Issue Assigned (System)"
+                },
+                new IssueEvent()
+                {
+                    Name = "Issue Resolved (System)"
+                },
+                new IssueEvent()
+                {
+                    Name = "Issue Closed (System)"
+                },
+                new IssueEvent()
+                {
+                    Name = "Issue Commented (System)"
+                },
+                new IssueEvent()
+                {
+                    Name = "Issue Comment Edited (System)"
+                },
+                new IssueEvent()
+                {
+                    Name = "Issue Comment Deleted (System)"
+                },
+                new IssueEvent()
+                {
+                    Name = "Issue Reopened (System)"
+                },
+                new IssueEvent()
+                {
+                    Name = "Issue Deleted (System)"
+                },
+                new IssueEvent()
+                {
+                    Name = "Issue Moved (System)"
+                },
+                new IssueEvent()
+                {
+                    Name = "Work Logged On Issue (System)"
+                },
+                new IssueEvent()
+                {
+                    Name = "Work Started On Issue (System)"
+                },
+                new IssueEvent()
+                {
+                    Name = "Work Stopped On Issue (System)"
+                },
+                new IssueEvent()
+                {
+                    Name = "Issue Worklog Updated (System)"
+                },
+                new IssueEvent()
+                {
+                    Name = "Issue Worklog Deleted (System)"
+                },
+                new IssueEvent()
+                {
+                    Name = "Generic Event (System)"
+                },
+            };
+
+            appDbContext.IssueEvents.AddRange(issueEvemts);
+            await appDbContext.SaveChangesAsync();
+
             if (await appDbContext.Priorities.AnyAsync()) return;
             var priorities = new List<Priority>()
             {

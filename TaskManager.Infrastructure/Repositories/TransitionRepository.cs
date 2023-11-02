@@ -40,7 +40,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public Transition GetCreateTransitionByProjectId(Guid projectId)
         {
-            var transition = _context.Transitions.Where(t => t.ProjectId == projectId && t.Name == CoreConstants.CreateTransitionName).FirstOrDefault();
+            var transition = _context.Transitions.AsNoTracking().Where(t => t.ProjectId == projectId && t.Name == CoreConstants.CreateTransitionName).FirstOrDefault();
             return transition!;
         }
     }

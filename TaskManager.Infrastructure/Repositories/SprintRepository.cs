@@ -30,7 +30,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<SprintViewModel>> Gets()
         {
-            var sprints = await _context.Sprints.ProjectToType<SprintViewModel>().ToListAsync();
+            var sprints = await _context.Sprints.AsNoTracking().ProjectToType<SprintViewModel>().ToListAsync();
             return sprints.AsReadOnly();
         }
 
@@ -41,12 +41,13 @@ namespace TaskManager.Infrastructure.Repositories
 
         public Sprint? Get(Guid id)
         {
-            return _context.Sprints.SingleOrDefault(e => e.Id == id);
+            return _context.Sprints.AsNoTracking().SingleOrDefault(e => e.Id == id);
         }
 
         public async Task<IReadOnlyCollection<Issue>> GetIssues(Guid sprintId)
         {
             var issues = await _context.Issues
+                .AsNoTracking()
                 .Where(i => i.SprintId == sprintId)
                 .Include(i => i.Sprint)
                 .Include(i => i.IssueType)
@@ -60,8 +61,8 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<SprintViewModel>> GetSprintByProjectId(Guid projectId)
         {
-            var sprints = await _context.Sprints.Where(e => e.ProjectId == projectId).ProjectToType<SprintViewModel>().ToListAsync();
-            return sprints.AsReadOnly();    
+            var sprints = await _context.Sprints.AsNoTracking().Where(e => e.ProjectId == projectId).ProjectToType<SprintViewModel>().ToListAsync();
+            return sprints.AsReadOnly();
         }
     }
 }

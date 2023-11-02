@@ -50,6 +50,7 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSet
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 builder.Services.Configure<SftpServerSettings>(builder.Configuration.GetSection("SftpServerSettings"));
 builder.Services.Configure<ElasticConfigurationSettings>(builder.Configuration.GetSection("ElasticConfigurationSettings"));
+builder.Services.Configure<EmailConfigurationSettings>(builder.Configuration.GetSection("EmailConfigurationSettings"));
 
 // Set Mapster
 builder.Services.AddMapster(); // From the configuration file
@@ -77,6 +78,8 @@ builder.Services.AddScoped<IWorkflowRepository, WorkflowRepository>();
 builder.Services.AddScoped<ITeamRepository, TeamRepository>();
 builder.Services.AddScoped<IPriorityRepository, PriorityRepository>();
 builder.Services.AddScoped<IVersionRepository, VersionRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IIssueEventRepository, IssueEventRepository>();
 
 // Services
 builder.Services.AddScoped<IJWTTokenService, JWTTokenService>();
@@ -92,6 +95,7 @@ builder.Services.AddScoped<IStatusService, StatusService>();
 builder.Services.AddScoped<ITeamService, TeamService>();
 builder.Services.AddScoped<IPriorityService, PriorityService>();
 builder.Services.AddScoped<IVersionService, VersionService>();
+builder.Services.AddScoped<IEmailSender, EmailSender>();
 // Add EmailService
 // End  Declaration DI
 

@@ -11,7 +11,7 @@ namespace TaskManager.Core.Entities
         public string Code { get; set; } = string.Empty;
         public string? Description { get; set; } = string.Empty;
         public DateTime? CompleteDate { get; set; }
-        public string? Watcher { get; set; } = string.Empty;
+        public Watcher? Watcher { get; set; }
         public string? Voted { get; set; } = string.Empty;
         public DateTime? StartDate { get; set; }
         public DateTime? DueDate { get; set; }
@@ -34,5 +34,16 @@ namespace TaskManager.Core.Entities
         public Guid? VersionId { get; set; }
         public Version? Version { get; set; }
         public Guid? ProjectId { get; set; }
+    }
+
+    public class Watcher
+    {
+        public List<User>? Users { get; set; } = new();
+    }
+
+    public class User
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
     }
 }

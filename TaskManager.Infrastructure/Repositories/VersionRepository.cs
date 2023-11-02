@@ -28,13 +28,13 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<Version> GetById(Guid id)
         {
-            var version = await _context.Versions.FirstOrDefaultAsync(v => v.Id == id);
+            var version = await _context.Versions.AsNoTracking().FirstOrDefaultAsync(v => v.Id == id);
             return version!;
         }
 
         public async Task<IReadOnlyCollection<Version>> GetByProjectId(Guid projectId)
         {
-            var versions = await _context.Versions.Where(e => e.ProjectId == projectId).ToListAsync();
+            var versions = await _context.Versions.AsNoTracking().Where(e => e.ProjectId == projectId).ToListAsync();
             return versions;
         }
 

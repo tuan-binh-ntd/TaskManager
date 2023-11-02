@@ -41,6 +41,13 @@ namespace TaskManager.Infrastructure.Data.Config
                 .WithMany(v => v.Issues)
                 .HasForeignKey(i => i.VersionId)
                 .IsRequired(false);
+
+            builder
+                .OwnsOne(issue => issue.Watcher, ownedNavigationBuilder =>
+                {
+                    ownedNavigationBuilder.ToJson();
+                    ownedNavigationBuilder.OwnsMany(watcher => watcher.Users);
+                });
         }
     }
 }

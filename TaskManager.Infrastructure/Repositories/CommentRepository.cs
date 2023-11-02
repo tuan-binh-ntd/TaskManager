@@ -30,7 +30,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<CommentViewModel>> Gets()
         {
-            var comments = await _context.Comments.ProjectToType<CommentViewModel>().ToListAsync();
+            var comments = await _context.Comments.AsNoTracking().ProjectToType<CommentViewModel>().ToListAsync();
             return comments.AsReadOnly();
         }
 
@@ -41,7 +41,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<Comment>> GetByIssueId(Guid issueId)
         {
-            var comments = await _context.Comments.Where(c => c.IssueId == issueId).ToListAsync();
+            var comments = await _context.Comments.AsNoTracking().Where(c => c.IssueId == issueId).ToListAsync();
             return comments.AsReadOnly();
         }
     }

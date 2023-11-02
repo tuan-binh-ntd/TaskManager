@@ -34,8 +34,8 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<Team>> GetByUserId(Guid userId)
         {
-            var teams = await (from ut in _context.UserTeams.Where(t => t.UserId == userId)
-                               join t in _context.Teams on ut.TeamId equals t.Id
+            var teams = await (from ut in _context.UserTeams.AsNoTracking().Where(t => t.UserId == userId)
+                               join t in _context.Teams.AsNoTracking() on ut.TeamId equals t.Id
                                select t).ToListAsync();
             return teams;
         }
@@ -52,8 +52,8 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<AppUser>> GetMembers(Guid teamId)
         {
-            var teams = await (from ut in _context.UserTeams.Where(t => t.TeamId == teamId)
-                               join t in _context.Teams on ut.TeamId equals t.Id
+            var teams = await (from ut in _context.UserTeams.AsNoTracking().Where(t => t.TeamId == teamId)
+                               join t in _context.Teams.AsNoTracking() on ut.TeamId equals t.Id
                                select ut.User).ToListAsync();
             return teams.AsReadOnly();
         }

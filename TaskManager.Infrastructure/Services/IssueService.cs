@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using MapsterMapper;
+using Microsoft.AspNetCore.Identity;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
@@ -17,6 +18,7 @@ namespace TaskManager.Infrastructure.Services
         private readonly IIssueTypeRepository _issueTypeRepository;
         private readonly ITransitionRepository _transitionRepository;
         private readonly ICommentRepository _commentRepository;
+        private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
 
         public IssueService(
@@ -27,6 +29,7 @@ namespace TaskManager.Infrastructure.Services
             IIssueTypeRepository issueTypeRepository,
             ITransitionRepository transitionRepository,
             ICommentRepository commentRepository,
+            UserManager<AppUser> userManager,
             IMapper mapper
             )
         {
@@ -37,6 +40,7 @@ namespace TaskManager.Infrastructure.Services
             _issueTypeRepository = issueTypeRepository;
             _transitionRepository = transitionRepository;
             _commentRepository = commentRepository;
+            _userManager = userManager;
             _mapper = mapper;
         }
 
@@ -142,6 +146,22 @@ namespace TaskManager.Infrastructure.Services
                 throw new ArgumentNullException(nameof(issue));
 #pragma warning restore CA2208 // Instantiate argument exceptions correctly
             }
+            if (updateIssueDto.UserIds is not null && updateIssueDto.UserIds.Any())
+            {
+                foreach (var item in updateIssueDto.UserIds)
+                {
+                    var user = await _userManager.FindByIdAsync(item.ToString());
+                    if (user is not null && issue.Watcher is not null && issue.Watcher.Users is not null)
+                    {
+                        var watcher = new User()
+                        {
+                            Name = user.Name,
+                            Email = user.Email!
+                        };
+                        issue.Watcher.Users.Add(watcher);
+                    }
+                }
+            }
             issue = updateIssueDto.Adapt(issue);
             _issueRepository.Update(issue);
             await _issueRepository.UnitOfWork.SaveChangesAsync();
@@ -180,6 +200,7 @@ namespace TaskManager.Infrastructure.Services
             var projectConfiguration = _projectConfigurationRepository.GetByProjectId(createIssueByNameDto.ProjectId);
             int issueIndex = projectConfiguration.IssueCode + 1;
             var createTransition = _transitionRepository.GetCreateTransitionByProjectId(createIssueByNameDto.ProjectId);
+            var creatorUser = await _userManager.FindByIdAsync(createIssueByNameDto.CreatorUserId.ToString());
 
             var issue = new Issue()
             {
@@ -187,7 +208,8 @@ namespace TaskManager.Infrastructure.Services
                 IssueTypeId = createIssueByNameDto.IssueTypeId,
                 Code = $"{projectConfiguration.Code}-{issueIndex}",
                 StatusId = createTransition.ToStatusId,
-                PriorityId = projectConfiguration.DefaultPriorityId
+                PriorityId = projectConfiguration.DefaultPriorityId,
+                Watcher = new()
             };
 
             if (sprintId is not null)
@@ -197,6 +219,16 @@ namespace TaskManager.Infrastructure.Services
             else
             {
                 issue.BacklogId = backlogId;
+            }
+
+            if (creatorUser is not null && issue.Watcher is not null && issue.Watcher.Users is not null)
+            {
+                var user = new User()
+                {
+                    Name = creatorUser.Name,
+                    Email = creatorUser.Email!
+                };
+                issue.Watcher.Users.Add(user);
             }
 
             _issueRepository.Add(issue);
@@ -242,6 +274,8 @@ namespace TaskManager.Infrastructure.Services
         {
             var projectConfiguration = _projectConfigurationRepository.GetByProjectId(createChildIssueDto.ProjectId);
             int issueIndex = projectConfiguration.IssueCode + 1;
+            var createTransition = _transitionRepository.GetCreateTransitionByProjectId(createChildIssueDto.ProjectId);
+            var creatorUser = await _userManager.FindByIdAsync(createChildIssueDto.CreatorUserId.ToString());
 
             var issueType = await _issueTypeRepository.GetSubtask();
 
@@ -251,8 +285,20 @@ namespace TaskManager.Infrastructure.Services
                 IssueTypeId = issueType.Id,
                 Code = $"{projectConfiguration.Code}-{issueIndex}",
                 ParentId = createChildIssueDto.ParentId,
-                PriorityId = projectConfiguration.DefaultPriorityId
+                PriorityId = projectConfiguration.DefaultPriorityId,
+                StatusId = createTransition.ToStatusId,
+                Watcher = new()
             };
+
+            if (creatorUser is not null && issue.Watcher is not null && issue.Watcher.Users is not null)
+            {
+                var user = new User()
+                {
+                    Name = creatorUser.Name,
+                    Email = creatorUser.Email!
+                };
+                issue.Watcher.Users.Add(user);
+            }
 
             _issueRepository.Add(issue);
             await _issueRepository.UnitOfWork.SaveChangesAsync();
@@ -306,6 +352,8 @@ namespace TaskManager.Infrastructure.Services
         {
             var projectConfiguration = _projectConfigurationRepository.GetByProjectId(createEpicDto.ProjectId);
             int issueIndex = projectConfiguration.IssueCode + 1;
+            var createTransition = _transitionRepository.GetCreateTransitionByProjectId(createEpicDto.ProjectId);
+            var creatorUser = await _userManager.FindByIdAsync(createEpicDto.CreatorUserId.ToString());
 
             var issueType = await _issueTypeRepository.GetEpic();
 
@@ -314,8 +362,20 @@ namespace TaskManager.Infrastructure.Services
                 Name = createEpicDto.Name,
                 IssueTypeId = issueType.Id,
                 Code = $"{projectConfiguration.Code}-{issueIndex}",
-                ProjectId = createEpicDto.ProjectId
+                ProjectId = createEpicDto.ProjectId,
+                StatusId = createTransition.ToStatusId,
+                Watcher = new()
             };
+
+            if (creatorUser is not null && issue.Watcher is not null && issue.Watcher.Users is not null)
+            {
+                var user = new User()
+                {
+                    Name = creatorUser.Name,
+                    Email = creatorUser.Email!
+                };
+                issue.Watcher.Users.Add(user);
+            }
 
             _issueRepository.Add(issue);
             await _issueRepository.UnitOfWork.SaveChangesAsync();

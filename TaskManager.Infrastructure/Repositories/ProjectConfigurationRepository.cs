@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Infrastructure.Data;
@@ -28,7 +23,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public ProjectConfiguration GetByProjectId(Guid projectId)
         {
-            return _context.ProjectConfigurations.Where(e => e.ProjectId == projectId).FirstOrDefault()!;
+            return _context.ProjectConfigurations.AsNoTracking().Where(e => e.ProjectId == projectId).FirstOrDefault()!;
         }
 
         public void Update(ProjectConfiguration projectConfiguration)

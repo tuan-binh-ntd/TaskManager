@@ -1,4 +1,6 @@
-﻿namespace TaskManager.Core.ViewModel
+﻿using TaskManager.Core.Entities;
+
+namespace TaskManager.Core.ViewModel
 {
     public class IssueViewModel
     {
@@ -9,7 +11,7 @@
         public DateTime CreationTime { get; set; }
         public DateTime? CompleteDate { get; set; }
         public Guid? PriorityId { get; set; }
-        public string? Watcher { get; set; } = string.Empty;
+        public Watcher? Watcher { get; set; }
         public string? Voted { get; set; } = string.Empty;
         public DateTime? StartDate { get; set; }
         public DateTime? DueDate { get; set; }
@@ -25,14 +27,12 @@
         public IssueDetailViewModel? IssueDetail { get; set; }
         public ICollection<ChildIssueViewModel>? ChildIssues { get; set; }
         public StatusViewModel? Status { get; set; }
-
     }
 
     public class IssueHistoryViewModel
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
-
         public Guid CreatorUserId { get; set; }
         public string Content { get; set; } = string.Empty;
         public DateTime CreationTime { get; set; }
@@ -71,7 +71,7 @@
         public DateTime CreationTime { get; set; }
         public DateTime? CompleteDate { get; set; }
         public string? Priority { get; set; } = string.Empty;
-        public string? Watcher { get; set; } = string.Empty;
+        public Watcher? Watcher { get; set; }
         public string? Voted { get; set; } = string.Empty;
         public DateTime? StartDate { get; set; }
         public DateTime? DueDate { get; set; }
@@ -95,7 +95,7 @@
         public DateTime CreationTime { get; set; }
         public DateTime? CompleteDate { get; set; }
         public string? Priority { get; set; } = string.Empty;
-        public string? Watcher { get; set; } = string.Empty;
+        public Watcher? Watcher { get; set; }
         public string? Voted { get; set; } = string.Empty;
         public DateTime? StartDate { get; set; }
         public DateTime? DueDate { get; set; }

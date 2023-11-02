@@ -31,7 +31,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<IssueTypeViewModel>> Gets()
         {
-            var issueTypes = await _context.IssueTypes.Select(e => new IssueTypeViewModel()
+            var issueTypes = await _context.IssueTypes.AsNoTracking().Select(e => new IssueTypeViewModel()
             {
                 Id = e.Id,
                 Name = e.Name,
@@ -49,8 +49,8 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<IssueTypeViewModel>> GetsByProjectId(Guid projectId)
         {
-            var issueTypes = await _context.IssueTypes.
-                Where(e => e.ProjectId == projectId || e.ProjectId == null).Select(e => new IssueTypeViewModel()
+            var issueTypes = await _context.IssueTypes.AsNoTracking()
+                .Where(e => e.ProjectId == projectId || e.ProjectId == null).Select(e => new IssueTypeViewModel()
                 {
                     Id = e.Id,
                     Name = e.Name,
@@ -63,21 +63,20 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IssueType> Get(Guid id)
         {
-            var issueType = await _context.IssueTypes.
-                Where(e => e.Id == id).SingleOrDefaultAsync();
+            var issueType = await _context.IssueTypes.AsNoTracking().Where(e => e.Id == id).SingleOrDefaultAsync();
             return issueType!;
         }
 
         public async Task<IssueType> GetSubtask()
         {
-            var issueType = await _context.IssueTypes.
+            var issueType = await _context.IssueTypes.AsNoTracking().
                Where(e => e.Name == CoreConstants.SubTaskName).SingleOrDefaultAsync();
             return issueType!;
         }
 
         public async Task<IssueType> GetEpic()
         {
-            var issueType = await _context.IssueTypes.
+            var issueType = await _context.IssueTypes.AsNoTracking().
                Where(e => e.Name == CoreConstants.EpicName).SingleOrDefaultAsync();
             return issueType!;
         }

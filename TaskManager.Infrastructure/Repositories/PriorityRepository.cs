@@ -34,13 +34,13 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<Priority> GetById(Guid id)
         {
-            var priority = await _context.Priorities.FirstOrDefaultAsync(p => p.Id == id);
+            var priority = await _context.Priorities.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
             return priority!;
         }
 
         public async Task<IReadOnlyCollection<Priority>> GetByProjectId(Guid projectId)
         {
-            var priorities = await _context.Priorities.Where(p => p.ProjectId == projectId && p.ProjectId == null).ToListAsync();
+            var priorities = await _context.Priorities.AsNoTracking().Where(p => p.ProjectId == projectId && p.ProjectId == null).ToListAsync();
             return priorities!;
         }
 
@@ -51,7 +51,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<Priority> GetNormal()
         {
-            var priority = await _context.Priorities.FirstOrDefaultAsync(p => p.Name == CoreConstants.LowestName);
+            var priority = await _context.Priorities.AsNoTracking().FirstOrDefaultAsync(p => p.Name == CoreConstants.LowestName);
             return priority!;
         }
     }

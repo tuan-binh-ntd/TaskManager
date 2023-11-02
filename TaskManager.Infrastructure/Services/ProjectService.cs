@@ -74,23 +74,16 @@ namespace TaskManager.Infrastructure.Services
 
         private IssueViewModel ToIssueViewModel(Issue issue)
         {
-            _issueRepository.LoadEntitiesRelationship(issue);
+            _issueRepository.LoadAttachments(issue);
+            _issueRepository.LoadIssueDetail(issue);
+            _issueRepository.LoadIssueType(issue);
+            _issueRepository.LoadStatus(issue);
             var issueViewModel = _mapper.Map<IssueViewModel>(issue);
 
             if (issue.IssueDetail is not null)
             {
                 var issueDetail = _mapper.Map<IssueDetailViewModel>(issue.IssueDetail);
                 issueViewModel.IssueDetail = issueDetail;
-            }
-            if (issue.IssueHistories is not null && issue.IssueHistories.Any())
-            {
-                var issueHistories = _mapper.Map<ICollection<IssueHistoryViewModel>>(issue.IssueHistories);
-                issueViewModel.IssueHistories = issueHistories;
-            }
-            if (issue.Comments is not null && issue.Comments.Any())
-            {
-                var comments = _mapper.Map<ICollection<CommentViewModel>>(issue.Comments);
-                issueViewModel.Comments = comments;
             }
             if (issue.Attachments is not null && issue.Attachments.Any())
             {
@@ -385,7 +378,7 @@ namespace TaskManager.Infrastructure.Services
                 epicViewModel.Status = status;
             }
             var childIssues = _issueRepository.GetChildIssueOfEpic(epic.Id).Result;
-            if(childIssues.Any())
+            if (childIssues.Any())
             {
                 epicViewModel.ChildIssues = _mapper.Map<ICollection<IssueViewModel>>(childIssues);
             }

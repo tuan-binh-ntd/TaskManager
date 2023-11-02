@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
 
@@ -14,20 +15,58 @@ namespace TaskManager.Infrastructure.Services
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IJWTTokenService _jwtTokenService;
+        private readonly INotificationRepository _notificationRepository;
+        private readonly IIssueEventRepository _issueEventRepository;
         private readonly IMapper _mapper;
 
         public UserService(
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
             IJWTTokenService jwtTokenService,
+            INotificationRepository notificationRepository,
+            IIssueEventRepository issueEventRepository,
             IMapper mapper
             )
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtTokenService = jwtTokenService;
+            _notificationRepository = notificationRepository;
+            _issueEventRepository = issueEventRepository;
             _mapper = mapper;
         }
+
+        #region PrivateMethod
+        private async Task<bool> CreateNotificationScheme(Guid userId)
+        {
+            var issueEvents = await _issueEventRepository.Gets();
+            var notification = new Notification()
+            {
+                Name = "Default Notification Scheme",
+                NotificationIssueEvents = new List<NotificationIssueEvent>(),
+                CreatorUserId = userId,
+            };
+            foreach (var item in issueEvents)
+            {
+                var notificationIssueEvent = new NotificationIssueEvent()
+                {
+                    NotificationId = notification.Id,
+                    IssueEventId = item.Id,
+                    CurrentAssignee = true,
+                    Reporter = true,
+                    CurrentUser = true,
+                    ComponentLead = true,
+                    AllWatcher = true,
+                    SingleUser = string.Empty,
+                    Team = string.Empty,
+                    Role = string.Empty,
+                };
+                notification.NotificationIssueEvents!.Add(notificationIssueEvent);
+            }
+            _notificationRepository.Add(notification);
+            return await _notificationRepository.UnitOfWork.SaveChangesAsync() > 0;
+        }
+        #endregion
 
         public async Task<object> SignIn(LoginDto loginDto)
         {
@@ -59,12 +98,15 @@ namespace TaskManager.Infrastructure.Services
 
             if (!result.Succeeded) return result.Errors;
 
+            await CreateNotificationScheme(user.Id);
+
             UserViewModel res = new()
             {
                 Token = await _jwtTokenService.CreateToken(user),
                 Id = user.Id,
                 Email = user.Email,
             };
+
             return res;
         }
 
@@ -95,7 +137,7 @@ namespace TaskManager.Infrastructure.Services
         public async Task<IReadOnlyCollection<UserViewModel>> Gets(GetUserByFilterDto filter)
         {
             var users = await _userManager.Users.ToListAsync();
-            if(filter.Name != null)
+            if (filter.Name != null)
             {
                 users = users.Where(users => users.Name.ToLower().Trim().
                 Contains(filter.Name.ToLower().Trim())).ToList();

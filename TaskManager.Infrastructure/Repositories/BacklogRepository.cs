@@ -1,5 +1,4 @@
-﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.ViewModel;
@@ -26,13 +25,14 @@ namespace TaskManager.Infrastructure.Repositories
 
         public Task<Backlog?> GetAsync(Guid id)
         {
-            var backlog = _context.Backlogs.SingleOrDefaultAsync(e => e.Id == id);
+            var backlog = _context.Backlogs.AsNoTracking().SingleOrDefaultAsync(e => e.Id == id);
             return backlog;
         }
 
         public async Task<IReadOnlyCollection<Issue>> GetIssues(Guid backlogId)
         {
             var issues = await _context.Issues
+                .AsNoTracking()
                 .Where(i => i.BacklogId == backlogId)
                 .Include(i => i.Backlog)
                 .Include(i => i.IssueType)
@@ -46,7 +46,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<BacklogViewModel> GetBacklog(Guid projectId)
         {
-            var backlog = await (from b in _context.Backlogs.Where(e => e.ProjectId == projectId)
+            var backlog = await (from b in _context.Backlogs.AsNoTracking().Where(e => e.ProjectId == projectId)
                                  select new BacklogViewModel
                                  {
                                      Id = b.Id,

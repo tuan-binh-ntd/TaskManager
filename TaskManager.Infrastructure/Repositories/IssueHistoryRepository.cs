@@ -30,7 +30,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<IssueHistoryViewModel>> Gets()
         {
-            var issueHistories = await _context.IssueHistories.Select(
+            var issueHistories = await _context.IssueHistories.AsNoTracking().Select(
                 e => new IssueHistoryViewModel
                 {
                     Id = e.Id,
@@ -48,7 +48,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<IssueHistory>> GetByIssueId(Guid issueId)
         {
-            var issueHistories = await _context.IssueHistories.Where(ih => ih.IssueId == issueId).ToListAsync();
+            var issueHistories = await _context.IssueHistories.AsNoTracking().Where(ih => ih.IssueId == issueId).ToListAsync();
             return issueHistories.AsReadOnly();
         }
     }

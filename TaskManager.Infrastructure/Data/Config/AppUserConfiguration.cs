@@ -30,6 +30,13 @@ namespace TaskManager.Infrastructure.Data.Config
                 .WithOne(p => p.User)
                 .HasForeignKey(p => p.UserId)
                 .IsRequired();
+
+            //One to Many Relationship (AppUser, Notification)
+            builder
+                .HasMany(u => u.Notifications)
+                .WithOne(n => n.User)
+                .HasForeignKey(n => n.CreatorUserId)
+                .IsRequired();
         }
     }
 }

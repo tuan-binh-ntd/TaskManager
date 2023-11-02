@@ -5,19 +5,20 @@ using TaskManager.Infrastructure.Data;
 
 namespace TaskManager.Infrastructure.Repositories
 {
-    public class StatusCategoryRepository : IStatusCategoryRepository
+    public class IssueEventRepository : IIssueEventRepository
     {
         private readonly AppDbContext _context;
+        public IUnitOfWork UnitOfWork => _context;
 
-        public StatusCategoryRepository(AppDbContext context)
+        public IssueEventRepository(AppDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public IReadOnlyCollection<StatusCategory> Gets()
+        public async Task<IReadOnlyCollection<IssueEvent>> Gets()
         {
-            var statusCategories = _context.StatusCategories.AsNoTracking().ToList();
-            return statusCategories.AsReadOnly();
+            var issueEvents = await _context.IssueEvents.AsNoTracking().ToListAsync();
+            return issueEvents.AsReadOnly();
         }
     }
 }

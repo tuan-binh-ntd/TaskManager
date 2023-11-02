@@ -38,6 +38,7 @@ namespace TaskManager.Infrastructure.Repositories
         public async Task<IReadOnlyCollection<Project>> GetAll()
         {
             var projects = await _context.Projects
+                .AsNoTracking()
                 .Include(p => p.UserProjects!)
                 .ThenInclude(up => up.User)
                 .ToListAsync();
@@ -47,6 +48,7 @@ namespace TaskManager.Infrastructure.Repositories
         public async Task<Project> GetById(Guid id)
         {
             var project = await _context.Projects
+                .AsNoTracking()
                 .Include(p => p.UserProjects!)
                 .ThenInclude(up => up.User)
                 .SingleOrDefaultAsync(p => p.Id == id);
@@ -56,9 +58,9 @@ namespace TaskManager.Infrastructure.Repositories
         public async Task<PaginationResult<Project>> GetByUserId(Guid userId, GetProjectByFilterDto filter, PaginationInput paginationInput)
         {
 
-            var query = from u in _context.Users
-                        join up in _context.UserProjects.Where(up => up.UserId == userId) on u.Id equals up.UserId
-                        join p in _context.Projects
+            var query = from u in _context.Users.AsNoTracking()
+                        join up in _context.UserProjects.AsNoTracking().Where(up => up.UserId == userId) on u.Id equals up.UserId
+                        join p in _context.Projects.AsNoTracking()
                         .WhereIf(!string.IsNullOrWhiteSpace(filter.name), p => p.Name.Contains(filter.name))
                         .WhereIf(!string.IsNullOrWhiteSpace(filter.code), p => p.Code.Contains(filter.code))
                         on up.ProjectId equals p.Id
@@ -69,9 +71,9 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<Project>> GetByUserId(Guid userId, GetProjectByFilterDto filter)
         {
-            var query = from u in _context.Users
-                        join up in _context.UserProjects.Where(up => up.UserId == userId) on u.Id equals up.UserId
-                        join p in _context.Projects
+            var query = from u in _context.Users.AsNoTracking()
+                        join up in _context.UserProjects.AsNoTracking().Where(up => up.UserId == userId) on u.Id equals up.UserId
+                        join p in _context.Projects.AsNoTracking()
                         .WhereIf(!string.IsNullOrWhiteSpace(filter.name), p => p.Name.Contains(filter.name))
                         .WhereIf(!string.IsNullOrWhiteSpace(filter.code), p => p.Code.Contains(filter.code))
                         on up.ProjectId equals p.Id
@@ -83,8 +85,8 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<UserViewModel>> GetMembers(Guid projectId)
         {
-            var members = await (from up in _context.UserProjects.Where(up => up.ProjectId == projectId)
-                                 join u in _context.Users on up.UserId equals u.Id
+            var members = await (from up in _context.UserProjects.AsNoTracking().Where(up => up.ProjectId == projectId)
+                                 join u in _context.Users.AsNoTracking() on up.UserId equals u.Id
                                  select new UserViewModel
                                  {
                                      Id = u.Id,
@@ -102,10 +104,8 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<Project?> GetByCode(string code)
         {
-            var project = await _context.Projects.SingleOrDefaultAsync(p => p.Code == code);
+            var project = await _context.Projects.AsNoTracking().SingleOrDefaultAsync(p => p.Code == code);
             return project;
         }
-
-        
     }
 }

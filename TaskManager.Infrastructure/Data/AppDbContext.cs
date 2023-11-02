@@ -46,6 +46,9 @@ namespace TaskManager.Infrastructure.Data
         public DbSet<Team> Teams => Set<Team>();
         public DbSet<Priority> Priorities => Set<Priority>();
         public DbSet<Version> Versions => Set<Version>();
+        public DbSet<Notification> Notifications => Set<Notification>();
+        public DbSet<NotificationIssueEvent> NotificationIssueEvents => Set<NotificationIssueEvent>();
+        public DbSet<IssueEvent> IssueEvents => Set<IssueEvent>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

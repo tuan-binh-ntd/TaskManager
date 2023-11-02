@@ -30,7 +30,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<IssueDetailViewModel>> Gets()
         {
-            var issueDetails = await _context.IssueDetails.ProjectToType<IssueDetailViewModel>().ToListAsync();
+            var issueDetails = await _context.IssueDetails.AsNoTracking().ProjectToType<IssueDetailViewModel>().ToListAsync();
             return issueDetails.AsReadOnly();
         }
 
@@ -41,7 +41,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IssueDetail> GetById(Guid id)
         {
-            var issueDetail = await _context.IssueDetails.Where(i => i.IssueId == id).FirstOrDefaultAsync();
+            var issueDetail = await _context.IssueDetails.AsNoTracking().Where(i => i.IssueId == id).FirstOrDefaultAsync();
             return issueDetail!;
         }
     }

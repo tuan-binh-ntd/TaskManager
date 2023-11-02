@@ -10,7 +10,6 @@ namespace TaskManager.Core.DTOs
         public string? Description { get; set; } = string.Empty;
         public DateTime? CompleteDate { get; set; }
         public string? Priority { get; set; } = string.Empty;
-        public string? Watcher { get; set; } = string.Empty;
         public string? Voted { get; set; } = string.Empty;
         public DateTime? StartDate { get; set; }
         public DateTime? DueDate { get; set; }
@@ -24,7 +23,7 @@ namespace TaskManager.Core.DTOs
         public string? Name { get; set; }
         public string? Description { get; set; }
         public DateTime? CompleteDate { get; set; }
-        public string? Watcher { get; set; }
+        public ICollection<Guid>? UserIds { get; set; }
         public string? Voted { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? DueDate { get; set; }
@@ -48,7 +47,6 @@ namespace TaskManager.Core.DTOs
                 .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Description), dest => dest.Description!)
                 .IgnoreIf((src, dest) => src.CompleteDate == null, dest => dest.CompleteDate!)
                 .IgnoreIf((src, dest) => src.PriorityId == null, dest => dest.PriorityId!)
-                .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Watcher), dest => dest.Watcher!)
                 .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Voted), dest => dest.Voted!)
                 .IgnoreIf((src, dest) => src.StartDate == null, dest => dest.StartDate!)
                 .IgnoreIf((src, dest) => src.DueDate == null, dest => dest.DueDate!)
@@ -92,7 +90,7 @@ namespace TaskManager.Core.DTOs
         public string? Name { get; set; }
         public string? Description { get; set; }
         public DateTime? CompleteDate { get; set; }
-        public string? Watcher { get; set; }
+        public ICollection<Guid>? UserIds { get; set; }
         public string? Voted { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? DueDate { get; set; }
@@ -113,7 +111,6 @@ namespace TaskManager.Core.DTOs
                 .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Description), dest => dest.Description!)
                 .IgnoreIf((src, dest) => src.CompleteDate == null, dest => dest.CompleteDate!)
                 .IgnoreIf((src, dest) => src.PriorityId == null, dest => dest.PriorityId!)
-                .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Watcher), dest => dest.Watcher!)
                 .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Voted), dest => dest.Voted!)
                 .IgnoreIf((src, dest) => src.StartDate == null, dest => dest.StartDate!)
                 .IgnoreIf((src, dest) => src.DueDate == null, dest => dest.DueDate!)

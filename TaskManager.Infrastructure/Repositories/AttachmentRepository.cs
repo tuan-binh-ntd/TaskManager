@@ -30,7 +30,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<AttachmentViewModel>> Gets()
         {
-            var attachments = await _context.Attachments.ProjectToType<AttachmentViewModel>().ToListAsync();
+            var attachments = await _context.Attachments.AsNoTracking().ProjectToType<AttachmentViewModel>().ToListAsync();
             return attachments.AsReadOnly();
         }
 

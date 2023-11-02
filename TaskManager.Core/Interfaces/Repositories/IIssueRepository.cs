@@ -1,15 +1,9 @@
 ﻿using TaskManager.Core.Entities;
-using TaskManager.Core.ViewModel;
 
 namespace TaskManager.Core.Interfaces.Repositories
 {
     public interface IIssueRepository : IRepository<Issue>
     {
-        /// <summary>
-        /// Get all issue
-        /// </summary>
-        /// <returns>List of issue</returns>
-        Task<IReadOnlyCollection<IssueViewModel>> Gets();
         /// <summary>
         /// Add issue
         /// </summary>
@@ -71,5 +65,11 @@ namespace TaskManager.Core.Interfaces.Repositories
         Task<IReadOnlyCollection<Issue>> GetEpicByProjectId(Guid projectId);
         Task<IReadOnlyCollection<Issue>> GetChildIssueOfEpic(Guid epicId);
         Task<IReadOnlyCollection<Issue>> GetChildIssueOfIssue(Guid issueId);
+        void LoadComments(Issue issue);
+        void LoadIssueType(Issue issue);
+        void LoadIssueDetail(Issue issue);
+        void LoadAttachments(Issue issue);
+        void LoadIssueHistories(Issue issue);
+        void LoadStatus(Issue issue);
     }
 }

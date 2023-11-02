@@ -39,21 +39,21 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<Status>> GetByProjectId(Guid projectId)
         {
-            var statuses = await (from s in _context.Statuses.Where(s => s.ProjectId == projectId)
-                                  join sc in _context.StatusCategories.Where(sc => sc.Code != CoreConstants.HideCode) on s.StatusCategoryId equals sc.Id
+            var statuses = await (from s in _context.Statuses.AsNoTracking().Where(s => s.ProjectId == projectId)
+                                  join sc in _context.StatusCategories.AsNoTracking().Where(sc => sc.Code != CoreConstants.HideCode) on s.StatusCategoryId equals sc.Id
                                   select s).ToListAsync();
             return statuses.AsReadOnly();
         }
 
         public async Task<Status> GetById(Guid id)
         {
-            var status = await _context.Statuses.Where(s => s.Id == id).FirstOrDefaultAsync();
+            var status = await _context.Statuses.AsNoTracking().Where(s => s.Id == id).FirstOrDefaultAsync();
             return status!;
         }
 
         public async Task<Status> GetUnreleasedStatus(Guid projectId)
         {
-            var status = await _context.Statuses.Where(e => e.Name == CoreConstants.UnreleasedStatusName && e.ProjectId == projectId).FirstOrDefaultAsync();
+            var status = await _context.Statuses.AsNoTracking().Where(e => e.Name == CoreConstants.UnreleasedStatusName && e.ProjectId == projectId).FirstOrDefaultAsync();
             return status!;
         }
     }
