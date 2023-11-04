@@ -12,7 +12,7 @@ namespace TaskManager.Core.Interfaces.Services
         Task<IssueViewModel> CreateIssueByName(CreateIssueByNameDto createIssueByNameDto, Guid? sprintId = default, Guid? backlogId = default);
         Task<Guid> DeleteIssue(Guid id);
         Task<ChildIssueViewModel> CreateChildIssue(CreateChildIssueDto createChildIssueDto);
-        Task<IssueViewModel> AddEpic(Guid issueId, Guid epicId);
+        Task<EpicViewModel> AddEpic(Guid issueId, Guid epicId);
         Task<EpicViewModel> CreateEpic(CreateEpicDto createEpicDto);
         Task<IssueViewModel> GetById(Guid id);
         Task<IReadOnlyCollection<IssueHistoryViewModel>> GetHistoriesByIssueId(Guid issueId);

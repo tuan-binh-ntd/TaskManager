@@ -33,5 +33,13 @@ namespace TaskManager.API.Controllers
             var res = await _issueService.UpdateEpic(id, updateEpicDto);
             return CustomResult(res, HttpStatusCode.OK);
         }
+
+        [HttpPut("{id}/issues:add")]
+        [ProducesResponseType(typeof(EpicViewModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> AddIssue(Guid id, AddIssueToEpicDto addIssueToEpicDto)
+        {
+            var res = await _issueService.AddEpic(issueId: addIssueToEpicDto.IssueId, epicId: id);
+            return CustomResult(res, HttpStatusCode.OK);
+        }
     }
 }

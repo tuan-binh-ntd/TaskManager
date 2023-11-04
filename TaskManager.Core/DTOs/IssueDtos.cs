@@ -122,4 +122,9 @@ namespace TaskManager.Core.DTOs
                 .IgnoreNullValues(true);
         }
     }
+
+    public class AddIssueToEpicDto
+    {
+        public Guid IssueId { get; set; }
+    }
 }

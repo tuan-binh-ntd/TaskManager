@@ -128,7 +128,8 @@ namespace TaskManager.Infrastructure.Services
             projectViewModel.Sprints = sprints.ToList();
             projectViewModel.IssueTypes = issueTypes.ToList();
             projectViewModel.Statuses = statuses.Adapt<ICollection<StatusViewModel>>();
-            projectViewModel.Epics = ToEpicViewModels(epics).ToList();
+            var epicViewModels = await ToEpicViewModels(epics);
+            projectViewModel.Epics = epicViewModels.ToList();
             return projectViewModel;
         }
 
@@ -328,21 +329,21 @@ namespace TaskManager.Infrastructure.Services
             await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
         }
 
-        private IReadOnlyCollection<EpicViewModel> ToEpicViewModels(IReadOnlyCollection<Issue> epics)
+        private async Task<IReadOnlyCollection<EpicViewModel>> ToEpicViewModels(IReadOnlyCollection<Issue> epics)
         {
             var epicViewModels = new List<EpicViewModel>();
             if (epics.Any())
             {
                 foreach (var issue in epics)
                 {
-                    var epicViewModel = ToEpicViewModel(issue);
+                    var epicViewModel = await ToEpicViewModel(issue);
                     epicViewModels.Add(epicViewModel);
                 }
             }
             return epicViewModels.AsReadOnly();
         }
 
-        private EpicViewModel ToEpicViewModel(Issue epic)
+        private async Task<EpicViewModel> ToEpicViewModel(Issue epic)
         {
             _issueRepository.LoadEntitiesRelationship(epic);
             var epicViewModel = _mapper.Map<EpicViewModel>(epic);
@@ -377,7 +378,7 @@ namespace TaskManager.Infrastructure.Services
                 var status = _mapper.Map<StatusViewModel>(epic.Status);
                 epicViewModel.Status = status;
             }
-            var childIssues = _issueRepository.GetChildIssueOfEpic(epic.Id).Result;
+            var childIssues = await _issueRepository.GetChildIssueOfEpic(epic.Id);
             if (childIssues.Any())
             {
                 epicViewModel.ChildIssues = _mapper.Map<ICollection<IssueViewModel>>(childIssues);

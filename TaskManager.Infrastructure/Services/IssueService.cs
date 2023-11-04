@@ -109,6 +109,63 @@ namespace TaskManager.Infrastructure.Services
             }
             return issueViewModel;
         }
+
+        private async Task<IReadOnlyCollection<EpicViewModel>> ToEpicViewModels(IReadOnlyCollection<Issue> epics)
+        {
+            var epicViewModels = new List<EpicViewModel>();
+            if (epics.Any())
+            {
+                foreach (var issue in epics)
+                {
+                    var epicViewModel = await ToEpicViewModel(issue);
+                    epicViewModels.Add(epicViewModel);
+                }
+            }
+            return epicViewModels.AsReadOnly();
+        }
+
+        private async Task<EpicViewModel> ToEpicViewModel(Issue epic)
+        {
+            _issueRepository.LoadEntitiesRelationship(epic);
+            var epicViewModel = _mapper.Map<EpicViewModel>(epic);
+
+            if (epic.IssueDetail is not null)
+            {
+                var issueDetail = _mapper.Map<IssueDetailViewModel>(epic.IssueDetail);
+                epicViewModel.IssueDetail = issueDetail;
+            }
+            if (epic.IssueHistories is not null && epic.IssueHistories.Any())
+            {
+                var issueHistories = _mapper.Map<ICollection<IssueHistoryViewModel>>(epic.IssueHistories);
+                epicViewModel.IssueHistories = issueHistories;
+            }
+            if (epic.Comments is not null && epic.Comments.Any())
+            {
+                var comments = _mapper.Map<ICollection<CommentViewModel>>(epic.Comments);
+                epicViewModel.Comments = comments;
+            }
+            if (epic.Attachments is not null && epic.Attachments.Any())
+            {
+                var attachments = _mapper.Map<ICollection<AttachmentViewModel>>(epic.Attachments);
+                epicViewModel.Attachments = attachments;
+            }
+            if (epic.IssueType is not null)
+            {
+                var issueType = _mapper.Map<IssueTypeViewModel>(epic.IssueType);
+                epicViewModel.IssueType = issueType;
+            }
+            if (epic.Status is not null)
+            {
+                var status = _mapper.Map<StatusViewModel>(epic.Status);
+                epicViewModel.Status = status;
+            }
+            var childIssues = await _issueRepository.GetChildIssueOfEpic(epic.Id);
+            if (childIssues.Any())
+            {
+                epicViewModel.ChildIssues = _mapper.Map<ICollection<IssueViewModel>>(childIssues);
+            }
+            return epicViewModel;
+        }
         #endregion
 
         public async Task<IssueViewModel> CreateIssue(CreateIssueDto createIssueDto, Guid? sprintId = null, Guid? backlogId = null)
@@ -354,7 +411,7 @@ namespace TaskManager.Infrastructure.Services
             return issueVM;
         }
 
-        public async Task<IssueViewModel> AddEpic(Guid issueId, Guid epicId)
+        public async Task<EpicViewModel> AddEpic(Guid issueId, Guid epicId)
         {
             var issue = await _issueRepository.Get(issueId);
             if (issue is null)
@@ -366,7 +423,8 @@ namespace TaskManager.Infrastructure.Services
             issue.ParentId = epicId;
             _issueRepository.Update(issue);
             await _issueRepository.UnitOfWork.SaveChangesAsync();
-            return await ToIssueViewModel(issue);
+            var epic = await _issueRepository.Get(epicId);
+            return await ToEpicViewModel(epic);
         }
 
         public async Task<EpicViewModel> CreateEpic(CreateEpicDto createEpicDto)
