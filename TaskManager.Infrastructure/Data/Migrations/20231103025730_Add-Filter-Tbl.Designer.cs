@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskManager.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using TaskManager.Infrastructure.Data;
 namespace TaskManager.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231103025730_Add-Filter-Tbl")]
+    partial class AddFilterTbl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -270,7 +273,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasIndex("IssueId");
 
-                    b.ToTable("Attachments", (string)null);
+                    b.ToTable("Attachments");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.Backlog", b =>
@@ -297,7 +300,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.HasIndex("ProjectId")
                         .IsUnique();
 
-                    b.ToTable("Backlogs", (string)null);
+                    b.ToTable("Backlogs");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.Comment", b =>
@@ -329,7 +332,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasIndex("IssueId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.Criteria", b =>
@@ -354,7 +357,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Criterias", (string)null);
+                    b.ToTable("Criterias");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.Filter", b =>
@@ -382,7 +385,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Filters", (string)null);
+                    b.ToTable("Filters");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.FilterCriteria", b =>
@@ -417,7 +420,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasIndex("FilterId");
 
-                    b.ToTable("FilterCriterias", (string)null);
+                    b.ToTable("FilterCriterias");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.Issue", b =>
@@ -496,7 +499,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasIndex("VersionId");
 
-                    b.ToTable("Issues", (string)null);
+                    b.ToTable("Issues");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.IssueDetail", b =>
@@ -532,7 +535,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.HasIndex("IssueId")
                         .IsUnique();
 
-                    b.ToTable("IssueDetails", (string)null);
+                    b.ToTable("IssueDetails");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.IssueEvent", b =>
@@ -553,7 +556,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("IssueEvents", (string)null);
+                    b.ToTable("IssueEvents");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.IssueHistory", b =>
@@ -586,7 +589,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasIndex("IssueId");
 
-                    b.ToTable("IssueHistories", (string)null);
+                    b.ToTable("IssueHistories");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.IssueType", b =>
@@ -625,7 +628,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("IssueTypes", (string)null);
+                    b.ToTable("IssueTypes");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.Notification", b =>
@@ -655,7 +658,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasIndex("CreatorUserId");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.NotificationIssueEvent", b =>
@@ -709,7 +712,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasIndex("NotificationId");
 
-                    b.ToTable("NotificationIssueEvents", (string)null);
+                    b.ToTable("NotificationIssueEvents");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.Priority", b =>
@@ -747,7 +750,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Priorities", (string)null);
+                    b.ToTable("Priorities");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.Project", b =>
@@ -785,7 +788,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.HasIndex("Code")
                         .IsUnique();
 
-                    b.ToTable("Projects", (string)null);
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.ProjectConfiguration", b =>
@@ -824,7 +827,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.HasIndex("ProjectId")
                         .IsUnique();
 
-                    b.ToTable("ProjectConfigurations", (string)null);
+                    b.ToTable("ProjectConfigurations");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.Sprint", b =>
@@ -865,7 +868,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Sprints", (string)null);
+                    b.ToTable("Sprints");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.Status", b =>
@@ -896,7 +899,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasIndex("StatusCategoryId");
 
-                    b.ToTable("Statuses", (string)null);
+                    b.ToTable("Statuses");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.StatusCategory", b =>
@@ -928,7 +931,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.HasIndex("Code")
                         .IsUnique();
 
-                    b.ToTable("StatusCategories", (string)null);
+                    b.ToTable("StatusCategories");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.Team", b =>
@@ -952,7 +955,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Teams", (string)null);
+                    b.ToTable("Teams");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.Transition", b =>
@@ -988,7 +991,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasIndex("ToStatusId");
 
-                    b.ToTable("Transitions", (string)null);
+                    b.ToTable("Transitions");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.UserFilter", b =>
@@ -1019,7 +1022,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserFilters", (string)null);
+                    b.ToTable("UserFilters");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.UserProject", b =>
@@ -1050,7 +1053,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserProjects", (string)null);
+                    b.ToTable("UserProjects");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.UserTeam", b =>
@@ -1077,7 +1080,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserTeams", (string)null);
+                    b.ToTable("UserTeams");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.Version", b =>
@@ -1149,7 +1152,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.HasIndex("ProjectId")
                         .IsUnique();
 
-                    b.ToTable("Workflows", (string)null);
+                    b.ToTable("Workflows");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.WorkflowIssueType", b =>
@@ -1176,7 +1179,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasIndex("WorkflowId");
 
-                    b.ToTable("WorkflowIssueTypes", (string)null);
+                    b.ToTable("WorkflowIssueTypes");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -1314,21 +1317,21 @@ namespace TaskManager.Infrastructure.Data.Migrations
                         .WithMany("Issues")
                         .HasForeignKey("VersionId");
 
-                    b.OwnsOne("TaskManager.Core.Entities.Issue.Watcher#TaskManager.Core.Entities.Watcher", "Watcher", b1 =>
+                    b.OwnsOne("TaskManager.Core.Entities.Watcher", "Watcher", b1 =>
                         {
                             b1.Property<Guid>("IssueId")
                                 .HasColumnType("uniqueidentifier");
 
                             b1.HasKey("IssueId");
 
-                            b1.ToTable("Issues", (string)null);
+                            b1.ToTable("Issues");
 
                             b1.ToJson("Watcher");
 
                             b1.WithOwner()
                                 .HasForeignKey("IssueId");
 
-                            b1.OwnsMany("TaskManager.Core.Entities.Issue.Watcher#TaskManager.Core.Entities.Watcher.Users#TaskManager.Core.Entities.User", "Users", b2 =>
+                            b1.OwnsMany("TaskManager.Core.Entities.User", "Users", b2 =>
                                 {
                                     b2.Property<Guid>("WatcherIssueId")
                                         .HasColumnType("uniqueidentifier");
@@ -1347,7 +1350,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                                     b2.HasKey("WatcherIssueId", "Id");
 
-                                    b2.ToTable("Issues", (string)null);
+                                    b2.ToTable("Issues");
 
                                     b2.WithOwner()
                                         .HasForeignKey("WatcherIssueId");

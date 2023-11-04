@@ -20,6 +20,7 @@ namespace TaskManager.Core.ViewModel
         public Guid? BacklogId { get; set; }
         public Guid IssueTypeId { get; set; }
         public Guid StatusId { get; set; }
+        public string ParentName { get; set; } = string.Empty;
         public IssueTypeViewModel? IssueType { get; set; }
         public ICollection<IssueHistoryViewModel>? IssueHistories { get; set; }
         public ICollection<CommentViewModel>? Comments { get; set; }

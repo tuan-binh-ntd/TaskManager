@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.Core;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Extensions;
 
 namespace TaskManager.Infrastructure.Data
 {
@@ -12,82 +13,348 @@ namespace TaskManager.Infrastructure.Data
             RoleManager<AppRole> roleManager,
             AppDbContext appDbContext)
         {
+            #region Seed Criteria
+            if (await appDbContext.Criterias.AnyAsync()) return;
+            var criterias = new List<Criteria>
+            {
+                new Criteria
+                {
+                    Name = CoreConstants.ProjectCriteriaName,
+                },
+                new Criteria
+                {
+                    Name = CoreConstants.TypeCriteriaName,
+                },
+                new Criteria
+                {
+                    Name = CoreConstants.StatusCriteriaName,
+                },
+                new Criteria
+                {
+                    Name = CoreConstants.AssigneeCriteriaName,
+                },
+                new Criteria
+                {
+                    Name = CoreConstants.CreatedCriteriaName,
+                },
+                new Criteria
+                {
+                    Name = CoreConstants.DueDateCriteriaName,
+                },
+                new Criteria
+                {
+                    Name = CoreConstants.FixVersionsCriteriaName,
+                },
+                new Criteria
+                {
+                    Name = CoreConstants.LabelsCriteriaName,
+                },
+                new Criteria
+                {
+                    Name = CoreConstants.PriorityCriteriaName,
+                },
+                new Criteria
+                {
+                    Name = CoreConstants.ReporterCriteriaName,
+                },
+                new Criteria
+                {
+                    Name = CoreConstants.ResolutionCriteriaName,
+                },
+                new Criteria
+                {
+                    Name = CoreConstants.ResolvedCriteriaName,
+                },
+                new Criteria
+                {
+                    Name = CoreConstants.SprintCriteriaName,
+                },
+                new Criteria
+                {
+                    Name = CoreConstants.StatusCategoryCriteriaName,
+                },
+                new Criteria
+                {
+                    Name = CoreConstants.SummaryCriteriaName,
+                },
+                new Criteria
+                {
+                    Name = CoreConstants.UpdatedCriteriaName,
+                },
+            };
+            appDbContext.Criterias.AddRange(criterias);
+            await appDbContext.SaveChangesAsync();
+            #endregion
+
+            #region Seed Default Filters
+            if (await appDbContext.Filters.AnyAsync()) return;
+
+            //var criterias = await appDbContext.Criterias.ToListAsync();
+
+            var assigneeCriteria = criterias.Where(c => c.Name == CoreConstants.AssigneeCriteriaName).FirstOrDefault();
+            var resolutionCriteria = criterias.Where(c => c.Name == CoreConstants.ResolutionCriteriaName).FirstOrDefault();
+            var reporterCriteria = criterias.Where(c => c.Name == CoreConstants.ReporterCriteriaName).FirstOrDefault();
+            var statusCategoryCriteria = criterias.Where(c => c.Name == CoreConstants.StatusCategoryCriteriaName).FirstOrDefault();
+            var createdCriteria = criterias.Where(c => c.Name == CoreConstants.CreatedCriteriaName).FirstOrDefault();
+            var resolvedCriteria = criterias.Where(c => c.Name == CoreConstants.ResolvedCriteriaName).FirstOrDefault();
+            var updatedCriteria = criterias.Where(c => c.Name == CoreConstants.UpdatedCriteriaName).FirstOrDefault();
+
+            #region Create My open issues filter
+            var myOpenIssues = new Filter()
+            {
+                Name = CoreConstants.MyOpenIssuesFilterName,
+                Type = CoreConstants.DefaultFiltersType,
+            };
+
+            myOpenIssues.FilterCriterias = new List<FilterCriteria>()
+            {
+                new FilterCriteria()
+                {
+                    FilterId = myOpenIssues.Id,
+                    CriteriaId = assigneeCriteria!.Id,
+                    Configuration = new AssigneeCriteria()
+                    {
+                        CurrentUser = true,
+                    }.ToJson(),
+                },
+                new FilterCriteria()
+                {
+                    FilterId = myOpenIssues.Id,
+                    CriteriaId = resolutionCriteria!.Id,
+                    Configuration = new ResolutionCriteria()
+                    {
+                        Unresolved = true,
+                        Done = false,
+                    }.ToJson(),
+                }
+            };
+            #endregion
+
+            #region Create Reported by me filter
+            var reportedByMe = new Filter()
+            {
+                Name = CoreConstants.ReportedByMeFilterName,
+                Type = CoreConstants.DefaultFiltersType,
+            };
+
+            reportedByMe.FilterCriterias = new List<FilterCriteria>()
+            {
+                new FilterCriteria()
+                {
+                    FilterId = reportedByMe.Id,
+                    CriteriaId = reporterCriteria!.Id,
+                    Configuration = new ReporterCriteria()
+                    {
+                        CurrentUser = true
+                    }.ToJson(),
+                }
+            };
+            #endregion
+
+            #region Create All issues filter
+            var allIssues = new Filter()
+            {
+                Name = CoreConstants.AllIssuesFilterName,
+                Type = CoreConstants.DefaultFiltersType,
+            };
+            #endregion
+
+            #region Create open issues
+            var openIssues = new Filter()
+            {
+                Name = CoreConstants.OpenIssuesFilterName,
+                Type = CoreConstants.DefaultFiltersType,
+            };
+
+            openIssues.FilterCriterias = new List<FilterCriteria>()
+            {
+                new FilterCriteria()
+                {
+                    FilterId = openIssues.Id,
+                    CriteriaId = resolutionCriteria!.Id,
+                    Configuration = new ResolutionCriteria()
+                    {
+                        Unresolved = true,
+                        Done = false,
+                    }.ToJson(),
+                }
+            };
+            #endregion
+
+            #region Create done issues
+            var doneIssues = new Filter()
+            {
+                Name = CoreConstants.DoneIssuesFilterName,
+                Type = CoreConstants.DefaultFiltersType,
+            };
+
+            doneIssues.FilterCriterias = new List<FilterCriteria>()
+            {
+                new FilterCriteria()
+                {
+                    FilterId = doneIssues.Id,
+                    CriteriaId = statusCategoryCriteria!.Id,
+                    Configuration = new StatusCategoryCriteria()
+                    {
+                        Todo = false,
+                        InProgress = false,
+                        Done = true,
+                    }.ToJson(),
+                }
+            };
+            #endregion
+
+            #region Create Created recently filter
+            var createdRecently = new Filter()
+            {
+                Name = CoreConstants.CreatedRecentlyFilterName,
+                Type = CoreConstants.DefaultFiltersType,
+            };
+
+            createdRecently.FilterCriterias = new List<FilterCriteria>()
+            {
+                new FilterCriteria()
+                {
+                    FilterId = createdRecently.Id,
+                    CriteriaId = createdCriteria!.Id,
+                    Configuration = new CreatedCriteria()
+                    {
+                        WithinTheLast = new WithinTheLast(1, CoreConstants.WeekUnit)
+                    }.ToJson(),
+                }
+            };
+            #endregion
+
+            #region Create resolved recently filter
+            var resolvedRecently = new Filter()
+            {
+                Name = CoreConstants.ResolvedRecentlyFilterName,
+                Type = CoreConstants.DefaultFiltersType,
+            };
+
+            resolvedRecently.FilterCriterias = new List<FilterCriteria>()
+            {
+                new FilterCriteria()
+                {
+                    FilterId = resolvedRecently.Id,
+                    CriteriaId = resolvedCriteria!.Id,
+                    Configuration = new ResolvedCriteria()
+                    {
+                        WithinTheLast = new WithinTheLast(1, CoreConstants.WeekUnit)
+                    }.ToJson(),
+                }
+            };
+            #endregion
+
+            #region Create updated recently filter
+            var updatedRecently = new Filter()
+            {
+                Name = CoreConstants.UpdatedRecentlyFilterName,
+                Type = CoreConstants.DefaultFiltersType,
+            };
+
+            updatedRecently.FilterCriterias = new List<FilterCriteria>()
+            {
+                new FilterCriteria()
+                {
+                    FilterId = updatedRecently.Id,
+                    CriteriaId = updatedCriteria!.Id,
+                    Configuration = new UpdatedCriteria()
+                    {
+                        WithinTheLast = new WithinTheLast(1, CoreConstants.WeekUnit)
+                    }.ToJson(),
+                }
+            };
+            #endregion
+
+            var filters = new List<Filter>
+            {
+                myOpenIssues, reportedByMe, allIssues, openIssues, doneIssues, createdRecently, resolvedRecently,updatedRecently
+            };
+
+            appDbContext.Filters.AddRange(filters);
+            await appDbContext.SaveChangesAsync();
+            #endregion
+
+            #region Seed Issue Event
             if (await appDbContext.IssueEvents.AnyAsync()) return;
             var issueEvemts = new List<IssueEvent>()
             {
                 new IssueEvent()
                 {
-                    Name = "Issue Created (System)"
+                    Name = CoreConstants.IssueCreatedName
                 },
                 new IssueEvent()
                 {
-                    Name = "Issue Updated (System)"
+                    Name = CoreConstants.IssueUpdatedName
                 },
                 new IssueEvent()
                 {
-                    Name = "Issue Assigned (System)"
+                    Name = CoreConstants.IssueAssignedName
                 },
                 new IssueEvent()
                 {
-                    Name = "Issue Resolved (System)"
+                    Name = CoreConstants.IssueResolvedName
                 },
                 new IssueEvent()
                 {
-                    Name = "Issue Closed (System)"
+                    Name = CoreConstants.IssueClosedName
                 },
                 new IssueEvent()
                 {
-                    Name = "Issue Commented (System)"
+                    Name = CoreConstants.IssueCommentedName
                 },
                 new IssueEvent()
                 {
-                    Name = "Issue Comment Edited (System)"
+                    Name = CoreConstants.IssueCommentEditedName
                 },
                 new IssueEvent()
                 {
-                    Name = "Issue Comment Deleted (System)"
+                    Name = CoreConstants.IssueCommentDeletedName
                 },
                 new IssueEvent()
                 {
-                    Name = "Issue Reopened (System)"
+                    Name = CoreConstants.IssueReopenedName
                 },
                 new IssueEvent()
                 {
-                    Name = "Issue Deleted (System)"
+                    Name = CoreConstants.IssueDeletedName
                 },
                 new IssueEvent()
                 {
-                    Name = "Issue Moved (System)"
+                    Name = CoreConstants.IssueMovedName
                 },
                 new IssueEvent()
                 {
-                    Name = "Work Logged On Issue (System)"
+                    Name = CoreConstants.WorkLoggedOnIssueName
                 },
                 new IssueEvent()
                 {
-                    Name = "Work Started On Issue (System)"
+                    Name = CoreConstants.WorkStartedOnIssueName
                 },
                 new IssueEvent()
                 {
-                    Name = "Work Stopped On Issue (System)"
+                    Name = CoreConstants.WorkStoppedOnIssueName
                 },
                 new IssueEvent()
                 {
-                    Name = "Issue Worklog Updated (System)"
+                    Name = CoreConstants.IssueWorklogUpdatedName
                 },
                 new IssueEvent()
                 {
-                    Name = "Issue Worklog Deleted (System)"
+                    Name = CoreConstants.IssueWorklogDeletedName
                 },
                 new IssueEvent()
                 {
-                    Name = "Generic Event (System)"
+                    Name = CoreConstants.GenericEventName
                 },
             };
 
             appDbContext.IssueEvents.AddRange(issueEvemts);
             await appDbContext.SaveChangesAsync();
+            #endregion
 
+            #region Seed Priorities
             if (await appDbContext.Priorities.AnyAsync()) return;
             var priorities = new List<Priority>()
             {
@@ -125,7 +392,9 @@ namespace TaskManager.Infrastructure.Data
 
             appDbContext.Priorities.AddRange(priorities);
             await appDbContext.SaveChangesAsync();
+            #endregion
 
+            #region Seed StatusCategories
             if (await appDbContext.StatusCategories.AnyAsync()) return;
             var statusCategories = new List<StatusCategory>
             {
@@ -169,7 +438,9 @@ namespace TaskManager.Infrastructure.Data
             });
 
             await appDbContext.SaveChangesAsync();
+            #endregion
 
+            #region Seed Issue Types
             if (await appDbContext.IssueTypes.AnyAsync()) return;
             var issueTypes = new List<IssueType>()
             {
@@ -207,7 +478,9 @@ namespace TaskManager.Infrastructure.Data
 
             await appDbContext.IssueTypes.AddRangeAsync(issueTypes);
             await appDbContext.SaveChangesAsync();
+            #endregion
 
+            #region Seed User
             if (await userManager.Users.AnyAsync()) return;
 
             // Create role of system
@@ -231,6 +504,7 @@ namespace TaskManager.Infrastructure.Data
 
             await userManager.CreateAsync(admin, "Abcd1234!");
             await userManager.AddToRolesAsync(admin, new[] { "Admin", "Employee" });
+            #endregion
         }
     }
 }

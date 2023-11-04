@@ -60,16 +60,80 @@ namespace TaskManager.Core.Interfaces.Repositories
         /// </summary>
         /// <param name="issue">Issue entity</param>
         void LoadEntitiesRelationship(Issue issue);
-
+        /// <summary>
+        /// Get issues by id list
+        /// </summary>
+        /// <param name="ids">List of id</param>
+        /// <returns>List of issue</returns>
         Task<IReadOnlyCollection<Issue>> GetByIds(IReadOnlyCollection<Guid> ids);
+        /// <summary>
+        /// Get epic by projectId
+        /// </summary>
+        /// <param name="projectId">Id of project</param>
+        /// <returns>List of epic</returns>
         Task<IReadOnlyCollection<Issue>> GetEpicByProjectId(Guid projectId);
+        /// <summary>
+        /// Get child issue of epic
+        /// </summary>
+        /// <param name="epicId">Id of epic</param>
+        /// <returns>List of epic</returns>
         Task<IReadOnlyCollection<Issue>> GetChildIssueOfEpic(Guid epicId);
+        /// <summary>
+        /// Get child issue of issue
+        /// </summary>
+        /// <param name="issueId">Id of issue</param>
+        /// <returns>List of issue</returns>
         Task<IReadOnlyCollection<Issue>> GetChildIssueOfIssue(Guid issueId);
+        /// <summary>
+        /// Load comments of issue
+        /// </summary>
+        /// <param name="issue">Issue entity</param>
         void LoadComments(Issue issue);
+        /// <summary>
+        /// Load issue type of issue
+        /// </summary>
+        /// <param name="issue">Issue entity</param>
         void LoadIssueType(Issue issue);
+        /// <summary>
+        /// Load issue detail of issue
+        /// </summary>
+        /// <param name="issue">Issue entity</param>
         void LoadIssueDetail(Issue issue);
+        /// <summary>
+        /// Load attachmennts of issue
+        /// </summary>
+        /// <param name="issue">Issue entity</param>
         void LoadAttachments(Issue issue);
+        /// <summary>
+        /// Load issue histories of issue
+        /// </summary>
+        /// <param name="issue">Issue entity</param>
         void LoadIssueHistories(Issue issue);
+        /// <summary>
+        /// Load status of issue
+        /// </summary>
+        /// <param name="issue">Issue entity</param>
         void LoadStatus(Issue issue);
+        /// <summary>
+        /// Get parent name of issue
+        /// </summary>
+        /// <param name="parentId">If of issue parent</param>
+        /// <returns></returns>
+        Task<string> GetParentName(Guid parentId);
+        /// <summary>
+        /// Get issue created a week ago
+        /// </summary>
+        /// <returns>List of issue</returns>
+        Task<IReadOnlyCollection<Issue>> GetCreatedAWeekAgo();
+        /// <summary>
+        /// Get issue resolved a wwek ago
+        /// </summary>
+        /// <returns>List of issue</returns>
+        Task<IReadOnlyCollection<Issue>> GetResolvedAWeekAgo();
+        /// <summary>
+        /// Get issue updated a week ago
+        /// </summary>
+        /// <returns>List of issue</returns>
+        Task<IReadOnlyCollection<Issue>> GetUpdatedAWeekAgo();
     }
 }

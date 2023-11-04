@@ -43,6 +43,7 @@ namespace TaskManager.Core.Entities
 
     public class User
     {
+        public Guid Identity { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
     }

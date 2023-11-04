@@ -18,5 +18,13 @@ namespace TaskManager.Core.Interfaces.Services
         Task<IReadOnlyCollection<IssueHistoryViewModel>> GetHistoriesByIssueId(Guid issueId);
         Task<IReadOnlyCollection<CommentViewModel>> GetCommentsByIssueId(Guid issueId);
         Task<IssueViewModel> UpdateEpic(Guid id, UpdateEpicDto updateEpicDto);
+        Task<IReadOnlyCollection<IssueViewModel>> GetIssueByMyOpenIssuesFilter(Guid userId);
+        Task<IReadOnlyCollection<IssueViewModel>> GetIssueByReportedByMeFilter(Guid userId);
+        Task<IReadOnlyCollection<IssueViewModel>> GetIssueByAllIssueFilter(Guid userId);
+        Task<IReadOnlyCollection<IssueViewModel>> GetIssueByOpenIssuesFilter();
+        Task<IReadOnlyCollection<IssueViewModel>> GetIssueByDoneIssuesFilter();
+        Task<IReadOnlyCollection<IssueViewModel>> GetIssueByCreatedRecentlyFilter();
+        Task<IReadOnlyCollection<IssueViewModel>> GetIssueByResolvedRecentlyFilter();
+        Task<IReadOnlyCollection<IssueViewModel>> GetIssueByUpdatedRecentlyFilter();
     }
 }

@@ -49,6 +49,10 @@ namespace TaskManager.Infrastructure.Data
         public DbSet<Notification> Notifications => Set<Notification>();
         public DbSet<NotificationIssueEvent> NotificationIssueEvents => Set<NotificationIssueEvent>();
         public DbSet<IssueEvent> IssueEvents => Set<IssueEvent>();
+        public DbSet<Filter> Filters => Set<Filter>();
+        public DbSet<FilterCriteria> FilterCriterias => Set<FilterCriteria>();
+        public DbSet<Criteria> Criterias => Set<Criteria>();
+        public DbSet<UserFilter> UserFilters => Set<UserFilter>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

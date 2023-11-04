@@ -1,6 +1,9 @@
-﻿using Mapster;
+﻿using Dapper;
+using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Options;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
@@ -18,7 +21,9 @@ namespace TaskManager.Infrastructure.Services
         private readonly IIssueTypeRepository _issueTypeRepository;
         private readonly ITransitionRepository _transitionRepository;
         private readonly ICommentRepository _commentRepository;
+        private readonly IFilterRepository _filterRepository;
         private readonly UserManager<AppUser> _userManager;
+        private readonly ConnectionStrings _connectionStrings;
         private readonly IMapper _mapper;
 
         public IssueService(
@@ -29,7 +34,9 @@ namespace TaskManager.Infrastructure.Services
             IIssueTypeRepository issueTypeRepository,
             ITransitionRepository transitionRepository,
             ICommentRepository commentRepository,
+            IFilterRepository filterRepository,
             UserManager<AppUser> userManager,
+            IOptionsMonitor<ConnectionStrings> optionsMonitor,
             IMapper mapper
             )
         {
@@ -40,26 +47,28 @@ namespace TaskManager.Infrastructure.Services
             _issueTypeRepository = issueTypeRepository;
             _transitionRepository = transitionRepository;
             _commentRepository = commentRepository;
+            _filterRepository = filterRepository;
             _userManager = userManager;
+            _connectionStrings = optionsMonitor.CurrentValue;
             _mapper = mapper;
         }
 
         #region Private Method
-        private IReadOnlyCollection<IssueViewModel> ToIssueViewModels(IReadOnlyCollection<Issue> issues)
+        private async Task<IReadOnlyCollection<IssueViewModel>> ToIssueViewModels(IReadOnlyCollection<Issue> issues)
         {
             var issueViewModels = new List<IssueViewModel>();
             if (issues.Any())
             {
                 foreach (var issue in issues)
                 {
-                    var issueViewModel = ToIssueViewModel(issue);
+                    var issueViewModel = await ToIssueViewModel(issue);
                     issueViewModels.Add(issueViewModel);
                 }
             }
             return issueViewModels.AsReadOnly();
         }
 
-        private IssueViewModel ToIssueViewModel(Issue issue)
+        private async Task<IssueViewModel> ToIssueViewModel(Issue issue)
         {
             _issueRepository.LoadEntitiesRelationship(issue);
             var issueViewModel = _mapper.Map<IssueViewModel>(issue);
@@ -93,6 +102,10 @@ namespace TaskManager.Infrastructure.Services
             {
                 var status = _mapper.Map<StatusViewModel>(issue.Status);
                 issueViewModel.Status = status;
+            }
+            if (issue.ParentId is not null)
+            {
+                issueViewModel.ParentName = await _issueRepository.GetParentName(issue.Id);
             }
             return issueViewModel;
         }
@@ -134,7 +147,7 @@ namespace TaskManager.Infrastructure.Services
 
             _issueHistoryRepository.Add(issueHis);
             await _issueHistoryRepository.UnitOfWork.SaveChangesAsync();
-            return ToIssueViewModel(issue);
+            return await ToIssueViewModel(issue);
         }
 
         public async Task<IssueViewModel> UpdateIssue(Guid id, UpdateIssueDto updateIssueDto)
@@ -155,6 +168,7 @@ namespace TaskManager.Infrastructure.Services
                     {
                         var watcher = new User()
                         {
+                            Identity = user.Id,
                             Name = user.Name,
                             Email = user.Email!
                         };
@@ -162,6 +176,11 @@ namespace TaskManager.Infrastructure.Services
                     }
                 }
             }
+            if (issue.Watcher is not null && issue.Watcher.Users is not null)
+            {
+                issue.Watcher.Users = issue.Watcher.Users.DistinctBy(i => i.Identity).ToList();
+            }
+
             issue = updateIssueDto.Adapt(issue);
             _issueRepository.Update(issue);
             await _issueRepository.UnitOfWork.SaveChangesAsync();
@@ -180,19 +199,19 @@ namespace TaskManager.Infrastructure.Services
                 issueDetail.AssigneeId = updateIssueDto.AssigneeId;
             }
             await _issueDetailRepository.UnitOfWork.SaveChangesAsync();
-            return ToIssueViewModel(issue);
+            return await ToIssueViewModel(issue);
         }
 
         public async Task<IReadOnlyCollection<IssueViewModel>> GetBySprintId(Guid sprintId)
         {
             var issues = await _issueRepository.GetIssueBySprintId(sprintId);
-            return ToIssueViewModels(issues);
+            return await ToIssueViewModels(issues);
         }
 
         public async Task<IReadOnlyCollection<IssueViewModel>> GetByBacklogId(Guid backlogId)
         {
             var issues = await _issueRepository.GetIssueByBacklogId(backlogId);
-            return ToIssueViewModels(issues);
+            return await ToIssueViewModels(issues);
         }
 
         public async Task<IssueViewModel> CreateIssueByName(CreateIssueByNameDto createIssueByNameDto, Guid? sprintId = null, Guid? backlogId = null)
@@ -225,6 +244,7 @@ namespace TaskManager.Infrastructure.Services
             {
                 var user = new User()
                 {
+                    Identity = creatorUser.Id,
                     Name = creatorUser.Name,
                     Email = creatorUser.Email!
                 };
@@ -260,7 +280,7 @@ namespace TaskManager.Infrastructure.Services
             _projectConfigurationRepository.Update(projectConfiguration);
             await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
 
-            return ToIssueViewModel(issue);
+            return await ToIssueViewModel(issue);
         }
 
         public async Task<Guid> DeleteIssue(Guid id)
@@ -294,6 +314,7 @@ namespace TaskManager.Infrastructure.Services
             {
                 var user = new User()
                 {
+                    Identity = creatorUser.Id,
                     Name = creatorUser.Name,
                     Email = creatorUser.Email!
                 };
@@ -345,7 +366,7 @@ namespace TaskManager.Infrastructure.Services
             issue.ParentId = epicId;
             _issueRepository.Update(issue);
             await _issueRepository.UnitOfWork.SaveChangesAsync();
-            return ToIssueViewModel(issue);
+            return await ToIssueViewModel(issue);
         }
 
         public async Task<EpicViewModel> CreateEpic(CreateEpicDto createEpicDto)
@@ -371,6 +392,7 @@ namespace TaskManager.Infrastructure.Services
             {
                 var user = new User()
                 {
+                    Identity = creatorUser.Id,
                     Name = creatorUser.Name,
                     Email = creatorUser.Email!
                 };
@@ -412,7 +434,7 @@ namespace TaskManager.Infrastructure.Services
         public async Task<IssueViewModel> GetById(Guid id)
         {
             var issue = await _issueRepository.Get(id);
-            return ToIssueViewModel(issue!);
+            return await ToIssueViewModel(issue!);
         }
 
         public async Task<IReadOnlyCollection<IssueHistoryViewModel>> GetHistoriesByIssueId(Guid issueId)
@@ -454,7 +476,164 @@ namespace TaskManager.Infrastructure.Services
                 issueDetail.AssigneeId = updateEpicDto.AssigneeId;
             }
             await _issueDetailRepository.UnitOfWork.SaveChangesAsync();
-            return ToIssueViewModel(epic);
+            return await ToIssueViewModel(epic);
+        }
+
+        public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByMyOpenIssuesFilter(Guid userId)
+        {
+            string query = @"
+                SELECT 
+                  IssueId Id
+                FROM IssueDetails id
+                JOIN Issues i ON id.IssueId = i.Id
+                JOIN Statuses s ON i.StatusId = s.Id
+                JOIN StatusCategories sc ON s.StatusCategoryId = sc.Id
+                WHERE sc.Code <> 'Done'
+                  AND id.AssigneeId = @UserId
+            ";
+
+            var param = new
+            {
+                UserId = userId,
+            };
+
+            using SqlConnection connection = new(_connectionStrings.DefaultConnection);
+            var issueIds = await connection.QueryAsync<Guid>(query, param);
+            if (issueIds.Any())
+            {
+                var issues = await _issueRepository.GetByIds(issueIds.ToList());
+                return await ToIssueViewModels(issues);
+            }
+            else
+            {
+                return new List<IssueViewModel>();
+            }
+        }
+
+        public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByReportedByMeFilter(Guid userId)
+        {
+            string query = @"
+                SELECT 
+                  IssueId Id
+                FROM IssueDetails
+                WHERE ReporterId = @UserId
+            ";
+
+            var param = new
+            {
+                UserId = userId,
+            };
+
+            using SqlConnection connection = new(_connectionStrings.DefaultConnection);
+            var issueIds = await connection.QueryAsync<Guid>(query, param);
+            if (issueIds.Any())
+            {
+                var issues = await _issueRepository.GetByIds(issueIds.ToList());
+                return await ToIssueViewModels(issues);
+            }
+            else
+            {
+                return new List<IssueViewModel>();
+            }
+        }
+
+        public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByAllIssueFilter(Guid userId)
+        {
+            string query = @"
+                SELECT 
+                  i.Id
+                FROM UserProjects up
+                JOIN Projects p ON up.ProjectId = p.Id
+                JOIN Backlogs b ON p.Id = b.ProjectId
+                JOIN Sprints s ON p.Id = s.ProjectId
+                JOIN Issues i ON s.Id = i.SprintId OR b.Id = i.BacklogId
+                WHERE up.UserId = @UserId
+            ";
+
+            var param = new
+            {
+                UserId = userId,
+            };
+
+            using SqlConnection connection = new(_connectionStrings.DefaultConnection);
+            var issueIds = await connection.QueryAsync<Guid>(query, param);
+            if (issueIds.Any())
+            {
+                var issues = await _issueRepository.GetByIds(issueIds.ToList());
+                return await ToIssueViewModels(issues);
+            }
+            else
+            {
+                return new List<IssueViewModel>();
+            }
+        }
+
+        public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByOpenIssuesFilter()
+        {
+            string query = @"
+                SELECT 
+                  IssueId Id
+                FROM IssueDetails id
+                JOIN Issues i ON id.IssueId = i.Id
+                JOIN Statuses s ON i.StatusId = s.Id
+                JOIN StatusCategories sc ON s.StatusCategoryId = sc.Id
+                WHERE sc.Code <> 'Done'
+            ";
+
+            using SqlConnection connection = new(_connectionStrings.DefaultConnection);
+            var issueIds = await connection.QueryAsync<Guid>(query);
+            if (issueIds.Any())
+            {
+                var issues = await _issueRepository.GetByIds(issueIds.ToList());
+                return await ToIssueViewModels(issues);
+            }
+            else
+            {
+                return new List<IssueViewModel>();
+            }
+        }
+
+        public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByDoneIssuesFilter()
+        {
+            string query = @"
+                SELECT 
+                  IssueId Id
+                FROM IssueDetails id
+                JOIN Issues i ON id.IssueId = i.Id
+                JOIN Statuses s ON i.StatusId = s.Id
+                JOIN StatusCategories sc ON s.StatusCategoryId = sc.Id
+                WHERE sc.Code = 'Done'
+            ";
+
+            using SqlConnection connection = new(_connectionStrings.DefaultConnection);
+            var issueIds = await connection.QueryAsync<Guid>(query);
+            if (issueIds.Any())
+            {
+                var issues = await _issueRepository.GetByIds(issueIds.ToList());
+                return await ToIssueViewModels(issues);
+            }
+            else
+            {
+                return new List<IssueViewModel>();
+            }
+        }
+
+        public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByCreatedRecentlyFilter()
+        {
+            var issues = await _issueRepository.GetCreatedAWeekAgo();
+            return await ToIssueViewModels(issues);
+        }
+
+        public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByResolvedRecentlyFilter()
+        {
+            var issues = await _issueRepository.GetResolvedAWeekAgo();
+            return await ToIssueViewModels(issues);
+        }
+
+        public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByUpdatedRecentlyFilter()
+        {
+            var issues = await _issueRepository.GetUpdatedAWeekAgo();
+            return await ToIssueViewModels(issues);
         }
     }
 }

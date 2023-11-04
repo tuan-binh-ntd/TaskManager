@@ -15,5 +15,6 @@ namespace TaskManager.Core.Entities
         public ICollection<UserProject>? UserProjects { get; set; }
         public ICollection<UserTeam>? UserTeams { get; set; }
         public ICollection<Notification>? Notifications { get; set; }
+        public ICollection<UserFilter>? UserFilters { get; set; }
     }
 }
