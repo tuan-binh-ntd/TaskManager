@@ -48,7 +48,6 @@ namespace TaskManager.Infrastructure.Repositories
         public async Task<Project> GetById(Guid id)
         {
             var project = await _context.Projects
-                .AsNoTracking()
                 .Include(p => p.UserProjects!)
                 .ThenInclude(up => up.User)
                 .SingleOrDefaultAsync(p => p.Id == id);
