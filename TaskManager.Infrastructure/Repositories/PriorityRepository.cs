@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.Core;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Extensions;
+using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Infrastructure.Data;
 
@@ -40,7 +42,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<Priority>> GetByProjectId(Guid projectId)
         {
-            var priorities = await _context.Priorities.AsNoTracking().Where(p => p.ProjectId == projectId && p.ProjectId == null).ToListAsync();
+            var priorities = await _context.Priorities.AsNoTracking().Where(p => p.ProjectId == projectId || p.ProjectId == null).ToListAsync();
             return priorities!;
         }
 
@@ -53,6 +55,12 @@ namespace TaskManager.Infrastructure.Repositories
         {
             var priority = await _context.Priorities.AsNoTracking().FirstOrDefaultAsync(p => p.Name == CoreConstants.LowestName);
             return priority!;
+        }
+
+        public async Task<PaginationResult<Priority>> GetByProjectId(Guid projectId, PaginationInput paginationInput)
+        {
+            var query = _context.Priorities.AsNoTracking().Where(p => p.ProjectId == projectId || p.ProjectId == null);
+            return await query.Pagination(paginationInput);
         }
     }
 }

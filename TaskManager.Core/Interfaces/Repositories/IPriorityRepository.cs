@@ -1,4 +1,5 @@
 ﻿using TaskManager.Core.Entities;
+using TaskManager.Core.Helper;
 
 namespace TaskManager.Core.Interfaces.Repositories
 {
@@ -11,6 +12,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         void Update(Priority priority);
         void Delete(Guid id);
         Task<Priority> GetNormal();
-
+        Task<PaginationResult<Priority>> GetByProjectId(Guid projectId, PaginationInput paginationInput);
     }
 }

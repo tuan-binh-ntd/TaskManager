@@ -2,12 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TaskManager.Core.DTOs;
+using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
 
 namespace TaskManager.API.Controllers
 {
-    [Route("api/projects/projectId/[controller]")]
+    [Route("api/projects/{projectId}/[controller]")]
     [ApiController]
     public class IssueTypesController : BaseController
     {
@@ -20,9 +21,9 @@ namespace TaskManager.API.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(IReadOnlyCollection<IssueTypeViewModel>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> Gets(Guid projectId)
+        public async Task<IActionResult> Gets(Guid projectId, [FromQuery] PaginationInput paginationInput)
         {
-            var res = await _issueTypeService.GetIssueTypesByProjectId(projectId);
+            var res = await _issueTypeService.GetIssueTypesByProjectId(projectId, paginationInput);
             return CustomResult(res, HttpStatusCode.OK);
         }
 

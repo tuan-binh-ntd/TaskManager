@@ -1,6 +1,7 @@
 ﻿using MapsterMapper;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
@@ -40,10 +41,18 @@ namespace TaskManager.Infrastructure.Services
             return _mapper.Map<PriorityViewModel>(priority);
         }
 
-        public async Task<IReadOnlyCollection<PriorityViewModel>> GetByProjectId(Guid projectId)
+        public async Task<object> GetByProjectId(Guid projectId, PaginationInput paginationInput)
         {
-            var priorities = await _priorityRepository.GetByProjectId(projectId);
-            return _mapper.Map<IReadOnlyCollection<PriorityViewModel>>(priorities);
+            if (paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))
+            {
+                var priorities = await _priorityRepository.GetByProjectId(projectId, paginationInput);
+                return priorities;
+            }
+            else
+            {
+                var priorities = await _priorityRepository.GetByProjectId(projectId);
+                return _mapper.Map<IReadOnlyCollection<PriorityViewModel>>(priorities);
+            }
         }
 
         public async Task<PriorityViewModel> Update(Guid id, UpdatePriorityDto updatePriorityDto)

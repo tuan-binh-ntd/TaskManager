@@ -1,4 +1,5 @@
 ﻿using TaskManager.Core.Entities;
+using TaskManager.Core.Helper;
 using TaskManager.Core.ViewModel;
 
 namespace TaskManager.Core.Interfaces.Repositories
@@ -13,5 +14,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         Task<IssueType> Get(Guid id);
         Task<IssueType> GetSubtask();
         Task<IssueType> GetEpic();
+        Task<PaginationResult<IssueTypeViewModel>> GetsByProjectIdPaging(Guid projectId, PaginationInput paginationInput);
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TaskManager.Core.DTOs;
+using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
 
@@ -19,9 +20,9 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(Guid projectId)
+        public async Task<IActionResult> Get(Guid projectId, [FromQuery] PaginationInput paginationInput)
         {
-            var res = await _priorityService.GetByProjectId(projectId);
+            var res = await _priorityService.GetByProjectId(projectId, paginationInput);
             return CustomResult(res, HttpStatusCode.OK);
         }
 

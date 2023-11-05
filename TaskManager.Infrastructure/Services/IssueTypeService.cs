@@ -2,6 +2,7 @@
 using MapsterMapper;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
@@ -32,10 +33,18 @@ namespace TaskManager.Infrastructure.Services
             return issueTypeViewModel;
         }
 
-        public async Task<IReadOnlyCollection<IssueTypeViewModel>> GetIssueTypesByProjectId(Guid projectId)
+        public async Task<object> GetIssueTypesByProjectId(Guid projectId, PaginationInput paginationInput)
         {
-            var issuesTypes = await _issueTypeRepository.GetsByProjectId(projectId);
-            return issuesTypes;
+            if (paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))
+            {
+                var issueTypes = await _issueTypeRepository.GetsByProjectIdPaging(projectId, paginationInput);
+                return issueTypes;
+            }
+            else
+            {
+                var issuesTypes = await _issueTypeRepository.GetsByProjectId(projectId);
+                return issuesTypes;
+            }
         }
 
         public async Task<IssueTypeViewModel> UpdateIssueType(Guid issueTypeId, UpdateIssueTypeDto updateIssueTypeDto)

@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.Core;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Extensions;
+using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.ViewModel;
 using TaskManager.Infrastructure.Data;
@@ -79,6 +81,21 @@ namespace TaskManager.Infrastructure.Repositories
             var issueType = await _context.IssueTypes.AsNoTracking().
                Where(e => e.Name == CoreConstants.EpicName).SingleOrDefaultAsync();
             return issueType!;
+        }
+
+        public async Task<PaginationResult<IssueTypeViewModel>> GetsByProjectIdPaging(Guid projectId, PaginationInput paginationInput)
+        {
+            var query = _context.IssueTypes.AsNoTracking()
+                .Where(e => e.ProjectId == projectId || e.ProjectId == null).Select(e => new IssueTypeViewModel()
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    Description = e.Description,
+                    Icon = e.Icon,
+                    Level = e.Level,
+                });
+
+            return await query.Pagination(paginationInput);
         }
     }
 }
