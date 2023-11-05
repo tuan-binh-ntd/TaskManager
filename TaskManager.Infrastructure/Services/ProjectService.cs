@@ -58,21 +58,21 @@ namespace TaskManager.Infrastructure.Services
         }
 
         #region Private Method
-        private IReadOnlyCollection<IssueViewModel> ToIssueViewModels(IReadOnlyCollection<Issue> issues)
+        private async Task<IReadOnlyCollection<IssueViewModel>> ToIssueViewModels(IReadOnlyCollection<Issue> issues)
         {
             var issueViewModels = new List<IssueViewModel>();
             if (issues.Any())
             {
                 foreach (var issue in issues)
                 {
-                    var issueViewModel = ToIssueViewModel(issue);
+                    var issueViewModel = await ToIssueViewModel(issue);
                     issueViewModels.Add(issueViewModel);
                 }
             }
             return issueViewModels.AsReadOnly();
         }
 
-        private IssueViewModel ToIssueViewModel(Issue issue)
+        private async Task<IssueViewModel> ToIssueViewModel(Issue issue)
         {
             _issueRepository.LoadAttachments(issue);
             _issueRepository.LoadIssueDetail(issue);
@@ -100,6 +100,10 @@ namespace TaskManager.Infrastructure.Services
                 var status = _mapper.Map<StatusViewModel>(issue.Status);
                 issueViewModel.Status = status;
             }
+            if (issue.ParentId is not null)
+            {
+                issueViewModel.ParentName = await _issueRepository.GetParentName(issue.Id);
+            }
             return issueViewModel;
         }
 
@@ -108,7 +112,8 @@ namespace TaskManager.Infrastructure.Services
             var members = await _projectRepository.GetMembers(project.Id);
             var backlog = await _backlogRepository.GetBacklog(project.Id);
             var issueForBacklog = await _backlogRepository.GetIssues(backlog.Id);
-            backlog.Issues = ToIssueViewModels(issueForBacklog).ToList();
+            var issueViewModels = await ToIssueViewModels(issueForBacklog);
+            backlog.Issues = issueViewModels.ToList();
             var sprints = await _sprintRepository.GetSprintByProjectId(project.Id);
             var issueTypes = await _issueTypeRepository.GetsByProjectId(project.Id);
             var statuses = await _statusRepository.GetByProjectId(project.Id);
@@ -118,7 +123,8 @@ namespace TaskManager.Infrastructure.Services
                 foreach (var sprint in sprints)
                 {
                     var issues = await _sprintRepository.GetIssues(sprint.Id);
-                    sprint.Issues = ToIssueViewModels(issues).ToList();
+                    issueViewModels = await ToIssueViewModels(issues);
+                    sprint.Issues = issueViewModels.ToList();
                 }
             }
             var projectViewModel = _mapper.Map<ProjectViewModel>(project);

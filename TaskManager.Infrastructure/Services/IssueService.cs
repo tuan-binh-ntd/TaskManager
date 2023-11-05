@@ -72,7 +72,7 @@ namespace TaskManager.Infrastructure.Services
         {
             _issueRepository.LoadEntitiesRelationship(issue);
             var issueViewModel = _mapper.Map<IssueViewModel>(issue);
-
+            var childIssues = await _issueRepository.GetChildIssueOfIssue(issue.Id);
             if (issue.IssueDetail is not null)
             {
                 var issueDetail = _mapper.Map<IssueDetailViewModel>(issue.IssueDetail);
@@ -106,6 +106,10 @@ namespace TaskManager.Infrastructure.Services
             if (issue.ParentId is not null)
             {
                 issueViewModel.ParentName = await _issueRepository.GetParentName(issue.Id);
+            }
+            if(childIssues.Any())
+            {
+                issueViewModel.ChildIssues = _mapper.Map<ICollection<ChildIssueViewModel>>(childIssues);
             }
             return issueViewModel;
         }
@@ -166,6 +170,66 @@ namespace TaskManager.Infrastructure.Services
             }
             return epicViewModel;
         }
+
+        //private async Task<IReadOnlyCollection<IssueViewModel>> ToIssueViewModels(IReadOnlyCollection<Issue> issues)
+        //{
+        //    var issueViewModels = new List<IssueViewModel>();
+        //    if (issues.Any())
+        //    {
+        //        foreach (var issue in issues)
+        //        {
+        //            var issueViewModel = await ToIssueViewModel(issue);
+        //            issueViewModels.Add(issueViewModel);
+        //        }
+        //    }
+        //    return issueViewModels.AsReadOnly();
+        //}
+
+        //private async Task<IssueViewModel> ToIssueViewModel(Issue issue)
+        //{
+        //    _issueRepository.LoadEntitiesRelationship(issue);
+        //    var issueViewModel = _mapper.Map<IssueViewModel>(issue);
+        //    var childIssues = await _issueRepository.GetChildIssueOfIssue(issue.Id);
+        //    if (issue.IssueDetail is not null)
+        //    {
+        //        var issueDetail = _mapper.Map<IssueDetailViewModel>(issue.IssueDetail);
+        //        issueViewModel.IssueDetail = issueDetail;
+        //    }
+        //    if (issue.IssueHistories is not null && issue.IssueHistories.Any())
+        //    {
+        //        var issueHistories = _mapper.Map<ICollection<IssueHistoryViewModel>>(issue.IssueHistories);
+        //        issueViewModel.IssueHistories = issueHistories;
+        //    }
+        //    if (issue.Comments is not null && issue.Comments.Any())
+        //    {
+        //        var comments = _mapper.Map<ICollection<CommentViewModel>>(issue.Comments);
+        //        issueViewModel.Comments = comments;
+        //    }
+        //    if (issue.Attachments is not null && issue.Attachments.Any())
+        //    {
+        //        var attachments = _mapper.Map<ICollection<AttachmentViewModel>>(issue.Attachments);
+        //        issueViewModel.Attachments = attachments;
+        //    }
+        //    if (issue.IssueType is not null)
+        //    {
+        //        var issueType = _mapper.Map<IssueTypeViewModel>(issue.IssueType);
+        //        issueViewModel.IssueType = issueType;
+        //    }
+        //    if (issue.Status is not null)
+        //    {
+        //        var status = _mapper.Map<StatusViewModel>(issue.Status);
+        //        issueViewModel.Status = status;
+        //    }
+        //    if (issue.ParentId is not null)
+        //    {
+        //        issueViewModel.ParentName = await _issueRepository.GetParentName(issue.Id);
+        //    }
+        //    if (childIssues.Any())
+        //    {
+        //        issueViewModel.ChildIssues = childIssues;
+        //    }
+        //    return issueViewModel;
+        //}
         #endregion
 
         public async Task<IssueViewModel> CreateIssue(CreateIssueDto createIssueDto, Guid? sprintId = null, Guid? backlogId = null)
