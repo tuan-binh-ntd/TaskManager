@@ -180,5 +180,11 @@ namespace TaskManager.Infrastructure.Repositories
             var issues = await _context.Issues.Where(i => i.ModificationTime >= DateTime.Now.AddDays(-7)).ToListAsync();
             return issues.AsReadOnly();
         }
+
+        public async Task<IReadOnlyCollection<Issue>> GetChildIssueOfVersion(Guid versionId)
+        {
+            var childIssues = await _context.Issues.Where(i => i.VersionId == versionId).ToListAsync();
+            return childIssues.AsReadOnly();
+        }
     }
 }

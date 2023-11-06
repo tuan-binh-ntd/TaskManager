@@ -11,15 +11,12 @@ namespace TaskManager.API.Controllers
     [ApiController]
     public class EpicsController : BaseController
     {
-        private readonly IIssueService _issueService;
         private readonly IEpicService _epicService;
 
         public EpicsController(
-            IIssueService issueService,
             IEpicService epicService
             )
         {
-            _issueService = issueService;
             _epicService = epicService;
         }
 
@@ -35,7 +32,7 @@ namespace TaskManager.API.Controllers
         [ProducesResponseType(typeof(EpicViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Update(Guid id, UpdateEpicDto updateEpicDto)
         {
-            var res = await _issueService.UpdateEpic(id, updateEpicDto);
+            var res = await _epicService.UpdateEpic(id, updateEpicDto);
             return CustomResult(res, HttpStatusCode.OK);
         }
 

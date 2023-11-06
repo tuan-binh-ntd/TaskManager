@@ -30,5 +30,4 @@
         public Guid VersionId { get; set; }
         public IEnumerable<Guid>? IssueIds { get; set; }
     }
-
 }

@@ -15,4 +15,11 @@
         public Guid StatusId { get; set; }
         public IReadOnlyCollection<IssueViewModel>? Issues { get; set; }
     }
+
+    public class GetIssuesByVersionIdViewModel
+    {
+        public IReadOnlyCollection<SprintViewModel>? Sprints { get; set; }
+        public BacklogViewModel? Backlog { get; set; }
+        public VersionViewModel? Version { get; set; }
+    }
 }

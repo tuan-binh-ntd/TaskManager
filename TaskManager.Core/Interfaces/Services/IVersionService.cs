@@ -10,5 +10,6 @@ namespace TaskManager.Core.Interfaces.Services
         Task<VersionViewModel> Update(Guid id, UpdateVersionDto updateVersionDto);
         Task<Guid> Delete(Guid id);
         Task<VersionViewModel> AddIssues(AddIssuesToVersionDto addIssuesToVersionDto);
+        Task<GetIssuesByVersionIdViewModel> GetIssuesByVersionId(Guid versionId);
     }
 }

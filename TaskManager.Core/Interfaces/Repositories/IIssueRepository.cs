@@ -135,5 +135,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         /// </summary>
         /// <returns>List of issue</returns>
         Task<IReadOnlyCollection<Issue>> GetUpdatedAWeekAgo();
+        Task<IReadOnlyCollection<Issue>> GetChildIssueOfVersion(Guid versionId);
     }
 }
