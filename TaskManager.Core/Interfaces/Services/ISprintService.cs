@@ -10,5 +10,6 @@ namespace TaskManager.Core.Interfaces.Services
         Task<SprintViewModel> CreateNoFieldSprint(Guid projectId);
         Task<Guid> DeleteSprint(Guid id);
         Task<SprintViewModel> StartSprint(Guid projectId, Guid sprintId, UpdateSprintDto updateSprintDto);
+        Task<SprintViewModel> CompleteSprint(Guid id, UpdateSprintDto updateSprintDto);
     }
 }

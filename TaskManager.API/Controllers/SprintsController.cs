@@ -59,5 +59,13 @@ namespace TaskManager.API.Controllers
             var res = await _sprintService.StartSprint(projectId, sprintId: id, updateSprintDto);
             return CustomResult(res, HttpStatusCode.OK);
         }
+
+        [HttpPut("{id}:complete")]
+        [ProducesResponseType(typeof(SprintViewModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Complete(Guid id, UpdateSprintDto updateSprintDto)
+        {
+            var res = await _sprintService.CompleteSprint(id, updateSprintDto);
+            return CustomResult(res, HttpStatusCode.OK);
+        }
     }
 }

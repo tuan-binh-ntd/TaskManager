@@ -13,7 +13,6 @@ namespace TaskManager.Infrastructure.Services
         private readonly ISprintRepository _sprintRepository;
         private readonly IProjectConfigurationRepository _projectConfigurationRepository;
         private readonly IIssueRepository _issueRepository;
-        private readonly IStatusRepository _statusRepository;
         private readonly ITransitionRepository _transitionRepository;
         private readonly IMapper _mapper;
 
@@ -21,7 +20,6 @@ namespace TaskManager.Infrastructure.Services
             ISprintRepository sprintRepository,
             IProjectConfigurationRepository projectConfigurationRepository,
             IIssueRepository issueRepository,
-            IStatusRepository statusRepository,
             ITransitionRepository transitionRepository,
             IMapper mapper
             )
@@ -29,7 +27,6 @@ namespace TaskManager.Infrastructure.Services
             _sprintRepository = sprintRepository;
             _projectConfigurationRepository = projectConfigurationRepository;
             _issueRepository = issueRepository;
-            _statusRepository = statusRepository;
             _transitionRepository = transitionRepository;
             _mapper = mapper;
         }
@@ -111,6 +108,23 @@ namespace TaskManager.Infrastructure.Services
 #pragma warning restore CA2208 // Instantiate argument exceptions correctly
             }
             sprint = updateSprintDto.Adapt(sprint);
+            _sprintRepository.Update(sprint);
+            await _sprintRepository.UnitOfWork.SaveChangesAsync();
+            return sprint.Adapt<SprintViewModel>();
+        }
+
+        public async Task<SprintViewModel> CompleteSprint(Guid id, UpdateSprintDto updateSprintDto)
+        {
+            var sprint = _sprintRepository.Get(id);
+            if (sprint is null)
+            {
+#pragma warning disable CA2208 // Instantiate argument exceptions correctly
+                throw new ArgumentNullException(nameof(sprint));
+#pragma warning restore CA2208 // Instantiate argument exceptions correctly
+            }
+            sprint = updateSprintDto.Adapt(sprint);
+            sprint.IsComplete = true;
+            sprint.IsStart = false;
             _sprintRepository.Update(sprint);
             await _sprintRepository.UnitOfWork.SaveChangesAsync();
             return sprint.Adapt<SprintViewModel>();

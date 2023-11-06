@@ -100,9 +100,9 @@ namespace TaskManager.Infrastructure.Services
                 var status = _mapper.Map<StatusViewModel>(issue.Status);
                 issueViewModel.Status = status;
             }
-            if (issue.ParentId is not null)
+            if (issue.ParentId is Guid parentId)
             {
-                issueViewModel.ParentName = await _issueRepository.GetParentName(issue.Id);
+                issueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
             }
             return issueViewModel;
         }
@@ -217,7 +217,7 @@ namespace TaskManager.Infrastructure.Services
 
             var statuses = new List<Status>()
             {
-                startStatus, todoStatus, doneStatus, inProgressStatus, anyStatus, unreleasedStatus, releasedStatus, archivedStatus,
+                startStatus, todoStatus, inProgressStatus, doneStatus, anyStatus, unreleasedStatus, releasedStatus, archivedStatus,
             };
 
             _statusRepository.AddRange(statuses);

@@ -75,9 +75,9 @@ namespace TaskManager.Infrastructure.Services
                 var status = _mapper.Map<StatusViewModel>(issue.Status);
                 issueViewModel.Status = status;
             }
-            if (issue.ParentId is not null)
+            if (issue.ParentId is Guid parentId)
             {
-                issueViewModel.ParentName = await _issueRepository.GetParentName(issue.Id);
+                issueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
             }
             if (childIssues.Any())
             {
