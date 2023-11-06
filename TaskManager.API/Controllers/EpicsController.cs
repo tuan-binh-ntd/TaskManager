@@ -12,17 +12,22 @@ namespace TaskManager.API.Controllers
     public class EpicsController : BaseController
     {
         private readonly IIssueService _issueService;
+        private readonly IEpicService _epicService;
 
-        public EpicsController(IIssueService issueService)
+        public EpicsController(
+            IIssueService issueService,
+            IEpicService epicService
+            )
         {
             _issueService = issueService;
+            _epicService = epicService;
         }
 
         [HttpPost]
         [ProducesResponseType(typeof(EpicViewModel), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> Create(CreateEpicDto createEpicDto)
         {
-            var res = await _issueService.CreateEpic(createEpicDto);
+            var res = await _epicService.CreateEpic(createEpicDto);
             return CustomResult(res, HttpStatusCode.Created);
         }
 
@@ -38,7 +43,7 @@ namespace TaskManager.API.Controllers
         [ProducesResponseType(typeof(EpicViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> AddIssue(Guid id, AddIssueToEpicDto addIssueToEpicDto)
         {
-            var res = await _issueService.AddEpic(issueId: addIssueToEpicDto.IssueId, epicId: id);
+            var res = await _epicService.AddIssueToEpic(issueId: addIssueToEpicDto.IssueId, epicId: id);
             return CustomResult(res, HttpStatusCode.OK);
         }
     }

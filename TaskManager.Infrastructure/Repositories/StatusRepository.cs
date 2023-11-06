@@ -40,7 +40,7 @@ namespace TaskManager.Infrastructure.Repositories
         public async Task<IReadOnlyCollection<Status>> GetByProjectId(Guid projectId)
         {
             var statuses = await (from s in _context.Statuses.AsNoTracking().Where(s => s.ProjectId == projectId)
-                                  join sc in _context.StatusCategories.AsNoTracking().Where(sc => sc.Code != CoreConstants.HideCode) on s.StatusCategoryId equals sc.Id
+                                  join sc in _context.StatusCategories.AsNoTracking().Where(sc => sc.Code != CoreConstants.HideCode || sc.Code != CoreConstants.VersionCode) on s.StatusCategoryId equals sc.Id
                                   select s).ToListAsync();
             return statuses.AsReadOnly();
         }

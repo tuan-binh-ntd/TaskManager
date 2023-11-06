@@ -98,6 +98,8 @@ builder.Services.AddScoped<ITeamService, TeamService>();
 builder.Services.AddScoped<IPriorityService, PriorityService>();
 builder.Services.AddScoped<IVersionService, VersionService>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
+builder.Services.AddScoped<IEpicService, EpicService>();
+builder.Services.AddScoped<IFilterService, FilterService>();
 // Add EmailService
 // End  Declaration DI
 
