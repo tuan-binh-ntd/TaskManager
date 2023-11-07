@@ -9,10 +9,6 @@ namespace TaskManager.Infrastructure.Data.Config
         public void Configure(EntityTypeBuilder<IssueType> builder)
         {
             builder
-                .HasIndex(e => e.Name)
-                .IsUnique();
-
-            builder
                 .HasOne(it => it.Project)
                 .WithMany(p => p.IssueTypes)
                 .HasForeignKey(it => it.ProjectId)

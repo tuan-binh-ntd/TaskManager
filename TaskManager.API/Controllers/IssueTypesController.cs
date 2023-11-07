@@ -42,5 +42,13 @@ namespace TaskManager.API.Controllers
             var res = await _issueTypeService.UpdateIssueType(issueTypeId, updateIssueTypeDto);
             return CustomResult(res, HttpStatusCode.OK);
         }
+
+        [HttpDelete("issueTypeId")]
+        [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Delete(Guid issueTypeId)
+        {
+            var res = await _issueTypeService.Delete(issueTypeId);
+            return CustomResult(res, HttpStatusCode.OK);
+        }
     }
 }

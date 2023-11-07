@@ -52,7 +52,7 @@ namespace TaskManager.Infrastructure.Repositories
         public async Task<IReadOnlyCollection<IssueTypeViewModel>> GetsByProjectId(Guid projectId)
         {
             var issueTypes = await _context.IssueTypes.AsNoTracking()
-                .Where(e => e.ProjectId == projectId || e.ProjectId == null).Select(e => new IssueTypeViewModel()
+                .Where(e => e.ProjectId == projectId).Select(e => new IssueTypeViewModel()
                 {
                     Id = e.Id,
                     Name = e.Name,
@@ -96,6 +96,11 @@ namespace TaskManager.Infrastructure.Repositories
                 });
 
             return await query.Pagination(paginationInput);
+        }
+
+        public void AddRange(IReadOnlyCollection<IssueType> issueTypes)
+        {
+            _context.IssueTypes.AddRange(issueTypes);
         }
     }
 }

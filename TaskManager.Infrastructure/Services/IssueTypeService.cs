@@ -33,6 +33,13 @@ namespace TaskManager.Infrastructure.Services
             return issueTypeViewModel;
         }
 
+        public async Task<Guid> Delete(Guid issueTypeId)
+        {
+            _issueTypeRepository.Delete(issueTypeId);
+            await _issueTypeRepository.UnitOfWork.SaveChangesAsync();
+            return issueTypeId;
+        }
+
         public async Task<object> GetIssueTypesByProjectId(Guid projectId, PaginationInput paginationInput)
         {
             if (paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))

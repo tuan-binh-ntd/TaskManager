@@ -367,7 +367,5 @@ namespace TaskManager.Infrastructure.Services
             var comments = await _commentRepository.GetByIssueId(issueId);
             return _mapper.Map<IReadOnlyCollection<CommentViewModel>>(comments);
         }
-
-
     }
 }

@@ -32,6 +32,12 @@
         public const string BugName = "Bug";
         public const string TaskName = "Task";
         public const string SubTaskName = "Subtask";
+
+        public const string EpicIcon = "epic";
+        public const string StoryIcon = "story";
+        public const string BugIcon = "bug";
+        public const string TaskIcon = "task";
+        public const string SubTaskIcon = "subtask";
         // Priority
         public const string LowestName = "Lowest";
         public const string LowName = "Low";

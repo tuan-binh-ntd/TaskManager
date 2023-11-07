@@ -354,46 +354,6 @@ namespace TaskManager.Infrastructure.Data
             await appDbContext.SaveChangesAsync();
             #endregion
 
-            #region Seed Priorities
-            if (await appDbContext.Priorities.AnyAsync()) return;
-            var priorities = new List<Priority>()
-            {
-                new Priority()
-                {
-                    Name = CoreConstants.LowestName,
-                    Description = "Trivial problem with little or no impact on progress.",
-                    Color = "#999999"
-                },
-                new Priority()
-                {
-                    Name = CoreConstants.LowName,
-                    Description = "Minor problem or easily worked around.",
-                    Color = "#707070"
-                },
-                new Priority()
-                {
-                    Name = CoreConstants.MediumName,
-                    Description = "Has the potential to affect progress.",
-                    Color = "#f79232"
-                },
-                new Priority()
-                {
-                    Name = CoreConstants.HighName,
-                    Description = "Serious problem that could block progress.",
-                    Color = "#f15C75"
-                },
-                new Priority()
-                {
-                    Name = CoreConstants.HighestName,
-                    Description = "This problem will block progress.",
-                    Color = "#d04437"
-                }
-            };
-
-            appDbContext.Priorities.AddRange(priorities);
-            await appDbContext.SaveChangesAsync();
-            #endregion
-
             #region Seed StatusCategories
             if (await appDbContext.StatusCategories.AnyAsync()) return;
             var statusCategories = new List<StatusCategory>
@@ -437,46 +397,6 @@ namespace TaskManager.Infrastructure.Data
                 Code = CoreConstants.VersionCode
             });
 
-            await appDbContext.SaveChangesAsync();
-            #endregion
-
-            #region Seed Issue Types
-            if (await appDbContext.IssueTypes.AnyAsync()) return;
-            var issueTypes = new List<IssueType>()
-            {
-                new IssueType()
-                {
-                    Name = CoreConstants.EpicName,
-                    Description = "Epics track collections of related bugs, stories, and tasks.",
-                    Level = 1,
-                },
-                new IssueType()
-                {
-                    Name = CoreConstants.BugName,
-                    Description = "Bugs track problems or errors.",
-                    Level = 2,
-                },
-                new IssueType()
-                {
-                    Name = CoreConstants.StoryName,
-                    Description = "Stories track functionality or features expressed as user goals.",
-                    Level = 2,
-                },
-                new IssueType()
-                {
-                    Name = CoreConstants.TaskName,
-                    Description = "Tasks track small, distinct pieces of work.",
-                    Level = 2,
-                },
-                new IssueType()
-                {
-                    Name = CoreConstants.SubTaskName,
-                    Description = "Subtasks track small pieces of work that are part of a larger task.",
-                    Level = 3,
-                }
-            };
-
-            await appDbContext.IssueTypes.AddRangeAsync(issueTypes);
             await appDbContext.SaveChangesAsync();
             #endregion
 

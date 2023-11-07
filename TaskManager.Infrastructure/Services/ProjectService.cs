@@ -391,6 +391,101 @@ namespace TaskManager.Infrastructure.Services
             }
             return epicViewModel;
         }
+
+        private async Task CreateIssueTypesForProject(Project project)
+        {
+            var issueTypes = new List<IssueType>()
+            {
+                new IssueType()
+                {
+                    Name = CoreConstants.EpicName,
+                    Description = "Epics track collections of related bugs, stories, and tasks.",
+                    Icon = CoreConstants.EpicIcon,
+                    Level = 1,
+                    ProjectId = project.Id,
+                },
+                new IssueType()
+                {
+                    Name = CoreConstants.BugName,
+                    Description = "Bugs track problems or errors.",
+                    Icon = CoreConstants.BugIcon,
+                    Level = 2,
+                    ProjectId = project.Id,
+                },
+                new IssueType()
+                {
+                    Name = CoreConstants.StoryName,
+                    Description = "Stories track functionality or features expressed as user goals.",
+                    Icon = CoreConstants.StoryIcon,
+                    Level = 2,
+                    ProjectId = project.Id,
+                },
+                new IssueType()
+                {
+                    Name = CoreConstants.TaskName,
+                    Description = "Tasks track small, distinct pieces of work.",
+                    Icon = CoreConstants.TaskIcon,
+                    Level = 2,
+                    ProjectId = project.Id,
+                },
+                new IssueType()
+                {
+                    Name = CoreConstants.SubTaskName,
+                    Description = "Subtasks track small pieces of work that are part of a larger task.",
+                    Icon = CoreConstants.SubTaskIcon,
+                    Level = 3,
+                    ProjectId = project.Id,
+                }
+            };
+
+            _issueTypeRepository.AddRange(issueTypes);
+            await _issueTypeRepository.UnitOfWork.SaveChangesAsync();
+        }
+
+        private async Task CreatePrioritiesForProject(Project project)
+        {
+            var priorities = new List<Priority>()
+            {
+                new Priority()
+                {
+                    Name = CoreConstants.LowestName,
+                    Description = "Trivial problem with little or no impact on progress.",
+                    Color = "#999999",
+                    ProjectId = project.Id
+                },
+                new Priority()
+                {
+                    Name = CoreConstants.LowName,
+                    Description = "Minor problem or easily worked around.",
+                    Color = "#707070",
+                    ProjectId = project.Id
+                },
+                new Priority()
+                {
+                    Name = CoreConstants.MediumName,
+                    Description = "Has the potential to affect progress.",
+                    Color = "#f79232",
+                    ProjectId = project.Id
+                },
+                new Priority()
+                {
+                    Name = CoreConstants.HighName,
+                    Description = "Serious problem that could block progress.",
+                    Color = "#f15C75",
+                    ProjectId = project.Id
+                },
+                new Priority()
+                {
+                    Name = CoreConstants.HighestName,
+                    Description = "This problem will block progress.",
+                    Color = "#d04437",
+                    ProjectId = project.Id
+                }
+            };
+
+            _priorityRepository.AddRange(priorities);
+            await _priorityRepository.UnitOfWork.SaveChangesAsync();
+        }
         #endregion
 
         public async Task<Guid> Delete(Guid id)
@@ -425,11 +520,15 @@ namespace TaskManager.Infrastructure.Services
             _projectRepository.Add(project);
             await _projectRepository.UnitOfWork.SaveChangesAsync();
 
+            await CreatePrioritiesForProject(project);
+
             await CreateBacklogAndProjectConfigurationForProject(project);
 
             await CreateStatusForProject(project);
 
             await CreateWorkflowForProject(project);
+
+            await CreateIssueTypesForProject(project);
 
             return await ToProjectViewModel(project);
         }

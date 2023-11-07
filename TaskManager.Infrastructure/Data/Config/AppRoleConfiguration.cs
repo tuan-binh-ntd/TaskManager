@@ -15,6 +15,12 @@ namespace TaskManager.Infrastructure.Data.Config
                 .WithOne(u => u.Role)
                 .HasForeignKey(ur => ur.RoleId)
                 .IsRequired();
+
+            /*builder
+                .HasMany(ur => ur.PermissionRoles)
+                .WithOne(u => u.Role)
+                .HasForeignKey(ur => ur.RoleId)
+                .IsRequired();*/
         }
     }
 }

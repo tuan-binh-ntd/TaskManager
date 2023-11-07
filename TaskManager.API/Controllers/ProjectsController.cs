@@ -11,7 +11,6 @@ namespace TaskManager.API.Controllers
 {
     [Route("api/users/{id}/[controller]")]
     [ApiController]
-    [Authorize]
     public class ProjectsController : BaseController
     {
         private readonly IProjectService _projectService;
