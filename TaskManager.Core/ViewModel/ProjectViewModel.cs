@@ -15,6 +15,7 @@
         public ICollection<IssueTypeViewModel>? IssueTypes { get; set; }
         public ICollection<StatusViewModel>? Statuses { get; set; }
         public ICollection<EpicViewModel>? Epics { get; set; }
+        public ICollection<PriorityViewModel>? Priorities { get; set; }
     }
 
     public class BacklogViewModel

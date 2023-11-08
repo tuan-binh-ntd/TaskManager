@@ -7,6 +7,8 @@
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public string Goal { get; set; } = string.Empty;
+        public bool IsStart { get; set; } = false;
+        public bool IsComplete { get; set; } = false;
         public ICollection<IssueViewModel>? Issues { get; set; }
     }
 }
