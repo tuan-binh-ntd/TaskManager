@@ -91,13 +91,12 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task LoadEntitiesRelationship(Issue issue)
         {
-            var task1 = _context.Entry(issue).Reference(i => i.IssueType).LoadAsync();
-            var task2 = _context.Entry(issue).Reference(i => i.IssueDetail).LoadAsync();
-            var task3 = _context.Entry(issue).Collection(i => i.Attachments!).LoadAsync();
-            var task4 = _context.Entry(issue).Collection(i => i.IssueHistories!).LoadAsync();
-            var task5 = _context.Entry(issue).Collection(i => i.Comments!).LoadAsync();
-            var task6 = _context.Entry(issue).Reference(i => i.Status).LoadAsync();
-            await Task.WhenAll(task1, task2, task3, task4, task5, task6);
+            await _context.Entry(issue).Reference(i => i.IssueType).LoadAsync();
+            await _context.Entry(issue).Reference(i => i.IssueDetail).LoadAsync();
+            await _context.Entry(issue).Collection(i => i.Attachments!).LoadAsync();
+            await _context.Entry(issue).Collection(i => i.IssueHistories!).LoadAsync();
+            await _context.Entry(issue).Collection(i => i.Comments!).LoadAsync();
+            await _context.Entry(issue).Reference(i => i.Status).LoadAsync();
         }
 
         public async Task<IReadOnlyCollection<Issue>> GetByIds(IReadOnlyCollection<Guid> ids)
