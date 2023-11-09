@@ -8,7 +8,6 @@ using TaskManager.Core.ViewModel;
 
 namespace TaskManager.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
     [Authorize]
     public class RolesController : BaseController
@@ -22,15 +21,15 @@ namespace TaskManager.API.Controllers
             _roleService = roleService;
         }
 
-        [HttpGet]
+        [HttpGet("api/projects/{projectId}/[controller]")]
         [ProducesResponseType(typeof(IReadOnlyCollection<RoleViewModel>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> Gets()
+        public async Task<IActionResult> Gets(Guid projectId)
         {
-            var res = await _roleService.Gets();
+            var res = await _roleService.GetByProjectId(projectId);
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("api/projects/{projectId}/[controller]/{id}")]
         [ProducesResponseType(typeof(RoleViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Get(Guid id)
         {
@@ -38,7 +37,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        [HttpPost]
+        [HttpPost("api/projects/{projectId}/[controller]")]
         [ProducesResponseType(typeof(RoleViewModel), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> Create(CreateAppRoleDto appRoleDto)
         {
@@ -46,7 +45,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.Created);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("api/projects/{projectId}/[controller]/{id}")]
         [ProducesResponseType(typeof(RoleViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Update(Guid id, CreateAppRoleDto appRoleDto)
         {
@@ -54,7 +53,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("api/projects/{projectId}/[controller]/{id}")]
         [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Delete(Guid id)
         {

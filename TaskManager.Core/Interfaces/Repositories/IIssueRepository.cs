@@ -59,7 +59,7 @@ namespace TaskManager.Core.Interfaces.Repositories
         /// Use Explicit Loading
         /// </summary>
         /// <param name="issue">Issue entity</param>
-        void LoadEntitiesRelationship(Issue issue);
+        Task LoadEntitiesRelationship(Issue issue);
         /// <summary>
         /// Get issues by id list
         /// </summary>

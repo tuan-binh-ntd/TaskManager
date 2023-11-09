@@ -1,14 +1,13 @@
-﻿namespace TaskManager.Core.ViewModel
+﻿namespace TaskManager.Core.DTOs
 {
-    public class RoleViewModel
+    public class CreatePermissionDto
     {
-        public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
+        public Guid? ParentId { get; set; }
     }
 
-    public class PermissionViewModel
+    public class UpdatePermissionDto
     {
-        public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public Guid? ParentId { get; set; }
     }

@@ -113,5 +113,9 @@
         public const string HoursUnit = "Hours";
         public const string DaysUnit = "Days";
         public const string WeekUnit = "Weeks";
+        // Role
+        public const string ProductOwnerName = "Product Owner";
+        public const string ScrumMasterName = "Scrum Master";
+        public const string DeveloperName = "Developer";
     }
 }

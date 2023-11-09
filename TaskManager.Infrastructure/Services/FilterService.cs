@@ -42,7 +42,7 @@ namespace TaskManager.Infrastructure.Services
 
         private async Task<IssueViewModel> ToIssueViewModel(Issue issue)
         {
-            _issueRepository.LoadEntitiesRelationship(issue);
+            await _issueRepository.LoadEntitiesRelationship(issue);
             var issueViewModel = _mapper.Map<IssueViewModel>(issue);
             if (issue.IssueDetail is not null)
             {

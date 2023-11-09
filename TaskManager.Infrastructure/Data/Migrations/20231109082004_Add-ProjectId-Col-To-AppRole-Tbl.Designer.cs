@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskManager.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using TaskManager.Infrastructure.Data;
 namespace TaskManager.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231109082004_Add-ProjectId-Col-To-AppRole-Tbl")]
+    partial class AddProjectIdColToAppRoleTbl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -751,7 +754,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.Property<DateTime?>("ModificationTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("PermissionId")
+                    b.Property<Guid>("PermissionGroupId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("RoleId")
@@ -759,7 +762,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PermissionId");
+                    b.HasIndex("PermissionGroupId");
 
                     b.HasIndex("RoleId");
 
@@ -1491,9 +1494,9 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("TaskManager.Core.Entities.PermissionRole", b =>
                 {
-                    b.HasOne("TaskManager.Core.Entities.Permission", "Permission")
+                    b.HasOne("TaskManager.Core.Entities.Permission", "PermissionGroup")
                         .WithMany("PermissionRoles")
-                        .HasForeignKey("PermissionId")
+                        .HasForeignKey("PermissionGroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1503,7 +1506,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Permission");
+                    b.Navigation("PermissionGroup");
 
                     b.Navigation("Role");
                 });

@@ -406,8 +406,7 @@ namespace TaskManager.Infrastructure.Data
             // Create role of system
             var roles = new List<AppRole>
             {
-                new AppRole{ Name = "Admin" },
-                new AppRole{ Name = "Employee" }
+                new AppRole{ Name = "Admin", ProjectId = Guid.Empty },
             };
 
             foreach (var role in roles)
@@ -423,7 +422,7 @@ namespace TaskManager.Infrastructure.Data
             };
 
             await userManager.CreateAsync(admin, "Abcd1234!");
-            await userManager.AddToRolesAsync(admin, new[] { "Admin", "Employee" });
+            await userManager.AddToRolesAsync(admin, new[] { "Admin" });
             #endregion
         }
     }

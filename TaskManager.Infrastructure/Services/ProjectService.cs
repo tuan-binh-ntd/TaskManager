@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using MapsterMapper;
+using Microsoft.AspNetCore.Identity;
 using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
@@ -24,6 +25,7 @@ namespace TaskManager.Infrastructure.Services
         private readonly IWorkflowRepository _workflowRepository;
         private readonly IIssueRepository _issueRepository;
         private readonly IPriorityRepository _priorityRepository;
+        private readonly RoleManager<AppRole> _roleManager;
         private readonly IMapper _mapper;
 
         public ProjectService(
@@ -39,6 +41,7 @@ namespace TaskManager.Infrastructure.Services
             IWorkflowRepository workflowRepository,
             IIssueRepository issueRepository,
             IPriorityRepository priorityRepository,
+            RoleManager<AppRole> roleManager,
             IMapper mapper
             )
         {
@@ -54,6 +57,7 @@ namespace TaskManager.Infrastructure.Services
             _workflowRepository = workflowRepository;
             _issueRepository = issueRepository;
             _priorityRepository = priorityRepository;
+            _roleManager = roleManager;
             _mapper = mapper;
         }
 
@@ -358,7 +362,7 @@ namespace TaskManager.Infrastructure.Services
 
         private async Task<EpicViewModel> ToEpicViewModel(Issue epic)
         {
-            _issueRepository.LoadEntitiesRelationship(epic);
+            await _issueRepository.LoadEntitiesRelationship(epic);
             var epicViewModel = _mapper.Map<EpicViewModel>(epic);
 
             if (epic.IssueDetail is not null)
@@ -548,6 +552,33 @@ namespace TaskManager.Infrastructure.Services
             }
             return childIssueViewModel;
         }
+
+        private async Task CreateRolesForProject(Project project)
+        {
+            var roles = new List<AppRole>()
+            {
+                new AppRole()
+                {
+                    Name = CoreConstants.ProductOwnerName,
+                    ProjectId = project.Id
+                },
+                new AppRole()
+                {
+                    Name = CoreConstants.ScrumMasterName,
+                    ProjectId = project.Id
+                },
+                new AppRole()
+                {
+                    Name = CoreConstants.DeveloperName,
+                    ProjectId = project.Id
+                },
+            };
+
+            foreach (var role in roles)
+            {
+                await _roleManager.CreateAsync(role);
+            }
+        }
         #endregion
 
         public async Task<Guid> Delete(Guid id)
@@ -591,6 +622,8 @@ namespace TaskManager.Infrastructure.Services
             await CreateWorkflowForProject(project);
 
             await CreateIssueTypesForProject(project);
+
+            await CreateRolesForProject(project);
 
             return await ToProjectViewModel(project);
         }

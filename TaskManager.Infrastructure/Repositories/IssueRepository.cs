@@ -89,14 +89,15 @@ namespace TaskManager.Infrastructure.Repositories
             _context.Issues.RemoveRange(issues);
         }
 
-        public void LoadEntitiesRelationship(Issue issue)
+        public async Task LoadEntitiesRelationship(Issue issue)
         {
-            _context.Entry(issue).Reference(i => i.IssueType).Load();
-            _context.Entry(issue).Reference(i => i.IssueDetail).Load();
-            _context.Entry(issue).Collection(i => i.Attachments!).Load();
-            _context.Entry(issue).Collection(i => i.IssueHistories!).Load();
-            _context.Entry(issue).Collection(i => i.Comments!).Load();
-            _context.Entry(issue).Reference(i => i.Status).Load();
+            var task1 = _context.Entry(issue).Reference(i => i.IssueType).LoadAsync();
+            var task2 = _context.Entry(issue).Reference(i => i.IssueDetail).LoadAsync();
+            var task3 = _context.Entry(issue).Collection(i => i.Attachments!).LoadAsync();
+            var task4 = _context.Entry(issue).Collection(i => i.IssueHistories!).LoadAsync();
+            var task5 = _context.Entry(issue).Collection(i => i.Comments!).LoadAsync();
+            var task6 = _context.Entry(issue).Reference(i => i.Status).LoadAsync();
+            await Task.WhenAll(task1, task2, task3, task4, task5, task6);
         }
 
         public async Task<IReadOnlyCollection<Issue>> GetByIds(IReadOnlyCollection<Guid> ids)

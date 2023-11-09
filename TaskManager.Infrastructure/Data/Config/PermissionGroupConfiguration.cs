@@ -1,14 +1,18 @@
-﻿namespace TaskManager.Infrastructure.Data.Config
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using TaskManager.Core.Entities;
+
+namespace TaskManager.Infrastructure.Data.Config
 {
-    /*public class PermissionGroupConfiguration : IEntityTypeConfiguration<PermissionGroup>
+    public class PermissionGroupConfiguration : IEntityTypeConfiguration<Permission>
     {
-        public void Configure(EntityTypeBuilder<PermissionGroup> builder)
+        public void Configure(EntityTypeBuilder<Permission> builder)
         {
             builder
                 .HasMany(pg => pg.PermissionRoles)
-                .WithOne(pr => pr.PermissionGroup)
-                .HasForeignKey(pr => pr.PermissionGroupId)
+                .WithOne(pr => pr.Permission)
+                .HasForeignKey(pr => pr.PermissionId)
                 .IsRequired();
         }
-    }*/
+    }
 }

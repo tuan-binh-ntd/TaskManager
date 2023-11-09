@@ -34,6 +34,9 @@
 	Add-Migration -Name Add-Icon-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
 	Add-Migration -Name Add-Notification-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
 	Add-Migration -Name Add-Filter-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
+	Add-Migration -Name Add-Permission-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
+	Add-Migration -Name Add-ProjectId-Col-To-AppRole-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
+	Add-Migration -Name Change-Name-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
 
 - Remove migration to DB
 	Remove-Migration -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API

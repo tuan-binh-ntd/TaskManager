@@ -82,6 +82,7 @@ builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IIssueEventRepository, IssueEventRepository>();
 builder.Services.AddScoped<IFilterRepository, FilterRepository>();
 builder.Services.AddScoped<ICriteriaRepository, CriteriaRepository>();
+builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
 
 // Services
 builder.Services.AddScoped<IJWTTokenService, JWTTokenService>();
