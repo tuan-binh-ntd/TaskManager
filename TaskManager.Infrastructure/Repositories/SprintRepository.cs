@@ -47,14 +47,7 @@ namespace TaskManager.Infrastructure.Repositories
         public async Task<IReadOnlyCollection<Issue>> GetIssues(Guid sprintId)
         {
             var issues = await _context.Issues
-                .AsNoTracking()
                 .Where(i => i.SprintId == sprintId)
-                .Include(i => i.Sprint)
-                .Include(i => i.IssueType)
-                .Include(i => i.IssueDetail)
-                .Include(i => i.IssueHistories)
-                .Include(i => i.Comments)
-                .Include(i => i.Attachments)
                 .ToListAsync();
             return issues.AsReadOnly();
         }

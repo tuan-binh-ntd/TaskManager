@@ -44,6 +44,18 @@
         public const string MediumName = "Medium";
         public const string HighName = "High";
         public const string HighestName = "Highest";
+
+        public const string LowestIcon = "fa-solid fa-angles-down";
+        public const string LowIcon = "fa-solid fa-arrow-down";
+        public const string MediumIcon = "fa-solid fa-equals";
+        public const string HighIcon = "fa-solid fa-chevron-up";
+        public const string HighestIcon = "fa-solid fa-angles-up";
+
+        public const string LowestColor = "#55a557";
+        public const string LowColor = "#2a8735";
+        public const string MediumColor = "#ffab00";
+        public const string HighColor = "#ff8d71";
+        public const string HighestColor = "#fe6d4b";
         // Issue Event
         public const string IssueCreatedName = "Issue Created (System)";
         public const string IssueUpdatedName = "Issue Updated (System)";

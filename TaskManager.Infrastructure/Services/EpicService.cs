@@ -66,7 +66,6 @@ namespace TaskManager.Infrastructure.Services
         {
             _issueRepository.LoadEntitiesRelationship(issue);
             var issueViewModel = _mapper.Map<IssueViewModel>(issue);
-            var childIssues = await _issueRepository.GetChildIssueOfIssue(issue.Id);
             if (issue.IssueDetail is not null)
             {
                 var issueDetail = _mapper.Map<IssueDetailViewModel>(issue.IssueDetail);
@@ -101,9 +100,10 @@ namespace TaskManager.Infrastructure.Services
             {
                 issueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
             }
+            var childIssues = await _issueRepository.GetChildIssueOfIssue(issue.Id);
             if (childIssues.Any())
             {
-                issueViewModel.ChildIssues = _mapper.Map<ICollection<ChildIssueViewModel>>(childIssues);
+                issueViewModel.ChildIssues = await ToChildIssueViewModels(childIssues);
             }
             return issueViewModel;
         }
@@ -112,6 +112,7 @@ namespace TaskManager.Infrastructure.Services
         {
             _issueRepository.LoadEntitiesRelationship(epic);
             var epicViewModel = _mapper.Map<EpicViewModel>(epic);
+
 
             if (epic.IssueDetail is not null)
             {
@@ -146,7 +147,7 @@ namespace TaskManager.Infrastructure.Services
             var childIssues = await _issueRepository.GetChildIssueOfEpic(epic.Id);
             if (childIssues.Any())
             {
-                epicViewModel.ChildIssues = _mapper.Map<ICollection<IssueViewModel>>(childIssues);
+                epicViewModel.ChildIssues = await ToIssueViewModels(childIssues);
             }
             return epicViewModel;
         }
@@ -154,7 +155,7 @@ namespace TaskManager.Infrastructure.Services
         private async Task<GetIssuesByEpicIdViewModel> ToGetIssuesByEpicIdViewModel(Issue epic, IReadOnlyCollection<Issue> childIssues)
         {
             var epicViewModel = _mapper.Map<EpicViewModel>(epic);
-            epicViewModel.ChildIssues = _mapper.Map<ICollection<IssueViewModel>>(childIssues);
+            epicViewModel.ChildIssues = await ToIssueViewModels(childIssues);
 
             if (epic.ProjectId is Guid projectId)
             {
@@ -190,6 +191,56 @@ namespace TaskManager.Infrastructure.Services
                     Epics = epicViewModel
                 };
             }
+        }
+
+        private async Task<IReadOnlyCollection<ChildIssueViewModel>> ToChildIssueViewModels(IReadOnlyCollection<Issue> issues)
+        {
+            var childIssueViewModels = new List<ChildIssueViewModel>();
+            if (issues.Any())
+            {
+                foreach (var issue in issues)
+                {
+                    var childIssueViewModel = await ToChildIssueViewModel(issue);
+                    childIssueViewModels.Add(childIssueViewModel);
+                }
+            }
+            return childIssueViewModels.AsReadOnly();
+        }
+
+        private async Task<ChildIssueViewModel> ToChildIssueViewModel(Issue childIssue)
+        {
+            await _issueRepository.LoadAttachments(childIssue);
+            await _issueRepository.LoadIssueDetail(childIssue);
+            await _issueRepository.LoadIssueType(childIssue);
+            await _issueRepository.LoadStatus(childIssue);
+
+            var childIssueViewModel = _mapper.Map<ChildIssueViewModel>(childIssue);
+
+            if (childIssue.IssueDetail is not null)
+            {
+                var issueDetail = _mapper.Map<IssueDetailViewModel>(childIssue.IssueDetail);
+                childIssueViewModel.IssueDetail = issueDetail;
+            }
+            if (childIssue.Attachments is not null && childIssue.Attachments.Any())
+            {
+                var attachments = _mapper.Map<ICollection<AttachmentViewModel>>(childIssue.Attachments);
+                childIssueViewModel.Attachments = attachments;
+            }
+            if (childIssue.IssueType is not null)
+            {
+                var issueType = _mapper.Map<IssueTypeViewModel>(childIssue.IssueType);
+                childIssueViewModel.IssueType = issueType;
+            }
+            if (childIssue.Status is not null)
+            {
+                var status = _mapper.Map<StatusViewModel>(childIssue.Status);
+                childIssueViewModel.Status = status;
+            }
+            if (childIssue.ParentId is Guid parentId)
+            {
+                childIssueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
+            }
+            return childIssueViewModel;
         }
         #endregion
 

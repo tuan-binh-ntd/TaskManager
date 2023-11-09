@@ -88,32 +88,32 @@ namespace TaskManager.Core.Interfaces.Repositories
         /// Load comments of issue
         /// </summary>
         /// <param name="issue">Issue entity</param>
-        void LoadComments(Issue issue);
+        Task LoadComments(Issue issue);
         /// <summary>
         /// Load issue type of issue
         /// </summary>
         /// <param name="issue">Issue entity</param>
-        void LoadIssueType(Issue issue);
+        Task LoadIssueType(Issue issue);
         /// <summary>
         /// Load issue detail of issue
         /// </summary>
         /// <param name="issue">Issue entity</param>
-        void LoadIssueDetail(Issue issue);
+        Task LoadIssueDetail(Issue issue);
         /// <summary>
         /// Load attachmennts of issue
         /// </summary>
         /// <param name="issue">Issue entity</param>
-        void LoadAttachments(Issue issue);
+        Task LoadAttachments(Issue issue);
         /// <summary>
         /// Load issue histories of issue
         /// </summary>
         /// <param name="issue">Issue entity</param>
-        void LoadIssueHistories(Issue issue);
+        Task LoadIssueHistories(Issue issue);
         /// <summary>
         /// Load status of issue
         /// </summary>
         /// <param name="issue">Issue entity</param>
-        void LoadStatus(Issue issue);
+        Task LoadStatus(Issue issue);
         /// <summary>
         /// Get parent name of issue
         /// </summary>

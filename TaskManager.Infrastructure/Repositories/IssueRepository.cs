@@ -123,34 +123,34 @@ namespace TaskManager.Infrastructure.Repositories
             return epics.AsReadOnly();
         }
 
-        public void LoadComments(Issue issue)
+        public async Task LoadComments(Issue issue)
         {
-            _context.Entry(issue).Collection(i => i.Comments!).LoadAsync();
+            await _context.Entry(issue).Collection(i => i.Comments!).LoadAsync();
         }
 
-        public void LoadIssueType(Issue issue)
+        public async Task LoadIssueType(Issue issue)
         {
-            _context.Entry(issue).Reference(i => i.IssueType).LoadAsync();
+            await _context.Entry(issue).Reference(i => i.IssueType).LoadAsync();
         }
 
-        public void LoadIssueDetail(Issue issue)
+        public async Task LoadIssueDetail(Issue issue)
         {
-            _context.Entry(issue).Reference(i => i.IssueDetail).LoadAsync();
+            await _context.Entry(issue).Reference(i => i.IssueDetail).LoadAsync();
         }
 
-        public void LoadAttachments(Issue issue)
+        public async Task LoadAttachments(Issue issue)
         {
-            _context.Entry(issue).Collection(i => i.Attachments!).LoadAsync();
+            await _context.Entry(issue).Collection(i => i.Attachments!).LoadAsync();
         }
 
-        public void LoadIssueHistories(Issue issue)
+        public async Task LoadIssueHistories(Issue issue)
         {
-            _context.Entry(issue).Collection(i => i.IssueHistories!).LoadAsync();
+            await _context.Entry(issue).Collection(i => i.IssueHistories!).LoadAsync();
         }
 
-        public void LoadStatus(Issue issue)
+        public async Task LoadStatus(Issue issue)
         {
-            _context.Entry(issue).Reference(i => i.Status).LoadAsync();
+            await _context.Entry(issue).Reference(i => i.Status).LoadAsync();
         }
 
         public async Task<string> GetParentName(Guid parentId)

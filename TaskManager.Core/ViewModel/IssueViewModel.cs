@@ -26,7 +26,7 @@ namespace TaskManager.Core.ViewModel
         public ICollection<CommentViewModel>? Comments { get; set; }
         public ICollection<AttachmentViewModel>? Attachments { get; set; }
         public IssueDetailViewModel? IssueDetail { get; set; }
-        public ICollection<ChildIssueViewModel>? ChildIssues { get; set; }
+        public IReadOnlyCollection<ChildIssueViewModel>? ChildIssues { get; set; }
         public StatusViewModel? Status { get; set; }
     }
 
@@ -79,6 +79,7 @@ namespace TaskManager.Core.ViewModel
         public Guid? ParentId { get; set; }
         public Guid? SprintId { get; set; }
         public Guid? BacklogId { get; set; }
+        public string ParentName { get; set; } = string.Empty;
         public IssueTypeViewModel? IssueType { get; set; }
         public ICollection<IssueHistoryViewModel>? IssueHistories { get; set; }
         public ICollection<CommentViewModel>? Comments { get; set; }
@@ -110,6 +111,6 @@ namespace TaskManager.Core.ViewModel
         public ICollection<AttachmentViewModel>? Attachments { get; set; }
         public IssueDetailViewModel? IssueDetail { get; set; }
         public StatusViewModel? Status { get; set; }
-        public ICollection<IssueViewModel>? ChildIssues { get; set; }
+        public IReadOnlyCollection<IssueViewModel>? ChildIssues { get; set; }
     }
 }

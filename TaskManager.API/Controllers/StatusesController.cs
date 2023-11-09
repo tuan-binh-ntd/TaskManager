@@ -41,5 +41,13 @@ namespace TaskManager.API.Controllers
             var res = await _statusService.Delete(id);
             return CustomResult(res, HttpStatusCode.OK);
         }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(IReadOnlyCollection<StatusViewModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Get(Guid projectId)
+        {
+            var res = await _statusService.Gets(projectId);
+            return CustomResult(res, HttpStatusCode.OK);
+        }
     }
 }

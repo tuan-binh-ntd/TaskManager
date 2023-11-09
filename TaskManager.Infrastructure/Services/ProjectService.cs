@@ -74,10 +74,10 @@ namespace TaskManager.Infrastructure.Services
 
         private async Task<IssueViewModel> ToIssueViewModel(Issue issue)
         {
-            _issueRepository.LoadAttachments(issue);
-            _issueRepository.LoadIssueDetail(issue);
-            _issueRepository.LoadIssueType(issue);
-            _issueRepository.LoadStatus(issue);
+            await _issueRepository.LoadAttachments(issue);
+            await _issueRepository.LoadIssueDetail(issue);
+            await _issueRepository.LoadIssueType(issue);
+            await _issueRepository.LoadStatus(issue);
             var issueViewModel = _mapper.Map<IssueViewModel>(issue);
 
             if (issue.IssueDetail is not null)
@@ -103,6 +103,11 @@ namespace TaskManager.Infrastructure.Services
             if (issue.ParentId is Guid parentId)
             {
                 issueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
+            }
+            var childIssue = await _issueRepository.GetChildIssueOfIssue(issue.Id);
+            if (childIssue.Any())
+            {
+                issueViewModel.ChildIssues = await ToChildIssueViewModels(childIssue);
             }
             return issueViewModel;
         }
@@ -389,7 +394,7 @@ namespace TaskManager.Infrastructure.Services
             var childIssues = await _issueRepository.GetChildIssueOfEpic(epic.Id);
             if (childIssues.Any())
             {
-                epicViewModel.ChildIssues = _mapper.Map<ICollection<IssueViewModel>>(childIssues);
+                epicViewModel.ChildIssues = await ToIssueViewModels(childIssues);
             }
             return epicViewModel;
         }
@@ -452,41 +457,96 @@ namespace TaskManager.Infrastructure.Services
                 {
                     Name = CoreConstants.LowestName,
                     Description = "Trivial problem with little or no impact on progress.",
-                    Color = "#999999",
-                    ProjectId = project.Id
+                    Color = CoreConstants.LowestColor,
+                    ProjectId = project.Id,
+                    Icon = CoreConstants.LowestIcon
                 },
                 new Priority()
                 {
                     Name = CoreConstants.LowName,
                     Description = "Minor problem or easily worked around.",
-                    Color = "#707070",
-                    ProjectId = project.Id
+                    Color = CoreConstants.LowColor,
+                    ProjectId = project.Id,
+                    Icon = CoreConstants.LowIcon
                 },
                 new Priority()
                 {
                     Name = CoreConstants.MediumName,
                     Description = "Has the potential to affect progress.",
-                    Color = "#f79232",
-                    ProjectId = project.Id
+                    Color = CoreConstants.MediumIcon,
+                    ProjectId = project.Id,
+                    Icon = CoreConstants.MediumIcon
                 },
                 new Priority()
                 {
                     Name = CoreConstants.HighName,
                     Description = "Serious problem that could block progress.",
-                    Color = "#f15C75",
-                    ProjectId = project.Id
+                    Color = CoreConstants.HighColor,
+                    ProjectId = project.Id,
+                    Icon = CoreConstants.HighIcon
                 },
                 new Priority()
                 {
                     Name = CoreConstants.HighestName,
                     Description = "This problem will block progress.",
-                    Color = "#d04437",
-                    ProjectId = project.Id
+                    Color = CoreConstants.HighestColor,
+                    ProjectId = project.Id,
+                    Icon = CoreConstants.HighestIcon
                 }
             };
 
             _priorityRepository.AddRange(priorities);
             await _priorityRepository.UnitOfWork.SaveChangesAsync();
+        }
+
+        private async Task<IReadOnlyCollection<ChildIssueViewModel>> ToChildIssueViewModels(IReadOnlyCollection<Issue> issues)
+        {
+            var childIssueViewModels = new List<ChildIssueViewModel>();
+            if (issues.Any())
+            {
+                foreach (var issue in issues)
+                {
+                    var childIssueViewModel = await ToChildIssueViewModel(issue);
+                    childIssueViewModels.Add(childIssueViewModel);
+                }
+            }
+            return childIssueViewModels.AsReadOnly();
+        }
+
+        private async Task<ChildIssueViewModel> ToChildIssueViewModel(Issue childIssue)
+        {
+            await _issueRepository.LoadAttachments(childIssue);
+            await _issueRepository.LoadIssueDetail(childIssue);
+            await _issueRepository.LoadIssueType(childIssue);
+            await _issueRepository.LoadStatus(childIssue);
+
+            var childIssueViewModel = _mapper.Map<ChildIssueViewModel>(childIssue);
+
+            if (childIssue.IssueDetail is not null)
+            {
+                var issueDetail = _mapper.Map<IssueDetailViewModel>(childIssue.IssueDetail);
+                childIssueViewModel.IssueDetail = issueDetail;
+            }
+            if (childIssue.Attachments is not null && childIssue.Attachments.Any())
+            {
+                var attachments = _mapper.Map<ICollection<AttachmentViewModel>>(childIssue.Attachments);
+                childIssueViewModel.Attachments = attachments;
+            }
+            if (childIssue.IssueType is not null)
+            {
+                var issueType = _mapper.Map<IssueTypeViewModel>(childIssue.IssueType);
+                childIssueViewModel.IssueType = issueType;
+            }
+            if (childIssue.Status is not null)
+            {
+                var status = _mapper.Map<StatusViewModel>(childIssue.Status);
+                childIssueViewModel.Status = status;
+            }
+            if (childIssue.ParentId is Guid parentId)
+            {
+                childIssueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
+            }
+            return childIssueViewModel;
         }
         #endregion
 

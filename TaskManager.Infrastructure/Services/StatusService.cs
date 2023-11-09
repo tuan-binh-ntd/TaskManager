@@ -37,6 +37,12 @@ namespace TaskManager.Infrastructure.Services
             return id;
         }
 
+        public async Task<IReadOnlyCollection<StatusViewModel>> Gets(Guid projectId)
+        {
+            var statuses = await _statusRepository.GetByProjectId(projectId);
+            return _mapper.Map<IReadOnlyCollection<StatusViewModel>>(statuses);
+        }
+
         public async Task<StatusViewModel> Update(Guid id, UpdateStatusDto updateStatusDto)
         {
             var status = await _statusRepository.GetById(id);
