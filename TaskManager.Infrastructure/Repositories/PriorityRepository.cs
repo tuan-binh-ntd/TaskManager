@@ -42,7 +42,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<Priority>> GetByProjectId(Guid projectId)
         {
-            var priorities = await _context.Priorities.AsNoTracking().Where(p => p.ProjectId == projectId || p.ProjectId == null).ToListAsync();
+            var priorities = await _context.Priorities.AsNoTracking().Where(p => p.ProjectId == projectId).ToListAsync();
             return priorities!;
         }
 
@@ -59,7 +59,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<PaginationResult<Priority>> GetByProjectId(Guid projectId, PaginationInput paginationInput)
         {
-            var query = _context.Priorities.AsNoTracking().Where(p => p.ProjectId == projectId || p.ProjectId == null);
+            var query = _context.Priorities.AsNoTracking().Where(p => p.ProjectId == projectId);
             return await query.Pagination(paginationInput);
         }
     }

@@ -117,5 +117,54 @@
         public const string ProductOwnerName = "Product Owner";
         public const string ScrumMasterName = "Scrum Master";
         public const string DeveloperName = "Developer";
+        // Permission
+        public const string SprintPermissionName = "Sprint";
+
+        public const string CreateSprintPermissionName = "Create Sprint";
+        public const string UpdateSprintPermissionName = "Update Sprint";
+        public const string DeleteSprintPermissionName = "Delete Sprint";
+
+        public const string EpicPermissionName = "Epic";
+
+        public const string CreateEpicPermissionName = "Create Epic";
+        public const string UpdateEpicPermissionName = "Update Epic";
+        public const string DeleteEpicPermissionName = "Delete Epic";
+
+        public const string IssuePermissionName = "Issue";
+
+        public const string CreateIssuePermissionName = "Create Issue";
+        public const string UpdateIssuePermissionName = "Update Issue";
+        public const string DeleteIssuePermissionName = "Delete Issue";
+
+        public const string ChildIssuePermissionName = "Child Issue";
+
+        public const string CreateChildIssuePermission = "Create Child Issue";
+        public const string UpdateChildIssuePermission = "Update Child Issue";
+        public const string DeleteChildIssuePermission = "Delete Child Issue";
+
+        public const string CommentPermissionName = "Comment";
+
+        public const string CreateCommentPermissionName = "Create Comment";
+        public const string UpdateCommentPermissionName = "Update Comment";
+        public const string DeleteCommentPermissionName = "Delete Comment";
+
+        public const string IssueTypePermissionName = "Issue Type";
+
+        public const string CreateIssueTypePermissionName = "Create Issue Type";
+        public const string UpdateIssueTypePermissionName = "Update Issue Type";
+        public const string DeleteIssueTypePermissionName = "Delete Issue Type";
+
+        public const string StatusPermissionName = "Status";
+
+        public const string CreateStatusPermissionName = "Create Status";
+        public const string UpdateStatusPermissionName = "Update Status";
+        public const string DeleteStatusPermissionName = "Delete Status";
+
+        public const string PriorityPermissionName = "Priority";
+
+        public const string CreatePriorityPermissionName = "Create Priority";
+        public const string UpdatePriorityPermissionName = "Update Priority";
+        public const string DeletePriorityPermissionName = "Delete Priority";
+
     }
 }

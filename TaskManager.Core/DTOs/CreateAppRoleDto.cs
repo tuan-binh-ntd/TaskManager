@@ -6,5 +6,7 @@ namespace TaskManager.Core.DTOs
     {
         [Required]
         public string Name { get; set; } = string.Empty;
+        [Required]
+        public Guid ProjectId { get; set; }
     }
 }
