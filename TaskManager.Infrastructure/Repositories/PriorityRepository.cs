@@ -51,9 +51,9 @@ namespace TaskManager.Infrastructure.Repositories
             _context.Entry(priority).State = EntityState.Modified;
         }
 
-        public async Task<Priority> GetNormal()
+        public async Task<Priority> GetMediumByProjectId(Guid projectId)
         {
-            var priority = await _context.Priorities.AsNoTracking().FirstOrDefaultAsync(p => p.Name == CoreConstants.LowestName);
+            var priority = await _context.Priorities.AsNoTracking().FirstOrDefaultAsync(p => p.Name == CoreConstants.MediumName && p.ProjectId == projectId);
             return priority!;
         }
 

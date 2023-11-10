@@ -323,7 +323,7 @@ namespace TaskManager.Infrastructure.Services
 
         private async Task CreateBacklogAndProjectConfigurationForProject(Project project)
         {
-            var normalPriority = await _priorityRepository.GetNormal();
+            var mediumPriority = await _priorityRepository.GetMediumByProjectId(project.Id);
             Backlog backlog = new()
             {
                 Name = project.Name,
@@ -339,7 +339,7 @@ namespace TaskManager.Infrastructure.Services
                 IssueCode = 0,
                 SprintCode = 0,
                 Code = project.Code,
-                DefaultPriorityId = normalPriority.Id,
+                DefaultPriorityId = mediumPriority.Id,
             };
 
             _projectConfigurationRepository.Add(projectConfiguration);
@@ -477,7 +477,7 @@ namespace TaskManager.Infrastructure.Services
                 {
                     Name = CoreConstants.MediumName,
                     Description = "Has the potential to affect progress.",
-                    Color = CoreConstants.MediumIcon,
+                    Color = CoreConstants.MediumColor,
                     ProjectId = project.Id,
                     Icon = CoreConstants.MediumIcon
                 },

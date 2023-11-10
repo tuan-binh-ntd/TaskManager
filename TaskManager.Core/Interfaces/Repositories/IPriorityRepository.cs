@@ -11,7 +11,7 @@ namespace TaskManager.Core.Interfaces.Repositories
         void AddRange(IReadOnlyCollection<Priority> priorities);
         void Update(Priority priority);
         void Delete(Guid id);
-        Task<Priority> GetNormal();
+        Task<Priority> GetMediumByProjectId(Guid projectId);
         Task<PaginationResult<Priority>> GetByProjectId(Guid projectId, PaginationInput paginationInput);
     }
 }
