@@ -274,7 +274,8 @@ namespace TaskManager.Infrastructure.Services
                 Code = $"{projectConfiguration.Code}-{issueIndex}",
                 StatusId = createTransition.ToStatusId,
                 PriorityId = projectConfiguration.DefaultPriorityId,
-                Watcher = new()
+                Watcher = new(),
+                ParentId = createIssueByNameDto.ParentId
             };
 
             if (sprintId is not null)

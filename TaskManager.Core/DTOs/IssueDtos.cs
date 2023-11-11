@@ -68,6 +68,7 @@ namespace TaskManager.Core.DTOs
         public Guid IssueTypeId { get; set; }
         public Guid CreatorUserId { get; set; }
         public Guid ProjectId { get; set; }
+        public Guid? ParentId { get; set; }
     }
 
     public class CreateChildIssueDto

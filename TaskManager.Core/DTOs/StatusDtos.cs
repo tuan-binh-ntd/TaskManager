@@ -7,6 +7,7 @@ namespace TaskManager.Core.DTOs
     public class CreateStatusDto
     {
         public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
         //Relationship
         public Guid? ProjectId { get; set; }
         public Guid StatusCategoryId { get; set; }
@@ -14,7 +15,8 @@ namespace TaskManager.Core.DTOs
 
     public class UpdateStatusDto : BaseDto<UpdateStatusDto, Status>
     {
-        public string Name { get; set; } = string.Empty;
+        public string? Name { get; set; } = string.Empty;
+        public string? Description { get; set; } = string.Empty;
         //Relationship
         public Guid? StatusCategoryId { get; set; }
 
