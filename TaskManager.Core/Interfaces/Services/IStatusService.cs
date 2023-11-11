@@ -1,4 +1,5 @@
 ﻿using TaskManager.Core.DTOs;
+using TaskManager.Core.Helper;
 using TaskManager.Core.ViewModel;
 
 namespace TaskManager.Core.Interfaces.Services
@@ -8,6 +9,6 @@ namespace TaskManager.Core.Interfaces.Services
         Task<StatusViewModel> Create(CreateStatusDto createStatusDto);
         Task<StatusViewModel> Update(Guid id, UpdateStatusDto updateStatusDto);
         Task<Guid> Delete(Guid id);
-        Task<IReadOnlyCollection<StatusViewModel>> Gets(Guid projectId);
+        Task<object> Gets(Guid projectId, PaginationInput paginationInput);
     }
 }

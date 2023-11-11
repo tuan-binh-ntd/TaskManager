@@ -2,6 +2,7 @@
 using MapsterMapper;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
@@ -37,10 +38,18 @@ namespace TaskManager.Infrastructure.Services
             return id;
         }
 
-        public async Task<IReadOnlyCollection<StatusViewModel>> Gets(Guid projectId)
+        public async Task<object> Gets(Guid projectId, PaginationInput paginationInput)
         {
-            var statuses = await _statusRepository.GetByProjectId(projectId);
-            return _mapper.Map<IReadOnlyCollection<StatusViewModel>>(statuses);
+            if (paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))
+            {
+                var statuses = await _statusRepository.GetByProjectIdPaging(projectId, paginationInput);
+                return statuses;
+            }
+            else
+            {
+                var statuses = await _statusRepository.GetByProjectId(projectId);
+                return _mapper.Map<IReadOnlyCollection<StatusViewModel>>(statuses);
+            }
         }
 
         public async Task<StatusViewModel> Update(Guid id, UpdateStatusDto updateStatusDto)

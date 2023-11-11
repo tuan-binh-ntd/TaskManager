@@ -1,4 +1,5 @@
 ﻿using TaskManager.Core.Entities;
+using TaskManager.Core.Helper;
 
 namespace TaskManager.Core.Interfaces.Repositories
 {
@@ -11,5 +12,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         Task<IReadOnlyCollection<Status>> GetByProjectId(Guid projectId);
         Task<Status> GetById(Guid id);
         Task<Status> GetUnreleasedStatus(Guid projectId);
+        Task<PaginationResult<Status>> GetByProjectIdPaging(Guid projectId, PaginationInput paginationInput);
     }
 }
