@@ -267,7 +267,7 @@ namespace TaskManager.Infrastructure.Services
             var createTransition = _transitionRepository.GetCreateTransitionByProjectId(createEpicDto.ProjectId);
             var creatorUser = await _userManager.FindByIdAsync(createEpicDto.CreatorUserId.ToString());
 
-            var issueType = await _issueTypeRepository.GetEpic();
+            var issueType = await _issueTypeRepository.GetEpic(createEpicDto.ProjectId);
 
             var issue = new Issue()
             {

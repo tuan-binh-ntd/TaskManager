@@ -74,12 +74,6 @@ namespace TaskManager.Infrastructure.Repositories
         {
             var childIssues = await _context.Issues
                 .Where(i => i.ParentId == parentId)
-                .Include(i => i.Backlog)
-                .Include(i => i.IssueType)
-                .Include(i => i.IssueDetail)
-                .Include(i => i.IssueHistories)
-                .Include(i => i.Comments)
-                .Include(i => i.Attachments)
                 .ToListAsync();
             return childIssues.AsReadOnly();
         }

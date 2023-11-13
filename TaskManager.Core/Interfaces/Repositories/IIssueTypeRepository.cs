@@ -13,7 +13,7 @@ namespace TaskManager.Core.Interfaces.Repositories
         Task<IReadOnlyCollection<IssueTypeViewModel>> GetsByProjectId(Guid projectId);
         Task<IssueType> Get(Guid id);
         Task<IssueType> GetSubtask();
-        Task<IssueType> GetEpic();
+        Task<IssueType> GetEpic(Guid projectId);
         Task<PaginationResult<IssueTypeViewModel>> GetsByProjectIdPaging(Guid projectId, PaginationInput paginationInput);
         void AddRange(IReadOnlyCollection<IssueType> issueTypes);
     }

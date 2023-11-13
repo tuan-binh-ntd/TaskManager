@@ -76,10 +76,10 @@ namespace TaskManager.Infrastructure.Repositories
             return issueType!;
         }
 
-        public async Task<IssueType> GetEpic()
+        public async Task<IssueType> GetEpic(Guid projectId)
         {
-            var issueType = await _context.IssueTypes.AsNoTracking().
-               Where(e => e.Name == CoreConstants.EpicName).SingleOrDefaultAsync();
+            var issueType = await _context.IssueTypes.AsNoTracking()
+                .Where(e => e.Name == CoreConstants.EpicName && e.ProjectId == projectId).SingleOrDefaultAsync();
             return issueType!;
         }
 
