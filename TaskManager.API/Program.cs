@@ -235,9 +235,6 @@ if (app.Environment.IsProduction())
             }
         });
     });
-
-    app.UseForwardedHeaders();
-    app.UseHttpsRedirection();
 }
 else
 {
