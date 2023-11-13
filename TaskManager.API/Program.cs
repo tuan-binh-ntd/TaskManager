@@ -1,16 +1,13 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Swashbuckle.AspNetCore.Filters;
-using System.Net;
 using System.Text;
 using TaskManager.API.Configurations;
 using TaskManager.Core.Entities;
-using TaskManager.Core.Extensions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Infrastructure;
@@ -207,66 +204,66 @@ builder.Host.UseSerilog();
 
 var app = builder.Build();
 
-if (app.Environment.IsProduction())
-{
-    app.UseExceptionHandler(errorApp =>
-    {
-        errorApp.Run(async context =>
-        {
-            var url = $"{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}{context.Request.QueryString}";
-            var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
-            var logger = app.Services.GetRequiredService<ILogger<Program>>();
-            logger.LogError(exceptionHandlerPathFeature?.Error, "Error url: {url}", url);
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+//if (app.Environment.IsProduction())
+//{
+//    app.UseExceptionHandler(errorApp =>
+//    {
+//        errorApp.Run(async context =>
+//        {
+//            var url = $"{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}{context.Request.QueryString}";
+//            var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+//            var logger = app.Services.GetRequiredService<ILogger<Program>>();
+//            logger.LogError(exceptionHandlerPathFeature?.Error, "Error url: {url}", url);
+//            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-            if (context.Request.Path.ToString().Contains("/api/"))
-            {
-                context.Response.ContentType = "application/json";
-                await context.Response.WriteAsync(new
-                {
-                    status = 500,
-                    message = "Something went wrong."
-                }.ToJson());
-            }
-            else
-            {
-                context.Response.ContentType = "text/html";
-                await context.Response.WriteAsync("Internal server error.");
-            }
-        });
-    });
+//            if (context.Request.Path.ToString().Contains("/api/"))
+//            {
+//                context.Response.ContentType = "application/json";
+//                await context.Response.WriteAsync(new
+//                {
+//                    status = 500,
+//                    message = "Something went wrong."
+//                }.ToJson());
+//            }
+//            else
+//            {
+//                context.Response.ContentType = "text/html";
+//                await context.Response.WriteAsync("Internal server error.");
+//            }
+//        });
+//    });
 
-    app.UseForwardedHeaders();
-    app.UseHttpsRedirection();
-}
-else
-{
-    app.UseExceptionHandler(errorApp =>
-    {
-        errorApp.Run(async context =>
-        {
-            var url = $"{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}{context.Request.QueryString}";
-            var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
-            var logger = app.Services.GetRequiredService<ILogger<Program>>();
-            logger.LogError(exceptionHandlerPathFeature?.Error, "Error url: {url}", url);
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            if (context.Request.Path.ToString().Contains("/api/"))
-            {
-                context.Response.ContentType = "application/json";
-                await context.Response.WriteAsync(new
-                {
-                    status = 500,
-                    message = "Something went wrong."
-                }.ToJson());
-            }
-            else
-            {
-                context.Response.ContentType = "text/html";
-                await context.Response.WriteAsync("Internal server error.");
-            }
-        });
-    });
-}
+//    app.UseForwardedHeaders();
+//    app.UseHttpsRedirection();
+//}
+//else
+//{
+//    app.UseExceptionHandler(errorApp =>
+//    {
+//        errorApp.Run(async context =>
+//        {
+//            var url = $"{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}{context.Request.QueryString}";
+//            var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+//            var logger = app.Services.GetRequiredService<ILogger<Program>>();
+//            logger.LogError(exceptionHandlerPathFeature?.Error, "Error url: {url}", url);
+//            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+//            if (context.Request.Path.ToString().Contains("/api/"))
+//            {
+//                context.Response.ContentType = "application/json";
+//                await context.Response.WriteAsync(new
+//                {
+//                    status = 500,
+//                    message = "Something went wrong."
+//                }.ToJson());
+//            }
+//            else
+//            {
+//                context.Response.ContentType = "text/html";
+//                await context.Response.WriteAsync("Internal server error.");
+//            }
+//        });
+//    });
+//}
 
 // Seeding
 using var scope = app.Services.CreateScope();
