@@ -290,6 +290,8 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+app.MapGet("time/utc", () => Results.Ok(DateTime.UtcNow));
+
 app.UseDefaultFiles();
 
 app.UseStaticFiles();
