@@ -26,6 +26,7 @@ namespace TaskManager.Infrastructure.Services
         private readonly IIssueRepository _issueRepository;
         private readonly IPriorityRepository _priorityRepository;
         private readonly RoleManager<AppRole> _roleManager;
+        private readonly IPermissionRepository _permissionRepository;
         private readonly IMapper _mapper;
 
         public ProjectService(
@@ -42,6 +43,7 @@ namespace TaskManager.Infrastructure.Services
             IIssueRepository issueRepository,
             IPriorityRepository priorityRepository,
             RoleManager<AppRole> roleManager,
+            IPermissionRepository permissionRepository,
             IMapper mapper
             )
         {
@@ -58,6 +60,7 @@ namespace TaskManager.Infrastructure.Services
             _issueRepository = issueRepository;
             _priorityRepository = priorityRepository;
             _roleManager = roleManager;
+            _permissionRepository = permissionRepository;
             _mapper = mapper;
         }
 
@@ -555,24 +558,54 @@ namespace TaskManager.Infrastructure.Services
 
         private async Task CreateRolesForProject(Project project)
         {
+            var permissions = await _permissionRepository.GetAll();
+            var productOwnerPermissionRoles = new List<PermissionRole>();
+            var scrumMasterPermissionRoles = new List<PermissionRole>();
+            var developerPermissionRoles = new List<PermissionRole>();
+
+            var productOwnerRole = new AppRole()
+            {
+                Name = CoreConstants.ProductOwnerName,
+                ProjectId = project.Id
+            };
+
+            var scrumMasterRole = new AppRole()
+            {
+                Name = CoreConstants.ScrumMasterName,
+                ProjectId = project.Id
+            };
+            var developerRole = new AppRole()
+            {
+                Name = CoreConstants.DeveloperName,
+                ProjectId = project.Id
+            };
+
             var roles = new List<AppRole>()
             {
-                new AppRole()
-                {
-                    Name = CoreConstants.ProductOwnerName,
-                    ProjectId = project.Id
-                },
-                new AppRole()
-                {
-                    Name = CoreConstants.ScrumMasterName,
-                    ProjectId = project.Id
-                },
-                new AppRole()
-                {
-                    Name = CoreConstants.DeveloperName,
-                    ProjectId = project.Id
-                },
+                productOwnerRole, scrumMasterRole, developerRole
             };
+
+            foreach (var permission in permissions)
+            {
+                var permissionRole = new PermissionRole()
+                {
+                    PermissionId = permission.Id,
+                    RoleId = productOwnerRole.Id
+                };
+                productOwnerPermissionRoles.Add(permissionRole);
+
+                permissionRole.RoleId = scrumMasterRole.Id;
+
+                scrumMasterPermissionRoles.Add(permissionRole);
+
+                permissionRole.RoleId = developerRole.Id;
+
+                developerPermissionRoles.Add(permissionRole);
+            }
+
+            productOwnerRole.PermissionRoles = productOwnerPermissionRoles;
+            scrumMasterRole.PermissionRoles = scrumMasterPermissionRoles;
+            developerRole.PermissionRoles = developerPermissionRoles;
 
             foreach (var role in roles)
             {

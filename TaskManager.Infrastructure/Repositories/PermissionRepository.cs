@@ -36,5 +36,11 @@ namespace TaskManager.Infrastructure.Repositories
         {
             _context.Entry(permission).State = EntityState.Modified;
         }
+
+        public async Task<IReadOnlyCollection<Permission>> GetAll()
+        {
+            var permissions = await _context.Permissions.ToListAsync();
+            return permissions.AsReadOnly();
+        }
     }
 }

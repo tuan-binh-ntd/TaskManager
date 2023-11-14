@@ -8,5 +8,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         Permission Add(Permission permission);
         void Update(Permission permission);
         void Delete(Guid id);
+        Task<IReadOnlyCollection<Permission>> GetAll();
     }
 }
