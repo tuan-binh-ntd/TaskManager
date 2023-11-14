@@ -33,7 +33,6 @@ namespace TaskManager.Infrastructure.Services
             AppRole appRole = new()
             {
                 Name = appRoleDto.Name,
-                ProjectId = appRoleDto.ProjectId,
             };
             await _roleManager.CreateAsync(appRole);
             return _mapper.Map<RoleViewModel>(appRole);
@@ -77,7 +76,7 @@ namespace TaskManager.Infrastructure.Services
 
         public async Task<IReadOnlyCollection<RoleViewModel>> GetByProjectId(Guid projectId)
         {
-            var roles = await _roleManager.Roles.Where(r => r.ProjectId == projectId).ToListAsync();
+            var roles = await _roleManager.Roles.ToListAsync();
             var roleViewModels = roles.Adapt<IReadOnlyCollection<RoleViewModel>>();
             return roleViewModels;
         }
@@ -92,7 +91,6 @@ namespace TaskManager.Infrastructure.Services
 #pragma warning restore CA2208 // Instantiate argument exceptions correctly
             }
             role.Name = appRoleDto.Name;
-            role.ProjectId = appRoleDto.ProjectId;
             await _roleManager.UpdateAsync(role);
             return _mapper.Map<RoleViewModel>(role);
         }

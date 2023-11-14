@@ -19,5 +19,6 @@ namespace TaskManager.Core.Entities
         public ICollection<Transition>? Transitions { get; set; }
         public Workflow? Workflow { get; set; }
         public ICollection<Priority>? Priorities { get; set; }
+        public ICollection<PermissionGroup>? PermissionGroups { get; set; }
     }
 }

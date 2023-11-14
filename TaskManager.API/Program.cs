@@ -80,6 +80,7 @@ builder.Services.AddScoped<IIssueEventRepository, IssueEventRepository>();
 builder.Services.AddScoped<IFilterRepository, FilterRepository>();
 builder.Services.AddScoped<ICriteriaRepository, CriteriaRepository>();
 builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
+builder.Services.AddScoped<IPermissionGroupRepository, PermissionGroupRepository>();
 
 // Services
 builder.Services.AddScoped<IJWTTokenService, JWTTokenService>();
@@ -290,7 +291,7 @@ app.UseDefaultFiles();
 
 app.UseStaticFiles();
 
-//app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins("http://localhost:3000"));
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins("http://localhost:3000"));
 
 app.UseAuthentication();
 

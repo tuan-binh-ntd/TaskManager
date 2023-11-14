@@ -1,6 +1,5 @@
 ﻿using Mapster;
 using MapsterMapper;
-using Microsoft.AspNetCore.Identity;
 using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
@@ -25,8 +24,8 @@ namespace TaskManager.Infrastructure.Services
         private readonly IWorkflowRepository _workflowRepository;
         private readonly IIssueRepository _issueRepository;
         private readonly IPriorityRepository _priorityRepository;
-        private readonly RoleManager<AppRole> _roleManager;
         private readonly IPermissionRepository _permissionRepository;
+        private readonly IPermissionGroupRepository _permissionGroupRepository;
         private readonly IMapper _mapper;
 
         public ProjectService(
@@ -42,8 +41,8 @@ namespace TaskManager.Infrastructure.Services
             IWorkflowRepository workflowRepository,
             IIssueRepository issueRepository,
             IPriorityRepository priorityRepository,
-            RoleManager<AppRole> roleManager,
             IPermissionRepository permissionRepository,
+            IPermissionGroupRepository permissionGroupRepository,
             IMapper mapper
             )
         {
@@ -59,8 +58,8 @@ namespace TaskManager.Infrastructure.Services
             _workflowRepository = workflowRepository;
             _issueRepository = issueRepository;
             _priorityRepository = priorityRepository;
-            _roleManager = roleManager;
             _permissionRepository = permissionRepository;
+            _permissionGroupRepository = permissionGroupRepository;
             _mapper = mapper;
         }
 
@@ -131,6 +130,7 @@ namespace TaskManager.Infrastructure.Services
             var statuses = await _statusRepository.GetByProjectId(project.Id);
             var epics = await _issueRepository.GetEpicByProjectId(project.Id);
             var priorities = await _priorityRepository.GetByProjectId(project.Id);
+            var permissionGroups = await _permissionGroupRepository.GetByProjectId(project.Id);
             if (sprints.Any())
             {
                 foreach (var sprint in sprints)
@@ -150,6 +150,7 @@ namespace TaskManager.Infrastructure.Services
             var epicViewModels = await ToEpicViewModels(epics);
             projectViewModel.Epics = epicViewModels.ToList();
             projectViewModel.Priorities = _mapper.Map<ICollection<PriorityViewModel>>(priorities);
+            projectViewModel.PermissionGroups = permissionGroups;
             return projectViewModel;
         }
 
@@ -563,24 +564,24 @@ namespace TaskManager.Infrastructure.Services
             var scrumMasterPermissionRoles = new List<PermissionRole>();
             var developerPermissionRoles = new List<PermissionRole>();
 
-            var productOwnerRole = new AppRole()
+            var productOwnerRole = new PermissionGroup()
             {
                 Name = CoreConstants.ProductOwnerName,
                 ProjectId = project.Id
             };
 
-            var scrumMasterRole = new AppRole()
+            var scrumMasterRole = new PermissionGroup()
             {
                 Name = CoreConstants.ScrumMasterName,
                 ProjectId = project.Id
             };
-            var developerRole = new AppRole()
+            var developerRole = new PermissionGroup()
             {
                 Name = CoreConstants.DeveloperName,
                 ProjectId = project.Id
             };
 
-            var roles = new List<AppRole>()
+            var permissionGroups = new List<PermissionGroup>()
             {
                 productOwnerRole, scrumMasterRole, developerRole
             };
@@ -590,15 +591,23 @@ namespace TaskManager.Infrastructure.Services
                 var permissionRole = new PermissionRole()
                 {
                     PermissionId = permission.Id,
-                    RoleId = productOwnerRole.Id
+                    PermissionGroupId = productOwnerRole.Id
                 };
                 productOwnerPermissionRoles.Add(permissionRole);
 
-                permissionRole.RoleId = scrumMasterRole.Id;
+                permissionRole = new PermissionRole()
+                {
+                    PermissionId = permission.Id,
+                    PermissionGroupId = scrumMasterRole.Id
+                };
 
                 scrumMasterPermissionRoles.Add(permissionRole);
 
-                permissionRole.RoleId = developerRole.Id;
+                permissionRole = new PermissionRole()
+                {
+                    PermissionId = permission.Id,
+                    PermissionGroupId = developerRole.Id
+                };
 
                 developerPermissionRoles.Add(permissionRole);
             }
@@ -607,16 +616,24 @@ namespace TaskManager.Infrastructure.Services
             scrumMasterRole.PermissionRoles = scrumMasterPermissionRoles;
             developerRole.PermissionRoles = developerPermissionRoles;
 
-            foreach (var role in roles)
-            {
-                await _roleManager.CreateAsync(role);
-            }
+            _permissionGroupRepository.AddRange(permissionGroups);
+            await _permissionGroupRepository.UnitOfWork.SaveChangesAsync();
         }
         #endregion
 
         public async Task<Guid> Delete(Guid id)
         {
-            _projectRepository.Delete(id);
+            var project = await _projectRepository.GetById(id);
+            await _projectRepository.LoadIssueTypes(project);
+            await _projectRepository.LoadStatuses(project);
+            await _projectRepository.LoadBacklog(project);
+            await _projectRepository.LoadUserProjects(project);
+            await _projectRepository.LoadProjectConfiguration(project);
+            await _projectRepository.LoadTransition(project);
+            await _projectRepository.LoadWorkflow(project);
+            await _projectRepository.LoadPriorities(project);
+            await _projectRepository.LoadPermissionGroup(project);
+            _projectRepository.Delete(project);
             await _projectRepository.UnitOfWork.SaveChangesAsync();
             return id;
         }

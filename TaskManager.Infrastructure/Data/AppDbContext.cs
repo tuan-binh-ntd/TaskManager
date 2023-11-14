@@ -55,6 +55,7 @@ namespace TaskManager.Infrastructure.Data
         public DbSet<UserFilter> UserFilters => Set<UserFilter>();
         public DbSet<Permission> Permissions => Set<Permission>();
         public DbSet<PermissionRole> PermissionRoles => Set<PermissionRole>();
+        public DbSet<PermissionGroup> PermissionGroups => Set<PermissionGroup>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -16,6 +16,7 @@
         public ICollection<StatusViewModel>? Statuses { get; set; }
         public ICollection<EpicViewModel>? Epics { get; set; }
         public ICollection<PriorityViewModel>? Priorities { get; set; }
+        public IReadOnlyCollection<PermissionGroupViewModel>? PermissionGroups { get; set; }
     }
 
     public class BacklogViewModel

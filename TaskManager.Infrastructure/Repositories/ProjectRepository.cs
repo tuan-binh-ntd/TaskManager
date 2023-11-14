@@ -29,10 +29,9 @@ namespace TaskManager.Infrastructure.Repositories
             _context.Entry(project).State = EntityState.Modified;
         }
 
-        public void Delete(Guid id)
+        public void Delete(Project project)
         {
-            var project = _context.Projects.SingleOrDefault(p => p.Id == id);
-            _context.Projects.Remove(project!);
+            _context.Projects.Remove(project);
         }
 
         public async Task<IReadOnlyCollection<Project>> GetAll()
@@ -105,6 +104,51 @@ namespace TaskManager.Infrastructure.Repositories
         {
             var project = await _context.Projects.AsNoTracking().SingleOrDefaultAsync(p => p.Code == code);
             return project;
+        }
+
+        public async Task LoadIssueTypes(Project project)
+        {
+            await _context.Entry(project).Collection(p => p.IssueTypes!).LoadAsync();
+        }
+
+        public async Task LoadStatuses(Project project)
+        {
+            await _context.Entry(project).Collection(p => p.Statuses!).LoadAsync();
+        }
+
+        public async Task LoadBacklog(Project project)
+        {
+            await _context.Entry(project).Reference(p => p.Backlog).LoadAsync();
+        }
+
+        public async Task LoadUserProjects(Project project)
+        {
+            await _context.Entry(project).Collection(p => p.UserProjects!).LoadAsync();
+        }
+
+        public async Task LoadProjectConfiguration(Project project)
+        {
+            await _context.Entry(project).Reference(p => p.ProjectConfiguration).LoadAsync();
+        }
+
+        public async Task LoadTransition(Project project)
+        {
+            await _context.Entry(project).Collection(p => p.Transitions!).LoadAsync();
+        }
+
+        public async Task LoadWorkflow(Project project)
+        {
+            await _context.Entry(project).Reference(p => p.Workflow).LoadAsync();
+        }
+
+        public async Task LoadPriorities(Project project)
+        {
+            await _context.Entry(project).Collection(p => p.Priorities!).LoadAsync();
+        }
+
+        public async Task LoadPermissionGroup(Project project)
+        {
+            await _context.Entry(project).Collection(p => p.PermissionGroups!).LoadAsync();
         }
     }
 }

@@ -609,7 +609,7 @@ namespace TaskManager.Infrastructure.Data
             // Create role of system
             var roles = new List<AppRole>
             {
-                new AppRole{ Name = "Admin", ProjectId = Guid.Empty },
+                new AppRole{ Name = "Admin"},
             };
 
             foreach (var role in roles)

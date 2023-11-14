@@ -28,7 +28,13 @@ namespace TaskManager.Infrastructure.Data.Config
                 .HasMany(p => p.Priorities)
                 .WithOne(p => p.Project)
                 .HasForeignKey(p => p.ProjectId)
-                .IsRequired(false);
+                .IsRequired();
+
+            builder
+                .HasMany(p => p.PermissionGroups)
+                .WithOne(p => p.Project)
+                .HasForeignKey(p => p.ProjectId)
+                .IsRequired();
         }
     }
 }
