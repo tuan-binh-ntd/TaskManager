@@ -71,7 +71,7 @@ namespace TaskManager.Core.ViewModel
         public string? Description { get; set; } = string.Empty;
         public DateTime CreationTime { get; set; }
         public DateTime? CompleteDate { get; set; }
-        public string? Priority { get; set; } = string.Empty;
+        public Guid? PriorityId { get; set; }
         public Watcher? Watcher { get; set; }
         public string? Voted { get; set; } = string.Empty;
         public DateTime? StartDate { get; set; }
@@ -96,7 +96,7 @@ namespace TaskManager.Core.ViewModel
         public string? Description { get; set; } = string.Empty;
         public DateTime CreationTime { get; set; }
         public DateTime? CompleteDate { get; set; }
-        public string? Priority { get; set; } = string.Empty;
+        public Guid? PriorityId { get; set; }
         public Watcher? Watcher { get; set; }
         public string? Voted { get; set; } = string.Empty;
         public DateTime? StartDate { get; set; }
@@ -104,7 +104,6 @@ namespace TaskManager.Core.ViewModel
         public Guid? ParentId { get; set; }
         public Guid IssueTypeId { get; set; }
         public Guid StatusId { get; set; }
-        public Guid? PriorityId { get; set; }
         public IssueTypeViewModel? IssueType { get; set; }
         public ICollection<IssueHistoryViewModel>? IssueHistories { get; set; }
         public ICollection<CommentViewModel>? Comments { get; set; }
