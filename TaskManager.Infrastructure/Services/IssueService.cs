@@ -226,6 +226,16 @@ namespace TaskManager.Infrastructure.Services
             {
                 issue.Watcher.Users = issue.Watcher.Users.DistinctBy(i => i.Identity).ToList();
             }
+            if (updateIssueDto.SprintId is not null && updateIssueDto.BacklogId is null)
+            {
+                issue.SprintId = updateIssueDto.SprintId;
+                issue.BacklogId = null;
+            }
+            if (updateIssueDto.SprintId is null && updateIssueDto.BacklogId is not null)
+            {
+                issue.SprintId = null;
+                issue.BacklogId = updateIssueDto.BacklogId;
+            }
 
             issue = updateIssueDto.Adapt(issue);
             _issueRepository.Update(issue);
@@ -244,6 +254,8 @@ namespace TaskManager.Infrastructure.Services
             {
                 issueDetail.AssigneeId = updateIssueDto.AssigneeId;
             }
+
+            _issueDetailRepository.Update(issueDetail);
             await _issueDetailRepository.UnitOfWork.SaveChangesAsync();
             return await ToIssueViewModel(issue);
         }
