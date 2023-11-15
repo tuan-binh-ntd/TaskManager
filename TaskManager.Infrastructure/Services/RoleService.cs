@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
-using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
 
@@ -15,17 +14,14 @@ namespace TaskManager.Infrastructure.Services
     {
         private readonly IMapper _mapper;
         private readonly RoleManager<AppRole> _roleManager;
-        private readonly IPermissionRepository _permissionRepository;
 
         public RoleService(
             IMapper mapper,
-            RoleManager<AppRole> roleManager,
-            IPermissionRepository permissionRepository
+            RoleManager<AppRole> roleManager
             )
         {
             _mapper = mapper;
             _roleManager = roleManager;
-            _permissionRepository = permissionRepository;
         }
 
         public async Task<RoleViewModel> Create(CreateAppRoleDto appRoleDto)
@@ -38,14 +34,6 @@ namespace TaskManager.Infrastructure.Services
             return _mapper.Map<RoleViewModel>(appRole);
         }
 
-        public async Task<PermissionViewModel> CreatePermission(CreatePermissionDto createPermissionDto)
-        {
-            var permission = createPermissionDto.Adapt<Permission>();
-            _permissionRepository.Add(permission);
-            await _permissionRepository.UnitOfWork.SaveChangesAsync();
-            return _mapper.Map<PermissionViewModel>(permission);
-        }
-
         public async Task<Guid> Delete(Guid id)
         {
             var role = await _roleManager.FindByIdAsync(id.ToString());
@@ -53,13 +41,6 @@ namespace TaskManager.Infrastructure.Services
             var result = await _roleManager.DeleteAsync(role);
 
             return result.Succeeded ? id : Guid.Empty;
-        }
-
-        public async Task<Guid> DeletePermission(Guid id)
-        {
-            _permissionRepository.Delete(id);
-            await _permissionRepository.UnitOfWork.SaveChangesAsync();
-            return id;
         }
 
         public async Task<RoleViewModel> Get(Guid id)
@@ -93,16 +74,6 @@ namespace TaskManager.Infrastructure.Services
             role.Name = appRoleDto.Name;
             await _roleManager.UpdateAsync(role);
             return _mapper.Map<RoleViewModel>(role);
-        }
-
-        public async Task<PermissionViewModel> UpdatePermission(Guid id, UpdatePermissionDto updatePermissionDto)
-        {
-            var permission = await _permissionRepository.GetById(id);
-            permission.Name = updatePermissionDto.Name;
-            permission.ParentId = updatePermissionDto.ParentId;
-            _permissionRepository.Update(permission);
-            await _permissionRepository.UnitOfWork.SaveChangesAsync();
-            return _mapper.Map<PermissionViewModel>(permission);
         }
     }
 }

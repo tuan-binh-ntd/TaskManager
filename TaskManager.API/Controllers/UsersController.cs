@@ -115,10 +115,28 @@ namespace TaskManager.API.Controllers
         }
 
         //[HttpDelete, AllowAnonymous]
-        //public IActionResult Test(IFormFile file)
+        //public async Task<IActionResult> Test([FromForm] FileDetails fileDetails)
         //{
-        //    var res = _uploadFileService.UploadFile(file);
-        //    return CustomResult(res);
+        //    if (fileDetails.FileDetail != null)
+        //    {
+        //        await _uploadFileService.FileUploadAsync(fileDetails);
+        //    }
+        //    return CustomResult();
+        //}
+
+        ///// <summary>
+        ///// download file
+        ///// </summary>
+        ///// <param name="fileDetail"></param>
+        ///// <returns></returns>
+        //[HttpPost("Download"), AllowAnonymous]
+        //public async Task<IActionResult> DownloadFile(string fileName)
+        //{
+        //    if (fileName != null)
+        //    {
+        //        await _uploadFileService.FileDownloadAsync(fileName);
+        //    }
+        //    return Ok();
         //}
     }
 }

@@ -20,10 +20,9 @@ namespace TaskManager.Infrastructure.Repositories
             return _context.Permissions.Add(permission).Entity;
         }
 
-        public void Delete(Guid id)
+        public void Delete(Permission permission)
         {
-            var permission = _context.Permissions.Where(e => e.Id == id).FirstOrDefault();
-            _context.Permissions.Remove(permission!);
+            _context.Permissions.Remove(permission);
         }
 
         public async Task<Permission> GetById(Guid id)
@@ -41,6 +40,11 @@ namespace TaskManager.Infrastructure.Repositories
         {
             var permissions = await _context.Permissions.ToListAsync();
             return permissions.AsReadOnly();
+        }
+
+        public async Task LoadPermissionRoles(Permission permission)
+        {
+            await _context.Entry(permission).Collection(p => p.PermissionRoles!).LoadAsync();
         }
     }
 }

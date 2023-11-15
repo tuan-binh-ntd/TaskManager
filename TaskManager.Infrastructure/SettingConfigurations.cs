@@ -59,4 +59,10 @@
         public string UserName { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
     }
+
+    public class FileShareSettings
+    {
+        public string FileShareName { get; set; } = string.Empty;
+        public string ConnectionStrings { get; set; } = string.Empty;
+    }
 }

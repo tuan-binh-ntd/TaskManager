@@ -48,6 +48,7 @@ builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection(
 builder.Services.Configure<SftpServerSettings>(builder.Configuration.GetSection("SftpServerSettings"));
 builder.Services.Configure<ElasticConfigurationSettings>(builder.Configuration.GetSection("ElasticConfigurationSettings"));
 builder.Services.Configure<EmailConfigurationSettings>(builder.Configuration.GetSection("EmailConfigurationSettings"));
+builder.Services.Configure<FileShareSettings>(builder.Configuration.GetSection("FileShareSettings"));
 
 // Set Mapster
 builder.Services.AddMapster(); // From the configuration file
@@ -99,6 +100,8 @@ builder.Services.AddScoped<IVersionService, VersionService>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 builder.Services.AddScoped<IEpicService, EpicService>();
 builder.Services.AddScoped<IFilterService, FilterService>();
+builder.Services.AddScoped<IPermissionGroupService, PermissionGroupService>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
 // Add EmailService
 // End  Declaration DI
 

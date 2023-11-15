@@ -1,5 +1,4 @@
 ﻿using CoreApiResponse;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TaskManager.Core.DTOs;
@@ -9,7 +8,6 @@ using TaskManager.Core.ViewModel;
 namespace TaskManager.API.Controllers
 {
     [ApiController]
-    [Authorize]
     public class RolesController : BaseController
     {
         private readonly IRoleService _roleService;
@@ -21,7 +19,7 @@ namespace TaskManager.API.Controllers
             _roleService = roleService;
         }
 
-        [HttpGet("api/projects/{projectId}/[controller]")]
+        [HttpGet("api/[controller]")]
         [ProducesResponseType(typeof(IReadOnlyCollection<RoleViewModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Gets(Guid projectId)
         {
@@ -29,7 +27,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        [HttpGet("api/projects/{projectId}/[controller]/{id}")]
+        [HttpGet("api/[controller]/{id}")]
         [ProducesResponseType(typeof(RoleViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Get(Guid id)
         {
@@ -37,7 +35,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        [HttpPost("api/projects/{projectId}/[controller]")]
+        [HttpPost("api/[controller]")]
         [ProducesResponseType(typeof(RoleViewModel), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> Create(CreateAppRoleDto appRoleDto)
         {
@@ -45,7 +43,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.Created);
         }
 
-        [HttpPut("api/projects/{projectId}/[controller]/{id}")]
+        [HttpPut("api/[controller]/{id}")]
         [ProducesResponseType(typeof(RoleViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Update(Guid id, CreateAppRoleDto appRoleDto)
         {
@@ -53,7 +51,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        [HttpDelete("api/projects/{projectId}/[controller]/{id}")]
+        [HttpDelete("api/[controller]/{id}")]
         [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Delete(Guid id)
         {
