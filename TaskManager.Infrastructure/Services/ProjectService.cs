@@ -26,6 +26,7 @@ namespace TaskManager.Infrastructure.Services
         private readonly IPriorityRepository _priorityRepository;
         private readonly IPermissionRepository _permissionRepository;
         private readonly IPermissionGroupRepository _permissionGroupRepository;
+        private readonly IStatusCategoryRepository _stateCategoryRepository;
         private readonly IMapper _mapper;
 
         public ProjectService(
@@ -43,6 +44,7 @@ namespace TaskManager.Infrastructure.Services
             IPriorityRepository priorityRepository,
             IPermissionRepository permissionRepository,
             IPermissionGroupRepository permissionGroupRepository,
+            IStatusCategoryRepository stateCategoryRepository,
             IMapper mapper
             )
         {
@@ -60,6 +62,7 @@ namespace TaskManager.Infrastructure.Services
             _priorityRepository = priorityRepository;
             _permissionRepository = permissionRepository;
             _permissionGroupRepository = permissionGroupRepository;
+            _stateCategoryRepository = stateCategoryRepository;
             _mapper = mapper;
         }
 
@@ -131,6 +134,7 @@ namespace TaskManager.Infrastructure.Services
             var epics = await _issueRepository.GetEpicByProjectId(project.Id);
             var priorities = await _priorityRepository.GetByProjectId(project.Id);
             var permissionGroups = await _permissionGroupRepository.GetByProjectId(project.Id);
+            var statusCategories = _stateCategoryRepository.Gets();
             if (sprints.Any())
             {
                 foreach (var sprint in sprints)
@@ -144,13 +148,14 @@ namespace TaskManager.Infrastructure.Services
             projectViewModel.Leader = members.Where(m => m.Role == CoreConstants.LeaderRole).SingleOrDefault();
             projectViewModel.Members = members.Where(m => m.Role != CoreConstants.LeaderRole).ToList();
             projectViewModel.Backlog = backlog;
-            projectViewModel.Sprints = sprints.ToList();
-            projectViewModel.IssueTypes = issueTypes.ToList();
-            projectViewModel.Statuses = statuses.Adapt<ICollection<StatusViewModel>>();
+            projectViewModel.Sprints = sprints;
+            projectViewModel.IssueTypes = issueTypes;
+            projectViewModel.Statuses = statuses.Adapt<IReadOnlyCollection<StatusViewModel>>();
             var epicViewModels = await ToEpicViewModels(epics);
             projectViewModel.Epics = epicViewModels.ToList();
-            projectViewModel.Priorities = _mapper.Map<ICollection<PriorityViewModel>>(priorities);
+            projectViewModel.Priorities = _mapper.Map<IReadOnlyCollection<PriorityViewModel>>(priorities);
             projectViewModel.PermissionGroups = permissionGroups;
+            projectViewModel.StatusCategories = _mapper.Map<IReadOnlyCollection<StatusCategoryViewModel>>(statusCategories);
             return projectViewModel;
         }
 
