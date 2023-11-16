@@ -54,7 +54,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<SprintViewModel>> GetSprintByProjectId(Guid projectId)
         {
-            var sprints = await _context.Sprints.AsNoTracking().Where(e => e.ProjectId == projectId && e.IsComplete == true).ProjectToType<SprintViewModel>().ToListAsync();
+            var sprints = await _context.Sprints.AsNoTracking().Where(e => e.ProjectId == projectId && e.IsComplete != true).ProjectToType<SprintViewModel>().ToListAsync();
             return sprints.AsReadOnly();
         }
     }
