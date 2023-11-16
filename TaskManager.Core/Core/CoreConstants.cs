@@ -165,6 +165,8 @@
         public const string CreatePriorityPermissionName = "Create Priority";
         public const string UpdatePriorityPermissionName = "Update Priority";
         public const string DeletePriorityPermissionName = "Delete Priority";
-
+        // Complete Sprint
+        public const string NewSprintOption = "New sprint";
+        public const string BacklogOption = "Backlog";
     }
 }

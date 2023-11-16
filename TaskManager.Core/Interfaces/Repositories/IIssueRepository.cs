@@ -135,6 +135,17 @@ namespace TaskManager.Core.Interfaces.Repositories
         /// </summary>
         /// <returns>List of issue</returns>
         Task<IReadOnlyCollection<Issue>> GetUpdatedAWeekAgo();
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="versionId">Id of version</param>
+        /// <returns>List of issue</returns>
         Task<IReadOnlyCollection<Issue>> GetChildIssueOfVersion(Guid versionId);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sprintId">Id of sprint</param>
+        /// <returns>List of issue</returns>
+        Task<IReadOnlyCollection<Issue>> GetNotDoneIssuesBySprintId(Guid sprintId, Guid projectId);
     }
 }

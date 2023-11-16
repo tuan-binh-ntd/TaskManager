@@ -37,4 +37,16 @@ namespace TaskManager.Core.DTOs
                 .IgnoreNullValues(true);
         }
     }
+
+    public class CompleteSprintDto
+    {
+        /// <summary>
+        /// Specific sprint name, New sprint or Backlog string
+        /// </summary>
+        public string Option { get; set; } = string.Empty;
+        /// <summary>
+        /// Field is not null when option is specific sprint name
+        /// </summary>
+        public Guid? SprintId { get; set; }
+    }
 }

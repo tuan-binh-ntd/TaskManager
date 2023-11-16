@@ -1,7 +1,9 @@
 ﻿using Mapster;
 using MapsterMapper;
+using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Exceptions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
@@ -14,6 +16,7 @@ namespace TaskManager.Infrastructure.Services
         private readonly IProjectConfigurationRepository _projectConfigurationRepository;
         private readonly IIssueRepository _issueRepository;
         private readonly ITransitionRepository _transitionRepository;
+        private readonly IBacklogRepository _backlogRepository;
         private readonly IMapper _mapper;
 
         public SprintService(
@@ -21,6 +24,7 @@ namespace TaskManager.Infrastructure.Services
             IProjectConfigurationRepository projectConfigurationRepository,
             IIssueRepository issueRepository,
             ITransitionRepository transitionRepository,
+            IBacklogRepository backlogRepository,
             IMapper mapper
             )
         {
@@ -28,6 +32,7 @@ namespace TaskManager.Infrastructure.Services
             _projectConfigurationRepository = projectConfigurationRepository;
             _issueRepository = issueRepository;
             _transitionRepository = transitionRepository;
+            _backlogRepository = backlogRepository;
             _mapper = mapper;
         }
 
@@ -100,29 +105,55 @@ namespace TaskManager.Infrastructure.Services
 
         public async Task<SprintViewModel> UpdateSprint(Guid id, UpdateSprintDto updateSprintDto)
         {
-            var sprint = _sprintRepository.Get(id);
-            if (sprint is null)
-            {
-#pragma warning disable CA2208 // Instantiate argument exceptions correctly
-                throw new ArgumentNullException(nameof(sprint));
-#pragma warning restore CA2208 // Instantiate argument exceptions correctly
-            }
+            var sprint = _sprintRepository.Get(id) ?? throw new SprintNullException();
             sprint = updateSprintDto.Adapt(sprint);
             _sprintRepository.Update(sprint);
             await _sprintRepository.UnitOfWork.SaveChangesAsync();
             return sprint.Adapt<SprintViewModel>();
         }
 
-        public async Task<SprintViewModel> CompleteSprint(Guid id, UpdateSprintDto updateSprintDto)
+        public async Task<SprintViewModel> CompleteSprint(Guid sprintId, Guid projectId, CompleteSprintDto completeSprintDto)
         {
-            var sprint = _sprintRepository.Get(id);
-            if (sprint is null)
+            var sprint = _sprintRepository.Get(sprintId) ?? throw new SprintNullException();
+
+            var issues = await _issueRepository.GetNotDoneIssuesBySprintId(sprintId, projectId);
+
+            if (completeSprintDto.Option == CoreConstants.NewSprintOption)
             {
-#pragma warning disable CA2208 // Instantiate argument exceptions correctly
-                throw new ArgumentNullException(nameof(sprint));
-#pragma warning restore CA2208 // Instantiate argument exceptions correctly
+                var newSprint = await CreateNoFieldSprint(projectId);
+
+                foreach (var issue in issues)
+                {
+                    issue.SprintId = newSprint.Id;
+                }
+                _issueRepository.UpdateRange(issues);
+                await _issueRepository.UnitOfWork.SaveChangesAsync();
             }
-            sprint = updateSprintDto.Adapt(sprint);
+            else if (completeSprintDto.Option == CoreConstants.BacklogOption)
+            {
+                var backlog = await _backlogRepository.GetByProjectId(projectId) ?? throw new BacklogNullException();
+                foreach (var issue in issues)
+                {
+                    issue.SprintId = null;
+                    issue.BacklogId = backlog.Id;
+                }
+                _issueRepository.UpdateRange(issues);
+                await _issueRepository.UnitOfWork.SaveChangesAsync();
+            }
+            else
+            {
+                if (completeSprintDto.SprintId is Guid specificSprintId)
+                {
+                    var specificSprint = _sprintRepository.Get(specificSprintId) ?? throw new SprintNullException();
+                    foreach (var issue in issues)
+                    {
+                        issue.SprintId = specificSprint.Id;
+                    }
+                    _issueRepository.UpdateRange(issues);
+                    await _issueRepository.UnitOfWork.SaveChangesAsync();
+                }
+            }
+
             sprint.IsComplete = true;
             sprint.IsStart = false;
             _sprintRepository.Update(sprint);

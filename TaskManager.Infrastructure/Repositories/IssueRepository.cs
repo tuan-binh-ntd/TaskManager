@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TaskManager.Core.Core;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Infrastructure.Data;
@@ -179,6 +180,21 @@ namespace TaskManager.Infrastructure.Repositories
         {
             var childIssues = await _context.Issues.Where(i => i.VersionId == versionId).ToListAsync();
             return childIssues.AsReadOnly();
+        }
+
+        public async Task<IReadOnlyCollection<Issue>> GetNotDoneIssuesBySprintId(Guid sprintId, Guid projectId)
+        {
+            var statusCategoryCodes = new List<string>()
+            {
+                CoreConstants.ToDoCode, CoreConstants.InProgressCode
+            };
+            var query = from sc in _context.StatusCategories.Where(sc => statusCategoryCodes.Contains(sc.Code))
+                        join s in _context.Statuses.Where(s => s.ProjectId == projectId) on sc.Id equals s.StatusCategoryId
+                        join i in _context.Issues.Where(i => i.SprintId == sprintId) on s.Id equals i.StatusId
+                        select i;
+
+            var issues = await query.ToListAsync();
+            return issues.AsReadOnly();
         }
     }
 }

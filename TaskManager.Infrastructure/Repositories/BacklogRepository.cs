@@ -23,9 +23,9 @@ namespace TaskManager.Infrastructure.Repositories
             return _context.Add(backlog).Entity;
         }
 
-        public Task<Backlog?> GetAsync(Guid id)
+        public async Task<Backlog?> GetAsync(Guid id)
         {
-            var backlog = _context.Backlogs.AsNoTracking().SingleOrDefaultAsync(e => e.Id == id);
+            var backlog = await _context.Backlogs.AsNoTracking().SingleOrDefaultAsync(e => e.Id == id);
             return backlog;
         }
 
@@ -46,6 +46,12 @@ namespace TaskManager.Infrastructure.Repositories
                                      Name = b.Name,
                                  }).FirstOrDefaultAsync();
             return backlog!;
+        }
+
+        public async Task<Backlog?> GetByProjectId(Guid projectId)
+        {
+            var backlog = await _context.Backlogs.Where(b => b.ProjectId == projectId).SingleOrDefaultAsync();
+            return backlog;
         }
     }
 }

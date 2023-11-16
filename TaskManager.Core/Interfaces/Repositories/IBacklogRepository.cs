@@ -9,5 +9,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         Backlog Add(Backlog backlog);
         Task<IReadOnlyCollection<Issue>> GetIssues(Guid backlogId);
         Task<BacklogViewModel> GetBacklog(Guid projectId);
+        Task<Backlog?> GetByProjectId(Guid projectId);
     }
 }
