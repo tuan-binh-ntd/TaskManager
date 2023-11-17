@@ -46,7 +46,7 @@ namespace TaskManager.Infrastructure.Services
             using Stream stream = file.OpenReadStream();
             shareFile.Create(stream.Length);
 
-            int blockSize = 8000 * 4000;
+            int blockSize = 4194304;
             long offset = 0;//Define http range offset
             BinaryReader reader = new(stream);
             while (true)
