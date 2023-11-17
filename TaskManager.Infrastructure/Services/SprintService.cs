@@ -36,6 +36,126 @@ namespace TaskManager.Infrastructure.Services
             _mapper = mapper;
         }
 
+        #region Private method
+        private async Task<SprintViewModel> ToSprintViewModel(Sprint sprint)
+        {
+            var issues = await _issueRepository.GetIssueBySprintId(sprint.Id);
+            var issueViewModels = await ToIssueViewModels(issues);
+            var sprintViewModel = _mapper.Map<SprintViewModel>(sprint);
+            sprintViewModel.Issues = issueViewModels;
+            return sprintViewModel;
+        }
+        private async Task<IReadOnlyCollection<IssueViewModel>> ToIssueViewModels(IReadOnlyCollection<Issue> issues)
+        {
+            var issueViewModels = new List<IssueViewModel>();
+            if (issues.Any())
+            {
+                foreach (var issue in issues)
+                {
+                    var issueViewModel = await ToIssueViewModel(issue);
+                    issueViewModels.Add(issueViewModel);
+                }
+            }
+            return issueViewModels.AsReadOnly();
+        }
+
+        private async Task<IssueViewModel> ToIssueViewModel(Issue issue)
+        {
+            await _issueRepository.LoadEntitiesRelationship(issue);
+            var issueViewModel = _mapper.Map<IssueViewModel>(issue);
+            var childIssues = await _issueRepository.GetChildIssueOfIssue(issue.Id);
+            if (issue.IssueDetail is not null)
+            {
+                var issueDetail = _mapper.Map<IssueDetailViewModel>(issue.IssueDetail);
+                issueViewModel.IssueDetail = issueDetail;
+            }
+            if (issue.IssueHistories is not null && issue.IssueHistories.Any())
+            {
+                var issueHistories = _mapper.Map<ICollection<IssueHistoryViewModel>>(issue.IssueHistories);
+                issueViewModel.IssueHistories = issueHistories;
+            }
+            if (issue.Comments is not null && issue.Comments.Any())
+            {
+                var comments = _mapper.Map<ICollection<CommentViewModel>>(issue.Comments);
+                issueViewModel.Comments = comments;
+            }
+            if (issue.Attachments is not null && issue.Attachments.Any())
+            {
+                var attachments = _mapper.Map<ICollection<AttachmentViewModel>>(issue.Attachments);
+                issueViewModel.Attachments = attachments;
+            }
+            if (issue.IssueType is not null)
+            {
+                var issueType = _mapper.Map<IssueTypeViewModel>(issue.IssueType);
+                issueViewModel.IssueType = issueType;
+            }
+            if (issue.Status is not null)
+            {
+                var status = _mapper.Map<StatusViewModel>(issue.Status);
+                issueViewModel.Status = status;
+            }
+            if (issue.ParentId is Guid parentId)
+            {
+                issueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
+            }
+            if (childIssues.Any())
+            {
+                issueViewModel.ChildIssues = await ToChildIssueViewModels(childIssues);
+            }
+            return issueViewModel;
+        }
+
+        private async Task<IReadOnlyCollection<ChildIssueViewModel>> ToChildIssueViewModels(IReadOnlyCollection<Issue> issues)
+        {
+            var childIssueViewModels = new List<ChildIssueViewModel>();
+            if (issues.Any())
+            {
+                foreach (var issue in issues)
+                {
+                    var childIssueViewModel = await ToChildIssueViewModel(issue);
+                    childIssueViewModels.Add(childIssueViewModel);
+                }
+            }
+            return childIssueViewModels.AsReadOnly();
+        }
+
+        private async Task<ChildIssueViewModel> ToChildIssueViewModel(Issue childIssue)
+        {
+            await _issueRepository.LoadAttachments(childIssue);
+            await _issueRepository.LoadIssueDetail(childIssue);
+            await _issueRepository.LoadIssueType(childIssue);
+            await _issueRepository.LoadStatus(childIssue);
+
+            var childIssueViewModel = _mapper.Map<ChildIssueViewModel>(childIssue);
+
+            if (childIssue.IssueDetail is not null)
+            {
+                var issueDetail = _mapper.Map<IssueDetailViewModel>(childIssue.IssueDetail);
+                childIssueViewModel.IssueDetail = issueDetail;
+            }
+            if (childIssue.Attachments is not null && childIssue.Attachments.Any())
+            {
+                var attachments = _mapper.Map<ICollection<AttachmentViewModel>>(childIssue.Attachments);
+                childIssueViewModel.Attachments = attachments;
+            }
+            if (childIssue.IssueType is not null)
+            {
+                var issueType = _mapper.Map<IssueTypeViewModel>(childIssue.IssueType);
+                childIssueViewModel.IssueType = issueType;
+            }
+            if (childIssue.Status is not null)
+            {
+                var status = _mapper.Map<StatusViewModel>(childIssue.Status);
+                childIssueViewModel.Status = status;
+            }
+            if (childIssue.ParentId is Guid parentId)
+            {
+                childIssueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
+            }
+            return childIssueViewModel;
+        }
+        #endregion
+
         public async Task<SprintViewModel> CreateNoFieldSprint(Guid projectId)
         {
             var projectConfiguration = _projectConfigurationRepository.GetByProjectId(projectId);
@@ -99,7 +219,7 @@ namespace TaskManager.Infrastructure.Services
             await _issueRepository.UnitOfWork.SaveChangesAsync();
 
             var sprintViewModel = _mapper.Map<SprintViewModel>(sprint!);
-            sprintViewModel.Issues = _mapper.Map<ICollection<IssueViewModel>>(issues);
+            sprintViewModel.Issues = _mapper.Map<IReadOnlyCollection<IssueViewModel>>(issues);
             return sprintViewModel;
         }
 
@@ -159,6 +279,12 @@ namespace TaskManager.Infrastructure.Services
             _sprintRepository.Update(sprint);
             await _sprintRepository.UnitOfWork.SaveChangesAsync();
             return sprint.Adapt<SprintViewModel>();
+        }
+
+        public async Task<SprintViewModel> GetById(Guid sprintId)
+        {
+            var sprint = _sprintRepository.Get(sprintId) ?? throw new SprintNullException();
+            return await ToSprintViewModel(sprint);
         }
     }
 }

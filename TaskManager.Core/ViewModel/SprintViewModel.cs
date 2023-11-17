@@ -9,6 +9,6 @@
         public string Goal { get; set; } = string.Empty;
         public bool IsStart { get; set; } = false;
         public bool IsComplete { get; set; } = false;
-        public ICollection<IssueViewModel>? Issues { get; set; }
+        public IReadOnlyCollection<IssueViewModel>? Issues { get; set; }
     }
 }

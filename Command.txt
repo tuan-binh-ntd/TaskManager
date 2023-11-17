@@ -39,6 +39,7 @@
 	Add-Migration -Name Change-Name-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
 	Add-Migration -Name Add-Description-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
 	Add-Migration -Name Add-PermissionGroup-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
+	Add-Migration -Name Add-ViewPermission-And-EditPermission-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
 
 - Remove migration to DB
 	Remove-Migration -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API

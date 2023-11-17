@@ -47,6 +47,8 @@ namespace TaskManager.Infrastructure.Repositories
                                 Id = pr.Id,
                                 Name = pr.Permission!.Name,
                                 ParentId = pr.Id,
+                                ViewPermission = pr.ViewPermission,
+                                EditPermission = pr.EditPermission
                             }).ToList()
                         };
             return await query.ToListAsync();

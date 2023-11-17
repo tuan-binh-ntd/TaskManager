@@ -596,25 +596,60 @@ namespace TaskManager.Infrastructure.Services
                 var permissionRole = new PermissionRole()
                 {
                     PermissionId = permission.Id,
-                    PermissionGroupId = productOwnerRole.Id
+                    PermissionGroupId = productOwnerRole.Id,
+
                 };
                 productOwnerPermissionRoles.Add(permissionRole);
 
-                permissionRole = new PermissionRole()
+                if (permission.Name != CoreConstants.ProjectPermissionName)
                 {
-                    PermissionId = permission.Id,
-                    PermissionGroupId = scrumMasterRole.Id
-                };
+                    permissionRole = new PermissionRole()
+                    {
+                        PermissionId = permission.Id,
+                        PermissionGroupId = scrumMasterRole.Id,
+                        ViewPermission = true,
+                        EditPermission = true,
+                    };
 
-                scrumMasterPermissionRoles.Add(permissionRole);
-
-                permissionRole = new PermissionRole()
+                    scrumMasterPermissionRoles.Add(permissionRole);
+                }
+                else
                 {
-                    PermissionId = permission.Id,
-                    PermissionGroupId = developerRole.Id
-                };
+                    permissionRole = new PermissionRole()
+                    {
+                        PermissionId = permission.Id,
+                        PermissionGroupId = scrumMasterRole.Id,
+                        ViewPermission = true,
+                        EditPermission = false,
+                    };
 
-                developerPermissionRoles.Add(permissionRole);
+                    scrumMasterPermissionRoles.Add(permissionRole);
+                }
+                if (permission.Name == CoreConstants.BacklogPermissionName)
+                {
+
+                    permissionRole = new PermissionRole()
+                    {
+                        PermissionId = permission.Id,
+                        PermissionGroupId = developerRole.Id,
+                        ViewPermission = true,
+                        EditPermission = true,
+                    };
+
+                    developerPermissionRoles.Add(permissionRole);
+                }
+                else
+                {
+                    permissionRole = new PermissionRole()
+                    {
+                        PermissionId = permission.Id,
+                        PermissionGroupId = developerRole.Id,
+                        ViewPermission = false,
+                        EditPermission = false,
+                    };
+
+                    developerPermissionRoles.Add(permissionRole);
+                }
             }
 
             productOwnerRole.PermissionRoles = productOwnerPermissionRoles;

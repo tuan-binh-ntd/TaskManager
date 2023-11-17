@@ -16,204 +16,73 @@ namespace TaskManager.Infrastructure.Data
             #region Permission
             if (await appDbContext.Permissions.AnyAsync()) return;
 
-            var sprintPermission = new Permission()
+            var timelinePermission = new Permission()
             {
-                Name = CoreConstants.SprintPermissionName,
+                Name = CoreConstants.TimelinePermissionName,
             };
 
-            var epicPermission = new Permission()
+            var backlogPermission = new Permission()
             {
-                Name = CoreConstants.EpicPermissionName,
+                Name = CoreConstants.BacklogPermissionName,
             };
 
-            var issuePermission = new Permission()
+            var boardPermission = new Permission()
             {
-                Name = CoreConstants.IssuePermissionName,
+                Name = CoreConstants.BoardPermissionName,
             };
 
-            var childIssuePermission = new Permission()
+            var codePermission = new Permission()
             {
-                Name = CoreConstants.ChildIssuePermissionName,
+                Name = CoreConstants.CodePermissionName,
             };
 
-            var commentPermission = new Permission()
+            var detailsPermission = new Permission()
             {
-                Name = CoreConstants.CommentPermissionName,
+                Name = CoreConstants.DetailsPermissionName,
             };
 
-            var issueTypePermission = new Permission()
+            var issueTypesPermission = new Permission()
             {
-                Name = CoreConstants.IssueTypePermissionName,
+                Name = CoreConstants.IssueTypesPermissionName,
             };
 
-            var statusPermission = new Permission()
+            var prioritiesPermission = new Permission()
             {
-                Name = CoreConstants.StatusPermissionName,
+                Name = CoreConstants.PrioritiesPermissionName,
             };
 
-            var priorityPermission = new Permission()
+            var statusesPermission = new Permission()
             {
-                Name = CoreConstants.PriorityPermissionName,
+                Name = CoreConstants.StatusesPermissionName,
+            };
+
+            var notificationsPermission = new Permission()
+            {
+                Name = CoreConstants.NotificationsPermissionName,
+            };
+
+            var accessPermission = new Permission()
+            {
+                Name = CoreConstants.AccessPermissionName,
+            };
+
+            var featuresPermission = new Permission()
+            {
+                Name = CoreConstants.FeaturesPermissionName,
+            };
+
+            var projectPermission = new Permission()
+            {
+                Name = CoreConstants.ProjectPermissionName,
             };
 
             var parentPermissions = new List<Permission>()
             {
-                sprintPermission, epicPermission, issuePermission, childIssuePermission, commentPermission, issueTypePermission, statusPermission, priorityPermission
+                timelinePermission, backlogPermission, boardPermission, codePermission, detailsPermission, issueTypesPermission, prioritiesPermission, statusesPermission, notificationsPermission, accessPermission, featuresPermission, projectPermission
             };
 
             appDbContext.Permissions.AddRange(parentPermissions);
             await appDbContext.SaveChangesAsync();
-
-            var childPermissions = new List<Permission>()
-            {
-                #region Child Sprint Permission
-                new Permission()
-                {
-                    Name = CoreConstants.CreateSprintPermissionName,
-                    ParentId = sprintPermission.Id
-                },
-                new Permission()
-                {
-                    Name = CoreConstants.UpdateSprintPermissionName,
-                    ParentId = sprintPermission.Id
-                },
-                new Permission()
-                {
-                    Name = CoreConstants.DeleteSprintPermissionName,
-                    ParentId = sprintPermission.Id
-                },
-                #endregion
-                   
-                #region Child Epic Permission
-                new Permission()
-                {
-                    Name = CoreConstants.CreateEpicPermissionName,
-                    ParentId = epicPermission.Id
-                },
-                new Permission()
-                {
-                    Name = CoreConstants.UpdateEpicPermissionName,
-                    ParentId = epicPermission.Id
-                },
-                new Permission()
-                {
-                    Name = CoreConstants.DeleteEpicPermissionName,
-                    ParentId = epicPermission.Id
-                },
-                #endregion
-
-                #region Child Issue Permission
-                new Permission()
-                {
-                    Name = CoreConstants.CreateIssuePermissionName,
-                    ParentId = issuePermission.Id
-                },
-                new Permission()
-                {
-                    Name = CoreConstants.UpdateIssuePermissionName,
-                    ParentId = issuePermission.Id
-                },
-                new Permission()
-                {
-                    Name = CoreConstants.DeleteIssuePermissionName,
-                    ParentId = issuePermission.Id
-                },
-                #endregion
-
-                #region Child Child Issue Permission
-                new Permission()
-                {
-                    Name = CoreConstants.CreateChildIssuePermission,
-                    ParentId = childIssuePermission.Id
-                },
-                new Permission()
-                {
-                    Name = CoreConstants.UpdateChildIssuePermission,
-                    ParentId = childIssuePermission.Id
-                },
-                new Permission()
-                {
-                    Name = CoreConstants.DeleteChildIssuePermission,
-                    ParentId = childIssuePermission.Id
-                },
-                #endregion
-
-                #region Child Comment Permission
-                new Permission()
-                {
-                    Name = CoreConstants.CreateCommentPermissionName,
-                    ParentId = commentPermission.Id
-                },
-                new Permission()
-                {
-                    Name = CoreConstants.UpdateCommentPermissionName,
-                    ParentId = commentPermission.Id
-                },
-                new Permission()
-                {
-                    Name = CoreConstants.DeleteCommentPermissionName,
-                    ParentId = commentPermission.Id
-                },
-                #endregion
-
-                #region Child Issue Type Permission
-                new Permission()
-                {
-                    Name = CoreConstants.CreateIssueTypePermissionName,
-                    ParentId = issueTypePermission.Id
-                },
-                new Permission()
-                {
-                    Name = CoreConstants.UpdateIssueTypePermissionName,
-                    ParentId = issueTypePermission.Id
-                },
-                new Permission()
-                {
-                    Name = CoreConstants.DeleteIssueTypePermissionName,
-                    ParentId = issueTypePermission.Id
-                },
-                #endregion
-
-                #region Child Status Permission
-                new Permission()
-                {
-                    Name = CoreConstants.CreateStatusPermissionName,
-                    ParentId = statusPermission.Id
-                },
-                new Permission()
-                {
-                    Name = CoreConstants.UpdateStatusPermissionName,
-                    ParentId = statusPermission.Id
-                },
-                new Permission()
-                {
-                    Name = CoreConstants.DeleteStatusPermissionName,
-                    ParentId = statusPermission.Id
-                },
-                #endregion
-
-                #region Child Priority Permission
-                new Permission()
-                {
-                    Name = CoreConstants.CreatePriorityPermissionName,
-                    ParentId = priorityPermission.Id
-                },
-                new Permission()
-                {
-                    Name = CoreConstants.UpdatePriorityPermissionName,
-                    ParentId = priorityPermission.Id
-                },
-                new Permission()
-                {
-                    Name = CoreConstants.DeletePriorityPermissionName,
-                    ParentId = priorityPermission.Id
-                },
-	            #endregion
-            };
-
-            appDbContext.Permissions.AddRange(childPermissions);
-            await appDbContext.SaveChangesAsync();
-
             #endregion
 
             #region Seed Criteria
