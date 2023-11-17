@@ -416,7 +416,7 @@ namespace TaskManager.Infrastructure.Services
         {
             var issueTypes = new List<IssueType>()
             {
-                new IssueType()
+                new()
                 {
                     Name = CoreConstants.EpicName,
                     Description = "Epics track collections of related bugs, stories, and tasks.",
@@ -424,7 +424,7 @@ namespace TaskManager.Infrastructure.Services
                     Level = 1,
                     ProjectId = project.Id,
                 },
-                new IssueType()
+                new()
                 {
                     Name = CoreConstants.BugName,
                     Description = "Bugs track problems or errors.",
@@ -432,7 +432,7 @@ namespace TaskManager.Infrastructure.Services
                     Level = 2,
                     ProjectId = project.Id,
                 },
-                new IssueType()
+                new()
                 {
                     Name = CoreConstants.StoryName,
                     Description = "Stories track functionality or features expressed as user goals.",
@@ -440,7 +440,7 @@ namespace TaskManager.Infrastructure.Services
                     Level = 2,
                     ProjectId = project.Id,
                 },
-                new IssueType()
+                new()
                 {
                     Name = CoreConstants.TaskName,
                     Description = "Tasks track small, distinct pieces of work.",
@@ -448,7 +448,7 @@ namespace TaskManager.Infrastructure.Services
                     Level = 2,
                     ProjectId = project.Id,
                 },
-                new IssueType()
+                new()
                 {
                     Name = CoreConstants.SubTaskName,
                     Description = "Subtasks track small pieces of work that are part of a larger task.",
@@ -466,7 +466,7 @@ namespace TaskManager.Infrastructure.Services
         {
             var priorities = new List<Priority>()
             {
-                new Priority()
+                new()
                 {
                     Name = CoreConstants.LowestName,
                     Description = "Trivial problem with little or no impact on progress.",
@@ -474,7 +474,7 @@ namespace TaskManager.Infrastructure.Services
                     ProjectId = project.Id,
                     Icon = CoreConstants.LowestIcon
                 },
-                new Priority()
+                new()
                 {
                     Name = CoreConstants.LowName,
                     Description = "Minor problem or easily worked around.",
@@ -482,7 +482,7 @@ namespace TaskManager.Infrastructure.Services
                     ProjectId = project.Id,
                     Icon = CoreConstants.LowIcon
                 },
-                new Priority()
+                new()
                 {
                     Name = CoreConstants.MediumName,
                     Description = "Has the potential to affect progress.",
@@ -490,7 +490,7 @@ namespace TaskManager.Infrastructure.Services
                     ProjectId = project.Id,
                     Icon = CoreConstants.MediumIcon
                 },
-                new Priority()
+                new()
                 {
                     Name = CoreConstants.HighName,
                     Description = "Serious problem that could block progress.",
@@ -498,7 +498,7 @@ namespace TaskManager.Infrastructure.Services
                     ProjectId = project.Id,
                     Icon = CoreConstants.HighIcon
                 },
-                new Priority()
+                new()
                 {
                     Name = CoreConstants.HighestName,
                     Description = "This problem will block progress.",

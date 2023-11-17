@@ -102,6 +102,7 @@ builder.Services.AddScoped<IEpicService, EpicService>();
 builder.Services.AddScoped<IFilterService, FilterService>();
 builder.Services.AddScoped<IPermissionGroupService, PermissionGroupService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<IAttachmentService, AttachmentService>();
 // Add EmailService
 // End  Declaration DI
 

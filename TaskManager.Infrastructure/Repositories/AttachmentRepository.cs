@@ -22,12 +22,6 @@ namespace TaskManager.Infrastructure.Repositories
             return _context.Attachments.Add(attachment).Entity.Adapt<AttachmentViewModel>();
         }
 
-        public void Delete(Guid id)
-        {
-            var attachment = _context.Attachments.SingleOrDefault(x => x.Id == id);
-            _context.Attachments.Remove(attachment!);
-        }
-
         public async Task<IReadOnlyCollection<AttachmentViewModel>> Gets()
         {
             var attachments = await _context.Attachments.AsNoTracking().ProjectToType<AttachmentViewModel>().ToListAsync();
@@ -37,6 +31,17 @@ namespace TaskManager.Infrastructure.Repositories
         public void Update(Attachment attachment)
         {
             _context.Entry(attachment).State = EntityState.Modified;
+        }
+
+        public void Delete(Attachment attachment)
+        {
+            _context.Attachments.Remove(attachment);
+        }
+
+        public async Task<Attachment?> GetById(Guid id)
+        {
+            var attachment = await _context.Attachments.Where(a => a.Id == id).FirstOrDefaultAsync();
+            return attachment;
         }
     }
 }

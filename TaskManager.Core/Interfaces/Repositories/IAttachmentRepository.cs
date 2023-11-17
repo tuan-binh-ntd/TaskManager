@@ -8,6 +8,7 @@ namespace TaskManager.Core.Interfaces.Repositories
         Task<IReadOnlyCollection<AttachmentViewModel>> Gets();
         AttachmentViewModel Add(Attachment attachment);
         void Update(Attachment attachment);
-        void Delete(Guid id);
+        void Delete(Attachment attachment);
+        Task<Attachment?> GetById(Guid id);
     }
 }

@@ -89,68 +89,52 @@ namespace TaskManager.Infrastructure.Data
             if (await appDbContext.Criterias.AnyAsync()) return;
             var criterias = new List<Criteria>
             {
-                new Criteria
-                {
+                new() {
                     Name = CoreConstants.ProjectCriteriaName,
                 },
-                new Criteria
-                {
+                new() {
                     Name = CoreConstants.TypeCriteriaName,
                 },
-                new Criteria
-                {
+                new() {
                     Name = CoreConstants.StatusCriteriaName,
                 },
-                new Criteria
-                {
+                new() {
                     Name = CoreConstants.AssigneeCriteriaName,
                 },
-                new Criteria
-                {
+                new() {
                     Name = CoreConstants.CreatedCriteriaName,
                 },
-                new Criteria
-                {
+                new() {
                     Name = CoreConstants.DueDateCriteriaName,
                 },
-                new Criteria
-                {
+                new() {
                     Name = CoreConstants.FixVersionsCriteriaName,
                 },
-                new Criteria
-                {
+                new() {
                     Name = CoreConstants.LabelsCriteriaName,
                 },
-                new Criteria
-                {
+                new() {
                     Name = CoreConstants.PriorityCriteriaName,
                 },
-                new Criteria
-                {
+                new() {
                     Name = CoreConstants.ReporterCriteriaName,
                 },
-                new Criteria
-                {
+                new() {
                     Name = CoreConstants.ResolutionCriteriaName,
                 },
-                new Criteria
-                {
+                new() {
                     Name = CoreConstants.ResolvedCriteriaName,
                 },
-                new Criteria
-                {
+                new() {
                     Name = CoreConstants.SprintCriteriaName,
                 },
-                new Criteria
-                {
+                new() {
                     Name = CoreConstants.StatusCategoryCriteriaName,
                 },
-                new Criteria
-                {
+                new() {
                     Name = CoreConstants.SummaryCriteriaName,
                 },
-                new Criteria
-                {
+                new() {
                     Name = CoreConstants.UpdatedCriteriaName,
                 },
             };
@@ -180,7 +164,7 @@ namespace TaskManager.Infrastructure.Data
 
             myOpenIssues.FilterCriterias = new List<FilterCriteria>()
             {
-                new FilterCriteria()
+                new()
                 {
                     FilterId = myOpenIssues.Id,
                     CriteriaId = assigneeCriteria!.Id,
@@ -189,7 +173,7 @@ namespace TaskManager.Infrastructure.Data
                         CurrentUser = true,
                     }.ToJson(),
                 },
-                new FilterCriteria()
+                new()
                 {
                     FilterId = myOpenIssues.Id,
                     CriteriaId = resolutionCriteria!.Id,
@@ -211,7 +195,7 @@ namespace TaskManager.Infrastructure.Data
 
             reportedByMe.FilterCriterias = new List<FilterCriteria>()
             {
-                new FilterCriteria()
+                new()
                 {
                     FilterId = reportedByMe.Id,
                     CriteriaId = reporterCriteria!.Id,
@@ -240,7 +224,7 @@ namespace TaskManager.Infrastructure.Data
 
             openIssues.FilterCriterias = new List<FilterCriteria>()
             {
-                new FilterCriteria()
+                new()
                 {
                     FilterId = openIssues.Id,
                     CriteriaId = resolutionCriteria!.Id,
@@ -262,7 +246,7 @@ namespace TaskManager.Infrastructure.Data
 
             doneIssues.FilterCriterias = new List<FilterCriteria>()
             {
-                new FilterCriteria()
+                new()
                 {
                     FilterId = doneIssues.Id,
                     CriteriaId = statusCategoryCriteria!.Id,
@@ -285,7 +269,7 @@ namespace TaskManager.Infrastructure.Data
 
             createdRecently.FilterCriterias = new List<FilterCriteria>()
             {
-                new FilterCriteria()
+                new()
                 {
                     FilterId = createdRecently.Id,
                     CriteriaId = createdCriteria!.Id,
@@ -306,7 +290,7 @@ namespace TaskManager.Infrastructure.Data
 
             resolvedRecently.FilterCriterias = new List<FilterCriteria>()
             {
-                new FilterCriteria()
+                new()
                 {
                     FilterId = resolvedRecently.Id,
                     CriteriaId = resolvedCriteria!.Id,
@@ -327,7 +311,7 @@ namespace TaskManager.Infrastructure.Data
 
             updatedRecently.FilterCriterias = new List<FilterCriteria>()
             {
-                new FilterCriteria()
+                new()
                 {
                     FilterId = updatedRecently.Id,
                     CriteriaId = updatedCriteria!.Id,
@@ -352,71 +336,71 @@ namespace TaskManager.Infrastructure.Data
             if (await appDbContext.IssueEvents.AnyAsync()) return;
             var issueEvemts = new List<IssueEvent>()
             {
-                new IssueEvent()
+                new()
                 {
                     Name = CoreConstants.IssueCreatedName
                 },
-                new IssueEvent()
+                new()
                 {
                     Name = CoreConstants.IssueUpdatedName
                 },
-                new IssueEvent()
+                new()
                 {
                     Name = CoreConstants.IssueAssignedName
                 },
-                new IssueEvent()
+                new()
                 {
                     Name = CoreConstants.IssueResolvedName
                 },
-                new IssueEvent()
+                new()
                 {
                     Name = CoreConstants.IssueClosedName
                 },
-                new IssueEvent()
+                new()
                 {
                     Name = CoreConstants.IssueCommentedName
                 },
-                new IssueEvent()
+                new()
                 {
                     Name = CoreConstants.IssueCommentEditedName
                 },
-                new IssueEvent()
+                new()
                 {
                     Name = CoreConstants.IssueCommentDeletedName
                 },
-                new IssueEvent()
+                new()
                 {
                     Name = CoreConstants.IssueReopenedName
                 },
-                new IssueEvent()
+                new()
                 {
                     Name = CoreConstants.IssueDeletedName
                 },
-                new IssueEvent()
+                new()
                 {
                     Name = CoreConstants.IssueMovedName
                 },
-                new IssueEvent()
+                new()
                 {
                     Name = CoreConstants.WorkLoggedOnIssueName
                 },
-                new IssueEvent()
+                new()
                 {
                     Name = CoreConstants.WorkStartedOnIssueName
                 },
-                new IssueEvent()
+                new()
                 {
                     Name = CoreConstants.WorkStoppedOnIssueName
                 },
-                new IssueEvent()
+                new()
                 {
                     Name = CoreConstants.IssueWorklogUpdatedName
                 },
-                new IssueEvent()
+                new()
                 {
                     Name = CoreConstants.IssueWorklogDeletedName
                 },
-                new IssueEvent()
+                new()
                 {
                     Name = CoreConstants.GenericEventName
                 },
@@ -430,25 +414,25 @@ namespace TaskManager.Infrastructure.Data
             if (await appDbContext.StatusCategories.AnyAsync()) return;
             var statusCategories = new List<StatusCategory>
             {
-                new StatusCategory()
+                new()
                 {
                     Name = "To-do status",
                     Color = "#dddddd",
                     Code = CoreConstants.ToDoCode
                 },
-                new StatusCategory()
+                new()
                 {
                     Name = "In-progress status",
                     Color = "#45b6fe",
                     Code = CoreConstants.InProgressCode
                 },
-                new StatusCategory()
+                new()
                 {
                     Name = "Done status",
                     Color = "#b4d3b2",
                     Code = CoreConstants.DoneCode
                 },
-                new StatusCategory()
+                new()
                 {
                     Name ="Hide status",
                     Color = "#26282A",
@@ -478,7 +462,7 @@ namespace TaskManager.Infrastructure.Data
             // Create role of system
             var roles = new List<AppRole>
             {
-                new AppRole{ Name = "Admin"},
+                new() { Name = "Admin"},
             };
 
             foreach (var role in roles)
