@@ -17,6 +17,7 @@ namespace TaskManager.Infrastructure.Services
         private readonly IIssueRepository _issueRepository;
         private readonly ITransitionRepository _transitionRepository;
         private readonly IBacklogRepository _backlogRepository;
+        private readonly IStatusRepository _statusRepository;
         private readonly IMapper _mapper;
 
         public SprintService(
@@ -25,6 +26,7 @@ namespace TaskManager.Infrastructure.Services
             IIssueRepository issueRepository,
             ITransitionRepository transitionRepository,
             IBacklogRepository backlogRepository,
+            IStatusRepository statusRepository,
             IMapper mapper
             )
         {
@@ -33,16 +35,24 @@ namespace TaskManager.Infrastructure.Services
             _issueRepository = issueRepository;
             _transitionRepository = transitionRepository;
             _backlogRepository = backlogRepository;
+            _statusRepository = statusRepository;
             _mapper = mapper;
         }
 
         #region Private method
-        private async Task<SprintViewModel> ToSprintViewModel(Sprint sprint)
+        private async Task<SprintViewModel> ToSprintViewModel(Sprint sprint, Guid projectId)
         {
-            var issues = await _issueRepository.GetIssueBySprintId(sprint.Id);
-            var issueViewModels = await ToIssueViewModels(issues);
             var sprintViewModel = _mapper.Map<SprintViewModel>(sprint);
-            sprintViewModel.Issues = issueViewModels;
+            sprintViewModel.IssueOnBoard = new Dictionary<string, IReadOnlyCollection<IssueViewModel>>();
+            var issues = await _issueRepository.GetIssueBySprintId(sprint.Id);
+            var statuses = await _statusRepository.GetByProjectId(projectId);
+            foreach (var status in statuses)
+            {
+                var issueByStatusIds = issues.Where(i => i.StatusId == status.Id).ToList();
+                var issueViewModels = await ToIssueViewModels(issueByStatusIds);
+                sprintViewModel.IssueOnBoard.Add(status.Name, issueViewModels);
+            }
+            //sprintViewModel.Issues = issueViewModels;
             return sprintViewModel;
         }
         private async Task<IReadOnlyCollection<IssueViewModel>> ToIssueViewModels(IReadOnlyCollection<Issue> issues)
@@ -281,10 +291,10 @@ namespace TaskManager.Infrastructure.Services
             return sprint.Adapt<SprintViewModel>();
         }
 
-        public async Task<SprintViewModel> GetById(Guid sprintId)
+        public async Task<SprintViewModel> GetById(Guid projectId, Guid sprintId)
         {
             var sprint = _sprintRepository.Get(sprintId) ?? throw new SprintNullException();
-            return await ToSprintViewModel(sprint);
+            return await ToSprintViewModel(sprint, projectId);
         }
     }
 }

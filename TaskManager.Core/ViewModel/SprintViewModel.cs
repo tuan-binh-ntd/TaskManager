@@ -10,5 +10,6 @@
         public bool IsStart { get; set; } = false;
         public bool IsComplete { get; set; } = false;
         public IReadOnlyCollection<IssueViewModel>? Issues { get; set; }
+        public Dictionary<string, IReadOnlyCollection<IssueViewModel>>? IssueOnBoard { get; set; }
     }
 }

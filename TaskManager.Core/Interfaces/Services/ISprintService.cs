@@ -11,6 +11,6 @@ namespace TaskManager.Core.Interfaces.Services
         Task<Guid> DeleteSprint(Guid id);
         Task<SprintViewModel> StartSprint(Guid projectId, Guid sprintId, UpdateSprintDto updateSprintDto);
         Task<SprintViewModel> CompleteSprint(Guid sprintId, Guid projectId, CompleteSprintDto completeSprintDto);
-        Task<SprintViewModel> GetById(Guid sprintId);
+        Task<SprintViewModel> GetById(Guid projectId, Guid sprintId);
     }
 }

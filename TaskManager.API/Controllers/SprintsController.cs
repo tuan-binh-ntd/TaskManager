@@ -70,9 +70,9 @@ namespace TaskManager.API.Controllers
 
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(SprintViewModel), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> Get(Guid id)
+        public async Task<IActionResult> Get(Guid projectId, Guid id)
         {
-            var res = await _sprintService.GetById(id);
+            var res = await _sprintService.GetById(projectId ,id);
             return CustomResult(res, HttpStatusCode.OK);
         }
     }
