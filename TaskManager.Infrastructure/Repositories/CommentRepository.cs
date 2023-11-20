@@ -44,5 +44,11 @@ namespace TaskManager.Infrastructure.Repositories
             var comments = await _context.Comments.AsNoTracking().Where(c => c.IssueId == issueId).ToListAsync();
             return comments.AsReadOnly();
         }
+
+        public async Task<Comment?> GetById(Guid id)
+        {
+            var comment = await _context.Comments.Where(c => c.Id == id).FirstOrDefaultAsync();
+            return comment;
+        }
     }
 }

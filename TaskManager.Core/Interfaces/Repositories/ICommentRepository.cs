@@ -10,5 +10,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         void Update(Comment comment);
         void Delete(Guid id);
         Task<IReadOnlyCollection<Comment>> GetByIssueId(Guid issueId);
+        Task<Comment?> GetById(Guid id);
     }
 }

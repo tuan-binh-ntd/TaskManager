@@ -1,5 +1,4 @@
-﻿using MapsterMapper;
-using TaskManager.Core.DTOs;
+﻿using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Exceptions;
 using TaskManager.Core.Extensions;
@@ -11,13 +10,11 @@ namespace TaskManager.Infrastructure.Services
 {
     public class PermissionGroupService : IPermissionGroupService
     {
-        private readonly IMapper _mapper;
 
         private readonly IPermissionGroupRepository _permissionGroupRepository;
 
-        public PermissionGroupService(IMapper mapper, IPermissionGroupRepository permissionGroupRepository)
+        public PermissionGroupService(IPermissionGroupRepository permissionGroupRepository)
         {
-            _mapper = mapper;
             _permissionGroupRepository = permissionGroupRepository;
         }
 

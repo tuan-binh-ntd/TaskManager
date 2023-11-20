@@ -3,6 +3,7 @@ using MapsterMapper;
 using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Exceptions;
 using TaskManager.Core.Extensions;
 using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Repositories;
@@ -25,7 +26,6 @@ namespace TaskManager.Infrastructure.Services
         private readonly IWorkflowRepository _workflowRepository;
         private readonly IIssueRepository _issueRepository;
         private readonly IPriorityRepository _priorityRepository;
-        private readonly IPermissionRepository _permissionRepository;
         private readonly IPermissionGroupRepository _permissionGroupRepository;
         private readonly IStatusCategoryRepository _stateCategoryRepository;
         private readonly IMapper _mapper;
@@ -43,7 +43,6 @@ namespace TaskManager.Infrastructure.Services
             IWorkflowRepository workflowRepository,
             IIssueRepository issueRepository,
             IPriorityRepository priorityRepository,
-            IPermissionRepository permissionRepository,
             IPermissionGroupRepository permissionGroupRepository,
             IStatusCategoryRepository stateCategoryRepository,
             IMapper mapper
@@ -61,7 +60,6 @@ namespace TaskManager.Infrastructure.Services
             _workflowRepository = workflowRepository;
             _issueRepository = issueRepository;
             _priorityRepository = priorityRepository;
-            _permissionRepository = permissionRepository;
             _permissionGroupRepository = permissionGroupRepository;
             _stateCategoryRepository = stateCategoryRepository;
             _mapper = mapper;
@@ -694,7 +692,7 @@ namespace TaskManager.Infrastructure.Services
 
         public async Task<Guid> Delete(Guid id)
         {
-            var project = await _projectRepository.GetById(id);
+            var project = await _projectRepository.GetById(id) ?? throw new ProjectNullException();
             await _projectRepository.LoadIssueTypes(project);
             await _projectRepository.LoadStatuses(project);
             await _projectRepository.LoadBacklog(project);

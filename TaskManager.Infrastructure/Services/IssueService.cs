@@ -18,9 +18,7 @@ namespace TaskManager.Infrastructure.Services
         private readonly IProjectConfigurationRepository _projectConfigurationRepository;
         private readonly IIssueTypeRepository _issueTypeRepository;
         private readonly ITransitionRepository _transitionRepository;
-        private readonly ICommentRepository _commentRepository;
         private readonly UserManager<AppUser> _userManager;
-        private readonly IProjectRepository _projectRepository;
         private readonly IBacklogRepository _backlogRepository;
         private readonly ISprintRepository _sprintRepository;
         private readonly IMapper _mapper;
@@ -32,9 +30,7 @@ namespace TaskManager.Infrastructure.Services
             IProjectConfigurationRepository projectConfigurationRepository,
             IIssueTypeRepository issueTypeRepository,
             ITransitionRepository transitionRepository,
-            ICommentRepository commentRepository,
             UserManager<AppUser> userManager,
-            IProjectRepository projectRepository,
             IBacklogRepository backlogRepository,
             ISprintRepository sprintRepository,
             IMapper mapper
@@ -46,9 +42,7 @@ namespace TaskManager.Infrastructure.Services
             _projectConfigurationRepository = projectConfigurationRepository;
             _issueTypeRepository = issueTypeRepository;
             _transitionRepository = transitionRepository;
-            _commentRepository = commentRepository;
             _userManager = userManager;
-            _projectRepository = projectRepository;
             _backlogRepository = backlogRepository;
             _sprintRepository = sprintRepository;
             _mapper = mapper;
@@ -458,12 +452,6 @@ namespace TaskManager.Infrastructure.Services
         {
             var issueHistories = await _issueHistoryRepository.GetByIssueId(issueId);
             return _mapper.Map<IReadOnlyCollection<IssueHistoryViewModel>>(issueHistories);
-        }
-
-        public async Task<IReadOnlyCollection<CommentViewModel>> GetCommentsByIssueId(Guid issueId)
-        {
-            var comments = await _commentRepository.GetByIssueId(issueId);
-            return _mapper.Map<IReadOnlyCollection<CommentViewModel>>(comments);
         }
 
         public async Task<IReadOnlyCollection<IssueForProjectViewModel>> GetIssuesForProject(Guid projectId)
