@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
-using TaskManager.Core.ViewModel;
 using TaskManager.Infrastructure.Data;
 
 namespace TaskManager.Infrastructure.Repositories
@@ -34,23 +33,25 @@ namespace TaskManager.Infrastructure.Repositories
             return permissionGroup!;
         }
 
-        public async Task<IReadOnlyCollection<PermissionGroupViewModel>> GetByProjectId(Guid projectId)
+        public async Task<IReadOnlyCollection<PermissionGroup>> GetByProjectId(Guid projectId)
         {
             var query = from pg in _context.PermissionGroups.Where(pg => pg.ProjectId == projectId)
-                        select new PermissionGroupViewModel
-                        {
-                            Id = pg.Id,
-                            Name = pg.Name,
-                            Permissions = pg.PermissionRoles!.Select(pr =>
-                            new PermissionViewModel
-                            {
-                                Id = pr.Id,
-                                Name = pr.Permission!.Name,
-                                ParentId = pr.Id,
-                                ViewPermission = pr.ViewPermission,
-                                EditPermission = pr.EditPermission
-                            }).ToList()
-                        };
+                        select pg;
+            //select new PermissionGroupViewModel
+            //{
+            //    Id = pg.Id,
+            //    Name = pg.Name,
+            //    Permissions = 
+            //    pg.PermissionRoles!.Select(pr =>
+            //    new PermissionViewModel
+            //    {
+            //        Id = pr.Id,
+            //        Name = pr.Permission!.Name,
+            //        ParentId = pr.Id,
+            //        ViewPermission = pr.ViewPermission,
+            //        EditPermission = pr.EditPermission
+            //    }).ToList()
+            //};
             return await query.ToListAsync();
         }
 

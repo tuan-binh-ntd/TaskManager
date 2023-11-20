@@ -7,7 +7,6 @@ using TaskManager.Core.ViewModel;
 
 namespace TaskManager.API.Controllers
 {
-    //[Route("api/sprints/{sprintId}/[controller]")]
     [ApiController]
     public class IssuesController : BaseController
     {
@@ -73,6 +72,14 @@ namespace TaskManager.API.Controllers
         public async Task<IActionResult> GetById(Guid id)
         {
             var res = await _issueService.GetById(id);
+            return CustomResult(res, HttpStatusCode.OK);
+        }
+
+        [HttpGet("api/projects/{projectId}/issues")]
+        [ProducesResponseType(typeof(IReadOnlyCollection<IssueForProjectViewModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Get(Guid projectId)
+        {
+            var res = await _issueService.GetIssuesForProject(projectId);
             return CustomResult(res, HttpStatusCode.OK);
         }
     }

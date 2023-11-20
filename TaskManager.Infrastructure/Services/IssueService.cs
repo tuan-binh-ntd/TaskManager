@@ -3,6 +3,7 @@ using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Exceptions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
@@ -19,7 +20,9 @@ namespace TaskManager.Infrastructure.Services
         private readonly ITransitionRepository _transitionRepository;
         private readonly ICommentRepository _commentRepository;
         private readonly UserManager<AppUser> _userManager;
-
+        private readonly IProjectRepository _projectRepository;
+        private readonly IBacklogRepository _backlogRepository;
+        private readonly ISprintRepository _sprintRepository;
         private readonly IMapper _mapper;
 
         public IssueService(
@@ -31,6 +34,9 @@ namespace TaskManager.Infrastructure.Services
             ITransitionRepository transitionRepository,
             ICommentRepository commentRepository,
             UserManager<AppUser> userManager,
+            IProjectRepository projectRepository,
+            IBacklogRepository backlogRepository,
+            ISprintRepository sprintRepository,
             IMapper mapper
             )
         {
@@ -42,6 +48,9 @@ namespace TaskManager.Infrastructure.Services
             _transitionRepository = transitionRepository;
             _commentRepository = commentRepository;
             _userManager = userManager;
+            _projectRepository = projectRepository;
+            _backlogRepository = backlogRepository;
+            _sprintRepository = sprintRepository;
             _mapper = mapper;
         }
 
@@ -154,6 +163,32 @@ namespace TaskManager.Infrastructure.Services
                 childIssueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
             }
             return childIssueViewModel;
+        }
+        private async Task<IssueForProjectViewModel> ToIssueForProjectViewModel(Issue issue)
+        {
+            await _issueRepository.LoadIssueType(issue);
+            return new IssueForProjectViewModel()
+            {
+                Id = issue.Id,
+                Name = issue.Name,
+                StartDate = issue.StartDate,
+                DueDate = issue.DueDate,
+                Type = issue.IssueType is null ? string.Empty : issue.IssueType.Name
+            };
+        }
+
+        private async Task<IReadOnlyCollection<IssueForProjectViewModel>> ToIssueForProjectViewModels(IReadOnlyCollection<Issue> issues)
+        {
+            var issueViewModels = new List<IssueForProjectViewModel>();
+            if (issues.Any())
+            {
+                foreach (var issue in issues)
+                {
+                    var issueViewModel = await ToIssueForProjectViewModel(issue);
+                    issueViewModels.Add(issueViewModel);
+                }
+            }
+            return issueViewModels.AsReadOnly();
         }
         #endregion
 
@@ -429,6 +464,26 @@ namespace TaskManager.Infrastructure.Services
         {
             var comments = await _commentRepository.GetByIssueId(issueId);
             return _mapper.Map<IReadOnlyCollection<CommentViewModel>>(comments);
+        }
+
+        public async Task<IReadOnlyCollection<IssueForProjectViewModel>> GetIssuesForProject(Guid projectId)
+        {
+            var backlog = await _backlogRepository.GetByProjectId(projectId) ?? throw new BacklogNullException();
+            var issuesOfBacklog = await _backlogRepository.GetIssues(backlog.Id);
+            var sprints = await _sprintRepository.GetSprintByProjectId(projectId);
+            var issues = new List<Issue>();
+            issues.AddRange(issuesOfBacklog);
+
+            if (sprints.Any())
+            {
+                foreach (var sprint in sprints)
+                {
+                    var issuesOfSprint = await _sprintRepository.GetIssues(sprint.Id);
+                    issues.AddRange(issuesOfSprint);
+                }
+            }
+
+            return await ToIssueForProjectViewModels(issues);
         }
     }
 }

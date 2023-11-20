@@ -3,6 +3,7 @@ using MapsterMapper;
 using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Extensions;
 using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
@@ -154,7 +155,6 @@ namespace TaskManager.Infrastructure.Services
             var epicViewModels = await ToEpicViewModels(epics);
             projectViewModel.Epics = epicViewModels.ToList();
             projectViewModel.Priorities = _mapper.Map<IReadOnlyCollection<PriorityViewModel>>(priorities);
-            projectViewModel.PermissionGroups = permissionGroups;
             projectViewModel.StatusCategories = _mapper.Map<IReadOnlyCollection<StatusCategoryViewModel>>(statusCategories);
             return projectViewModel;
         }
@@ -197,21 +197,25 @@ namespace TaskManager.Infrastructure.Services
             {
                 Name = CoreConstants.TodoStatusName,
                 ProjectId = project.Id,
-                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.ToDoCode).Select(e => e.Id).FirstOrDefault()
+                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.ToDoCode).Select(e => e.Id).FirstOrDefault(),
+                Ordering = 1
             };
 
             var inProgressStatus = new Status()
             {
                 Name = CoreConstants.InProgresstatusName,
                 ProjectId = project.Id,
-                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.InProgressCode).Select(e => e.Id).FirstOrDefault()
+                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.InProgressCode).Select(e => e.Id).FirstOrDefault(),
+                Ordering = 2
+
             };
 
             var doneStatus = new Status()
             {
                 Name = CoreConstants.DoneStatusName,
                 ProjectId = project.Id,
-                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.DoneCode).Select(e => e.Id).FirstOrDefault()
+                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.DoneCode).Select(e => e.Id).FirstOrDefault(),
+                Ordering = 3
             };
 
             var unreleasedStatus = new Status()
@@ -564,26 +568,53 @@ namespace TaskManager.Infrastructure.Services
 
         private async Task CreateRolesForProject(Project project)
         {
-            var permissions = await _permissionRepository.GetAll();
-            var productOwnerPermissionRoles = new List<PermissionRole>();
-            var scrumMasterPermissionRoles = new List<PermissionRole>();
-            var developerPermissionRoles = new List<PermissionRole>();
+            //var permissions = await _permissionRepository.GetAll();
+            //var productOwnerPermissionRoles = new List<PermissionRole>();
+            //var scrumMasterPermissionRoles = new List<PermissionRole>();
+            //var developerPermissionRoles = new List<PermissionRole>();
+
+            var poPermissions = new Permissions()
+            {
+                Timeline = new PermissionGroupDto { ViewPermission = true, EditPermission = true },
+                Backlog = new PermissionGroupDto { ViewPermission = true, EditPermission = true },
+                Board = new PermissionGroupDto { ViewPermission = true, EditPermission = true },
+                Project = new PermissionGroupDto { ViewPermission = true, EditPermission = true },
+            };
+
+            var smPermissions = new Permissions()
+            {
+                Timeline = new PermissionGroupDto { ViewPermission = true, EditPermission = true },
+                Backlog = new PermissionGroupDto { ViewPermission = true, EditPermission = true },
+                Board = new PermissionGroupDto { ViewPermission = true, EditPermission = true },
+                Project = new PermissionGroupDto { ViewPermission = true, EditPermission = false },
+            };
+
+            var devPermissions = new Permissions()
+            {
+                Timeline = new PermissionGroupDto { ViewPermission = false, EditPermission = false },
+                Backlog = new PermissionGroupDto { ViewPermission = true, EditPermission = true },
+                Board = new PermissionGroupDto { ViewPermission = false, EditPermission = false },
+                Project = new PermissionGroupDto { ViewPermission = false, EditPermission = false },
+            };
 
             var productOwnerRole = new PermissionGroup()
             {
                 Name = CoreConstants.ProductOwnerName,
-                ProjectId = project.Id
+                ProjectId = project.Id,
+                Permissions = poPermissions.ToJson()
             };
 
             var scrumMasterRole = new PermissionGroup()
             {
                 Name = CoreConstants.ScrumMasterName,
-                ProjectId = project.Id
+                ProjectId = project.Id,
+                Permissions = smPermissions.ToJson()
             };
             var developerRole = new PermissionGroup()
             {
                 Name = CoreConstants.DeveloperName,
-                ProjectId = project.Id
+                ProjectId = project.Id,
+                Permissions = devPermissions.ToJson()
             };
 
             var permissionGroups = new List<PermissionGroup>()
@@ -591,70 +622,70 @@ namespace TaskManager.Infrastructure.Services
                 productOwnerRole, scrumMasterRole, developerRole
             };
 
-            foreach (var permission in permissions)
-            {
-                var permissionRole = new PermissionRole()
-                {
-                    PermissionId = permission.Id,
-                    PermissionGroupId = productOwnerRole.Id,
+            //foreach (var permission in permissions)
+            //{
+            //    var permissionRole = new PermissionRole()
+            //    {
+            //        PermissionId = permission.Id,
+            //        PermissionGroupId = productOwnerRole.Id,
 
-                };
-                productOwnerPermissionRoles.Add(permissionRole);
+            //    };
+            //    productOwnerPermissionRoles.Add(permissionRole);
 
-                if (permission.Name != CoreConstants.ProjectPermissionName)
-                {
-                    permissionRole = new PermissionRole()
-                    {
-                        PermissionId = permission.Id,
-                        PermissionGroupId = scrumMasterRole.Id,
-                        ViewPermission = true,
-                        EditPermission = true,
-                    };
+            //    if (permission.Name != CoreConstants.ProjectPermissionName)
+            //    {
+            //        permissionRole = new PermissionRole()
+            //        {
+            //            PermissionId = permission.Id,
+            //            PermissionGroupId = scrumMasterRole.Id,
+            //            ViewPermission = true,
+            //            EditPermission = true,
+            //        };
 
-                    scrumMasterPermissionRoles.Add(permissionRole);
-                }
-                else
-                {
-                    permissionRole = new PermissionRole()
-                    {
-                        PermissionId = permission.Id,
-                        PermissionGroupId = scrumMasterRole.Id,
-                        ViewPermission = true,
-                        EditPermission = false,
-                    };
+            //        scrumMasterPermissionRoles.Add(permissionRole);
+            //    }
+            //    else
+            //    {
+            //        permissionRole = new PermissionRole()
+            //        {
+            //            PermissionId = permission.Id,
+            //            PermissionGroupId = scrumMasterRole.Id,
+            //            ViewPermission = true,
+            //            EditPermission = false,
+            //        };
 
-                    scrumMasterPermissionRoles.Add(permissionRole);
-                }
-                if (permission.Name == CoreConstants.BacklogPermissionName)
-                {
+            //        scrumMasterPermissionRoles.Add(permissionRole);
+            //    }
+            //    if (permission.Name == CoreConstants.BacklogPermissionName)
+            //    {
 
-                    permissionRole = new PermissionRole()
-                    {
-                        PermissionId = permission.Id,
-                        PermissionGroupId = developerRole.Id,
-                        ViewPermission = true,
-                        EditPermission = true,
-                    };
+            //        permissionRole = new PermissionRole()
+            //        {
+            //            PermissionId = permission.Id,
+            //            PermissionGroupId = developerRole.Id,
+            //            ViewPermission = true,
+            //            EditPermission = true,
+            //        };
 
-                    developerPermissionRoles.Add(permissionRole);
-                }
-                else
-                {
-                    permissionRole = new PermissionRole()
-                    {
-                        PermissionId = permission.Id,
-                        PermissionGroupId = developerRole.Id,
-                        ViewPermission = false,
-                        EditPermission = false,
-                    };
+            //        developerPermissionRoles.Add(permissionRole);
+            //    }
+            //    else
+            //    {
+            //        permissionRole = new PermissionRole()
+            //        {
+            //            PermissionId = permission.Id,
+            //            PermissionGroupId = developerRole.Id,
+            //            ViewPermission = false,
+            //            EditPermission = false,
+            //        };
 
-                    developerPermissionRoles.Add(permissionRole);
-                }
-            }
+            //        developerPermissionRoles.Add(permissionRole);
+            //    }
+            //}
 
-            productOwnerRole.PermissionRoles = productOwnerPermissionRoles;
-            scrumMasterRole.PermissionRoles = scrumMasterPermissionRoles;
-            developerRole.PermissionRoles = developerPermissionRoles;
+            //productOwnerRole.PermissionRoles = productOwnerPermissionRoles;
+            //scrumMasterRole.PermissionRoles = scrumMasterPermissionRoles;
+            //developerRole.PermissionRoles = developerPermissionRoles;
 
             _permissionGroupRepository.AddRange(permissionGroups);
             await _permissionGroupRepository.UnitOfWork.SaveChangesAsync();

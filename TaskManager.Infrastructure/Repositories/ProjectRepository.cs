@@ -44,13 +44,13 @@ namespace TaskManager.Infrastructure.Repositories
             return projects.AsReadOnly();
         }
 
-        public async Task<Project> GetById(Guid id)
+        public async Task<Project?> GetById(Guid id)
         {
             var project = await _context.Projects
                 .Include(p => p.UserProjects!)
                 .ThenInclude(up => up.User)
                 .SingleOrDefaultAsync(p => p.Id == id);
-            return project!;
+            return project;
         }
 
         public async Task<PaginationResult<Project>> GetByUserId(Guid userId, GetProjectByFilterDto filter, PaginationInput paginationInput)

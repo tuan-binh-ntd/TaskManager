@@ -112,4 +112,13 @@ namespace TaskManager.Core.ViewModel
         public StatusViewModel? Status { get; set; }
         public IReadOnlyCollection<IssueViewModel>? ChildIssues { get; set; }
     }
+
+    public class IssueForProjectViewModel
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public DateTime? StartDate { get; set; }
+        public DateTime? DueDate { get; set; }
+        public string Type { get; set; } = string.Empty;
+    }
 }

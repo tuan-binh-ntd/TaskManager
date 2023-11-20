@@ -16,7 +16,6 @@
         public IReadOnlyCollection<StatusViewModel>? Statuses { get; set; }
         public IReadOnlyCollection<EpicViewModel>? Epics { get; set; }
         public IReadOnlyCollection<PriorityViewModel>? Priorities { get; set; }
-        public IReadOnlyCollection<PermissionGroupViewModel>? PermissionGroups { get; set; }
         public IReadOnlyCollection<StatusCategoryViewModel>? StatusCategories { get; set; }
     }
 

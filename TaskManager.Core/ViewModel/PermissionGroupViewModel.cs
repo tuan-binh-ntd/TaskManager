@@ -1,10 +1,13 @@
-﻿namespace TaskManager.Core.ViewModel
+﻿using TaskManager.Core.Entities;
+
+namespace TaskManager.Core.ViewModel
 {
     public class PermissionGroupViewModel
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public IReadOnlyCollection<PermissionViewModel>? Permissions { get; set; }
+        //public IReadOnlyCollection<PermissionViewModel>? Permissions { get; set; }
+        public Permissions? Permissions { get; set; }
     }
 
     public class PermissionViewModel
