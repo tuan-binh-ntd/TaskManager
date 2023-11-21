@@ -117,8 +117,9 @@ namespace TaskManager.Core.ViewModel
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public DateTime? StartDate { get; set; }
-        public DateTime? DueDate { get; set; }
+        public DateTime? Start { get; set; }
+        public DateTime? End { get; set; }
         public string Type { get; set; } = string.Empty;
+        public double Progress { get; set; }
     }
 }
