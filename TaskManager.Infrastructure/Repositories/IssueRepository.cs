@@ -42,12 +42,6 @@ namespace TaskManager.Infrastructure.Repositories
         {
             var issues = await _context.Issues
                 .Where(i => i.SprintId == sprintId)
-                .Include(i => i.Sprint)
-                .Include(i => i.IssueType)
-                .Include(i => i.IssueDetail)
-                .Include(i => i.IssueHistories)
-                .Include(i => i.Comments)
-                .Include(i => i.Attachments)
                 .ToListAsync();
             return issues.AsReadOnly();
         }
@@ -56,12 +50,6 @@ namespace TaskManager.Infrastructure.Repositories
         {
             var issues = await _context.Issues
                 .Where(i => i.BacklogId == backlogId)
-                .Include(i => i.Backlog)
-                .Include(i => i.IssueType)
-                .Include(i => i.IssueDetail)
-                .Include(i => i.IssueHistories)
-                .Include(i => i.Comments)
-                .Include(i => i.Attachments)
                 .ToListAsync();
             return issues.AsReadOnly();
         }
@@ -114,8 +102,8 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<Issue>> GetChildIssueOfIssue(Guid issueId)
         {
-            var epics = await _context.Issues.Where(e => e.ParentId == issueId).ToListAsync();
-            return epics.AsReadOnly();
+            var childIssues = await _context.Issues.Where(e => e.ParentId == issueId).ToListAsync();
+            return childIssues.AsReadOnly();
         }
 
         public async Task LoadComments(Issue issue)

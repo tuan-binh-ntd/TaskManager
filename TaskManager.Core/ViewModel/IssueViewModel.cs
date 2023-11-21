@@ -120,5 +120,6 @@ namespace TaskManager.Core.ViewModel
         public DateTime? StartDate { get; set; }
         public DateTime? DueDate { get; set; }
         public string Type { get; set; } = string.Empty;
+        public double Progress { get; set; }
     }
 }

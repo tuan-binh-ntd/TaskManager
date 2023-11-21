@@ -21,6 +21,7 @@ namespace TaskManager.Infrastructure.Services
         private readonly UserManager<AppUser> _userManager;
         private readonly IBacklogRepository _backlogRepository;
         private readonly ISprintRepository _sprintRepository;
+        private readonly IStatusCategoryRepository _statusCategoryRepository;
         private readonly IMapper _mapper;
 
         public IssueService(
@@ -33,6 +34,7 @@ namespace TaskManager.Infrastructure.Services
             UserManager<AppUser> userManager,
             IBacklogRepository backlogRepository,
             ISprintRepository sprintRepository,
+            IStatusCategoryRepository statusCategoryRepository,
             IMapper mapper
             )
         {
@@ -45,6 +47,7 @@ namespace TaskManager.Infrastructure.Services
             _userManager = userManager;
             _backlogRepository = backlogRepository;
             _sprintRepository = sprintRepository;
+            _statusCategoryRepository = statusCategoryRepository;
             _mapper = mapper;
         }
 
@@ -160,15 +163,40 @@ namespace TaskManager.Infrastructure.Services
         }
         private async Task<IssueForProjectViewModel> ToIssueForProjectViewModel(Issue issue)
         {
-            await _issueRepository.LoadIssueType(issue);
-            return new IssueForProjectViewModel()
+            var childIssues = await _issueRepository.GetChildIssueOfIssue(issue.Id);
+            var doneStatusCategory = await _statusCategoryRepository.GetDone() ?? throw new StatusCategoryNullException();
+            if (childIssues.Any())
             {
-                Id = issue.Id,
-                Name = issue.Name,
-                StartDate = issue.StartDate,
-                DueDate = issue.DueDate,
-                Type = issue.IssueType is null ? string.Empty : issue.IssueType.Name
-            };
+                foreach (var childIssue in childIssues)
+                {
+                    await _issueRepository.LoadStatus(childIssue);
+                }
+
+                var doneChildIssuesNum = childIssues.Where(ci => ci.Status!.StatusCategoryId == doneStatusCategory.Id).Count();
+                var childIssuesNum = childIssues.Count;
+
+                return new IssueForProjectViewModel()
+                {
+                    Id = issue.Id,
+                    Name = issue.Name,
+                    StartDate = issue.StartDate,
+                    DueDate = issue.DueDate,
+                    Type = issue.ProjectId is null ? "task" : "project",
+                    Progress = (doneChildIssuesNum / childIssuesNum) * 100,
+                };
+            }
+            else
+            {
+                return new IssueForProjectViewModel()
+                {
+                    Id = issue.Id,
+                    Name = issue.Name,
+                    StartDate = issue.StartDate,
+                    DueDate = issue.DueDate,
+                    Type = issue.ProjectId is null ? "task" : "project",
+                    Progress = 0,
+                };
+            }
         }
 
         private async Task<IReadOnlyCollection<IssueForProjectViewModel>> ToIssueForProjectViewModels(IReadOnlyCollection<Issue> issues)
