@@ -40,11 +40,11 @@ namespace TaskManager.Infrastructure.Services
         }
 
         #region Private method
-        private async Task<SprintViewModel> ToSprintViewModel(Sprint sprint, Guid projectId)
+        private async Task<SprintViewModel> ToSprintViewModel(Sprint sprint, Guid projectId, GetSprintByFilterDto? getSprintByFilterDto = null)
         {
             var sprintViewModel = _mapper.Map<SprintViewModel>(sprint);
             sprintViewModel.IssueOnBoard = new Dictionary<string, IReadOnlyCollection<IssueViewModel>>();
-            var issues = await _issueRepository.GetIssueBySprintId(sprint.Id);
+            var issues = getSprintByFilterDto is null ? await _issueRepository.GetIssueBySprintId(sprintId: sprint.Id) : await _issueRepository.GetByFilter(getSprintByFilterDto);
             var statuses = await _statusRepository.GetByProjectId(projectId);
             foreach (var status in statuses)
             {
@@ -55,14 +55,14 @@ namespace TaskManager.Infrastructure.Services
             return sprintViewModel;
         }
 
-        private async Task<IReadOnlyCollection<SprintViewModel>> ToSprintViewModels(IReadOnlyCollection<Sprint> sprints, Guid projectId)
+        private async Task<IReadOnlyCollection<SprintViewModel>> ToSprintViewModels(IReadOnlyCollection<Sprint> sprints, Guid projectId, GetSprintByFilterDto getSprintByFilterDto)
         {
             var sprintViewModels = new List<SprintViewModel>();
             if (sprints.Any())
             {
                 foreach (var sprint in sprints)
                 {
-                    var sprintViewModel = await ToSprintViewModel(sprint, projectId);
+                    var sprintViewModel = await ToSprintViewModel(sprint, projectId, getSprintByFilterDto);
                     sprintViewModels.Add(sprintViewModel);
                 }
             }
@@ -204,7 +204,7 @@ namespace TaskManager.Infrastructure.Services
         public async Task<IReadOnlyCollection<SprintViewModel>> GetAll(Guid projectId, GetSprintByFilterDto getSprintByFilterDto)
         {
             var sprints = await _sprintRepository.GetByProjectId(projectId, getSprintByFilterDto);
-            return await ToSprintViewModels(sprints, projectId);
+            return await ToSprintViewModels(sprints, projectId, getSprintByFilterDto);
         }
     }
 }
