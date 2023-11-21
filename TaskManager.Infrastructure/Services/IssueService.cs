@@ -283,10 +283,13 @@ namespace TaskManager.Infrastructure.Services
             {
                 issue.Watcher.Users = issue.Watcher.Users.DistinctBy(i => i.Identity).ToList();
             }
-            if (updateIssueDto.SprintId is not null && updateIssueDto.BacklogId is null)
+            if (updateIssueDto.SprintId is Guid sprintId && updateIssueDto.BacklogId is null)
             {
-                issue.SprintId = updateIssueDto.SprintId;
+                var sprint = _sprintRepository.Get(sprintId) ?? throw new SprintNullException();
+                issue.SprintId = sprintId;
                 issue.BacklogId = null;
+                issue.StartDate = sprint.StartDate;
+                issue.DueDate = sprint.EndDate;
             }
             if (updateIssueDto.SprintId is null && updateIssueDto.BacklogId is not null)
             {
