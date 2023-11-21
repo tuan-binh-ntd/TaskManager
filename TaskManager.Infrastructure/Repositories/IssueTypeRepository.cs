@@ -86,7 +86,7 @@ namespace TaskManager.Infrastructure.Repositories
         public async Task<PaginationResult<IssueTypeViewModel>> GetsByProjectIdPaging(Guid projectId, PaginationInput paginationInput)
         {
             var query = _context.IssueTypes.AsNoTracking()
-                .Where(e => e.ProjectId == projectId || e.ProjectId == null).Select(e => new IssueTypeViewModel()
+                .Where(e => e.ProjectId == projectId).Select(e => new IssueTypeViewModel()
                 {
                     Id = e.Id,
                     Name = e.Name,
