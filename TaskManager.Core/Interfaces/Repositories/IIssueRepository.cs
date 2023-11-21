@@ -1,4 +1,5 @@
-﻿using TaskManager.Core.Entities;
+﻿using TaskManager.Core.DTOs;
+using TaskManager.Core.Entities;
 
 namespace TaskManager.Core.Interfaces.Repositories
 {
@@ -147,5 +148,11 @@ namespace TaskManager.Core.Interfaces.Repositories
         /// <param name="sprintId">Id of sprint</param>
         /// <returns>List of issue</returns>
         Task<IReadOnlyCollection<Issue>> GetNotDoneIssuesBySprintId(Guid sprintId, Guid projectId);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="getSprintByFilterDto"></param>
+        /// <returns></returns>
+        Task<IReadOnlyCollection<Issue>> GetByFilter(GetSprintByFilterDto getSprintByFilterDto);
     }
 }

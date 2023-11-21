@@ -1,6 +1,8 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
+using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Extensions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.ViewModel;
 using TaskManager.Infrastructure.Data;
@@ -58,9 +60,13 @@ namespace TaskManager.Infrastructure.Repositories
             return sprints.AsReadOnly();
         }
 
-        public async Task<IReadOnlyCollection<Sprint>> GetByProjectId(Guid projectId)
+        public async Task<IReadOnlyCollection<Sprint>> GetByProjectId(Guid projectId, GetSprintByFilterDto getSprintByFilterDto)
         {
-            var sprints = await _context.Sprints.AsNoTracking().Where(e => e.ProjectId == projectId && e.IsComplete != true).ToListAsync();
+            var sprints = await _context.Sprints
+                .AsNoTracking()
+                .Where(e => e.ProjectId == projectId && e.IsComplete != true)
+                .WhereIf(getSprintByFilterDto.sprintid is not null, s => s.Id == getSprintByFilterDto.sprintid)
+                .ToListAsync();
             return sprints.AsReadOnly();
         }
     }

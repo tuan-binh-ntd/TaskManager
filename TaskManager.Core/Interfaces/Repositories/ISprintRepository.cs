@@ -1,4 +1,5 @@
-﻿using TaskManager.Core.Entities;
+﻿using TaskManager.Core.DTOs;
+using TaskManager.Core.Entities;
 using TaskManager.Core.ViewModel;
 
 namespace TaskManager.Core.Interfaces.Repositories
@@ -12,6 +13,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         Sprint? Get(Guid id);
         Task<IReadOnlyCollection<Issue>> GetIssues(Guid sprintId);
         Task<IReadOnlyCollection<SprintViewModel>> GetSprintByProjectId(Guid projectId);
-        Task<IReadOnlyCollection<Sprint>> GetByProjectId(Guid projectId);
+        Task<IReadOnlyCollection<Sprint>> GetByProjectId(Guid projectId, GetSprintByFilterDto getSprintByFilterDto);
     }
 }

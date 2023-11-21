@@ -78,9 +78,9 @@ namespace TaskManager.API.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(IReadOnlyCollection<SprintViewModel>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> Get(Guid projectId, Guid id, GetSprintByFilterDto getSprintByFilterDto)
+        public async Task<IActionResult> Get(Guid projectId, [FromQuery] GetSprintByFilterDto getSprintByFilterDto)
         {
-            var res = await _sprintService.GetById(projectId, id);
+            var res = await _sprintService.GetAll(projectId, getSprintByFilterDto);
             return CustomResult(res, HttpStatusCode.OK);
         }
     }

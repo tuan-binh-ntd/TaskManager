@@ -201,9 +201,9 @@ namespace TaskManager.Infrastructure.Services
             return await ToSprintViewModel(sprint, projectId);
         }
 
-        public async Task<IReadOnlyCollection<SprintViewModel>> GetAll(Guid projectId)
+        public async Task<IReadOnlyCollection<SprintViewModel>> GetAll(Guid projectId, GetSprintByFilterDto getSprintByFilterDto)
         {
-            var sprints = await _sprintRepository.GetByProjectId(projectId);
+            var sprints = await _sprintRepository.GetByProjectId(projectId, getSprintByFilterDto);
             return await ToSprintViewModels(sprints, projectId);
         }
     }

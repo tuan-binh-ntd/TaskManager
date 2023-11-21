@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.Core;
+using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Extensions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Infrastructure.Data;
 
@@ -182,6 +184,16 @@ namespace TaskManager.Infrastructure.Repositories
                         select i;
 
             var issues = await query.ToListAsync();
+            return issues.AsReadOnly();
+        }
+
+        public async Task<IReadOnlyCollection<Issue>> GetByFilter(GetSprintByFilterDto getSprintByFilterDto)
+        {
+            var issues = await _context.Issues
+                .WhereIf(getSprintByFilterDto.sprintid is not null, i => i.SprintId == getSprintByFilterDto.sprintid)
+                .WhereIf(getSprintByFilterDto.issuetypeid is not null, i => i.IssueTypeId == getSprintByFilterDto.issuetypeid)
+                .WhereIf(getSprintByFilterDto.epicid is not null, i => i.ParentId == getSprintByFilterDto.epicid)
+                .ToListAsync();
             return issues.AsReadOnly();
         }
     }
