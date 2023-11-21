@@ -179,8 +179,8 @@ namespace TaskManager.Infrastructure.Services
                 {
                     Id = issue.Id,
                     Name = issue.Name,
-                    StartDate = issue.StartDate,
-                    DueDate = issue.DueDate,
+                    Start = issue.StartDate,
+                    End = issue.DueDate,
                     Type = issue.ProjectId is null ? "task" : "project",
                     Progress = (doneChildIssuesNum / childIssuesNum) * 100,
                 };
@@ -191,8 +191,8 @@ namespace TaskManager.Infrastructure.Services
                 {
                     Id = issue.Id,
                     Name = issue.Name,
-                    StartDate = issue.StartDate,
-                    DueDate = issue.DueDate,
+                    Start = issue.StartDate,
+                    End = issue.DueDate,
                     Type = issue.ProjectId is null ? "task" : "project",
                     Progress = 0,
                 };

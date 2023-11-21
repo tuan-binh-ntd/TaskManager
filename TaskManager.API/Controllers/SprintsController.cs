@@ -75,5 +75,13 @@ namespace TaskManager.API.Controllers
             var res = await _sprintService.GetById(projectId, id);
             return CustomResult(res, HttpStatusCode.OK);
         }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(IReadOnlyCollection<SprintViewModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Get(Guid projectId, Guid id, GetSprintByFilterDto getSprintByFilterDto)
+        {
+            var res = await _sprintService.GetById(projectId, id);
+            return CustomResult(res, HttpStatusCode.OK);
+        }
     }
 }

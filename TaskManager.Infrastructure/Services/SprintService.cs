@@ -52,8 +52,21 @@ namespace TaskManager.Infrastructure.Services
                 var issueViewModels = issues.Adapt<IReadOnlyCollection<IssueViewModel>>();
                 sprintViewModel.IssueOnBoard.Add(status.Name, issueViewModels);
             }
-            //sprintViewModel.Issues = issueViewModels;
             return sprintViewModel;
+        }
+
+        private async Task<IReadOnlyCollection<SprintViewModel>> ToSprintViewModels(IReadOnlyCollection<Sprint> sprints, Guid projectId)
+        {
+            var sprintViewModels = new List<SprintViewModel>();
+            if (sprints.Any())
+            {
+                foreach (var sprint in sprints)
+                {
+                    var sprintViewModel = await ToSprintViewModel(sprint, projectId);
+                    sprintViewModels.Add(sprintViewModel);
+                }
+            }
+            return sprintViewModels;
         }
         #endregion
 
@@ -186,6 +199,12 @@ namespace TaskManager.Infrastructure.Services
         {
             var sprint = _sprintRepository.Get(sprintId) ?? throw new SprintNullException();
             return await ToSprintViewModel(sprint, projectId);
+        }
+
+        public async Task<IReadOnlyCollection<SprintViewModel>> GetAll(Guid projectId)
+        {
+            var sprints = await _sprintRepository.GetByProjectId(projectId);
+            return await ToSprintViewModels(sprints, projectId);
         }
     }
 }
