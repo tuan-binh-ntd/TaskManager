@@ -5,7 +5,9 @@ namespace TaskManager.Core.Interfaces.Services
 {
     public interface IAttachmentService
     {
-        Task<AttachmentViewModel> Create(Guid issueId, IFormFile file);
+        Task<IReadOnlyCollection<AttachmentViewModel>> CreateMultiple(Guid issueId, List<IFormFile> files);
         Task<Guid> Delete(Guid id);
+        Task<IReadOnlyCollection<AttachmentViewModel>> UploadFiles(Guid issueId, List<IFormFile> files);
+        Task<string> GetUploadedBlobs();
     }
 }

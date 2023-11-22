@@ -18,10 +18,10 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(AttachmentViewModel), (int)HttpStatusCode.Created)]
-        public async Task<IActionResult> Create(Guid issueId, IFormFile file)
+        [ProducesResponseType(typeof(IReadOnlyCollection<AttachmentViewModel>), (int)HttpStatusCode.Created)]
+        public async Task<IActionResult> Create(Guid issueId, List<IFormFile> files)
         {
-            var res = await _attachmentService.Create(issueId, file);
+            var res = await _attachmentService.CreateMultiple(issueId, files);
             return CustomResult(res, HttpStatusCode.Created);
         }
 
@@ -32,5 +32,19 @@ namespace TaskManager.API.Controllers
             var res = await _attachmentService.Delete(id);
             return CustomResult(res, HttpStatusCode.OK);
         }
+
+        //[HttpPost]
+        //public async Task<IActionResult> UploadBlobs(Guid issueId, List<IFormFile> files)
+        //{
+        //    var response = await _attachmentService.UploadFiles(issueId, files);
+        //    return Ok(response);
+        //}
+
+        //[HttpGet]
+        //public async Task<IActionResult> GetAllBlobs()
+        //{
+        //    var response = await _attachmentService.GetUploadedBlobs();
+        //    return Ok(response);
+        //}
     }
 }

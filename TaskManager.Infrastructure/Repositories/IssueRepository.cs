@@ -196,5 +196,15 @@ namespace TaskManager.Infrastructure.Repositories
                 .ToListAsync();
             return issues.AsReadOnly();
         }
+
+        public async Task<IReadOnlyCollection<Issue>> GetBySprintIds(IReadOnlyCollection<Guid> sprintIds, GetSprintByFilterDto getSprintByFilterDto)
+        {
+            var issues = await _context.Issues
+                .Where(i => sprintIds.Contains((Guid)i.SprintId!))
+                .WhereIf(getSprintByFilterDto.issuetypeid is not null, i => i.IssueTypeId == getSprintByFilterDto.issuetypeid)
+                .WhereIf(getSprintByFilterDto.epicid is not null, i => i.ParentId == getSprintByFilterDto.epicid)
+                .ToListAsync();
+            return issues.AsReadOnly();
+        }
     }
 }

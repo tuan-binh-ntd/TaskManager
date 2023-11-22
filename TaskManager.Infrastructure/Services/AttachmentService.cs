@@ -1,10 +1,13 @@
 ﻿using Azure;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Azure.Storage.Files.Shares;
 using Mapster;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Exceptions;
+using TaskManager.Core.Extensions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
@@ -14,15 +17,23 @@ namespace TaskManager.Infrastructure.Services
     public class AttachmentService : IAttachmentService
     {
         private readonly FileShareSettings _fileShareSettings;
+        private readonly BlobContainerSettings _blobContainerSettings;
         private readonly IAttachmentRepository _attachmentRepository;
+        private readonly BlobServiceClient _blobClient;
+        private readonly BlobContainerClient _containerClient;
 
         public AttachmentService(
             IAttachmentRepository attachmentRepository,
-            IOptionsMonitor<FileShareSettings> optionsMonitor
+            IOptionsMonitor<FileShareSettings> optionsMonitor,
+            IOptionsMonitor<BlobContainerSettings> optionsMonitor1
             )
         {
             _fileShareSettings = optionsMonitor.CurrentValue;
+            _blobContainerSettings = optionsMonitor1.CurrentValue;
             _attachmentRepository = attachmentRepository;
+
+            _blobClient = new BlobServiceClient(_blobContainerSettings.ConnectionStrings);
+            _containerClient = _blobClient.GetBlobContainerClient("attachmentofissue");
         }
 
         #region Private method
@@ -90,28 +101,40 @@ namespace TaskManager.Infrastructure.Services
             var reponse = shareFile.Delete();
             return reponse;
         }
+
+        private async Task FileUploadToContainerAsync(IFormFile file)
+        {
+            string fileName = file.FileName;
+            using var memoryStream = new MemoryStream();
+            file.CopyTo(memoryStream);
+            memoryStream.Position = 0;
+            var client = await _containerClient.UploadBlobAsync(fileName, memoryStream, default);
+        }
         #endregion
 
-        public async Task<AttachmentViewModel> Create(Guid issueId, IFormFile file)
+        public async Task<IReadOnlyCollection<AttachmentViewModel>> CreateMultiple(Guid issueId, List<IFormFile> files)
         {
-            var uploadfileUri = await FileUploadAsync(file);
-            if (string.IsNullOrWhiteSpace(uploadfileUri))
+            var attachments = new List<Attachment>();
+            foreach (var file in files)
             {
-                return new AttachmentViewModel();
-            }
-            else
-            {
-                var attachment = new Attachment()
+                var uploadfileUri = await FileUploadAsync(file);
+                if (!string.IsNullOrWhiteSpace(uploadfileUri))
                 {
-                    Name = file.FileName,
-                    Link = uploadfileUri,
-                    IssueId = issueId,
-                };
+                    var attachment = new Attachment()
+                    {
+                        Name = file.FileName,
+                        Link = uploadfileUri,
+                        Size = file.Length,
+                        Type = file.ContentType,
+                        IssueId = issueId,
+                    };
 
-                _attachmentRepository.Add(attachment);
-                await _attachmentRepository.UnitOfWork.SaveChangesAsync();
-                return attachment.Adapt<AttachmentViewModel>();
+                    attachments.Add(attachment);
+                }
             }
+            _attachmentRepository.AddRange(attachments);
+            await _attachmentRepository.UnitOfWork.SaveChangesAsync();
+            return attachments.Adapt<IReadOnlyCollection<AttachmentViewModel>>();
         }
 
         public async Task<Guid> Delete(Guid id)
@@ -129,6 +152,40 @@ namespace TaskManager.Infrastructure.Services
             {
                 return Guid.Empty;
             }
+        }
+
+        public async Task<IReadOnlyCollection<AttachmentViewModel>> UploadFiles(Guid issueId, List<IFormFile> files)
+        {
+            var attachmentViewModels = new List<AttachmentViewModel>();
+            foreach (var file in files)
+            {
+                await FileUploadToContainerAsync(file);
+                var attachment = new Attachment
+                {
+                    Name = file.FileName,
+                    Link = string.Empty,
+                    Size = file.Length,
+                    Type = file.ContentType,
+                    IssueId = issueId,
+                };
+                _attachmentRepository.Add(attachment);
+                await _attachmentRepository.UnitOfWork.SaveChangesAsync();
+                attachmentViewModels.Add(attachment.Adapt<AttachmentViewModel>());
+            };
+
+            return attachmentViewModels;
+        }
+
+        public async Task<string> GetUploadedBlobs()
+        {
+            var items = new List<BlobItem>();
+            var uploadedFiles = _containerClient.GetBlobsAsync();
+            await foreach (BlobItem file in uploadedFiles)
+            {
+                items.Add(file);
+            }
+
+            return items.ToJson();
         }
     }
 }

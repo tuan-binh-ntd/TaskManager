@@ -10,5 +10,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         void Update(Attachment attachment);
         void Delete(Attachment attachment);
         Task<Attachment?> GetById(Guid id);
+        void AddRange(IReadOnlyCollection<Attachment> attachments);
     }
 }

@@ -40,11 +40,11 @@ namespace TaskManager.Infrastructure.Services
         }
 
         #region Private method
-        private async Task<SprintViewModel> ToSprintViewModel(Sprint sprint, Guid projectId, GetSprintByFilterDto? getSprintByFilterDto = null)
+        private async Task<SprintViewModel> ToSprintViewModel(Sprint sprint, Guid projectId)
         {
             var sprintViewModel = _mapper.Map<SprintViewModel>(sprint);
             sprintViewModel.IssueOnBoard = new Dictionary<string, IReadOnlyCollection<IssueViewModel>>();
-            var issues = getSprintByFilterDto is null ? await _issueRepository.GetIssueBySprintId(sprintId: sprint.Id) : await _issueRepository.GetByFilter(getSprintByFilterDto);
+            var issues = await _issueRepository.GetIssueBySprintId(sprintId: sprint.Id);
             var statuses = await _statusRepository.GetByProjectId(projectId);
             foreach (var status in statuses)
             {
@@ -53,20 +53,6 @@ namespace TaskManager.Infrastructure.Services
                 sprintViewModel.IssueOnBoard.Add(status.Name, issueViewModels);
             }
             return sprintViewModel;
-        }
-
-        private async Task<IReadOnlyCollection<SprintViewModel>> ToSprintViewModels(IReadOnlyCollection<Sprint> sprints, Guid projectId, GetSprintByFilterDto getSprintByFilterDto)
-        {
-            var sprintViewModels = new List<SprintViewModel>();
-            if (sprints.Any())
-            {
-                foreach (var sprint in sprints)
-                {
-                    var sprintViewModel = await ToSprintViewModel(sprint, projectId, getSprintByFilterDto);
-                    sprintViewModels.Add(sprintViewModel);
-                }
-            }
-            return sprintViewModels;
         }
         #endregion
 
@@ -201,10 +187,22 @@ namespace TaskManager.Infrastructure.Services
             return await ToSprintViewModel(sprint, projectId);
         }
 
-        public async Task<IReadOnlyCollection<SprintViewModel>> GetAll(Guid projectId, GetSprintByFilterDto getSprintByFilterDto)
+        public async Task<Dictionary<string, IReadOnlyCollection<IssueViewModel>>> GetAll(Guid projectId, GetSprintByFilterDto getSprintByFilterDto)
         {
-            var sprints = await _sprintRepository.GetByProjectId(projectId, getSprintByFilterDto);
-            return await ToSprintViewModels(sprints, projectId, getSprintByFilterDto);
+            var sprintIds = await _sprintRepository.GetSprintIdsByProjectId(projectId, getSprintByFilterDto);
+            var issues = await _issueRepository.GetBySprintIds(sprintIds, getSprintByFilterDto);
+
+            var issueOnBoard = new Dictionary<string, IReadOnlyCollection<IssueViewModel>>();
+            var statuses = await _statusRepository.GetByProjectId(projectId);
+
+            foreach (var status in statuses)
+            {
+                var issueByStatusIds = issues.Where(i => i.StatusId == status.Id).ToList();
+                var issueViewModels = issues.Adapt<IReadOnlyCollection<IssueViewModel>>();
+                issueOnBoard.Add(status.Name, issueViewModels);
+            }
+
+            return issueOnBoard;
         }
     }
 }

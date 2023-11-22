@@ -52,6 +52,9 @@ namespace TaskManager.Core.ViewModel
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Link { get; set; } = string.Empty;
+        public long Size { get; set; }
+        public string Type { get; set; } = string.Empty;
+        public DateTime? ModificationTime { get; set; }
     }
 
     public class IssueDetailViewModel

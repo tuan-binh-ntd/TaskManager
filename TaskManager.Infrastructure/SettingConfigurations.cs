@@ -65,4 +65,10 @@
         public string FileShareName { get; set; } = string.Empty;
         public string ConnectionStrings { get; set; } = string.Empty;
     }
+
+
+    public class BlobContainerSettings
+    {
+        public string ConnectionStrings { get; set; } = string.Empty;
+    }
 }

@@ -43,5 +43,10 @@ namespace TaskManager.Infrastructure.Repositories
             var attachment = await _context.Attachments.Where(a => a.Id == id).FirstOrDefaultAsync();
             return attachment;
         }
+
+        public void AddRange(IReadOnlyCollection<Attachment> attachments)
+        {
+            _context.Attachments.AddRange(attachments);
+        }
     }
 }

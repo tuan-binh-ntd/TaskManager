@@ -49,6 +49,7 @@ builder.Services.Configure<SftpServerSettings>(builder.Configuration.GetSection(
 builder.Services.Configure<ElasticConfigurationSettings>(builder.Configuration.GetSection("ElasticConfigurationSettings"));
 builder.Services.Configure<EmailConfigurationSettings>(builder.Configuration.GetSection("EmailConfigurationSettings"));
 builder.Services.Configure<FileShareSettings>(builder.Configuration.GetSection("FileShareSettings"));
+builder.Services.Configure<BlobContainerSettings>(builder.Configuration.GetSection("BlobContainerSettings"));
 
 // Set Mapster
 builder.Services.AddMapster(); // From the configuration file

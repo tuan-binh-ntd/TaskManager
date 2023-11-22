@@ -154,5 +154,11 @@ namespace TaskManager.Core.Interfaces.Repositories
         /// <param name="getSprintByFilterDto"></param>
         /// <returns></returns>
         Task<IReadOnlyCollection<Issue>> GetByFilter(GetSprintByFilterDto getSprintByFilterDto);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sprintIds"></param>
+        /// <returns></returns>
+        Task<IReadOnlyCollection<Issue>> GetBySprintIds(IReadOnlyCollection<Guid> sprintIds, GetSprintByFilterDto getSprintByFilterDto);
     }
 }
