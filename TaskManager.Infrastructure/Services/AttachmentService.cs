@@ -187,5 +187,10 @@ namespace TaskManager.Infrastructure.Services
 
             return items.ToJson();
         }
+
+        public async Task<IReadOnlyCollection<AttachmentViewModel>> GetByIssueId(Guid issueId)
+        {
+            return await _attachmentRepository.GetByIssueId(issueId);
+        }
     }
 }

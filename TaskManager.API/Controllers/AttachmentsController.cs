@@ -40,11 +40,12 @@ namespace TaskManager.API.Controllers
         //    return Ok(response);
         //}
 
-        //[HttpGet]
-        //public async Task<IActionResult> GetAllBlobs()
-        //{
-        //    var response = await _attachmentService.GetUploadedBlobs();
-        //    return Ok(response);
-        //}
+        [HttpGet]
+        [ProducesResponseType(typeof(IReadOnlyCollection<AttachmentViewModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Gets(Guid issueId)
+        {
+            var res = await _attachmentService.GetByIssueId(issueId);
+            return CustomResult(res, HttpStatusCode.OK);
+        }
     }
 }

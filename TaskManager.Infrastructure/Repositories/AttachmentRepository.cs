@@ -22,9 +22,9 @@ namespace TaskManager.Infrastructure.Repositories
             return _context.Attachments.Add(attachment).Entity.Adapt<AttachmentViewModel>();
         }
 
-        public async Task<IReadOnlyCollection<AttachmentViewModel>> Gets()
+        public async Task<IReadOnlyCollection<AttachmentViewModel>> GetByIssueId(Guid issueId)
         {
-            var attachments = await _context.Attachments.AsNoTracking().ProjectToType<AttachmentViewModel>().ToListAsync();
+            var attachments = await _context.Attachments.AsNoTracking().Where(a => a.IssueId == issueId).ProjectToType<AttachmentViewModel>().ToListAsync();
             return attachments.AsReadOnly();
         }
 

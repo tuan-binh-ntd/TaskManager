@@ -9,5 +9,6 @@ namespace TaskManager.Core.Interfaces.Services
         Task<Guid> Delete(Guid id);
         Task<IReadOnlyCollection<AttachmentViewModel>> UploadFiles(Guid issueId, List<IFormFile> files);
         Task<string> GetUploadedBlobs();
+        Task<IReadOnlyCollection<AttachmentViewModel>> GetByIssueId(Guid issueId);
     }
 }
