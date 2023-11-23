@@ -37,7 +37,7 @@ namespace TaskManager.Infrastructure.Services
         }
 
         #region Private method
-        private async Task<string> FileUploadAsync(IFormFile file)
+        private async Task<string> FileUploadAsync(IFormFile file, string fileName)
         {
             // Get the configurations and create share object
             ShareClient share = new(_fileShareSettings.ConnectionStrings, _fileShareSettings.FileShareName);
@@ -52,7 +52,7 @@ namespace TaskManager.Infrastructure.Services
             await directory.CreateIfNotExistsAsync();
 
             // Get a reference to a file and upload it
-            ShareFileClient shareFile = directory.GetFileClient(file.FileName);
+            ShareFileClient shareFile = directory.GetFileClient(fileName);
 
             using Stream stream = file.OpenReadStream();
             shareFile.Create(stream.Length);
@@ -117,7 +117,8 @@ namespace TaskManager.Infrastructure.Services
             var attachments = new List<Attachment>();
             foreach (var file in files)
             {
-                var uploadfileUri = await FileUploadAsync(file);
+                var code = $"{Guid.NewGuid()}_{file.FileName}";
+                var uploadfileUri = await FileUploadAsync(file, fileName: code);
                 if (!string.IsNullOrWhiteSpace(uploadfileUri))
                 {
                     var attachment = new Attachment()
@@ -127,6 +128,7 @@ namespace TaskManager.Infrastructure.Services
                         Size = file.Length,
                         Type = file.ContentType,
                         IssueId = issueId,
+                        Code = code
                     };
 
                     attachments.Add(attachment);
@@ -140,10 +142,9 @@ namespace TaskManager.Infrastructure.Services
         public async Task<Guid> Delete(Guid id)
         {
             var attachment = await _attachmentRepository.GetById(id) ?? throw new AttachmentNullException();
-            var deleteFileResponse = await DeleteFileAsync(attachment.Name);
+            var deleteFileResponse = await DeleteFileAsync(attachment.Code);
             if (!deleteFileResponse.IsError)
             {
-
                 _attachmentRepository.Delete(attachment);
                 await _attachmentRepository.UnitOfWork.SaveChangesAsync();
                 return id;

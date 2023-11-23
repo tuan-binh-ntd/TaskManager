@@ -54,7 +54,7 @@ namespace TaskManager.Core.ViewModel
         public string Link { get; set; } = string.Empty;
         public long Size { get; set; }
         public string Type { get; set; } = string.Empty;
-        public DateTime? ModificationTime { get; set; }
+        public DateTime CreationTime { get; set; }
     }
 
     public class IssueDetailViewModel
