@@ -161,6 +161,7 @@ namespace TaskManager.Infrastructure.Services
             }
             return childIssueViewModel;
         }
+
         private async Task<IssueForProjectViewModel> ToIssueForProjectViewModel(Issue issue)
         {
             var childIssues = await _issueRepository.GetChildIssueOfIssue(issue.Id);
@@ -290,11 +291,36 @@ namespace TaskManager.Infrastructure.Services
                 issue.BacklogId = null;
                 issue.StartDate = sprint.StartDate;
                 issue.DueDate = sprint.EndDate;
+
+                var childIssues = await _issueRepository.GetChildIssueOfIssue(issue.Id);
+                if (childIssues.Any())
+                {
+
+                    foreach (var childIssue in childIssues)
+                    {
+                        childIssue.SprintId = sprintId;
+                        childIssue.BacklogId = null;
+                    }
+                    _issueRepository.UpdateRange(childIssues);
+                }
+
             }
-            if (updateIssueDto.SprintId is null && updateIssueDto.BacklogId is not null)
+            if (updateIssueDto.SprintId is null && updateIssueDto.BacklogId is Guid backlogId)
             {
                 issue.SprintId = null;
-                issue.BacklogId = updateIssueDto.BacklogId;
+                issue.BacklogId = backlogId;
+
+                var childIssues = await _issueRepository.GetChildIssueOfIssue(issue.Id);
+                if (childIssues.Any())
+                {
+                    foreach (var childIssue in childIssues)
+                    {
+                        childIssue.SprintId = null;
+                        childIssue.BacklogId = backlogId;
+                    }
+                    _issueRepository.UpdateRange(childIssues);
+                }
+
             }
 
             issue = updateIssueDto.Adapt(issue);

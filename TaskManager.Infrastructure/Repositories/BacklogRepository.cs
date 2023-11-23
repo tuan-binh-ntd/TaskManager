@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.ViewModel;
@@ -31,8 +32,12 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<Issue>> GetIssues(Guid backlogId)
         {
+            var projectId = await _context.Backlogs.Where(b => b.Id == backlogId).Select(b => b.ProjectId).FirstOrDefaultAsync();
+
+            var subtaskTypeId = await _context.IssueTypes.Where(it => it.ProjectId == projectId).Select(it => it.Id).FirstOrDefaultAsync();
+
             var issues = await _context.Issues
-                .Where(i => i.BacklogId == backlogId)
+                .Where(i => i.BacklogId == backlogId && i.IssueTypeId != subtaskTypeId)
                 .ToListAsync();
             return issues.AsReadOnly();
         }
