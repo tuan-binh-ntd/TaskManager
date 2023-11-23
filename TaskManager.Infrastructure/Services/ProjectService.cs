@@ -112,11 +112,6 @@ namespace TaskManager.Infrastructure.Services
             {
                 issueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
             }
-            var childIssue = await _issueRepository.GetChildIssueOfIssue(issue.Id);
-            if (childIssue.Any())
-            {
-                issueViewModel.ChildIssues = await ToChildIssueViewModels(childIssue);
-            }
             return issueViewModel;
         }
 
@@ -512,56 +507,6 @@ namespace TaskManager.Infrastructure.Services
 
             _priorityRepository.AddRange(priorities);
             await _priorityRepository.UnitOfWork.SaveChangesAsync();
-        }
-
-        private async Task<IReadOnlyCollection<ChildIssueViewModel>> ToChildIssueViewModels(IReadOnlyCollection<Issue> issues)
-        {
-            var childIssueViewModels = new List<ChildIssueViewModel>();
-            if (issues.Any())
-            {
-                foreach (var issue in issues)
-                {
-                    var childIssueViewModel = await ToChildIssueViewModel(issue);
-                    childIssueViewModels.Add(childIssueViewModel);
-                }
-            }
-            return childIssueViewModels.AsReadOnly();
-        }
-
-        private async Task<ChildIssueViewModel> ToChildIssueViewModel(Issue childIssue)
-        {
-            await _issueRepository.LoadAttachments(childIssue);
-            await _issueRepository.LoadIssueDetail(childIssue);
-            await _issueRepository.LoadIssueType(childIssue);
-            await _issueRepository.LoadStatus(childIssue);
-
-            var childIssueViewModel = _mapper.Map<ChildIssueViewModel>(childIssue);
-
-            if (childIssue.IssueDetail is not null)
-            {
-                var issueDetail = _mapper.Map<IssueDetailViewModel>(childIssue.IssueDetail);
-                childIssueViewModel.IssueDetail = issueDetail;
-            }
-            if (childIssue.Attachments is not null && childIssue.Attachments.Any())
-            {
-                var attachments = _mapper.Map<ICollection<AttachmentViewModel>>(childIssue.Attachments);
-                childIssueViewModel.Attachments = attachments;
-            }
-            if (childIssue.IssueType is not null)
-            {
-                var issueType = _mapper.Map<IssueTypeViewModel>(childIssue.IssueType);
-                childIssueViewModel.IssueType = issueType;
-            }
-            if (childIssue.Status is not null)
-            {
-                var status = _mapper.Map<StatusViewModel>(childIssue.Status);
-                childIssueViewModel.Status = status;
-            }
-            if (childIssue.ParentId is Guid parentId)
-            {
-                childIssueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
-            }
-            return childIssueViewModel;
         }
 
         private async Task CreateRolesForProject(Project project)
