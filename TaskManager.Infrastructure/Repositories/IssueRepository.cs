@@ -200,6 +200,7 @@ namespace TaskManager.Infrastructure.Repositories
         public async Task<IReadOnlyCollection<Issue>> GetBySprintIds(IReadOnlyCollection<Guid> sprintIds, GetSprintByFilterDto getSprintByFilterDto)
         {
             var issues = await _context.Issues
+                .Include(i => i.IssueType)
                 .Where(i => sprintIds.Contains((Guid)i.SprintId!))
                 .WhereIf(getSprintByFilterDto.issuetypeid is not null, i => i.IssueTypeId == getSprintByFilterDto.issuetypeid)
                 .WhereIf(getSprintByFilterDto.epicid is not null, i => i.ParentId == getSprintByFilterDto.epicid)

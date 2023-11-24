@@ -198,7 +198,7 @@ namespace TaskManager.Infrastructure.Services
             foreach (var status in statuses)
             {
                 var issueByStatusIds = issues.Where(i => i.StatusId == status.Id).ToList();
-                var issueViewModels = issues.Adapt<IReadOnlyCollection<IssueViewModel>>();
+                var issueViewModels = issueByStatusIds.Adapt<IReadOnlyCollection<IssueViewModel>>();
                 issueOnBoard.Add(status.Name, issueViewModels);
             }
 
