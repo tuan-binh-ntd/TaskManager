@@ -1,6 +1,7 @@
 ﻿using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
+using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Exceptions;
@@ -22,6 +23,7 @@ namespace TaskManager.Infrastructure.Services
         private readonly IBacklogRepository _backlogRepository;
         private readonly ISprintRepository _sprintRepository;
         private readonly IStatusCategoryRepository _statusCategoryRepository;
+        private readonly IEmailSender _emailSender;
         private readonly IMapper _mapper;
 
         public IssueService(
@@ -35,6 +37,7 @@ namespace TaskManager.Infrastructure.Services
             IBacklogRepository backlogRepository,
             ISprintRepository sprintRepository,
             IStatusCategoryRepository statusCategoryRepository,
+            IEmailSender emailSender,
             IMapper mapper
             )
         {
@@ -48,6 +51,7 @@ namespace TaskManager.Infrastructure.Services
             _backlogRepository = backlogRepository;
             _sprintRepository = sprintRepository;
             _statusCategoryRepository = statusCategoryRepository;
+            _emailSender = emailSender;
             _mapper = mapper;
         }
 
@@ -213,6 +217,74 @@ namespace TaskManager.Infrastructure.Services
             }
             return issueViewModels.AsReadOnly();
         }
+
+        private string DetachUpdateField(UpdateIssueDto updateIssueDto)
+        {
+            if(!string.IsNullOrWhiteSpace(updateIssueDto.Name))
+            {
+                return CoreConstants.IssueUpdatedName;
+            }
+            else if(!string.IsNullOrWhiteSpace(updateIssueDto.Description))
+            {
+                return CoreConstants.IssueUpdatedName;
+            }
+            else if(updateIssueDto.CompleteDate is DateTime completeDate)
+            {
+                return CoreConstants.IssueResolvedName;
+            }
+            else if(updateIssueDto.StartDate is DateTime startDate)
+            {
+                return CoreConstants.IssueUpdatedName;
+            }
+            else if(updateIssueDto.DueDate is DateTime dueDate)
+            {
+                return CoreConstants.IssueUpdatedName;
+            }
+            else if(updateIssueDto.ParentId is Guid parentId)
+            {
+                return CoreConstants.IssueUpdatedName;
+            }
+            else if(updateIssueDto.SprintId is Guid sprintId)
+            {
+                return CoreConstants.IssueUpdatedName;
+            }
+            else if(updateIssueDto.IssueTypeId is Guid issueTypeId)
+            {
+                return CoreConstants.IssueUpdatedName;
+            }
+            else if(updateIssueDto.BacklogId is Guid backlogId)
+            {
+                return CoreConstants.IssueUpdatedName;
+            }
+            else if(updateIssueDto.AssigneeId is Guid assigneeId)
+            {
+                return CoreConstants.IssueAssignedName;
+            }
+            else if (updateIssueDto.StatusId is Guid statusId)
+            {
+                return CoreConstants.IssueUpdatedName;
+            }
+            else if(updateIssueDto.PriorityId is Guid priorityId)
+            {
+                return CoreConstants.IssueUpdatedName;
+            }
+            else if(updateIssueDto.StoryPointEstimate is int storyPointEstimate)
+            {
+                return CoreConstants.IssueUpdatedName;
+            }
+            else if (updateIssueDto.VersionId is Guid versionId)
+            {
+                return CoreConstants.IssueUpdatedName;
+            }
+            else if(updateIssueDto.ReporterId is Guid reporterId)
+            {
+                return CoreConstants.IssueUpdatedName;
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
         #endregion
 
         public async Task<IssueViewModel> CreateIssue(CreateIssueDto createIssueDto, Guid? sprintId = null, Guid? backlogId = null)
@@ -256,13 +328,8 @@ namespace TaskManager.Infrastructure.Services
 
         public async Task<IssueViewModel> UpdateIssue(Guid id, UpdateIssueDto updateIssueDto)
         {
-            var issue = await _issueRepository.Get(id);
-            if (issue is null)
-            {
-#pragma warning disable CA2208 // Instantiate argument exceptions correctly
-                throw new ArgumentNullException(nameof(issue));
-#pragma warning restore CA2208 // Instantiate argument exceptions correctly
-            }
+            var issue = await _issueRepository.Get(id) ?? throw new SprintNullException();
+
             if (updateIssueDto.UserIds is not null && updateIssueDto.UserIds.Any())
             {
                 foreach (var item in updateIssueDto.UserIds)
@@ -280,6 +347,7 @@ namespace TaskManager.Infrastructure.Services
                     }
                 }
             }
+
             if (issue.Watcher is not null && issue.Watcher.Users is not null)
             {
                 issue.Watcher.Users = issue.Watcher.Users.DistinctBy(i => i.Identity).ToList();
@@ -332,9 +400,9 @@ namespace TaskManager.Infrastructure.Services
             {
                 issueDetail.StoryPointEstimate = (int)updateIssueDto.StoryPointEstimate;
             }
-            if (updateIssueDto.ReporterId is not null)
+            if (updateIssueDto.ReporterId is Guid reporterId)
             {
-                issueDetail.ReporterId = (Guid)updateIssueDto.ReporterId;
+                issueDetail.ReporterId = reporterId;
             }
             if (updateIssueDto.AssigneeId is not null)
             {

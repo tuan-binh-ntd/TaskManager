@@ -133,7 +133,7 @@ namespace TaskManager.Infrastructure.Services
             {
                 foreach (var sprint in sprints)
                 {
-                    var issues = await _sprintRepository.GetIssues(sprint.Id);
+                    var issues = await _sprintRepository.GetIssues(sprint.Id, project.Id);
                     issueViewModels = await ToIssueViewModels(issues);
                     sprint.Issues = issueViewModels.ToList();
                 }

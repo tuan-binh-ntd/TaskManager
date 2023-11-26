@@ -14,5 +14,8 @@
 #pragma warning disable IDE1006 // Naming Styles
         public Guid? sprintid { get; set; }
 #pragma warning restore IDE1006 // Naming Styles
+#pragma warning disable IDE1006 // Naming Styles
+        public string searchkey { get; set; } = string.Empty;
+#pragma warning restore IDE1006 // Naming Styles
     }
 }

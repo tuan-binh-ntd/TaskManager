@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
+using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Extensions;
@@ -46,10 +47,12 @@ namespace TaskManager.Infrastructure.Repositories
             return _context.Sprints.AsNoTracking().SingleOrDefault(e => e.Id == id);
         }
 
-        public async Task<IReadOnlyCollection<Issue>> GetIssues(Guid sprintId)
+        public async Task<IReadOnlyCollection<Issue>> GetIssues(Guid sprintId, Guid projectId)
         {
+            var subtaskTypeId = await _context.IssueTypes.AsNoTracking().Where(it => it.ProjectId == projectId && it.Name == CoreConstants.SubTaskName).Select(it => it.Id).FirstOrDefaultAsync();
+
             var issues = await _context.Issues
-                .Where(i => i.SprintId == sprintId)
+                .Where(i => i.SprintId == sprintId && i.IssueTypeId != subtaskTypeId)
                 .ToListAsync();
             return issues.AsReadOnly();
         }

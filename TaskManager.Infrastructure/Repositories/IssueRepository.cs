@@ -202,6 +202,7 @@ namespace TaskManager.Infrastructure.Repositories
             var issues = await _context.Issues
                 .Include(i => i.IssueType)
                 .Where(i => sprintIds.Contains((Guid)i.SprintId!))
+                .WhereIf(!string.IsNullOrWhiteSpace(getSprintByFilterDto.searchkey), i => i.Name.Contains(getSprintByFilterDto.searchkey))
                 .WhereIf(getSprintByFilterDto.issuetypeid is not null, i => i.IssueTypeId == getSprintByFilterDto.issuetypeid)
                 .WhereIf(getSprintByFilterDto.epicid is not null, i => i.ParentId == getSprintByFilterDto.epicid)
                 .ToListAsync();

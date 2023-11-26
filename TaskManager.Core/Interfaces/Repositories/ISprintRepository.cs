@@ -11,7 +11,7 @@ namespace TaskManager.Core.Interfaces.Repositories
         void Update(Sprint sprint);
         void Delete(Guid id);
         Sprint? Get(Guid id);
-        Task<IReadOnlyCollection<Issue>> GetIssues(Guid sprintId);
+        Task<IReadOnlyCollection<Issue>> GetIssues(Guid sprintId, Guid projectId);
         Task<IReadOnlyCollection<SprintViewModel>> GetSprintByProjectId(Guid projectId);
         Task<IReadOnlyCollection<Guid>> GetSprintIdsByProjectId(Guid projectId, GetSprintByFilterDto getSprintByFilterDto);
     }

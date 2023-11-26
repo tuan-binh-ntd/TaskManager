@@ -33,9 +33,9 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<Issue>> GetIssues(Guid backlogId)
         {
-            var projectId = await _context.Backlogs.Where(b => b.Id == backlogId).Select(b => b.ProjectId).FirstOrDefaultAsync();
+            var projectId = await _context.Backlogs.AsNoTracking().Where(b => b.Id == backlogId).Select(b => b.ProjectId).FirstOrDefaultAsync();
 
-            var subtaskTypeId = await _context.IssueTypes.Where(it => it.ProjectId == projectId && it.Name == CoreConstants.SubTaskName).Select(it => it.Id).FirstOrDefaultAsync();
+            var subtaskTypeId = await _context.IssueTypes.AsNoTracking().Where(it => it.ProjectId == projectId && it.Name == CoreConstants.SubTaskName).Select(it => it.Id).FirstOrDefaultAsync();
 
             var issues = await _context.Issues
                 .Where(i => i.BacklogId == backlogId && i.IssueTypeId != subtaskTypeId)
