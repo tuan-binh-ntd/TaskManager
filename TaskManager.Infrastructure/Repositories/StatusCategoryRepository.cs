@@ -10,6 +10,8 @@ namespace TaskManager.Infrastructure.Repositories
     {
         private readonly AppDbContext _context;
 
+        public IUnitOfWork UnitOfWork => _context;
+
         public StatusCategoryRepository(AppDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
@@ -25,6 +27,18 @@ namespace TaskManager.Infrastructure.Repositories
         {
             var doneStatusCategory = await _context.StatusCategories.Where(sc => sc.Code == CoreConstants.DoneCode).FirstOrDefaultAsync();
             return doneStatusCategory;
+        }
+
+        public async Task<IReadOnlyCollection<StatusCategory>> GetForStatus()
+        {
+            var statusCategoryCodes = new List<string>()
+            {
+                CoreConstants.ToDoCode,
+                CoreConstants.InProgressCode,
+                CoreConstants.DoneCode,
+            };
+            var statusCategories = await _context.StatusCategories.Where(sc => statusCategoryCodes.Contains(sc.Code)).AsNoTracking().ToListAsync();
+            return statusCategories.AsReadOnly();
         }
     }
 }

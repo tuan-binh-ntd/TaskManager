@@ -2,9 +2,10 @@
 
 namespace TaskManager.Core.Interfaces.Repositories
 {
-    public interface IStatusCategoryRepository
+    public interface IStatusCategoryRepository : IRepository<StatusCategory>
     {
         IReadOnlyCollection<StatusCategory> Gets();
         Task<StatusCategory?> GetDone();
+        Task<IReadOnlyCollection<StatusCategory>> GetForStatus();
     }
 }

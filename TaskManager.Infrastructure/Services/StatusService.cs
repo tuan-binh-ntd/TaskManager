@@ -12,14 +12,17 @@ namespace TaskManager.Infrastructure.Services
     public class StatusService : IStatusService
     {
         private readonly IStatusRepository _statusRepository;
+        private readonly IStatusCategoryRepository _statusCategoryRepository;
         private readonly IMapper _mapper;
 
         public StatusService(
             IStatusRepository statusRepository,
+            IStatusCategoryRepository statusCategoryRepository,
             IMapper mapper
             )
         {
             _statusRepository = statusRepository;
+            _statusCategoryRepository = statusCategoryRepository;
             _mapper = mapper;
         }
 
@@ -50,6 +53,12 @@ namespace TaskManager.Infrastructure.Services
                 var statuses = await _statusRepository.GetByProjectId(projectId);
                 return _mapper.Map<IReadOnlyCollection<StatusViewModel>>(statuses);
             }
+        }
+
+        public async Task<IReadOnlyCollection<StatusCategoryViewModel>> GetStatusCategoryViewModels()
+        {
+            var statusCategories = await _statusCategoryRepository.GetForStatus();
+            return statusCategories.Adapt<IReadOnlyCollection<StatusCategoryViewModel>>();
         }
 
         public async Task<StatusViewModel> Update(Guid id, UpdateStatusDto updateStatusDto)

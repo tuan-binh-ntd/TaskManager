@@ -10,5 +10,6 @@ namespace TaskManager.Core.Interfaces.Services
         Task<StatusViewModel> Update(Guid id, UpdateStatusDto updateStatusDto);
         Task<Guid> Delete(Guid id);
         Task<object> Gets(Guid projectId, PaginationInput paginationInput);
+        Task<IReadOnlyCollection<StatusCategoryViewModel>> GetStatusCategoryViewModels();
     }
 }
