@@ -73,5 +73,13 @@ namespace TaskManager.Infrastructure.Repositories
                 .ToListAsync();
             return sprints.AsReadOnly();
         }
+
+        public async Task<IReadOnlyCollection<Issue>> GetIssues(Guid sprintId)
+        {
+            var issues = await _context.Issues
+                .Where(i => i.SprintId == sprintId)
+                .ToListAsync();
+            return issues.AsReadOnly();
+        }
     }
 }
