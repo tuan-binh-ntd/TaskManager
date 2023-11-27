@@ -234,7 +234,8 @@ namespace TaskManager.Infrastructure.Services
                 {
                     Name = IssueConstants.Summary_IssueHistoryName,
                     Content = $"{issue.Name} to {updateIssueDto.Name}",
-                    CreatorUserId = updateIssueDto.ModificationUserId
+                    CreatorUserId = updateIssueDto.ModificationUserId,
+                    IssueId = issue.Id,
                 };
                 issueHistories.Add(updatedTheSumaryHis);
 
@@ -246,7 +247,8 @@ namespace TaskManager.Infrastructure.Services
                 {
                     Name = IssueConstants.Description_IssueHistoryName,
                     Content = string.IsNullOrWhiteSpace(issue.Description) ? $"{IssueConstants.None_IssueHistoryContent} to {updateIssueDto.Description}" : $"{issue.Description} to {updateIssueDto.Description}",
-                    CreatorUserId = updateIssueDto.ModificationUserId
+                    CreatorUserId = updateIssueDto.ModificationUserId,
+                    IssueId = issue.Id,
                 };
                 issueHistories.Add(updatedTheDescriptionHis);
 
@@ -255,12 +257,13 @@ namespace TaskManager.Infrastructure.Services
             else if (updateIssueDto.ParentId is Guid parentId)
             {
                 string? oldParentName = await _issueRepository.GetNameOfIssue(issue.Id);
-                string? newParentName = await _issueRepository.GetNameOfIssue(issue.Id);
+                string? newParentName = await _issueRepository.GetNameOfIssue(parentId);
                 var changedTheParentHis = new IssueHistory()
                 {
                     Name = IssueConstants.Parent_IssueHistoryName,
                     Content = $"{oldParentName} to {newParentName}",
-                    CreatorUserId = updateIssueDto.ModificationUserId
+                    CreatorUserId = updateIssueDto.ModificationUserId,
+                    IssueId = issue.Id,
                 };
                 issueHistories.Add(changedTheParentHis);
 
@@ -270,24 +273,26 @@ namespace TaskManager.Infrastructure.Services
             {
                 if (issue.SprintId is Guid oldSprintId)
                 {
-                    string? oldSprintName = await _issueRepository.GetNameOfIssue(oldSprintId);
-                    string? newSprintName = await _issueRepository.GetNameOfIssue(newSprintId);
+                    string? oldSprintName = await _sprintRepository.GetNameOfSprint(oldSprintId);
+                    string? newSprintName = await _sprintRepository.GetNameOfSprint(newSprintId);
                     var changedTheParentHis = new IssueHistory()
                     {
                         Name = IssueConstants.Parent_IssueHistoryName,
                         Content = $"{oldSprintName} to {newSprintName}",
-                        CreatorUserId = updateIssueDto.ModificationUserId
+                        CreatorUserId = updateIssueDto.ModificationUserId,
+                        IssueId = issue.Id,
                     };
                     issueHistories.Add(changedTheParentHis);
                 }
                 else if (issue.SprintId is null)
                 {
-                    string? newSprintName = await _issueRepository.GetNameOfIssue(newSprintId);
+                    string? newSprintName = await _sprintRepository.GetNameOfSprint(newSprintId);
                     var changedTheParentHis = new IssueHistory()
                     {
                         Name = IssueConstants.Parent_IssueHistoryName,
                         Content = $"{IssueConstants.None_IssueHistoryContent} to {newSprintName}",
-                        CreatorUserId = updateIssueDto.ModificationUserId
+                        CreatorUserId = updateIssueDto.ModificationUserId,
+                        IssueId = issue.Id,
                     };
                     issueHistories.Add(changedTheParentHis);
                 }
@@ -302,7 +307,8 @@ namespace TaskManager.Infrastructure.Services
                 {
                     Name = IssueConstants.IssueType_IssueHistoryName,
                     Content = $"{oldIssueTypeName} to {newIssueTypeName}",
-                    CreatorUserId = updateIssueDto.ModificationUserId
+                    CreatorUserId = updateIssueDto.ModificationUserId,
+                    IssueId = issue.Id,
                 };
                 issueHistories.Add(updatedTheIssueTypeHis);
 
@@ -312,12 +318,13 @@ namespace TaskManager.Infrastructure.Services
             {
                 if (issue.SprintId is Guid oldSprintId)
                 {
-                    string? oldSprintName = await _issueRepository.GetNameOfIssue(oldSprintId);
+                    string? oldSprintName = await _sprintRepository.GetNameOfSprint(oldSprintId);
                     var changedTheBacklogHis = new IssueHistory()
                     {
                         Name = IssueConstants.Sprint_IssueHistoryName,
                         Content = $"{oldSprintName} to {IssueConstants.None_IssueHistoryContent}",
-                        CreatorUserId = updateIssueDto.ModificationUserId
+                        CreatorUserId = updateIssueDto.ModificationUserId,
+                        IssueId = issue.Id,
                     };
                     issueHistories.Add(changedTheBacklogHis);
                 }
@@ -336,7 +343,8 @@ namespace TaskManager.Infrastructure.Services
                             From = oldAssigneeId,
                             To = newAssigneeId,
                         }.ToJson(),
-                        CreatorUserId = updateIssueDto.ModificationUserId
+                        CreatorUserId = updateIssueDto.ModificationUserId,
+                        IssueId = issue.Id,
                     };
                     issueHistories.Add(changedTheAssigneeHis);
                 }
@@ -350,29 +358,28 @@ namespace TaskManager.Infrastructure.Services
                             From = null,
                             To = newAssigneeId,
                         }.ToJson(),
-                        CreatorUserId = updateIssueDto.ModificationUserId
+                        CreatorUserId = updateIssueDto.ModificationUserId,
+                        IssueId = issue.Id,
                     };
                     issueHistories.Add(changedTheAssigneeHis);
                 }
 
                 issueDetail.AssigneeId = newAssigneeId;
             }
-            else if (updateIssueDto.AssigneeId is null)
+            else if (updateIssueDto.AssigneeId is null && issueDetail.AssigneeId is Guid oldAssigneeId)
             {
-                if (issueDetail.AssigneeId is Guid oldAssigneeId)
+                var changedTheAssigneeHis = new IssueHistory()
                 {
-                    var changedTheAssigneeHis = new IssueHistory()
+                    Name = IssueConstants.Assignee_IssueHistoryName,
+                    Content = new AssigneeFromTo
                     {
-                        Name = IssueConstants.Assignee_IssueHistoryName,
-                        Content = new AssigneeFromTo
-                        {
-                            From = oldAssigneeId,
-                            To = null,
-                        }.ToJson(),
-                        CreatorUserId = updateIssueDto.ModificationUserId
-                    };
-                    issueHistories.Add(changedTheAssigneeHis);
-                }
+                        From = oldAssigneeId,
+                        To = null,
+                    }.ToJson(),
+                    CreatorUserId = updateIssueDto.ModificationUserId,
+                    IssueId = issue.Id,
+                };
+                issueHistories.Add(changedTheAssigneeHis);
 
                 issueDetail.AssigneeId = null;
             }
@@ -386,7 +393,8 @@ namespace TaskManager.Infrastructure.Services
                     {
                         Name = IssueConstants.Status_IssueHistoryName,
                         Content = $"{oldStatusName} to {newStatusName}",
-                        CreatorUserId = updateIssueDto.ModificationUserId
+                        CreatorUserId = updateIssueDto.ModificationUserId,
+                        IssueId = issue.Id,
                     };
                     issueHistories.Add(changedTheStatusHis);
                 }
@@ -403,7 +411,8 @@ namespace TaskManager.Infrastructure.Services
                     {
                         Name = IssueConstants.Priority_IssueHistoryName,
                         Content = $"{oldPriorityName} to {newPriorityName}",
-                        CreatorUserId = updateIssueDto.ModificationUserId
+                        CreatorUserId = updateIssueDto.ModificationUserId,
+                        IssueId = issue.Id,
                     };
 
                     issueHistories.Add(changedThePriorityHis);
@@ -415,7 +424,8 @@ namespace TaskManager.Infrastructure.Services
                     {
                         Name = IssueConstants.Priority_IssueHistoryName,
                         Content = $"{IssueConstants.None_IssueHistoryContent} to {newPriorityName}",
-                        CreatorUserId = updateIssueDto.ModificationUserId
+                        CreatorUserId = updateIssueDto.ModificationUserId,
+                        IssueId = issue.Id,
                     };
 
                     issueHistories.Add(changedThePriorityHis);
@@ -423,47 +433,44 @@ namespace TaskManager.Infrastructure.Services
 
                 issue.PriorityId = newPriorityId;
             }
-            else if (updateIssueDto.StoryPointEstimate is int newStoryPointEstimate)
+            else if (updateIssueDto.StoryPointEstimate is not 0 && issueDetail.StoryPointEstimate is not 0)
             {
-                if (issueDetail.StoryPointEstimate is int oldStoryPointEstimate)
+                var updatedTheSPEHis = new IssueHistory()
                 {
-                    var updatedTheSPEHis = new IssueHistory()
-                    {
-                        Name = IssueConstants.StoryPointEstimate_IssueHistoryName,
-                        Content = $"{oldStoryPointEstimate} to {newStoryPointEstimate}",
-                        CreatorUserId = updateIssueDto.ModificationUserId
-                    };
-                    issueHistories.Add(updatedTheSPEHis);
+                    Name = IssueConstants.StoryPointEstimate_IssueHistoryName,
+                    Content = $"{issueDetail.StoryPointEstimate} to {updateIssueDto.StoryPointEstimate}",
+                    CreatorUserId = updateIssueDto.ModificationUserId,
+                    IssueId = issue.Id,
+                };
+                issueHistories.Add(updatedTheSPEHis);
 
-                    issueDetail.StoryPointEstimate = newStoryPointEstimate;
-                }
-                else
-                {
-                    var updatedTheSPEHis = new IssueHistory()
-                    {
-                        Name = IssueConstants.StoryPointEstimate_IssueHistoryName,
-                        Content = $"0 to {newStoryPointEstimate}",
-                        CreatorUserId = updateIssueDto.ModificationUserId
-                    };
-                    issueHistories.Add(updatedTheSPEHis);
-
-                    issueDetail.StoryPointEstimate = 0;
-                }
+                issueDetail.StoryPointEstimate = updateIssueDto.StoryPointEstimate ?? 0;
             }
-            else if (updateIssueDto.StoryPointEstimate is null)
+            else if (updateIssueDto.StoryPointEstimate is not 0 && issueDetail.StoryPointEstimate is 0)
             {
-                if (issueDetail.StoryPointEstimate is int oldStoryPointEstimate)
+                var updatedTheSPEHis = new IssueHistory()
                 {
-                    var updatedTheSPEHis = new IssueHistory()
-                    {
-                        Name = IssueConstants.StoryPointEstimate_IssueHistoryName,
-                        Content = $"{oldStoryPointEstimate} to 0",
-                        CreatorUserId = updateIssueDto.ModificationUserId
-                    };
-                    issueHistories.Add(updatedTheSPEHis);
+                    Name = IssueConstants.StoryPointEstimate_IssueHistoryName,
+                    Content = $"{issueDetail.StoryPointEstimate} to {updateIssueDto.StoryPointEstimate}",
+                    CreatorUserId = updateIssueDto.ModificationUserId,
+                    IssueId = issue.Id,
+                };
+                issueHistories.Add(updatedTheSPEHis);
 
-                    issueDetail.StoryPointEstimate = 0;
-                }
+                issueDetail.StoryPointEstimate = updateIssueDto.StoryPointEstimate ?? 0;
+            }
+            else if (updateIssueDto.StoryPointEstimate is 0 && issueDetail.StoryPointEstimate is not 0)
+            {
+                var updatedTheSPEHis = new IssueHistory()
+                {
+                    Name = IssueConstants.StoryPointEstimate_IssueHistoryName,
+                    Content = $"{issueDetail.StoryPointEstimate} to {updateIssueDto.StoryPointEstimate}",
+                    CreatorUserId = updateIssueDto.ModificationUserId,
+                    IssueId = issue.Id,
+                };
+                issueHistories.Add(updatedTheSPEHis);
+
+                issueDetail.StoryPointEstimate = updateIssueDto.StoryPointEstimate ?? 0;
             }
             else if (updateIssueDto.ReporterId is Guid reporterId)
             {
@@ -475,7 +482,8 @@ namespace TaskManager.Infrastructure.Services
                         From = issueDetail.ReporterId,
                         To = reporterId
                     }.ToJson(),
-                    CreatorUserId = updateIssueDto.ModificationUserId
+                    CreatorUserId = updateIssueDto.ModificationUserId,
+                    IssueId = issue.Id,
                 };
                 issueHistories.Add(updatedTheReporterHis);
 
@@ -529,6 +537,9 @@ namespace TaskManager.Infrastructure.Services
         public async Task<IssueViewModel> UpdateIssue(Guid id, UpdateIssueDto updateIssueDto)
         {
             var issue = await _issueRepository.Get(id) ?? throw new SprintNullException();
+            var issueDetail = await _issueDetailRepository.GetById(id);
+            await DetachUpdateField(issue, issueDetail, updateIssueDto);
+
 
             if (updateIssueDto.UserIds is not null && updateIssueDto.UserIds.Any())
             {
@@ -590,9 +601,7 @@ namespace TaskManager.Infrastructure.Services
                 }
 
             }
-            var issueDetail = await _issueDetailRepository.GetById(id);
 
-            await DetachUpdateField(issue, issueDetail, updateIssueDto);
 
             issue = updateIssueDto.Adapt(issue);
             _issueRepository.Update(issue);
