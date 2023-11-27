@@ -190,7 +190,7 @@ namespace TaskManager.Infrastructure.Services
         public async Task<Dictionary<string, IReadOnlyCollection<IssueViewModel>>> GetAll(Guid projectId, GetSprintByFilterDto getSprintByFilterDto)
         {
             var sprintIds = await _sprintRepository.GetSprintIdsByProjectId(projectId, getSprintByFilterDto);
-            var issues = await _issueRepository.GetBySprintIds(sprintIds, getSprintByFilterDto);
+            var issues = await _issueRepository.GetBySprintIds(sprintIds, getSprintByFilterDto, projectId);
 
             var issueOnBoard = new Dictionary<string, IReadOnlyCollection<IssueViewModel>>();
             var statuses = await _statusRepository.GetByProjectId(projectId);

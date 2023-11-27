@@ -8,6 +8,6 @@
         //#pragma warning restore IDE1006 // Naming Styles
         public Guid? IssueTypeId { get; set; }
         public Guid? SprintId { get; set; }
-        public string SearchKey { get; set; } = string.Empty;
+        public string? SearchKey { get; set; } = string.Empty;
     }
 }

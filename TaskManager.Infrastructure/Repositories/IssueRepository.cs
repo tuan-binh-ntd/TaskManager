@@ -189,12 +189,15 @@ namespace TaskManager.Infrastructure.Repositories
             return issues.AsReadOnly();
         }
 
-        public async Task<IReadOnlyCollection<Issue>> GetBySprintIds(IReadOnlyCollection<Guid> sprintIds, GetSprintByFilterDto getSprintByFilterDto)
+        public async Task<IReadOnlyCollection<Issue>> GetBySprintIds(IReadOnlyCollection<Guid> sprintIds, GetSprintByFilterDto getSprintByFilterDto, Guid projectId)
         {
+            var subtaskTypeId = await _context.IssueTypes.AsNoTracking().Where(it => it.ProjectId == projectId && it.Name == CoreConstants.SubTaskName).Select(it => it.Id).FirstOrDefaultAsync();
+
             var issues = await _context.Issues
                 .Include(i => i.IssueType)
                 .Where(i => sprintIds.Contains((Guid)i.SprintId!))
-                .WhereIf(!string.IsNullOrWhiteSpace(getSprintByFilterDto.SearchKey), i => i.Name.Contains(getSprintByFilterDto.SearchKey))
+                .Where(i => i.IssueTypeId != subtaskTypeId)
+                .WhereIf(!string.IsNullOrWhiteSpace(getSprintByFilterDto.SearchKey), i => i.Name.Contains(getSprintByFilterDto.SearchKey!))
                 .WhereIf(getSprintByFilterDto.IssueTypeId is not null, i => i.IssueTypeId == getSprintByFilterDto.IssueTypeId)
                 .WhereIf(getSprintByFilterDto.EpicIds.Any(), i => getSprintByFilterDto.EpicIds.Contains((Guid)i.ParentId!))
                 .ToListAsync();
