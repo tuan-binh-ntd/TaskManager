@@ -76,7 +76,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        [HttpPost("")]
+        [HttpPost("get-sprints")]
         [ProducesResponseType(typeof(IReadOnlyCollection<SprintViewModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Get(Guid projectId, [FromBody] GetSprintByFilterDto getSprintByFilterDto)
         {

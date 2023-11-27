@@ -405,10 +405,23 @@ namespace TaskManager.Infrastructure.Services
                         Content = $"{oldPriorityName} to {newPriorityName}",
                         CreatorUserId = updateIssueDto.ModificationUserId
                     };
+
+                    issueHistories.Add(changedThePriorityHis);
+                }
+                else
+                {
+                    string? newPriorityName = await _priorityRepository.GetNameOfPriority(newPriorityId);
+                    var changedThePriorityHis = new IssueHistory()
+                    {
+                        Name = IssueConstants.Priority_IssueHistoryName,
+                        Content = $"{IssueConstants.None_IssueHistoryContent} to {newPriorityName}",
+                        CreatorUserId = updateIssueDto.ModificationUserId
+                    };
+
                     issueHistories.Add(changedThePriorityHis);
                 }
 
-                issue.StatusId = newPriorityId;
+                issue.PriorityId = newPriorityId;
             }
             else if (updateIssueDto.StoryPointEstimate is int newStoryPointEstimate)
             {
