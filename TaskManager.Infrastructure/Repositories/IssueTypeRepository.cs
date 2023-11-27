@@ -102,5 +102,11 @@ namespace TaskManager.Infrastructure.Repositories
         {
             _context.IssueTypes.AddRange(issueTypes);
         }
+
+        public async Task<string?> GetNameOfIssueType(Guid issueTypeId)
+        {
+            string? name = await _context.IssueTypes.AsNoTracking().Where(it => it.Id == issueTypeId).Select(it => it.Name).FirstOrDefaultAsync();
+            return name;
+        }
     }
 }

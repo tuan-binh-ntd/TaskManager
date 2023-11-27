@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using System.ComponentModel.DataAnnotations;
 using TaskManager.Core.Entities;
 using static TaskManager.Core.Extensions.CoreExtensions;
 
@@ -37,6 +38,8 @@ namespace TaskManager.Core.DTOs
         public int? StoryPointEstimate { get; set; }
         public Guid? VersionId { get; set; }
         public Guid? ReporterId { get; set; }
+        [Required]
+        public Guid ModificationUserId { get; set; }
 
         public override void Register(TypeAdapterConfig config)
         {
@@ -54,7 +57,6 @@ namespace TaskManager.Core.DTOs
                 .IgnoreIf((src, dest) => src.SprintId == null, dest => dest.SprintId!)
                 .IgnoreIf((src, dest) => src.IssueTypeId == null, dest => dest.IssueTypeId!)
                 .IgnoreIf((src, dest) => src.BacklogId == null, dest => dest.BacklogId!)
-                .IgnoreIf((src, dest) => src.VersionId == null, dest => dest.VersionId!)
                 .Ignore(dest => dest.Id)
                 .Ignore(dest => dest.CreationTime)
                 .Ignore(dest => dest.ModificationTime!)
@@ -116,7 +118,6 @@ namespace TaskManager.Core.DTOs
                 .IgnoreIf((src, dest) => src.StartDate == null, dest => dest.StartDate!)
                 .IgnoreIf((src, dest) => src.DueDate == null, dest => dest.DueDate!)
                 .IgnoreIf((src, dest) => src.ParentId == null, dest => dest.ParentId!)
-                .IgnoreIf((src, dest) => src.VersionId == null, dest => dest.VersionId!)
                 .Ignore(dest => dest.Id)
                 .Ignore(dest => dest.CreationTime)
                 .Ignore(dest => dest.ModificationTime!)

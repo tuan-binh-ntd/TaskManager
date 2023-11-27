@@ -1,4 +1,5 @@
-﻿using Version = TaskManager.Core.Entities.Version;
+﻿using TaskManager.Core.Entities;
+using Version = TaskManager.Core.Entities.Version;
 
 namespace TaskManager.Core.Interfaces.Repositories
 {
@@ -9,6 +10,7 @@ namespace TaskManager.Core.Interfaces.Repositories
         Version Add(Version version);
         void Update(Version version);
         void Delete(Guid id);
-        void LoadEntitiesRelationship(Version version);
+        void AddRange(IReadOnlyCollection<VersionIssue> versionIssues);
+        Task<IReadOnlyCollection<Guid>> GetIssueIdsByVersionId(Guid versionId);
     }
 }

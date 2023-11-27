@@ -1,10 +1,10 @@
-﻿using MailKit.Net.Smtp;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.Text;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Interfaces.Services;
+using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 namespace TaskManager.Infrastructure.Services
 {
@@ -22,13 +22,7 @@ namespace TaskManager.Infrastructure.Services
             _logger = logger;
         }
 
-        public async Task SendEmailAsync(EmailMessageDto message, TextFormat textFormat = TextFormat.Text)
-        {
-            var mailMessage = CreateEmailMessage(message, textFormat);
-
-            await SendAsync(mailMessage);
-        }
-
+        #region Private methods
         private async Task SendAsync(MimeMessage mailMessage)
         {
             using var client = new SmtpClient();
@@ -75,6 +69,32 @@ namespace TaskManager.Infrastructure.Services
             }
 
             return emailMessage;
+        }
+        #endregion
+
+        public async Task SendEmailAsync(EmailMessageDto message, TextFormat textFormat = TextFormat.Text)
+        {
+            var mailMessage = CreateEmailMessage(message, textFormat);
+
+            await SendAsync(mailMessage);
+        }
+
+        public async Task ReplyEmailAsync(EmailMessageDto emailMessageDto, TextFormat textFormat = TextFormat.Text)
+        {
+
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(_emailConfigurationSettings.UserName, _emailConfigurationSettings.From));
+            message.To.AddRange(emailMessageDto.To);
+            message.Subject = "Re: " + emailMessageDto.Subject;
+
+            var bodyBuilder = new BodyBuilder
+            {
+                TextBody = emailMessageDto.Content
+            };
+
+            message.Body = bodyBuilder.ToMessageBody();
+
+            await SendAsync(message);
         }
     }
 }

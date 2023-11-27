@@ -1,4 +1,5 @@
-﻿using MapsterMapper;
+﻿using Mapster;
+using MapsterMapper;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
@@ -34,12 +35,13 @@ namespace TaskManager.Infrastructure.Services
         }
 
         #region PrivateMethod
-        private Task<VersionViewModel> ToVersionViewModel(Version version)
+        private async Task<VersionViewModel> ToVersionViewModel(Version version)
         {
             var versionViewModel = _mapper.Map<VersionViewModel>(version);
-            _versionRepository.LoadEntitiesRelationship(version);
-            versionViewModel.Issues = version.Issues is not null ? _mapper.Map<IReadOnlyCollection<IssueViewModel>>(version.Issues) : null;
-            return Task.FromResult(versionViewModel);
+            var issueIds = await _versionRepository.GetIssueIdsByVersionId(version.Id);
+            var issues = await _issueRepository.GetByIds(issueIds);
+            versionViewModel.Issues = issues.Adapt<IReadOnlyCollection<IssueViewModel>>();
+            return versionViewModel;
         }
 
         private async Task<IReadOnlyCollection<IssueViewModel>> ToIssueViewModels(IReadOnlyCollection<Issue> issues)
@@ -196,25 +198,24 @@ namespace TaskManager.Infrastructure.Services
 
         public async Task<VersionViewModel> AddIssues(AddIssuesToVersionDto addIssuesToVersionDto)
         {
-            if (addIssuesToVersionDto.IssueIds is not null && addIssuesToVersionDto.IssueIds.Any())
+            var version = await _versionRepository.GetById(addIssuesToVersionDto.VersionId);
+            var versionIssues = new List<VersionIssue>();
+            if (addIssuesToVersionDto.IssueIds.Any())
             {
-                var issues = await _issueRepository.GetByIds(addIssuesToVersionDto.IssueIds.ToList());
-                if (issues.Any())
+                foreach (var issueId in addIssuesToVersionDto.IssueIds)
                 {
-                    foreach (var issue in issues)
+
+                    var versionIssue = new VersionIssue()
                     {
-                        issue.VersionId = addIssuesToVersionDto.VersionId;
-                    }
+                        IssueId = issueId,
+                        VersionId = addIssuesToVersionDto.VersionId
+                    };
+                    versionIssues.Add(versionIssue);
                 }
-                _issueRepository.UpdateRange(issues);
-                await _issueRepository.UnitOfWork.SaveChangesAsync();
-                var version = await _versionRepository.GetById(addIssuesToVersionDto.VersionId);
-                return await ToVersionViewModel(version);
             }
-            else
-            {
-                return new VersionViewModel();
-            }
+            _versionRepository.AddRange(versionIssues);
+            await _versionRepository.UnitOfWork.SaveChangesAsync();
+            return await ToVersionViewModel(version);
         }
 
         public async Task<VersionViewModel> Create(CreateVersionDto createVersionDto)

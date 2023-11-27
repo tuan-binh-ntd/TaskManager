@@ -17,16 +17,19 @@ namespace TaskManager.API.Controllers
         private readonly IUserService _userService;
         private readonly IUploadFileService _uploadFileService;
         private readonly ILogger<UsersController> _logger;
+        private readonly IEmailSender _emailSender;
 
         public UsersController(
             IUserService userService,
             IUploadFileService uploadFileService,
-            ILogger<UsersController> logger
+            ILogger<UsersController> logger,
+            IEmailSender emailSender
             )
         {
             _userService = userService;
             _uploadFileService = uploadFileService;
             _logger = logger;
+            _emailSender = emailSender;
         }
 
 
@@ -114,29 +117,20 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        //[HttpDelete, AllowAnonymous]
-        //public async Task<IActionResult> Test([FromForm] FileDetails fileDetails)
-        //{
-        //    if (fileDetails.FileDetail != null)
-        //    {
-        //        await _uploadFileService.FileUploadAsync(fileDetails);
-        //    }
-        //    return CustomResult();
-        //}
+        [HttpPost("send-email"), AllowAnonymous]
+        public async Task<IActionResult> SendEmail([FromBody] EmailModel emailModel)
+        {
+            var emailMessageDto = new EmailMessageDto(new List<string>() { emailModel.To }, emailModel.Subject, emailModel.Body);
+            await _emailSender.SendEmailAsync(emailMessageDto);
+            return CustomResult(HttpStatusCode.OK);
+        }
 
-        ///// <summary>
-        ///// download file
-        ///// </summary>
-        ///// <param name="fileDetail"></param>
-        ///// <returns></returns>
-        //[HttpPost("Download"), AllowAnonymous]
-        //public async Task<IActionResult> DownloadFile(string fileName)
-        //{
-        //    if (fileName != null)
-        //    {
-        //        await _uploadFileService.FileDownloadAsync(fileName);
-        //    }
-        //    return Ok();
-        //}
+        [HttpPost("reply-email"), AllowAnonymous]
+        public async Task<IActionResult> ReplyEmail([FromBody] EmailModel emailModel)
+        {
+            var emailMessageDto = new EmailMessageDto(new List<string>() { emailModel.To }, emailModel.Subject, emailModel.Body);
+            await _emailSender.SendEmailAsync(emailMessageDto);
+            return CustomResult(HttpStatusCode.OK);
+        }
     }
 }

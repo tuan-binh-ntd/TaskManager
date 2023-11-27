@@ -31,8 +31,8 @@ namespace TaskManager.Core.Entities
         public Status? Status { get; set; }
         public Guid? PriorityId { get; set; }
         public Priority? Priority { get; set; }
-        public Guid? VersionId { get; set; }
-        public Version? Version { get; set; }
+        public ICollection<VersionIssue>? VersionIssues { get; set; }
+        public ICollection<LabelIssue>? LabelIssues { get; set; }
         public Guid? ProjectId { get; set; }
     }
 
@@ -46,5 +46,17 @@ namespace TaskManager.Core.Entities
         public Guid Identity { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
+    }
+
+    public class AssigneeFromTo
+    {
+        public Guid? From { get; set; }
+        public Guid? To { get; set; }
+    }
+
+    public class ReporterFromTo
+    {
+        public Guid From { get; set; }
+        public Guid To { get; set; }
     }
 }

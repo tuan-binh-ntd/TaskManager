@@ -51,5 +51,10 @@ namespace TaskManager.Infrastructure.Repositories
             var issueHistories = await _context.IssueHistories.AsNoTracking().Where(ih => ih.IssueId == issueId).ToListAsync();
             return issueHistories.AsReadOnly();
         }
+
+        public void AddRange(IReadOnlyCollection<IssueHistory> issueHistories)
+        {
+            _context.IssueHistories.AddRange(issueHistories);
+        }
     }
 }

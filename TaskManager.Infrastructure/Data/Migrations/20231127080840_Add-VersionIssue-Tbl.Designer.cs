@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskManager.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using TaskManager.Infrastructure.Data;
 namespace TaskManager.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231127080840_Add-VersionIssue-Tbl")]
+    partial class AddVersionIssueTbl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -629,59 +632,6 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.HasIndex("ProjectId");
 
                     b.ToTable("IssueTypes");
-                });
-
-            modelBuilder.Entity("TaskManager.Core.Entities.Label", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ModificationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Labels");
-                });
-
-            modelBuilder.Entity("TaskManager.Core.Entities.LabelIssue", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("IssueId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("LabelId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("ModificationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("VersionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IssueId");
-
-                    b.HasIndex("LabelId");
-
-                    b.HasIndex("VersionId");
-
-                    b.ToTable("LabelIssues");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.Notification", b =>
@@ -1302,7 +1252,7 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.HasIndex("VersionId");
 
-                    b.ToTable("VersionIssues");
+                    b.ToTable("VersionIssue");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.Workflow", b =>
@@ -1578,29 +1528,6 @@ namespace TaskManager.Infrastructure.Data.Migrations
                         .HasForeignKey("ProjectId");
 
                     b.Navigation("Project");
-                });
-
-            modelBuilder.Entity("TaskManager.Core.Entities.LabelIssue", b =>
-                {
-                    b.HasOne("TaskManager.Core.Entities.Issue", null)
-                        .WithMany("LabelIssues")
-                        .HasForeignKey("IssueId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TaskManager.Core.Entities.Label", "Label")
-                        .WithMany("LabelIssues")
-                        .HasForeignKey("LabelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TaskManager.Core.Entities.Version", "Version")
-                        .WithMany()
-                        .HasForeignKey("VersionId");
-
-                    b.Navigation("Label");
-
-                    b.Navigation("Version");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.Notification", b =>
@@ -1904,8 +1831,6 @@ namespace TaskManager.Infrastructure.Data.Migrations
 
                     b.Navigation("IssueHistories");
 
-                    b.Navigation("LabelIssues");
-
                     b.Navigation("VersionIssues");
                 });
 
@@ -1919,11 +1844,6 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.Navigation("Issues");
 
                     b.Navigation("WorkflowIssueTypes");
-                });
-
-            modelBuilder.Entity("TaskManager.Core.Entities.Label", b =>
-                {
-                    b.Navigation("LabelIssues");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.Notification", b =>

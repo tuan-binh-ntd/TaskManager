@@ -37,10 +37,10 @@ namespace TaskManager.Infrastructure.Data.Config
                 .IsUnique();
 
             builder
-                .HasOne(i => i.Version)
-                .WithMany(v => v.Issues)
-                .HasForeignKey(i => i.VersionId)
-                .IsRequired(false);
+                .HasMany(i => i.VersionIssues)
+                .WithOne(v => v.Issue)
+                .HasForeignKey(i => i.IssueId)
+                .IsRequired();
 
             builder
                 .OwnsOne(issue => issue.Watcher, ownedNavigationBuilder =>

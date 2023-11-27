@@ -56,6 +56,9 @@ namespace TaskManager.Infrastructure.Data
         public DbSet<Permission> Permissions => Set<Permission>();
         public DbSet<PermissionRole> PermissionRoles => Set<PermissionRole>();
         public DbSet<PermissionGroup> PermissionGroups => Set<PermissionGroup>();
+        public DbSet<VersionIssue> VersionIssues => Set<VersionIssue>();
+        public DbSet<Label> Labels => Set<Label>();
+        public DbSet<LabelIssue> LabelIssues => Set<LabelIssue>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

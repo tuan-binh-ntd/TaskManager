@@ -13,5 +13,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         void Delete(Guid id);
         Task<Priority> GetMediumByProjectId(Guid projectId);
         Task<PaginationResult<Priority>> GetByProjectId(Guid projectId, PaginationInput paginationInput);
+        Task<string?> GetNameOfPriority(Guid priorityId);
     }
 }

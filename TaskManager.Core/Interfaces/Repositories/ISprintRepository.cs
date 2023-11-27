@@ -15,5 +15,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         Task<IReadOnlyCollection<SprintViewModel>> GetSprintByProjectId(Guid projectId);
         Task<IReadOnlyCollection<Guid>> GetSprintIdsByProjectId(Guid projectId, GetSprintByFilterDto getSprintByFilterDto);
         Task<IReadOnlyCollection<Issue>> GetIssues(Guid sprintId);
+        Task<string?> GetNameOfSprint(Guid sprintId);
     }
 }

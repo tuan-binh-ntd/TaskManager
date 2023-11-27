@@ -10,6 +10,12 @@ namespace TaskManager.Infrastructure.Data.Config
         {
             builder
                 .ToTable("Versions");
+
+            builder
+                .HasMany(i => i.VersionIssues)
+                .WithOne(v => v.Version)
+                .HasForeignKey(i => i.VersionId)
+                .IsRequired();
         }
     }
 }

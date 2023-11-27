@@ -168,7 +168,9 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<Issue>> GetChildIssueOfVersion(Guid versionId)
         {
-            var childIssues = await _context.Issues.Where(i => i.VersionId == versionId).ToListAsync();
+            var childIssues = await _context.Issues
+                //.Where(i => i.VersionId == versionId)
+                .ToListAsync();
             return childIssues.AsReadOnly();
         }
 
@@ -197,6 +199,12 @@ namespace TaskManager.Infrastructure.Repositories
                 .WhereIf(getSprintByFilterDto.EpicIds.Any(), i => getSprintByFilterDto.EpicIds.Contains((Guid)i.ParentId!))
                 .ToListAsync();
             return issues.AsReadOnly();
+        }
+
+        public async Task<string?> GetNameOfIssue(Guid issueId)
+        {
+            var name = await _context.Issues.AsNoTracking().Where(i => i.Id == issueId).Select(i => i.Name).FirstOrDefaultAsync();
+            return name;
         }
     }
 }

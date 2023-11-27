@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Infrastructure.Data;
 using Version = TaskManager.Core.Entities.Version;
@@ -43,9 +44,15 @@ namespace TaskManager.Infrastructure.Repositories
             _context.Entry(version).State = EntityState.Modified;
         }
 
-        public void LoadEntitiesRelationship(Version version)
+        public void AddRange(IReadOnlyCollection<VersionIssue> versionIssues)
         {
-            _context.Entry(version).Collection(i => i.Issues!).Load();
+            _context.VersionIssues.AddRange(versionIssues);
+        }
+
+        public async Task<IReadOnlyCollection<Guid>> GetIssueIdsByVersionId(Guid versionId)
+        {
+            var issueIds = await _context.VersionIssues.Where(vi => vi.VersionId == versionId).Select(vi => vi.IssueId).ToListAsync();
+            return issueIds.AsReadOnly();
         }
     }
 }

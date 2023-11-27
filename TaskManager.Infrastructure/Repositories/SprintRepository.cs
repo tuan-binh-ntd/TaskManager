@@ -81,5 +81,11 @@ namespace TaskManager.Infrastructure.Repositories
                 .ToListAsync();
             return issues.AsReadOnly();
         }
+
+        public async Task<string?> GetNameOfSprint(Guid sprintId)
+        {
+            string? name = await _context.Sprints.AsNoTracking().Where(s => s.Id == sprintId).Select(s => s.Name).FirstOrDefaultAsync();
+            return name;
+        }
     }
 }

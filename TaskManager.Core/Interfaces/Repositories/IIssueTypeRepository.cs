@@ -16,5 +16,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         Task<IssueType> GetEpic(Guid projectId);
         Task<PaginationResult<IssueTypeViewModel>> GetsByProjectIdPaging(Guid projectId, PaginationInput paginationInput);
         void AddRange(IReadOnlyCollection<IssueType> issueTypes);
+        Task<string?> GetNameOfIssueType(Guid issueTypeId);
     }
 }
