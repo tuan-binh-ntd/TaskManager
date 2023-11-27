@@ -28,6 +28,6 @@
     public class AddIssuesToVersionDto
     {
         public Guid VersionId { get; set; }
-        public IEnumerable<Guid>? IssueIds { get; set; }
+        public IEnumerable<Guid> IssueIds { get; set; } = new List<Guid>();
     }
 }

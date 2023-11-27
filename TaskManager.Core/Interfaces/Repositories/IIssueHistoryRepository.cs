@@ -10,5 +10,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         void Update(IssueHistory issueHistory);
         void Delete(Guid id);
         Task<IReadOnlyCollection<IssueHistory>> GetByIssueId(Guid issueId);
+        void AddRange(IReadOnlyCollection<IssueHistory> issueHistories);
     }
 }

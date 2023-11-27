@@ -76,9 +76,15 @@ namespace TaskManager.Infrastructure.Repositories
             };
 
             var query = from sc in _context.StatusCategories.AsNoTracking().Where(sc => statusCodes.Contains(sc.Code))
-                                 join s in _context.Statuses.AsNoTracking().Where(s => s.ProjectId == projectId) on sc.Id equals s.StatusCategoryId
-                                 select s;
+                        join s in _context.Statuses.AsNoTracking().Where(s => s.ProjectId == projectId) on sc.Id equals s.StatusCategoryId
+                        select s;
             return await query.Pagination(paginationInput);
+        }
+
+        public async Task<string?> GetNameOfStatus(Guid statusId)
+        {
+            string? name = await _context.Statuses.AsNoTracking().Where(s => s.Id == statusId).Select(s => s.Name).FirstOrDefaultAsync();
+            return name;
         }
     }
 }

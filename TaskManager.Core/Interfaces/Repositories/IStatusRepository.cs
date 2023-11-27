@@ -13,5 +13,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         Task<Status> GetById(Guid id);
         Task<Status> GetUnreleasedStatus(Guid projectId);
         Task<PaginationResult<Status>> GetByProjectIdPaging(Guid projectId, PaginationInput paginationInput);
+        Task<string?> GetNameOfStatus(Guid statusId);
     }
 }

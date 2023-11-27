@@ -62,5 +62,11 @@ namespace TaskManager.Infrastructure.Repositories
             var query = _context.Priorities.AsNoTracking().Where(p => p.ProjectId == projectId);
             return await query.Pagination(paginationInput);
         }
+
+        public async Task<string?> GetNameOfPriority(Guid priorityId)
+        {
+            string? name = await _context.Priorities.AsNoTracking().Where(p => p.Id == priorityId).Select(p => p.Name).FirstOrDefaultAsync();
+            return name;
+        }
     }
 }

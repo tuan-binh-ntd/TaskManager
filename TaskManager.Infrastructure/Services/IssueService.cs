@@ -5,6 +5,7 @@ using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Exceptions;
+using TaskManager.Core.Extensions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
@@ -24,6 +25,8 @@ namespace TaskManager.Infrastructure.Services
         private readonly ISprintRepository _sprintRepository;
         private readonly IStatusCategoryRepository _statusCategoryRepository;
         private readonly IEmailSender _emailSender;
+        private readonly IStatusRepository _statusRepository;
+        private readonly IPriorityRepository _priorityRepository;
         private readonly IMapper _mapper;
 
         public IssueService(
@@ -38,6 +41,8 @@ namespace TaskManager.Infrastructure.Services
             ISprintRepository sprintRepository,
             IStatusCategoryRepository statusCategoryRepository,
             IEmailSender emailSender,
+            IStatusRepository statusRepository,
+            IPriorityRepository priorityRepository,
             IMapper mapper
             )
         {
@@ -52,6 +57,8 @@ namespace TaskManager.Infrastructure.Services
             _sprintRepository = sprintRepository;
             _statusCategoryRepository = statusCategoryRepository;
             _emailSender = emailSender;
+            _statusRepository = statusRepository;
+            _priorityRepository = priorityRepository;
             _mapper = mapper;
         }
 
@@ -218,72 +225,252 @@ namespace TaskManager.Infrastructure.Services
             return issueViewModels.AsReadOnly();
         }
 
-        private string DetachUpdateField(UpdateIssueDto updateIssueDto)
+        private async Task DetachUpdateField(Issue issue, IssueDetail issueDetail, UpdateIssueDto updateIssueDto)
         {
-            if(!string.IsNullOrWhiteSpace(updateIssueDto.Name))
+            var issueHistories = new List<IssueHistory>();
+            if (!string.IsNullOrWhiteSpace(updateIssueDto.Name))
             {
-                return CoreConstants.IssueUpdatedName;
+                var updatedTheSumaryHis = new IssueHistory()
+                {
+                    Name = IssueConstants.Summary_IssueHistoryName,
+                    Content = $"{issue.Name} to {updateIssueDto.Name}",
+                    CreatorUserId = updateIssueDto.ModificationUserId
+                };
+                issueHistories.Add(updatedTheSumaryHis);
+
+                issue.Name = updateIssueDto.Name;
             }
-            else if(!string.IsNullOrWhiteSpace(updateIssueDto.Description))
+            else if (!string.IsNullOrWhiteSpace(updateIssueDto.Description))
             {
-                return CoreConstants.IssueUpdatedName;
+                var updatedTheDescriptionHis = new IssueHistory()
+                {
+                    Name = IssueConstants.Description_IssueHistoryName,
+                    Content = string.IsNullOrWhiteSpace(issue.Description) ? $"{IssueConstants.None_IssueHistoryContent} to {updateIssueDto.Description}" : $"{issue.Description} to {updateIssueDto.Description}",
+                    CreatorUserId = updateIssueDto.ModificationUserId
+                };
+                issueHistories.Add(updatedTheDescriptionHis);
+
+                issue.Description = updateIssueDto.Description;
             }
-            else if(updateIssueDto.CompleteDate is DateTime completeDate)
+            else if (updateIssueDto.ParentId is Guid parentId)
             {
-                return CoreConstants.IssueResolvedName;
+                string? oldParentName = await _issueRepository.GetNameOfIssue(issue.Id);
+                string? newParentName = await _issueRepository.GetNameOfIssue(issue.Id);
+                var changedTheParentHis = new IssueHistory()
+                {
+                    Name = IssueConstants.Parent_IssueHistoryName,
+                    Content = $"{oldParentName} to {newParentName}",
+                    CreatorUserId = updateIssueDto.ModificationUserId
+                };
+                issueHistories.Add(changedTheParentHis);
+
+                issue.ParentId = parentId;
             }
-            else if(updateIssueDto.StartDate is DateTime startDate)
+            else if (updateIssueDto.SprintId is Guid newSprintId)
             {
-                return CoreConstants.IssueUpdatedName;
+                if (issue.SprintId is Guid oldSprintId)
+                {
+                    string? oldSprintName = await _issueRepository.GetNameOfIssue(oldSprintId);
+                    string? newSprintName = await _issueRepository.GetNameOfIssue(newSprintId);
+                    var changedTheParentHis = new IssueHistory()
+                    {
+                        Name = IssueConstants.Parent_IssueHistoryName,
+                        Content = $"{oldSprintName} to {newSprintName}",
+                        CreatorUserId = updateIssueDto.ModificationUserId
+                    };
+                    issueHistories.Add(changedTheParentHis);
+                }
+                else if (issue.SprintId is null)
+                {
+                    string? newSprintName = await _issueRepository.GetNameOfIssue(newSprintId);
+                    var changedTheParentHis = new IssueHistory()
+                    {
+                        Name = IssueConstants.Parent_IssueHistoryName,
+                        Content = $"{IssueConstants.None_IssueHistoryContent} to {newSprintName}",
+                        CreatorUserId = updateIssueDto.ModificationUserId
+                    };
+                    issueHistories.Add(changedTheParentHis);
+                }
+
+                issue.SprintId = newSprintId;
             }
-            else if(updateIssueDto.DueDate is DateTime dueDate)
+            else if (updateIssueDto.IssueTypeId is Guid newIssueTypeId)
             {
-                return CoreConstants.IssueUpdatedName;
+                string? newIssueTypeName = await _issueTypeRepository.GetNameOfIssueType(newIssueTypeId);
+                string? oldIssueTypeName = await _issueTypeRepository.GetNameOfIssueType(issue.IssueTypeId);
+                var updatedTheIssueTypeHis = new IssueHistory()
+                {
+                    Name = IssueConstants.IssueType_IssueHistoryName,
+                    Content = $"{oldIssueTypeName} to {newIssueTypeName}",
+                    CreatorUserId = updateIssueDto.ModificationUserId
+                };
+                issueHistories.Add(updatedTheIssueTypeHis);
+
+                issue.IssueTypeId = newIssueTypeId;
             }
-            else if(updateIssueDto.ParentId is Guid parentId)
+            else if (updateIssueDto.BacklogId is Guid backlogId)
             {
-                return CoreConstants.IssueUpdatedName;
+                if (issue.SprintId is Guid oldSprintId)
+                {
+                    string? oldSprintName = await _issueRepository.GetNameOfIssue(oldSprintId);
+                    var changedTheBacklogHis = new IssueHistory()
+                    {
+                        Name = IssueConstants.Sprint_IssueHistoryName,
+                        Content = $"{oldSprintName} to {IssueConstants.None_IssueHistoryContent}",
+                        CreatorUserId = updateIssueDto.ModificationUserId
+                    };
+                    issueHistories.Add(changedTheBacklogHis);
+                }
+
+                issue.BacklogId = backlogId;
             }
-            else if(updateIssueDto.SprintId is Guid sprintId)
+            else if (updateIssueDto.AssigneeId is Guid newAssigneeId)
             {
-                return CoreConstants.IssueUpdatedName;
+                if (issueDetail.AssigneeId is Guid oldAssigneeId)
+                {
+                    var changedTheAssigneeHis = new IssueHistory()
+                    {
+                        Name = IssueConstants.Assignee_IssueHistoryName,
+                        Content = new AssigneeFromTo
+                        {
+                            From = oldAssigneeId,
+                            To = newAssigneeId,
+                        }.ToJson(),
+                        CreatorUserId = updateIssueDto.ModificationUserId
+                    };
+                    issueHistories.Add(changedTheAssigneeHis);
+                }
+                else if (issueDetail.AssigneeId is null)
+                {
+                    var changedTheAssigneeHis = new IssueHistory()
+                    {
+                        Name = IssueConstants.Assignee_IssueHistoryName,
+                        Content = new AssigneeFromTo
+                        {
+                            From = null,
+                            To = newAssigneeId,
+                        }.ToJson(),
+                        CreatorUserId = updateIssueDto.ModificationUserId
+                    };
+                    issueHistories.Add(changedTheAssigneeHis);
+                }
+
+                issueDetail.AssigneeId = newAssigneeId;
             }
-            else if(updateIssueDto.IssueTypeId is Guid issueTypeId)
+            else if (updateIssueDto.AssigneeId is null)
             {
-                return CoreConstants.IssueUpdatedName;
+                if (issueDetail.AssigneeId is Guid oldAssigneeId)
+                {
+                    var changedTheAssigneeHis = new IssueHistory()
+                    {
+                        Name = IssueConstants.Assignee_IssueHistoryName,
+                        Content = new AssigneeFromTo
+                        {
+                            From = oldAssigneeId,
+                            To = null,
+                        }.ToJson(),
+                        CreatorUserId = updateIssueDto.ModificationUserId
+                    };
+                    issueHistories.Add(changedTheAssigneeHis);
+                }
+
+                issueDetail.AssigneeId = null;
             }
-            else if(updateIssueDto.BacklogId is Guid backlogId)
+            else if (updateIssueDto.StatusId is Guid newStatusId)
             {
-                return CoreConstants.IssueUpdatedName;
+                if (issue.StatusId is Guid oldStatusId)
+                {
+                    string? newStatusName = await _statusRepository.GetNameOfStatus(newStatusId);
+                    string? oldStatusName = await _statusRepository.GetNameOfStatus(oldStatusId);
+                    var changedTheStatusHis = new IssueHistory()
+                    {
+                        Name = IssueConstants.Status_IssueHistoryName,
+                        Content = $"{oldStatusName} to {newStatusName}",
+                        CreatorUserId = updateIssueDto.ModificationUserId
+                    };
+                    issueHistories.Add(changedTheStatusHis);
+                }
+
+                issue.StatusId = newStatusId;
             }
-            else if(updateIssueDto.AssigneeId is Guid assigneeId)
+            else if (updateIssueDto.PriorityId is Guid newPriorityId)
             {
-                return CoreConstants.IssueAssignedName;
+                if (issue.PriorityId is Guid oldPriorityId)
+                {
+                    string? newPriorityName = await _priorityRepository.GetNameOfPriority(newPriorityId);
+                    string? oldPriorityName = await _priorityRepository.GetNameOfPriority(oldPriorityId);
+                    var changedThePriorityHis = new IssueHistory()
+                    {
+                        Name = IssueConstants.Priority_IssueHistoryName,
+                        Content = $"{oldPriorityName} to {newPriorityName}",
+                        CreatorUserId = updateIssueDto.ModificationUserId
+                    };
+                    issueHistories.Add(changedThePriorityHis);
+                }
+
+                issue.StatusId = newPriorityId;
             }
-            else if (updateIssueDto.StatusId is Guid statusId)
+            else if (updateIssueDto.StoryPointEstimate is int newStoryPointEstimate)
             {
-                return CoreConstants.IssueUpdatedName;
+                if (issueDetail.StoryPointEstimate is int oldStoryPointEstimate)
+                {
+                    var updatedTheSPEHis = new IssueHistory()
+                    {
+                        Name = IssueConstants.StoryPointEstimate_IssueHistoryName,
+                        Content = $"{oldStoryPointEstimate} to {newStoryPointEstimate}",
+                        CreatorUserId = updateIssueDto.ModificationUserId
+                    };
+                    issueHistories.Add(updatedTheSPEHis);
+
+                    issueDetail.StoryPointEstimate = newStoryPointEstimate;
+                }
+                else
+                {
+                    var updatedTheSPEHis = new IssueHistory()
+                    {
+                        Name = IssueConstants.StoryPointEstimate_IssueHistoryName,
+                        Content = $"0 to {newStoryPointEstimate}",
+                        CreatorUserId = updateIssueDto.ModificationUserId
+                    };
+                    issueHistories.Add(updatedTheSPEHis);
+
+                    issueDetail.StoryPointEstimate = 0;
+                }
             }
-            else if(updateIssueDto.PriorityId is Guid priorityId)
+            else if (updateIssueDto.StoryPointEstimate is null)
             {
-                return CoreConstants.IssueUpdatedName;
+                if (issueDetail.StoryPointEstimate is int oldStoryPointEstimate)
+                {
+                    var updatedTheSPEHis = new IssueHistory()
+                    {
+                        Name = IssueConstants.StoryPointEstimate_IssueHistoryName,
+                        Content = $"{oldStoryPointEstimate} to 0",
+                        CreatorUserId = updateIssueDto.ModificationUserId
+                    };
+                    issueHistories.Add(updatedTheSPEHis);
+
+                    issueDetail.StoryPointEstimate = 0;
+                }
             }
-            else if(updateIssueDto.StoryPointEstimate is int storyPointEstimate)
+            else if (updateIssueDto.ReporterId is Guid reporterId)
             {
-                return CoreConstants.IssueUpdatedName;
+                var updatedTheReporterHis = new IssueHistory()
+                {
+                    Name = IssueConstants.Reporter_IssueHistoryName,
+                    Content = new ReporterFromTo
+                    {
+                        From = issueDetail.ReporterId,
+                        To = reporterId
+                    }.ToJson(),
+                    CreatorUserId = updateIssueDto.ModificationUserId
+                };
+                issueHistories.Add(updatedTheReporterHis);
+
+                issueDetail.ReporterId = reporterId;
             }
-            else if (updateIssueDto.VersionId is Guid versionId)
-            {
-                return CoreConstants.IssueUpdatedName;
-            }
-            else if(updateIssueDto.ReporterId is Guid reporterId)
-            {
-                return CoreConstants.IssueUpdatedName;
-            }
-            else
-            {
-                return string.Empty;
-            }
+            _issueHistoryRepository.AddRange(issueHistories);
+            await _issueHistoryRepository.UnitOfWork.SaveChangesAsync();
+
         }
         #endregion
 
@@ -390,12 +577,14 @@ namespace TaskManager.Infrastructure.Services
                 }
 
             }
+            var issueDetail = await _issueDetailRepository.GetById(id);
+
+            await DetachUpdateField(issue, issueDetail, updateIssueDto);
 
             issue = updateIssueDto.Adapt(issue);
             _issueRepository.Update(issue);
             await _issueRepository.UnitOfWork.SaveChangesAsync();
 
-            var issueDetail = await _issueDetailRepository.GetById(id);
             if (updateIssueDto.StoryPointEstimate is not null)
             {
                 issueDetail.StoryPointEstimate = (int)updateIssueDto.StoryPointEstimate;
@@ -411,6 +600,8 @@ namespace TaskManager.Infrastructure.Services
 
             _issueDetailRepository.Update(issueDetail);
             await _issueDetailRepository.UnitOfWork.SaveChangesAsync();
+
+
             return await ToIssueViewModel(issue);
         }
 

@@ -14,7 +14,7 @@ namespace TaskManager.Core.Entities
         public Guid DriverId { get; set; }
         public Guid ProjectId { get; set; }
         public Project? Project { get; set; }
-        public ICollection<Issue>? Issues { get; set; }
+        public ICollection<VersionIssue>? VersionIssues { get; set; }
         public Guid StatusId { get; set; }
         public Status? Status { get; set; }
     }
