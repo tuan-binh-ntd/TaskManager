@@ -657,9 +657,18 @@ namespace TaskManager.Infrastructure.Services
                 ParentId = createIssueByNameDto.ParentId
             };
 
-            if (sprintId is not null)
+            if (sprintId is Guid newSprintId)
             {
-                issue.SprintId = sprintId;
+                issue.SprintId = newSprintId;
+                string? newSprintName = await _sprintRepository.GetNameOfSprint(newSprintId);
+                issue.IssueHistories = new List<IssueHistory>();
+                var changedTheParentHis = new IssueHistory()
+                {
+                    Name = IssueConstants.Parent_IssueHistoryName,
+                    Content = $"{IssueConstants.None_IssueHistoryContent} to {newSprintName}",
+                    CreatorUserId = createIssueByNameDto.CreatorUserId,
+                };
+                issue.IssueHistories.Add(changedTheParentHis);
             }
             else
             {
