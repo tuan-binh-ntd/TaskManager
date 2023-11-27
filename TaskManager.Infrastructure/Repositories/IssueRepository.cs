@@ -187,24 +187,14 @@ namespace TaskManager.Infrastructure.Repositories
             return issues.AsReadOnly();
         }
 
-        public async Task<IReadOnlyCollection<Issue>> GetByFilter(GetSprintByFilterDto getSprintByFilterDto)
-        {
-            var issues = await _context.Issues
-                .WhereIf(getSprintByFilterDto.sprintid is not null, i => i.SprintId == getSprintByFilterDto.sprintid)
-                .WhereIf(getSprintByFilterDto.issuetypeid is not null, i => i.IssueTypeId == getSprintByFilterDto.issuetypeid)
-                .WhereIf(getSprintByFilterDto.epicid is not null, i => i.ParentId == getSprintByFilterDto.epicid)
-                .ToListAsync();
-            return issues.AsReadOnly();
-        }
-
         public async Task<IReadOnlyCollection<Issue>> GetBySprintIds(IReadOnlyCollection<Guid> sprintIds, GetSprintByFilterDto getSprintByFilterDto)
         {
             var issues = await _context.Issues
                 .Include(i => i.IssueType)
                 .Where(i => sprintIds.Contains((Guid)i.SprintId!))
-                .WhereIf(!string.IsNullOrWhiteSpace(getSprintByFilterDto.searchkey), i => i.Name.Contains(getSprintByFilterDto.searchkey))
-                .WhereIf(getSprintByFilterDto.issuetypeid is not null, i => i.IssueTypeId == getSprintByFilterDto.issuetypeid)
-                .WhereIf(getSprintByFilterDto.epicid is not null, i => i.ParentId == getSprintByFilterDto.epicid)
+                .WhereIf(!string.IsNullOrWhiteSpace(getSprintByFilterDto.SearchKey), i => i.Name.Contains(getSprintByFilterDto.SearchKey))
+                .WhereIf(getSprintByFilterDto.IssueTypeId is not null, i => i.IssueTypeId == getSprintByFilterDto.IssueTypeId)
+                .WhereIf(getSprintByFilterDto.EpicIds.Any(), i => getSprintByFilterDto.EpicIds.Contains((Guid)i.ParentId!))
                 .ToListAsync();
             return issues.AsReadOnly();
         }

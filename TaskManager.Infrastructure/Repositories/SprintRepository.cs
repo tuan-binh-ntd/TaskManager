@@ -68,7 +68,7 @@ namespace TaskManager.Infrastructure.Repositories
             var sprints = await _context.Sprints
                 .AsNoTracking()
                 .Where(e => e.ProjectId == projectId && e.IsComplete != true)
-                .WhereIf(getSprintByFilterDto.sprintid is not null, s => s.Id == getSprintByFilterDto.sprintid)
+                .WhereIf(getSprintByFilterDto.SprintId is not null, s => s.Id == getSprintByFilterDto.SprintId)
                 .Select(s => s.Id)
                 .ToListAsync();
             return sprints.AsReadOnly();
