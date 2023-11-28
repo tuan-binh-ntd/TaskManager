@@ -1,8 +1,10 @@
 ﻿using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
+using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Extensions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
@@ -20,6 +22,8 @@ namespace TaskManager.Infrastructure.Services
         private readonly IIssueHistoryRepository _issueHistoryRepository;
         private readonly IBacklogRepository _backlogRepository;
         private readonly ISprintRepository _sprintRepository;
+        private readonly IPriorityRepository _priorityRepository;
+        private readonly IStatusRepository _statusRepository;
         private readonly IMapper _mapper;
 
         public EpicService(
@@ -32,6 +36,8 @@ namespace TaskManager.Infrastructure.Services
             IIssueHistoryRepository issueHistoryRepository,
             IBacklogRepository backlogRepository,
             ISprintRepository sprintRepository,
+            IPriorityRepository priorityRepository,
+            IStatusRepository statusRepository,
             IMapper mapper
             )
         {
@@ -44,6 +50,8 @@ namespace TaskManager.Infrastructure.Services
             _issueHistoryRepository = issueHistoryRepository;
             _backlogRepository = backlogRepository;
             _sprintRepository = sprintRepository;
+            _priorityRepository = priorityRepository;
+            _statusRepository = statusRepository;
             _mapper = mapper;
         }
 
@@ -242,6 +250,213 @@ namespace TaskManager.Infrastructure.Services
             }
             return childIssueViewModel;
         }
+
+        private async Task DetachUpdateField(Issue issue, IssueDetail issueDetail, UpdateEpicDto updateIssueDto)
+        {
+            var issueHistories = new List<IssueHistory>();
+            if (!string.IsNullOrWhiteSpace(updateIssueDto.Name))
+            {
+                var updatedTheSumaryHis = new IssueHistory()
+                {
+                    Name = IssueConstants.Summary_IssueHistoryName,
+                    Content = $"{issue.Name} to {updateIssueDto.Name}",
+                    CreatorUserId = updateIssueDto.ModificationUserId,
+                    IssueId = issue.Id,
+                };
+                issueHistories.Add(updatedTheSumaryHis);
+
+                issue.Name = updateIssueDto.Name;
+            }
+            else if (!string.IsNullOrWhiteSpace(updateIssueDto.Description))
+            {
+                var updatedTheDescriptionHis = new IssueHistory()
+                {
+                    Name = IssueConstants.Description_IssueHistoryName,
+                    Content = string.IsNullOrWhiteSpace(issue.Description) ? $"{IssueConstants.None_IssueHistoryContent} to {updateIssueDto.Description}" : $"{issue.Description} to {updateIssueDto.Description}",
+                    CreatorUserId = updateIssueDto.ModificationUserId,
+                    IssueId = issue.Id,
+                };
+                issueHistories.Add(updatedTheDescriptionHis);
+
+                issue.Description = updateIssueDto.Description;
+            }
+            else if (updateIssueDto.ParentId is Guid parentId)
+            {
+                string? oldParentName = await _issueRepository.GetNameOfIssue(issue.Id);
+                string? newParentName = await _issueRepository.GetNameOfIssue(parentId);
+                var changedTheParentHis = new IssueHistory()
+                {
+                    Name = IssueConstants.Parent_IssueHistoryName,
+                    Content = $"{oldParentName} to {newParentName}",
+                    CreatorUserId = updateIssueDto.ModificationUserId,
+                    IssueId = issue.Id,
+                };
+                issueHistories.Add(changedTheParentHis);
+
+                issue.ParentId = parentId;
+            }
+            else if (updateIssueDto.AssigneeId is Guid newAssigneeId)
+            {
+                if (issueDetail.AssigneeId is Guid oldAssigneeId)
+                {
+                    var changedTheAssigneeHis = new IssueHistory()
+                    {
+                        Name = IssueConstants.Assignee_IssueHistoryName,
+                        Content = new AssigneeFromTo
+                        {
+                            From = oldAssigneeId,
+                            To = newAssigneeId,
+                        }.ToJson(),
+                        CreatorUserId = updateIssueDto.ModificationUserId,
+                        IssueId = issue.Id,
+                    };
+                    issueHistories.Add(changedTheAssigneeHis);
+                }
+                else if (issueDetail.AssigneeId is null)
+                {
+                    var changedTheAssigneeHis = new IssueHistory()
+                    {
+                        Name = IssueConstants.Assignee_IssueHistoryName,
+                        Content = new AssigneeFromTo
+                        {
+                            From = null,
+                            To = newAssigneeId,
+                        }.ToJson(),
+                        CreatorUserId = updateIssueDto.ModificationUserId,
+                        IssueId = issue.Id,
+                    };
+                    issueHistories.Add(changedTheAssigneeHis);
+                }
+
+                issueDetail.AssigneeId = newAssigneeId;
+            }
+            else if (updateIssueDto.AssigneeId is null && issueDetail.AssigneeId is Guid oldAssigneeId)
+            {
+                var changedTheAssigneeHis = new IssueHistory()
+                {
+                    Name = IssueConstants.Assignee_IssueHistoryName,
+                    Content = new AssigneeFromTo
+                    {
+                        From = oldAssigneeId,
+                        To = null,
+                    }.ToJson(),
+                    CreatorUserId = updateIssueDto.ModificationUserId,
+                    IssueId = issue.Id,
+                };
+                issueHistories.Add(changedTheAssigneeHis);
+
+                issueDetail.AssigneeId = null;
+            }
+            else if (updateIssueDto.StatusId is Guid newStatusId)
+            {
+                if (issue.StatusId is Guid oldStatusId)
+                {
+                    string? newStatusName = await _statusRepository.GetNameOfStatus(newStatusId);
+                    string? oldStatusName = await _statusRepository.GetNameOfStatus(oldStatusId);
+                    var changedTheStatusHis = new IssueHistory()
+                    {
+                        Name = IssueConstants.Status_IssueHistoryName,
+                        Content = $"{oldStatusName} to {newStatusName}",
+                        CreatorUserId = updateIssueDto.ModificationUserId,
+                        IssueId = issue.Id,
+                    };
+                    issueHistories.Add(changedTheStatusHis);
+                }
+
+                issue.StatusId = newStatusId;
+            }
+            else if (updateIssueDto.PriorityId is Guid newPriorityId)
+            {
+                if (issue.PriorityId is Guid oldPriorityId)
+                {
+                    string? newPriorityName = await _priorityRepository.GetNameOfPriority(newPriorityId);
+                    string? oldPriorityName = await _priorityRepository.GetNameOfPriority(oldPriorityId);
+                    var changedThePriorityHis = new IssueHistory()
+                    {
+                        Name = IssueConstants.Priority_IssueHistoryName,
+                        Content = $"{oldPriorityName} to {newPriorityName}",
+                        CreatorUserId = updateIssueDto.ModificationUserId,
+                        IssueId = issue.Id,
+                    };
+
+                    issueHistories.Add(changedThePriorityHis);
+                }
+                else
+                {
+                    string? newPriorityName = await _priorityRepository.GetNameOfPriority(newPriorityId);
+                    var changedThePriorityHis = new IssueHistory()
+                    {
+                        Name = IssueConstants.Priority_IssueHistoryName,
+                        Content = $"{IssueConstants.None_IssueHistoryContent} to {newPriorityName}",
+                        CreatorUserId = updateIssueDto.ModificationUserId,
+                        IssueId = issue.Id,
+                    };
+
+                    issueHistories.Add(changedThePriorityHis);
+                }
+
+                issue.PriorityId = newPriorityId;
+            }
+            else if (updateIssueDto.StoryPointEstimate is not 0 && issueDetail.StoryPointEstimate is not 0)
+            {
+                var updatedTheSPEHis = new IssueHistory()
+                {
+                    Name = IssueConstants.StoryPointEstimate_IssueHistoryName,
+                    Content = $"{issueDetail.StoryPointEstimate} to {updateIssueDto.StoryPointEstimate}",
+                    CreatorUserId = updateIssueDto.ModificationUserId,
+                    IssueId = issue.Id,
+                };
+                issueHistories.Add(updatedTheSPEHis);
+
+                issueDetail.StoryPointEstimate = updateIssueDto.StoryPointEstimate ?? 0;
+            }
+            else if (updateIssueDto.StoryPointEstimate is not 0 && issueDetail.StoryPointEstimate is 0)
+            {
+                var updatedTheSPEHis = new IssueHistory()
+                {
+                    Name = IssueConstants.StoryPointEstimate_IssueHistoryName,
+                    Content = $"{issueDetail.StoryPointEstimate} to {updateIssueDto.StoryPointEstimate}",
+                    CreatorUserId = updateIssueDto.ModificationUserId,
+                    IssueId = issue.Id,
+                };
+                issueHistories.Add(updatedTheSPEHis);
+
+                issueDetail.StoryPointEstimate = updateIssueDto.StoryPointEstimate ?? 0;
+            }
+            else if (updateIssueDto.StoryPointEstimate is 0 && issueDetail.StoryPointEstimate is not 0)
+            {
+                var updatedTheSPEHis = new IssueHistory()
+                {
+                    Name = IssueConstants.StoryPointEstimate_IssueHistoryName,
+                    Content = $"{issueDetail.StoryPointEstimate} to {updateIssueDto.StoryPointEstimate}",
+                    CreatorUserId = updateIssueDto.ModificationUserId,
+                    IssueId = issue.Id,
+                };
+                issueHistories.Add(updatedTheSPEHis);
+
+                issueDetail.StoryPointEstimate = updateIssueDto.StoryPointEstimate ?? 0;
+            }
+            else if (updateIssueDto.ReporterId is Guid reporterId)
+            {
+                var updatedTheReporterHis = new IssueHistory()
+                {
+                    Name = IssueConstants.Reporter_IssueHistoryName,
+                    Content = new ReporterFromTo
+                    {
+                        From = issueDetail.ReporterId,
+                        To = reporterId
+                    }.ToJson(),
+                    CreatorUserId = updateIssueDto.ModificationUserId,
+                    IssueId = issue.Id,
+                };
+                issueHistories.Add(updatedTheReporterHis);
+
+                issueDetail.ReporterId = reporterId;
+            }
+            _issueHistoryRepository.AddRange(issueHistories);
+            await _issueHistoryRepository.UnitOfWork.SaveChangesAsync();
+
+        }
         #endregion
 
         public async Task<EpicViewModel> AddIssueToEpic(Guid issueId, Guid epicId)
@@ -332,6 +547,8 @@ namespace TaskManager.Infrastructure.Services
         public async Task<EpicViewModel> UpdateEpic(Guid id, UpdateEpicDto updateEpicDto)
         {
             var epic = await _issueRepository.Get(id);
+            var issueDetail = await _issueDetailRepository.GetById(id);
+            await DetachUpdateField(epic, issueDetail, updateEpicDto);
             if (epic is null)
             {
 #pragma warning disable CA2208 // Instantiate argument exceptions correctly
@@ -342,7 +559,6 @@ namespace TaskManager.Infrastructure.Services
             _issueRepository.Update(epic);
             await _issueRepository.UnitOfWork.SaveChangesAsync();
 
-            var issueDetail = await _issueDetailRepository.GetById(id);
             if (updateEpicDto.StoryPointEstimate is not null)
             {
                 issueDetail.StoryPointEstimate = (int)updateEpicDto.StoryPointEstimate;

@@ -176,14 +176,16 @@ namespace TaskManager.Infrastructure.Services
             {
                 Name = CoreConstants.StartStatusName,
                 ProjectId = project.Id,
-                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.HideCode).Select(e => e.Id).FirstOrDefault()
+                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.HideCode).Select(e => e.Id).FirstOrDefault(),
+                IsMain = true
             };
 
             var anyStatus = new Status()
             {
                 Name = CoreConstants.AnyStatusName,
                 ProjectId = project.Id,
-                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.HideCode).Select(e => e.Id).FirstOrDefault()
+                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.HideCode).Select(e => e.Id).FirstOrDefault(),
+                IsMain = true
             };
 
             var todoStatus = new Status()
@@ -191,7 +193,8 @@ namespace TaskManager.Infrastructure.Services
                 Name = CoreConstants.TodoStatusName,
                 ProjectId = project.Id,
                 StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.ToDoCode).Select(e => e.Id).FirstOrDefault(),
-                Ordering = 1
+                Ordering = 1,
+                IsMain = true
             };
 
             var inProgressStatus = new Status()
@@ -199,8 +202,8 @@ namespace TaskManager.Infrastructure.Services
                 Name = CoreConstants.InProgresstatusName,
                 ProjectId = project.Id,
                 StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.InProgressCode).Select(e => e.Id).FirstOrDefault(),
-                Ordering = 2
-
+                Ordering = 2,
+                IsMain = true
             };
 
             var doneStatus = new Status()
@@ -208,28 +211,32 @@ namespace TaskManager.Infrastructure.Services
                 Name = CoreConstants.DoneStatusName,
                 ProjectId = project.Id,
                 StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.DoneCode).Select(e => e.Id).FirstOrDefault(),
-                Ordering = 3
+                Ordering = 3,
+                IsMain = true
             };
 
             var unreleasedStatus = new Status()
             {
                 Name = CoreConstants.UnreleasedStatusName,
                 ProjectId = project.Id,
-                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.VersionCode).Select(e => e.Id).FirstOrDefault()
+                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.VersionCode).Select(e => e.Id).FirstOrDefault(),
+                IsMain = true
             };
 
             var releasedStatus = new Status()
             {
                 Name = CoreConstants.ReleasedStatusName,
                 ProjectId = project.Id,
-                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.VersionCode).Select(e => e.Id).FirstOrDefault()
+                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.VersionCode).Select(e => e.Id).FirstOrDefault(),
+                IsMain = true
             };
 
             var archivedStatus = new Status()
             {
                 Name = CoreConstants.ArchivedStatusName,
                 ProjectId = project.Id,
-                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.VersionCode).Select(e => e.Id).FirstOrDefault()
+                StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.VersionCode).Select(e => e.Id).FirstOrDefault(),
+                IsMain = true
             };
 
             var statuses = new List<Status>()
@@ -420,6 +427,7 @@ namespace TaskManager.Infrastructure.Services
                     Icon = CoreConstants.EpicIcon,
                     Level = 1,
                     ProjectId = project.Id,
+                IsMain = true
                 },
                 new()
                 {
@@ -428,6 +436,7 @@ namespace TaskManager.Infrastructure.Services
                     Icon = CoreConstants.BugIcon,
                     Level = 2,
                     ProjectId = project.Id,
+                    IsMain = true
                 },
                 new()
                 {
@@ -436,6 +445,7 @@ namespace TaskManager.Infrastructure.Services
                     Icon = CoreConstants.StoryIcon,
                     Level = 2,
                     ProjectId = project.Id,
+                    IsMain = true
                 },
                 new()
                 {
@@ -444,6 +454,7 @@ namespace TaskManager.Infrastructure.Services
                     Icon = CoreConstants.TaskIcon,
                     Level = 2,
                     ProjectId = project.Id,
+                    IsMain = true
                 },
                 new()
                 {
@@ -452,6 +463,7 @@ namespace TaskManager.Infrastructure.Services
                     Icon = CoreConstants.SubTaskIcon,
                     Level = 3,
                     ProjectId = project.Id,
+                    IsMain = true
                 }
             };
 
@@ -469,7 +481,9 @@ namespace TaskManager.Infrastructure.Services
                     Description = "Trivial problem with little or no impact on progress.",
                     Color = CoreConstants.LowestColor,
                     ProjectId = project.Id,
-                    Icon = CoreConstants.LowestIcon
+                    Icon = CoreConstants.LowestIcon,
+                IsMain = true
+
                 },
                 new()
                 {
@@ -477,7 +491,8 @@ namespace TaskManager.Infrastructure.Services
                     Description = "Minor problem or easily worked around.",
                     Color = CoreConstants.LowColor,
                     ProjectId = project.Id,
-                    Icon = CoreConstants.LowIcon
+                    Icon = CoreConstants.LowIcon,
+                    IsMain = true
                 },
                 new()
                 {
@@ -485,7 +500,8 @@ namespace TaskManager.Infrastructure.Services
                     Description = "Has the potential to affect progress.",
                     Color = CoreConstants.MediumColor,
                     ProjectId = project.Id,
-                    Icon = CoreConstants.MediumIcon
+                    Icon = CoreConstants.MediumIcon,
+                    IsMain = true
                 },
                 new()
                 {
@@ -493,7 +509,8 @@ namespace TaskManager.Infrastructure.Services
                     Description = "Serious problem that could block progress.",
                     Color = CoreConstants.HighColor,
                     ProjectId = project.Id,
-                    Icon = CoreConstants.HighIcon
+                    Icon = CoreConstants.HighIcon,
+                    IsMain = true
                 },
                 new()
                 {
@@ -501,7 +518,8 @@ namespace TaskManager.Infrastructure.Services
                     Description = "This problem will block progress.",
                     Color = CoreConstants.HighestColor,
                     ProjectId = project.Id,
-                    Icon = CoreConstants.HighestIcon
+                    Icon = CoreConstants.HighestIcon,
+                    IsMain = true
                 }
             };
 
@@ -647,6 +665,8 @@ namespace TaskManager.Infrastructure.Services
             await _projectRepository.LoadWorkflow(project);
             await _projectRepository.LoadPriorities(project);
             await _projectRepository.LoadPermissionGroup(project);
+            await _projectRepository.LoadSprints(project);
+            await _projectRepository.LoadVersions(project);
             _projectRepository.Delete(project);
             await _projectRepository.UnitOfWork.SaveChangesAsync();
             return id;

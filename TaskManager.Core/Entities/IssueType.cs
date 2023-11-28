@@ -8,6 +8,7 @@ namespace TaskManager.Core.Entities
         public string? Description { get; set; }
         public string Icon { get; set; } = string.Empty;
         public byte Level { get; set; }
+        public bool IsMain { get; set; }
 
         //Relationship
         public ICollection<Issue>? Issues { get; set; }
