@@ -25,5 +25,7 @@ namespace TaskManager.Core.Interfaces.Repositories
         Task LoadWorkflow(Project project);
         Task LoadPriorities(Project project);
         Task LoadPermissionGroup(Project project);
+        Task LoadSprints(Project project);
+        Task LoadVersions(Project project);
     }
 }

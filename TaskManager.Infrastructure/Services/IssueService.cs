@@ -657,18 +657,9 @@ namespace TaskManager.Infrastructure.Services
                 ParentId = createIssueByNameDto.ParentId
             };
 
-            if (sprintId is Guid newSprintId)
+            if (sprintId is not null)
             {
-                issue.SprintId = newSprintId;
-                string? newSprintName = await _sprintRepository.GetNameOfSprint(newSprintId);
-                issue.IssueHistories = new List<IssueHistory>();
-                var changedTheParentHis = new IssueHistory()
-                {
-                    Name = IssueConstants.Parent_IssueHistoryName,
-                    Content = $"{IssueConstants.None_IssueHistoryContent} to {newSprintName}",
-                    CreatorUserId = createIssueByNameDto.CreatorUserId,
-                };
-                issue.IssueHistories.Add(changedTheParentHis);
+                issue.SprintId = sprintId;
             }
             else
             {
@@ -707,6 +698,19 @@ namespace TaskManager.Infrastructure.Services
                 CreatorUserId = createIssueByNameDto.CreatorUserId,
                 IssueId = issue.Id,
             };
+
+            if (sprintId is Guid newSprintId)
+            {
+                string? newSprintName = await _sprintRepository.GetNameOfSprint(newSprintId);
+                var changedTheParentHis = new IssueHistory()
+                {
+                    Name = IssueConstants.Parent_IssueHistoryName,
+                    Content = $"{IssueConstants.None_IssueHistoryContent} to {newSprintName}",
+                    CreatorUserId = createIssueByNameDto.CreatorUserId,
+                    IssueId = issue.Id,
+                };
+                _issueHistoryRepository.Add(changedTheParentHis);
+            }
 
             _issueHistoryRepository.Add(issueHis);
             await _issueHistoryRepository.UnitOfWork.SaveChangesAsync();

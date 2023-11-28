@@ -20,5 +20,7 @@ namespace TaskManager.Core.Entities
         public Workflow? Workflow { get; set; }
         public ICollection<Priority>? Priorities { get; set; }
         public ICollection<PermissionGroup>? PermissionGroups { get; set; }
+        public ICollection<Sprint>? Sprints { get; set; }
+        public ICollection<Version>? Versions { get; set; }
     }
 }

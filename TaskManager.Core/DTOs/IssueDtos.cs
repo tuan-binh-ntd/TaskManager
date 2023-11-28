@@ -104,6 +104,8 @@ namespace TaskManager.Core.DTOs
         public int? StoryPointEstimate { get; set; }
         public Guid? VersionId { get; set; }
         public Guid? ReporterId { get; set; }
+        [Required]
+        public Guid ModificationUserId { get; set; }
 
         public override void Register(TypeAdapterConfig config)
         {

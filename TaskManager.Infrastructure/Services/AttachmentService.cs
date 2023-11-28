@@ -5,6 +5,7 @@ using Azure.Storage.Files.Shares;
 using Mapster;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using TaskManager.Core.Core;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Exceptions;
 using TaskManager.Core.Extensions;
@@ -19,19 +20,21 @@ namespace TaskManager.Infrastructure.Services
         private readonly FileShareSettings _fileShareSettings;
         private readonly BlobContainerSettings _blobContainerSettings;
         private readonly IAttachmentRepository _attachmentRepository;
+        private readonly IIssueHistoryRepository _issueHistoryRepository;
         private readonly BlobServiceClient _blobClient;
         private readonly BlobContainerClient _containerClient;
 
         public AttachmentService(
             IAttachmentRepository attachmentRepository,
             IOptionsMonitor<FileShareSettings> optionsMonitor,
-            IOptionsMonitor<BlobContainerSettings> optionsMonitor1
+            IOptionsMonitor<BlobContainerSettings> optionsMonitor1,
+            IIssueHistoryRepository issueHistoryRepository
             )
         {
             _fileShareSettings = optionsMonitor.CurrentValue;
             _blobContainerSettings = optionsMonitor1.CurrentValue;
             _attachmentRepository = attachmentRepository;
-
+            _issueHistoryRepository = issueHistoryRepository;
             _blobClient = new BlobServiceClient(_blobContainerSettings.ConnectionStrings);
             _containerClient = _blobClient.GetBlobContainerClient("attachmentofissue");
         }
@@ -112,9 +115,11 @@ namespace TaskManager.Infrastructure.Services
         }
         #endregion
 
-        public async Task<IReadOnlyCollection<AttachmentViewModel>> CreateMultiple(Guid issueId, List<IFormFile> files)
+        public async Task<IReadOnlyCollection<AttachmentViewModel>> CreateMultiple(Guid issueId, List<IFormFile> files, Guid userId)
         {
             var attachments = new List<Attachment>();
+            var issueHistories = new List<IssueHistory>();
+
             foreach (var file in files)
             {
                 var code = $"{Guid.NewGuid()}_{file.FileName}";
@@ -131,22 +136,43 @@ namespace TaskManager.Infrastructure.Services
                         Code = code
                     };
 
+                    var issueHistory = new IssueHistory()
+                    {
+                        Name = IssueConstants.Added_Attachment_IssueHistoryName,
+                        Content = $"{IssueConstants.None_IssueHistoryContent} to {file.FileName}",
+                        CreatorUserId = userId,
+                        IssueId = issueId,
+                    };
+
                     attachments.Add(attachment);
+                    issueHistories.Add(issueHistory);
                 }
             }
             _attachmentRepository.AddRange(attachments);
+            _issueHistoryRepository.AddRange(issueHistories);
             await _attachmentRepository.UnitOfWork.SaveChangesAsync();
+
             return attachments.Adapt<IReadOnlyCollection<AttachmentViewModel>>();
         }
 
-        public async Task<Guid> Delete(Guid id)
+        public async Task<Guid> Delete(Guid id, Guid userId, Guid issueId)
         {
             var attachment = await _attachmentRepository.GetById(id) ?? throw new AttachmentNullException();
-            var deleteFileResponse = await DeleteFileAsync(attachment.Code);
-            if (!deleteFileResponse.IsError)
+            var issueHistory = new IssueHistory()
             {
-                _attachmentRepository.Delete(attachment);
-                await _attachmentRepository.UnitOfWork.SaveChangesAsync();
+                Name = IssueConstants.Deleted_Attachment_IssueHistoryName,
+                Content = $"{attachment.Name} to {IssueConstants.None_IssueHistoryContent}",
+                CreatorUserId = userId,
+                IssueId = issueId,
+            };
+
+            _issueHistoryRepository.Add(issueHistory);
+            _attachmentRepository.Delete(attachment);
+            var rowAffected = await _attachmentRepository.UnitOfWork.SaveChangesAsync();
+
+            if (rowAffected > 0)
+            {
+                await DeleteFileAsync(attachment.Code);
                 return id;
             }
             else

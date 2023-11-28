@@ -150,5 +150,15 @@ namespace TaskManager.Infrastructure.Repositories
         {
             await _context.Entry(project).Collection(p => p.PermissionGroups!).LoadAsync();
         }
+
+        public async Task LoadSprints(Project project)
+        {
+            await _context.Entry(project).Collection(p => p.Sprints!).LoadAsync();
+        }
+
+        public async Task LoadVersions(Project project)
+        {
+            await _context.Entry(project).Collection(p => p.Versions!).LoadAsync();
+        }
     }
 }

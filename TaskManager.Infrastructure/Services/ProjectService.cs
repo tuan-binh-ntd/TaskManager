@@ -647,6 +647,8 @@ namespace TaskManager.Infrastructure.Services
             await _projectRepository.LoadWorkflow(project);
             await _projectRepository.LoadPriorities(project);
             await _projectRepository.LoadPermissionGroup(project);
+            await _projectRepository.LoadSprints(project);
+            await _projectRepository.LoadVersions(project);
             _projectRepository.Delete(project);
             await _projectRepository.UnitOfWork.SaveChangesAsync();
             return id;

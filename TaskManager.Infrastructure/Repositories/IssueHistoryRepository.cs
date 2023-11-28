@@ -48,7 +48,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<IssueHistory>> GetByIssueId(Guid issueId)
         {
-            var issueHistories = await _context.IssueHistories.AsNoTracking().Where(ih => ih.IssueId == issueId).ToListAsync();
+            var issueHistories = await _context.IssueHistories.AsNoTracking().Where(ih => ih.IssueId == issueId).OrderBy(ih => ih.CreationTime).ToListAsync();
             return issueHistories.AsReadOnly();
         }
 
