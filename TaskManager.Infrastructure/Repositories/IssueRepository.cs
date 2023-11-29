@@ -198,9 +198,10 @@ namespace TaskManager.Infrastructure.Repositories
                 .Where(i => sprintIds.Contains((Guid)i.SprintId!))
                 .Where(i => i.IssueTypeId != subtaskTypeId)
                 .WhereIf(!string.IsNullOrWhiteSpace(getSprintByFilterDto.SearchKey), i => i.Name.Contains(getSprintByFilterDto.SearchKey!))
-                .WhereIf(getSprintByFilterDto.IssueTypeId is not null, i => i.IssueTypeId == getSprintByFilterDto.IssueTypeId)
+                .WhereIf(getSprintByFilterDto.IssueTypeIds is not null && getSprintByFilterDto.IssueTypeIds.Any(), i => getSprintByFilterDto.IssueTypeIds!.Contains(i.IssueTypeId))
                 .WhereIf(getSprintByFilterDto.EpicIds.Any(), i => getSprintByFilterDto.EpicIds.Contains((Guid)i.ParentId!))
                 .ToListAsync();
+
             return issues.AsReadOnly();
         }
 
@@ -208,6 +209,39 @@ namespace TaskManager.Infrastructure.Repositories
         {
             var name = await _context.Issues.AsNoTracking().Where(i => i.Id == issueId).Select(i => i.Name).FirstOrDefaultAsync();
             return name;
+        }
+
+        public async Task DeleteByBacklogId(Guid backlogId)
+        {
+            var issues = await _context.Issues.Where(i => i.BacklogId == backlogId).ToListAsync();
+            foreach (var issue in issues)
+            {
+                await LoadEntitiesRelationship(issue);
+                _context.Issues.Remove(issue);
+            }
+            await UnitOfWork.SaveChangesAsync();
+        }
+
+        public async Task DeleteBySprintId(Guid sprintId)
+        {
+            var issues = await _context.Issues.Where(i => i.SprintId == sprintId).ToListAsync();
+            foreach (var issue in issues)
+            {
+                await LoadEntitiesRelationship(issue);
+                _context.Issues.Remove(issue);
+            }
+            await UnitOfWork.SaveChangesAsync();
+        }
+
+        public async Task DeleteByProjectId(Guid projectId)
+        {
+            var issues = await _context.Issues.Where(i => i.ProjectId == projectId).ToListAsync();
+            foreach (var issue in issues)
+            {
+                await LoadEntitiesRelationship(issue);
+                _context.Issues.Remove(issue);
+            }
+            await UnitOfWork.SaveChangesAsync();
         }
     }
 }

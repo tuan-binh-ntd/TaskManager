@@ -667,6 +667,20 @@ namespace TaskManager.Infrastructure.Services
             await _projectRepository.LoadPermissionGroup(project);
             await _projectRepository.LoadSprints(project);
             await _projectRepository.LoadVersions(project);
+
+            await _issueRepository.DeleteByProjectId(project.Id);
+            if (project.Sprints is not null && project.Sprints.Any())
+            {
+                foreach (var sprint in project.Sprints)
+                {
+                    await _issueRepository.DeleteBySprintId(sprint.Id);
+                }
+            }
+            if (project.Backlog is not null)
+            {
+                await _issueRepository.DeleteByBacklogId(project.Backlog.Id);
+            }
+
             _projectRepository.Delete(project);
             await _projectRepository.UnitOfWork.SaveChangesAsync();
             return id;

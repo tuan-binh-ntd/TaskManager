@@ -817,10 +817,13 @@ namespace TaskManager.Infrastructure.Services
             {
                 foreach (var sprint in sprints)
                 {
-                    var issuesOfSprint = await _sprintRepository.GetIssues(sprint.Id);
+                    var issuesOfSprint = await _sprintRepository.GetIssues(sprint.Id, projectId);
                     issues.AddRange(issuesOfSprint);
                 }
             }
+
+            var epics = await _issueRepository.GetEpicByProjectId(projectId);
+            issues.AddRange(epics);
 
             return await ToIssueForProjectViewModels(issues);
         }

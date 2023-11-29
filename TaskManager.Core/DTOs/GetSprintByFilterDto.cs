@@ -6,8 +6,8 @@
         //#pragma warning disable IDE1006 // Naming Styles
         //        public Guid? labelid { get; set; }
         //#pragma warning restore IDE1006 // Naming Styles
-        public Guid? IssueTypeId { get; set; }
-        public Guid? SprintId { get; set; }
+        public IReadOnlyCollection<Guid>? IssueTypeIds { get; set; } = new List<Guid>();
+        public IReadOnlyCollection<Guid>? SprintIds { get; set; } = new List<Guid>();
         public string? SearchKey { get; set; } = string.Empty;
     }
 }

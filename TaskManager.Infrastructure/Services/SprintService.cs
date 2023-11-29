@@ -103,22 +103,15 @@ namespace TaskManager.Infrastructure.Services
 
         public async Task<SprintViewModel> StartSprint(Guid projectId, Guid sprintId, UpdateSprintDto updateSprintDto)
         {
-            var sprint = _sprintRepository.Get(sprintId);
+            var sprint = _sprintRepository.Get(sprintId) ?? throw new SprintNullException();
             sprint = updateSprintDto.Adapt(sprint);
-            sprint!.IsStart = true;
-            _sprintRepository.Update(sprint!);
+            sprint.IsStart = true;
+            _sprintRepository.Update(sprint);
             await _sprintRepository.UnitOfWork.SaveChangesAsync();
 
             var issues = await _sprintRepository.GetIssues(sprintId);
-            var createTransition = _transitionRepository.GetCreateTransitionByProjectId(projectId);
-            foreach (var issue in issues)
-            {
-                issue.StatusId = createTransition.ToStatusId;
-            }
-            _issueRepository.UpdateRange(issues);
-            await _issueRepository.UnitOfWork.SaveChangesAsync();
 
-            var sprintViewModel = _mapper.Map<SprintViewModel>(sprint!);
+            var sprintViewModel = _mapper.Map<SprintViewModel>(sprint);
             sprintViewModel.Issues = _mapper.Map<IReadOnlyCollection<IssueViewModel>>(issues);
             return sprintViewModel;
         }
