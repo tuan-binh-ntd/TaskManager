@@ -40,6 +40,7 @@ namespace TaskManager.Core.DTOs
         public Guid? ReporterId { get; set; }
         [Required]
         public Guid ModificationUserId { get; set; }
+        public Guid? LabelId { get; set; }
 
         public override void Register(TypeAdapterConfig config)
         {

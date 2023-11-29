@@ -27,6 +27,8 @@ namespace TaskManager.Infrastructure.Services
         private readonly IEmailSender _emailSender;
         private readonly IStatusRepository _statusRepository;
         private readonly IPriorityRepository _priorityRepository;
+        private readonly IVersionRepository _versionRepository;
+        private readonly ILabelRepository _labelRepository;
         private readonly IMapper _mapper;
 
         public IssueService(
@@ -43,6 +45,8 @@ namespace TaskManager.Infrastructure.Services
             IEmailSender emailSender,
             IStatusRepository statusRepository,
             IPriorityRepository priorityRepository,
+            IVersionRepository versionRepository,
+            ILabelRepository labelRepository,
             IMapper mapper
             )
         {
@@ -59,6 +63,8 @@ namespace TaskManager.Infrastructure.Services
             _emailSender = emailSender;
             _statusRepository = statusRepository;
             _priorityRepository = priorityRepository;
+            _versionRepository = versionRepository;
+            _labelRepository = labelRepository;
             _mapper = mapper;
         }
 
@@ -493,6 +499,115 @@ namespace TaskManager.Infrastructure.Services
             await _issueHistoryRepository.UnitOfWork.SaveChangesAsync();
 
         }
+
+        private async Task AddWatcher(Issue issue, UpdateIssueDto updateIssueDto)
+        {
+            if (updateIssueDto.UserIds is not null && updateIssueDto.UserIds.Any())
+            {
+                foreach (var item in updateIssueDto.UserIds)
+                {
+                    var user = await _userManager.FindByIdAsync(item.ToString());
+                    if (user is not null && issue.Watcher is not null && issue.Watcher.Users is not null)
+                    {
+                        var watcher = new User()
+                        {
+                            Identity = user.Id,
+                            Name = user.Name,
+                            Email = user.Email!
+                        };
+                        issue.Watcher.Users.Add(watcher);
+                    }
+                }
+            }
+
+            if (issue.Watcher is not null && issue.Watcher.Users is not null)
+            {
+                issue.Watcher.Users = issue.Watcher.Users.DistinctBy(i => i.Identity).ToList();
+            }
+        }
+
+        private async Task ChangeSprintOrBacklog(Issue issue, UpdateIssueDto updateIssueDto)
+        {
+            if (updateIssueDto.SprintId is Guid sprintId && updateIssueDto.BacklogId is null)
+            {
+                var sprint = _sprintRepository.Get(sprintId) ?? throw new SprintNullException();
+                issue.SprintId = sprintId;
+                issue.BacklogId = null;
+                issue.StartDate = sprint.StartDate;
+                issue.DueDate = sprint.EndDate;
+
+                var childIssues = await _issueRepository.GetChildIssueOfIssue(issue.Id);
+                if (childIssues.Any())
+                {
+
+                    foreach (var childIssue in childIssues)
+                    {
+                        childIssue.SprintId = sprintId;
+                        childIssue.BacklogId = null;
+                    }
+                    _issueRepository.UpdateRange(childIssues);
+                }
+            }
+
+            if (updateIssueDto.SprintId is null && updateIssueDto.BacklogId is Guid backlogId)
+            {
+                issue.SprintId = null;
+                issue.BacklogId = backlogId;
+
+                var childIssues = await _issueRepository.GetChildIssueOfIssue(issue.Id);
+                if (childIssues.Any())
+                {
+                    foreach (var childIssue in childIssues)
+                    {
+                        childIssue.SprintId = null;
+                        childIssue.BacklogId = backlogId;
+                    }
+                    _issueRepository.UpdateRange(childIssues);
+                }
+            }
+        }
+
+        private void UpdateIssueDetail(IssueDetail issueDetail, UpdateIssueDto updateIssueDto)
+        {
+            if (updateIssueDto.StoryPointEstimate is int storyPointEstimate)
+            {
+                issueDetail.StoryPointEstimate = storyPointEstimate;
+            }
+            if (updateIssueDto.ReporterId is Guid reporterId)
+            {
+                issueDetail.ReporterId = reporterId;
+            }
+            if (updateIssueDto.AssigneeId is not null)
+            {
+                issueDetail.AssigneeId = updateIssueDto.AssigneeId;
+            }
+        }
+
+        private async Task AddVersionOrLabel(Issue issue, UpdateIssueDto updateIssueDto)
+        {
+            if (updateIssueDto.VersionId is Guid versionId)
+            {
+                var versionIssue = new VersionIssue()
+                {
+                    IssueId = issue.Id,
+                    VersionId = versionId
+                };
+                _versionRepository.AddVersionIssue(versionIssue);
+                await _versionRepository.UnitOfWork.SaveChangesAsync();
+            }
+
+            if (updateIssueDto.LabelId is Guid labelId)
+            {
+                var labelIssue = new LabelIssue()
+                {
+                    LabelId = labelId,
+                    IssueId = issue.Id,
+                };
+
+                _labelRepository.AddLabelIssue(labelIssue);
+                await _labelRepository.UnitOfWork.SaveChangesAsync();
+            }
+        }
         #endregion
 
         public async Task<IssueViewModel> CreateIssue(CreateIssueDto createIssueDto, Guid? sprintId = null, Guid? backlogId = null)
@@ -538,91 +653,22 @@ namespace TaskManager.Infrastructure.Services
         {
             var issue = await _issueRepository.Get(id) ?? throw new SprintNullException();
             var issueDetail = await _issueDetailRepository.GetById(id);
+
             await DetachUpdateField(issue, issueDetail, updateIssueDto);
 
+            await AddWatcher(issue, updateIssueDto);
 
-            if (updateIssueDto.UserIds is not null && updateIssueDto.UserIds.Any())
-            {
-                foreach (var item in updateIssueDto.UserIds)
-                {
-                    var user = await _userManager.FindByIdAsync(item.ToString());
-                    if (user is not null && issue.Watcher is not null && issue.Watcher.Users is not null)
-                    {
-                        var watcher = new User()
-                        {
-                            Identity = user.Id,
-                            Name = user.Name,
-                            Email = user.Email!
-                        };
-                        issue.Watcher.Users.Add(watcher);
-                    }
-                }
-            }
+            await ChangeSprintOrBacklog(issue, updateIssueDto);
 
-            if (issue.Watcher is not null && issue.Watcher.Users is not null)
-            {
-                issue.Watcher.Users = issue.Watcher.Users.DistinctBy(i => i.Identity).ToList();
-            }
-            if (updateIssueDto.SprintId is Guid sprintId && updateIssueDto.BacklogId is null)
-            {
-                var sprint = _sprintRepository.Get(sprintId) ?? throw new SprintNullException();
-                issue.SprintId = sprintId;
-                issue.BacklogId = null;
-                issue.StartDate = sprint.StartDate;
-                issue.DueDate = sprint.EndDate;
-
-                var childIssues = await _issueRepository.GetChildIssueOfIssue(issue.Id);
-                if (childIssues.Any())
-                {
-
-                    foreach (var childIssue in childIssues)
-                    {
-                        childIssue.SprintId = sprintId;
-                        childIssue.BacklogId = null;
-                    }
-                    _issueRepository.UpdateRange(childIssues);
-                }
-
-            }
-            if (updateIssueDto.SprintId is null && updateIssueDto.BacklogId is Guid backlogId)
-            {
-                issue.SprintId = null;
-                issue.BacklogId = backlogId;
-
-                var childIssues = await _issueRepository.GetChildIssueOfIssue(issue.Id);
-                if (childIssues.Any())
-                {
-                    foreach (var childIssue in childIssues)
-                    {
-                        childIssue.SprintId = null;
-                        childIssue.BacklogId = backlogId;
-                    }
-                    _issueRepository.UpdateRange(childIssues);
-                }
-
-            }
-
+            await AddVersionOrLabel(issue, updateIssueDto);
 
             issue = updateIssueDto.Adapt(issue);
             _issueRepository.Update(issue);
             await _issueRepository.UnitOfWork.SaveChangesAsync();
 
-            if (updateIssueDto.StoryPointEstimate is not null)
-            {
-                issueDetail.StoryPointEstimate = (int)updateIssueDto.StoryPointEstimate;
-            }
-            if (updateIssueDto.ReporterId is Guid reporterId)
-            {
-                issueDetail.ReporterId = reporterId;
-            }
-            if (updateIssueDto.AssigneeId is not null)
-            {
-                issueDetail.AssigneeId = updateIssueDto.AssigneeId;
-            }
-
+            UpdateIssueDetail(issueDetail, updateIssueDto);
             _issueDetailRepository.Update(issueDetail);
             await _issueDetailRepository.UnitOfWork.SaveChangesAsync();
-
 
             return await ToIssueViewModel(issue);
         }

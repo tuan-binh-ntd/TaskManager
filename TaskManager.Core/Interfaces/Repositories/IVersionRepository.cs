@@ -12,5 +12,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         void Delete(Guid id);
         void AddRange(IReadOnlyCollection<VersionIssue> versionIssues);
         Task<IReadOnlyCollection<Guid>> GetIssueIdsByVersionId(Guid versionId);
+        void AddVersionIssue(VersionIssue versionIssue);
     }
 }

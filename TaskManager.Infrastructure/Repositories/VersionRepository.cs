@@ -54,5 +54,10 @@ namespace TaskManager.Infrastructure.Repositories
             var issueIds = await _context.VersionIssues.Where(vi => vi.VersionId == versionId).Select(vi => vi.IssueId).ToListAsync();
             return issueIds.AsReadOnly();
         }
+
+        public void AddVersionIssue(VersionIssue versionIssue)
+        {
+            _context.VersionIssues.Add(versionIssue);
+        }
     }
 }
