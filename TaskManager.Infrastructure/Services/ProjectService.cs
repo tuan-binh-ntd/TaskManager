@@ -820,7 +820,8 @@ namespace TaskManager.Infrastructure.Services
                     {
                         ProjectId = addMemberToProjectDto.ProjectId,
                         UserId = userId,
-                        Role = addMemberToProjectDto.Role
+                        Role = addMemberToProjectDto.Role,
+                        PermissionGroupId = addMemberToProjectDto.PermissionGroupId
                     };
                     project.UserProjects!.Add(userProject);
                 }

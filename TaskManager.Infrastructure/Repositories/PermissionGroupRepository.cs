@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Extensions;
+using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Repositories;
+using TaskManager.Core.ViewModel;
 using TaskManager.Infrastructure.Data;
 
 namespace TaskManager.Infrastructure.Repositories
@@ -33,25 +36,15 @@ namespace TaskManager.Infrastructure.Repositories
             return permissionGroup!;
         }
 
-        public async Task<IReadOnlyCollection<PermissionGroup>> GetByProjectId(Guid projectId)
+        public async Task<IReadOnlyCollection<PermissionGroupViewModel>> GetByProjectId(Guid projectId)
         {
             var query = from pg in _context.PermissionGroups.Where(pg => pg.ProjectId == projectId)
-                        select pg;
-            //select new PermissionGroupViewModel
-            //{
-            //    Id = pg.Id,
-            //    Name = pg.Name,
-            //    Permissions = 
-            //    pg.PermissionRoles!.Select(pr =>
-            //    new PermissionViewModel
-            //    {
-            //        Id = pr.Id,
-            //        Name = pr.Permission!.Name,
-            //        ParentId = pr.Id,
-            //        ViewPermission = pr.ViewPermission,
-            //        EditPermission = pr.EditPermission
-            //    }).ToList()
-            //};
+                        select new PermissionGroupViewModel
+                        {
+                            Id = pg.Id,
+                            Name = pg.Name,
+                            Permissions = pg.Permissions.FromJson<Permissions>()
+                        };
             return await query.ToListAsync();
         }
 
@@ -63,6 +56,18 @@ namespace TaskManager.Infrastructure.Repositories
         public void AddRange(IReadOnlyCollection<PermissionGroup> permissionGroups)
         {
             _context.PermissionGroups.AddRange(permissionGroups);
+        }
+
+        public async Task<PaginationResult<PermissionGroupViewModel>> GetByProjectId(Guid projectId, PaginationInput paginationInput)
+        {
+            var query = from pg in _context.PermissionGroups.Where(pg => pg.ProjectId == projectId)
+                        select new PermissionGroupViewModel
+                        {
+                            Id = pg.Id,
+                            Name = pg.Name,
+                            Permissions = pg.Permissions.FromJson<Permissions>()
+                        };
+            return await query.Pagination(paginationInput);
         }
     }
 }

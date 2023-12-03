@@ -200,6 +200,7 @@ namespace TaskManager.Infrastructure.Services
                     Start = issue.StartDate,
                     End = issue.DueDate,
                     Type = issue.ProjectId is null ? "task" : "project",
+                    Project = issue.ProjectId is null ? issue.ParentId : null,
                     Progress = (doneChildIssuesNum / childIssuesNum) * 100,
                 };
             }
@@ -212,6 +213,7 @@ namespace TaskManager.Infrastructure.Services
                     Start = issue.StartDate,
                     End = issue.DueDate,
                     Type = issue.ProjectId is null ? "task" : "project",
+                    Project = issue.ProjectId is null ? issue.ParentId : null,
                     Progress = 0,
                 };
             }
