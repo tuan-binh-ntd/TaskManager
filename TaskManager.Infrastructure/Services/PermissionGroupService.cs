@@ -2,6 +2,7 @@
 using TaskManager.Core.Entities;
 using TaskManager.Core.Exceptions;
 using TaskManager.Core.Extensions;
+using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
@@ -19,7 +20,7 @@ namespace TaskManager.Infrastructure.Services
         }
 
         #region Private methods
-        private async Task<PermissionGroupViewModel> ToPermissionGroupViewModel(PermissionGroup permissionGroup)
+        private static async Task<PermissionGroupViewModel> ToPermissionGroupViewModel(PermissionGroup permissionGroup)
         {
             var permissionGroupViewModel = new PermissionGroupViewModel()
             {
@@ -29,25 +30,6 @@ namespace TaskManager.Infrastructure.Services
             };
 
             return await Task.FromResult(permissionGroupViewModel);
-        }
-
-        private async Task<IReadOnlyCollection<PermissionGroupViewModel>> ToPermissionGroupViewModels(IReadOnlyCollection<PermissionGroup> permissionGroups)
-        {
-            var permissionGroupsViewModels = new List<PermissionGroupViewModel>();
-            if (permissionGroups.Any())
-            {
-
-                foreach (var permissionGroup in permissionGroups)
-                {
-                    var permissionGroupViewModel = await ToPermissionGroupViewModel(permissionGroup);
-                    permissionGroupsViewModels.Add(permissionGroupViewModel);
-                }
-                return permissionGroupsViewModels;
-            }
-            else
-            {
-                return permissionGroupsViewModels;
-            }
         }
         #endregion
 
@@ -79,10 +61,18 @@ namespace TaskManager.Infrastructure.Services
             return id;
         }
 
-        public async Task<IReadOnlyCollection<PermissionGroupViewModel>> GetPermissionGroupsByProjectId(Guid projectId)
+        public async Task<object> GetPermissionGroupsByProjectId(Guid projectId, PaginationInput paginationInput)
         {
-            var permissionGroups = await _permissionGroupRepository.GetByProjectId(projectId);
-            return await ToPermissionGroupViewModels(permissionGroups);
+            if (paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))
+            {
+                var permissionGroups = await _permissionGroupRepository.GetByProjectId(projectId, paginationInput);
+                return permissionGroups;
+            }
+            else
+            {
+                var permissionGroups = await _permissionGroupRepository.GetByProjectId(projectId);
+                return permissionGroups;
+            }
         }
 
         public async Task<PermissionGroupViewModel> Update(Guid id, UpdatePermissionGroupDto updatePermissionGroupDto)
