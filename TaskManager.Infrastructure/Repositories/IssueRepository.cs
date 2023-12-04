@@ -243,5 +243,13 @@ namespace TaskManager.Infrastructure.Repositories
             }
             await UnitOfWork.SaveChangesAsync();
         }
+
+        public async Task<IReadOnlyCollection<Guid>?> GetAllWatcherOfIssue(Guid issueId)
+        {
+            var watcher = await _context.Issues.AsNoTracking().Where(i => i.Id == issueId).Select(i => i.Watcher).FirstOrDefaultAsync();
+            if (watcher is null) return null;
+            var watcherIds = watcher.Users!.Select(u => u.Identity).ToList();
+            return watcherIds.AsReadOnly();
+        }
     }
 }

@@ -36,13 +36,6 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> UploadBlobs(Guid issueId, List<IFormFile> files)
-        //{
-        //    var response = await _attachmentService.UploadFiles(issueId, files);
-        //    return Ok(response);
-        //}
-
         [HttpGet]
         [ProducesResponseType(typeof(IReadOnlyCollection<AttachmentViewModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Gets(Guid issueId)

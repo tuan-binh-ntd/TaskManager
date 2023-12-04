@@ -117,20 +117,20 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        [HttpPost("send-email"), AllowAnonymous]
-        public async Task<IActionResult> SendEmail([FromBody] EmailModel emailModel)
-        {
-            var emailMessageDto = new EmailMessageDto(new List<string>() { emailModel.To }, emailModel.Subject, emailModel.Body);
-            await _emailSender.SendEmailAsync(emailMessageDto);
-            return CustomResult(HttpStatusCode.OK);
-        }
+        //[HttpPost("send-email"), AllowAnonymous]
+        //public async Task<IActionResult> SendEmail([FromBody] EmailModel emailModel)
+        //{
+        //    var emailMessageDto = new EmailMessageDto(new List<string>() { emailModel.To }, emailModel.Subject, emailModel.Body);
+        //    await _emailSender.SendEmailAsync(emailMessageDto);
+        //    return CustomResult(HttpStatusCode.OK);
+        //}
 
-        [HttpPost("reply-email"), AllowAnonymous]
-        public async Task<IActionResult> ReplyEmail([FromBody] EmailModel emailModel)
-        {
-            var emailMessageDto = new EmailMessageDto(new List<string>() { emailModel.To }, emailModel.Subject, emailModel.Body);
-            await _emailSender.SendEmailAsync(emailMessageDto);
-            return CustomResult(HttpStatusCode.OK);
-        }
+        //[HttpPost("reply-email"), AllowAnonymous]
+        //public async Task<IActionResult> ReplyEmail([FromBody] EmailModel emailModel)
+        //{
+        //    var emailMessageDto = new EmailMessageDto(new List<string>() { emailModel.To }, emailModel.Subject, emailModel.Body);
+        //    await _emailSender.SendEmailAsync(emailMessageDto);
+        //    return CustomResult(HttpStatusCode.OK);
+        //}
     }
 }

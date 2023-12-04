@@ -21,6 +21,8 @@ namespace TaskManager.Infrastructure.Services
         private readonly BlobContainerSettings _blobContainerSettings;
         private readonly IAttachmentRepository _attachmentRepository;
         private readonly IIssueHistoryRepository _issueHistoryRepository;
+        private readonly IIssueRepository _issueRepository;
+        private readonly IEmailSender _emailSender;
         private readonly BlobServiceClient _blobClient;
         private readonly BlobContainerClient _containerClient;
 
@@ -28,13 +30,17 @@ namespace TaskManager.Infrastructure.Services
             IAttachmentRepository attachmentRepository,
             IOptionsMonitor<FileShareSettings> optionsMonitor,
             IOptionsMonitor<BlobContainerSettings> optionsMonitor1,
-            IIssueHistoryRepository issueHistoryRepository
+            IIssueHistoryRepository issueHistoryRepository,
+            IIssueRepository issueRepository,
+            IEmailSender emailSender
             )
         {
             _fileShareSettings = optionsMonitor.CurrentValue;
             _blobContainerSettings = optionsMonitor1.CurrentValue;
             _attachmentRepository = attachmentRepository;
             _issueHistoryRepository = issueHistoryRepository;
+            _issueRepository = issueRepository;
+            _emailSender = emailSender;
             _blobClient = new BlobServiceClient(_blobContainerSettings.ConnectionStrings);
             _containerClient = _blobClient.GetBlobContainerClient("attachmentofissue");
         }
@@ -119,6 +125,7 @@ namespace TaskManager.Infrastructure.Services
         {
             var attachments = new List<Attachment>();
             var issueHistories = new List<IssueHistory>();
+            var issue = await _issueRepository.Get(issueId);
 
             foreach (var file in files)
             {
@@ -144,8 +151,10 @@ namespace TaskManager.Infrastructure.Services
                         IssueId = issueId,
                     };
 
+
                     attachments.Add(attachment);
                     issueHistories.Add(issueHistory);
+                    await _emailSender.SendEmailWhenUpdateIssue(issueId: issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", content: issueHistory.Content, from: userId);
                 }
             }
             _attachmentRepository.AddRange(attachments);
@@ -158,6 +167,7 @@ namespace TaskManager.Infrastructure.Services
         public async Task<Guid> Delete(Guid id, Guid userId, Guid issueId)
         {
             var attachment = await _attachmentRepository.GetById(id) ?? throw new AttachmentNullException();
+            var issue = await _issueRepository.Get(issueId);
             var issueHistory = new IssueHistory()
             {
                 Name = IssueConstants.Deleted_Attachment_IssueHistoryName,
@@ -169,7 +179,7 @@ namespace TaskManager.Infrastructure.Services
             _issueHistoryRepository.Add(issueHistory);
             _attachmentRepository.Delete(attachment);
             var rowAffected = await _attachmentRepository.UnitOfWork.SaveChangesAsync();
-
+            await _emailSender.SendEmailWhenUpdateIssue(issueId: issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", content: issueHistory.Content, from: userId);
             if (rowAffected > 0)
             {
                 await DeleteFileAsync(attachment.Code);

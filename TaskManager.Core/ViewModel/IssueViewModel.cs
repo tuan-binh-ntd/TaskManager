@@ -127,4 +127,10 @@ namespace TaskManager.Core.ViewModel
         public Guid? Project { get; set; }
         public bool? HideChildren { get; set; }
     }
+
+    public class CurrentAssigneeAndReporterViewModel
+    {
+        public Guid? CurrentAssigness { get; set; }
+        public Guid Reporter { get; set; }
+    }
 }
