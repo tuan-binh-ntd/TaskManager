@@ -202,6 +202,7 @@ namespace TaskManager.Infrastructure.Services
                     Type = issue.ProjectId is null ? "task" : "project",
                     Project = issue.ProjectId is null ? issue.ParentId : null,
                     Progress = (doneChildIssuesNum / childIssuesNum) * 100,
+                    HideChildren = issue.ProjectId is null ? null : false,
                 };
             }
             else
@@ -215,6 +216,7 @@ namespace TaskManager.Infrastructure.Services
                     Type = issue.ProjectId is null ? "task" : "project",
                     Project = issue.ProjectId is null ? issue.ParentId : null,
                     Progress = 0,
+                    HideChildren = issue.ProjectId is null ? null : false,
                 };
             }
         }
@@ -569,7 +571,7 @@ namespace TaskManager.Infrastructure.Services
             }
         }
 
-        private void UpdateIssueDetail(IssueDetail issueDetail, UpdateIssueDto updateIssueDto)
+        private static void UpdateIssueDetail(IssueDetail issueDetail, UpdateIssueDto updateIssueDto)
         {
             if (updateIssueDto.StoryPointEstimate is int storyPointEstimate)
             {

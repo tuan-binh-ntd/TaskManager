@@ -125,5 +125,6 @@ namespace TaskManager.Core.ViewModel
         public string Type { get; set; } = string.Empty;
         public double Progress { get; set; }
         public Guid? Project { get; set; }
+        public bool? HideChildren { get; set; }
     }
 }
