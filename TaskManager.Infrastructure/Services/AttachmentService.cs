@@ -4,8 +4,11 @@ using Azure.Storage.Blobs.Models;
 using Azure.Storage.Files.Shares;
 using Mapster;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using TaskManager.Core.Core;
+using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Exceptions;
 using TaskManager.Core.Extensions;
@@ -23,6 +26,7 @@ namespace TaskManager.Infrastructure.Services
         private readonly IIssueHistoryRepository _issueHistoryRepository;
         private readonly IIssueRepository _issueRepository;
         private readonly IEmailSender _emailSender;
+        private readonly UserManager<AppUser> _userManager;
         private readonly BlobServiceClient _blobClient;
         private readonly BlobContainerClient _containerClient;
 
@@ -32,7 +36,8 @@ namespace TaskManager.Infrastructure.Services
             IOptionsMonitor<BlobContainerSettings> optionsMonitor1,
             IIssueHistoryRepository issueHistoryRepository,
             IIssueRepository issueRepository,
-            IEmailSender emailSender
+            IEmailSender emailSender,
+            UserManager<AppUser> userManager
             )
         {
             _fileShareSettings = optionsMonitor.CurrentValue;
@@ -41,6 +46,7 @@ namespace TaskManager.Infrastructure.Services
             _issueHistoryRepository = issueHistoryRepository;
             _issueRepository = issueRepository;
             _emailSender = emailSender;
+            _userManager = userManager;
             _blobClient = new BlobServiceClient(_blobContainerSettings.ConnectionStrings);
             _containerClient = _blobClient.GetBlobContainerClient("attachmentofissue");
         }
@@ -154,12 +160,38 @@ namespace TaskManager.Infrastructure.Services
 
                     attachments.Add(attachment);
                     issueHistories.Add(issueHistory);
-                    await _emailSender.SendEmailWhenUpdateIssue(issueId: issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", content: issueHistory.Content, from: userId);
                 }
             }
             _attachmentRepository.AddRange(attachments);
             _issueHistoryRepository.AddRange(issueHistories);
             await _attachmentRepository.UnitOfWork.SaveChangesAsync();
+
+            foreach (var attachment in attachments)
+            {
+                var senderName = await _userManager.Users.Where(u => u.Id == userId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
+                var projectName = await _issueRepository.GetProjectNameOfIssue(issueId);
+
+                var addNewAttachmentIssueEmailContentDto = new AddNewAttachmentIssueEmailContentDto()
+                {
+                    ReporterName = senderName,
+                    IssueCreationTime = DateTime.Now,
+                    AttachmentName = attachment.Name,
+                };
+
+                string emailContent = EmailContentConstants.AddNewAttachmentIssueContent(addNewAttachmentIssueEmailContentDto);
+
+                var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+                {
+                    SenderName = senderName,
+                    ActionName = EmailConstants.AddOneNewAttachment,
+                    ProjectName = projectName,
+                    IssueCode = issue.Code,
+                    IssueName = issue.Name,
+                    EmailContent = emailContent,
+                };
+
+                await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: userId, buidEmailTemplateBaseDto);
+            }
 
             return attachments.Adapt<IReadOnlyCollection<AttachmentViewModel>>();
         }
@@ -179,7 +211,31 @@ namespace TaskManager.Infrastructure.Services
             _issueHistoryRepository.Add(issueHistory);
             _attachmentRepository.Delete(attachment);
             var rowAffected = await _attachmentRepository.UnitOfWork.SaveChangesAsync();
-            await _emailSender.SendEmailWhenUpdateIssue(issueId: issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", content: issueHistory.Content, from: userId);
+
+            var senderName = await _userManager.Users.Where(u => u.Id == userId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
+            var projectName = await _issueRepository.GetProjectNameOfIssue(issueId);
+
+            var deleteNewAttachmentIssueEmailContentDto = new DeleteNewAttachmentIssueEmailContentDto()
+            {
+                ReporterName = senderName,
+                IssueCreationTime = DateTime.Now,
+                AttachmentName = attachment.Name,
+            };
+
+            string emailContent = EmailContentConstants.DeleteNewAttachmentIssueContent(deleteNewAttachmentIssueEmailContentDto);
+
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+            {
+                SenderName = senderName,
+                ActionName = EmailConstants.DeleteOneNewAttachment,
+                ProjectName = projectName,
+                IssueCode = issue.Code,
+                IssueName = issue.Name,
+                EmailContent = emailContent,
+            };
+
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: userId, buidEmailTemplateBaseDto);
+
             if (rowAffected > 0)
             {
                 await DeleteFileAsync(attachment.Code);

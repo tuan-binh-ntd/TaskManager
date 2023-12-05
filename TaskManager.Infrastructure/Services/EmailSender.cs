@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.Text;
+using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Exceptions;
@@ -67,20 +68,11 @@ namespace TaskManager.Infrastructure.Services
             emailMessage.From.Add(new MailboxAddress(message.From, _emailConfigurationSettings.From));
             emailMessage.To.AddRange(message.To);
             emailMessage.Subject = message.Subject;
-            if (textFormat is TextFormat.Text)
+
+            emailMessage.Body = new TextPart(textFormat)
             {
-                emailMessage.Body = new TextPart(textFormat)
-                {
-                    Text = message.Content
-                };
-            }
-            else
-            {
-                emailMessage.Body = new TextPart(textFormat)
-                {
-                    Text = message.Content
-                };
-            }
+                Text = message.Content
+            };
 
             return emailMessage;
         }
@@ -93,7 +85,7 @@ namespace TaskManager.Infrastructure.Services
             await SendAsync(mailMessage);
         }
 
-        public async Task SendEmailWhenUpdateIssue(Guid issueId, string subjectOfEmail, string content, Guid from)
+        public async Task SendEmailWhenUpdateIssue(Guid issueId, string subjectOfEmail, Guid from, BuidEmailTemplateBaseDto buidEmailTemplateBase)
         {
             var userIds = new List<Guid>();
             var watcherIds = await _issueRepository.GetAllWatcherOfIssue(issueId) ?? throw new IssueNullException();
@@ -109,8 +101,35 @@ namespace TaskManager.Infrastructure.Services
             if (emails.Any())
             {
                 var senderName = await _userManager.Users.Where(u => u.Id == from).Select(u => u.Name).FirstOrDefaultAsync();
+
+                string content = BuildEmailTemplateConstants.BuildEmailTemplate(buidEmailTemplateBase);
+
                 var emailMessageDto = new EmailMessageDto(emails, subjectOfEmail, content, senderName!);
-                await SendEmailAsync(emailMessageDto);
+                await SendEmailAsync(emailMessageDto, TextFormat.Html);
+            }
+        }
+
+        public async Task SendEmailWhenCreatedIssue(Guid issueId, string subjectOfEmail, Guid from, BuidEmailTemplateBaseDto buidEmailTemplateBase)
+        {
+            var userIds = new List<Guid>();
+            var watcherIds = await _issueRepository.GetAllWatcherOfIssue(issueId) ?? throw new IssueNullException();
+            var currentAssigneeAndReporterId = await _issueDetailRepository.GetCurrentAssigneeAndReporter(issueId) ?? throw new IssueDetailNullException();
+            userIds.AddRange(watcherIds);
+            userIds.Add(currentAssigneeAndReporterId.Reporter);
+            if (currentAssigneeAndReporterId.CurrentAssigness is Guid currentAssigness)
+            {
+                userIds.Add(currentAssigness);
+            }
+            userIds = userIds.Distinct().ToList();
+            var emails = await _userManager.Users.Where(u => userIds.Contains(u.Id)).Select(u => u.Email!).ToListAsync();
+            if (emails.Any())
+            {
+                var senderName = await _userManager.Users.Where(u => u.Id == from).Select(u => u.Name).FirstOrDefaultAsync();
+
+                string content = BuildEmailTemplateConstants.BuildEmailTemplate(buidEmailTemplateBase);
+
+                var emailMessageDto = new EmailMessageDto(emails, subjectOfEmail, content, senderName!);
+                await SendEmailAsync(emailMessageDto, TextFormat.Html);
             }
         }
     }

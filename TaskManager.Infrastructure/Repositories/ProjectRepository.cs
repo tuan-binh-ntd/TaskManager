@@ -160,5 +160,10 @@ namespace TaskManager.Infrastructure.Repositories
         {
             await _context.Entry(project).Collection(p => p.Versions!).LoadAsync();
         }
+        public async Task<string> GetProjectName(Guid projectId)
+        {
+            var name = await _context.Projects.Where(p => p.Id == projectId).Select(p => p.Name).FirstOrDefaultAsync();
+            return name!;
+        }
     }
 }

@@ -251,5 +251,28 @@ namespace TaskManager.Infrastructure.Repositories
             var watcherIds = watcher.Users!.Select(u => u.Identity).ToList();
             return watcherIds.AsReadOnly();
         }
+
+        public async Task<string> GetProjectNameOfIssue(Guid issueId)
+        {
+            var issue = await _context.Issues.AsNoTracking().Where(i => i.Id == issueId).FirstOrDefaultAsync();
+            if (issue is not null && issue.SprintId is Guid sprintId)
+            {
+                var projectId = await _context.Sprints.AsNoTracking().Where(s => s.Id == sprintId).Select(s => s.ProjectId).FirstOrDefaultAsync();
+                return await _context.Projects.AsNoTracking().Where(s => s.Id == projectId).Select(s => s.Name).FirstOrDefaultAsync() ?? string.Empty;
+            }
+            else if (issue is not null && issue.BacklogId is Guid backlogId)
+            {
+                var projectId = await _context.Backlogs.AsNoTracking().Where(s => s.Id == backlogId).Select(s => s.ProjectId).FirstOrDefaultAsync();
+                return await _context.Projects.AsNoTracking().Where(s => s.Id == projectId).Select(s => s.Name).FirstOrDefaultAsync() ?? string.Empty;
+            }
+            else if (issue is not null && issue.ProjectId is Guid projectId)
+            {
+                return await _context.Projects.AsNoTracking().Where(s => s.Id == projectId).Select(s => s.Name).FirstOrDefaultAsync() ?? string.Empty;
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
     }
 }

@@ -30,6 +30,7 @@ public class IssueService : IIssueService
     private readonly IPriorityRepository _priorityRepository;
     private readonly IVersionRepository _versionRepository;
     private readonly ILabelRepository _labelRepository;
+    private readonly IProjectRepository _projectRepository;
     private readonly IMapper _mapper;
 
     public IssueService(
@@ -48,6 +49,7 @@ public class IssueService : IIssueService
         IPriorityRepository priorityRepository,
         IVersionRepository versionRepository,
         ILabelRepository labelRepository,
+        IProjectRepository projectRepository,
         IMapper mapper
         )
     {
@@ -66,6 +68,7 @@ public class IssueService : IIssueService
         _priorityRepository = priorityRepository;
         _versionRepository = versionRepository;
         _labelRepository = labelRepository;
+        _projectRepository = projectRepository;
         _mapper = mapper;
     }
 
@@ -238,296 +241,59 @@ public class IssueService : IIssueService
 
     private async Task DetachUpdateField(Issue issue, IssueDetail issueDetail, UpdateIssueDto updateIssueDto)
     {
+        var senderName = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
+        var projectName = await _issueRepository.GetProjectNameOfIssue(issue.Id);
+
         var issueHistories = new List<IssueHistory>();
         if (!string.IsNullOrWhiteSpace(updateIssueDto.Name))
         {
-            var updatedTheSumaryHis = new IssueHistory()
-            {
-                Name = IssueConstants.Summary_IssueHistoryName,
-                Content = $"{issue.Name} to {updateIssueDto.Name}",
-                CreatorUserId = updateIssueDto.ModificationUserId,
-                IssueId = issue.Id,
-            };
-            issueHistories.Add(updatedTheSumaryHis);
-
-            issue.Name = updateIssueDto.Name;
+            await ChangeNameIssue(issue, updateIssueDto, issueHistories, senderName, projectName);
         }
         else if (!string.IsNullOrWhiteSpace(updateIssueDto.Description))
         {
-            var updatedTheDescriptionHis = new IssueHistory()
-            {
-                Name = IssueConstants.Description_IssueHistoryName,
-                Content = string.IsNullOrWhiteSpace(issue.Description) ? $"{IssueConstants.None_IssueHistoryContent} to {updateIssueDto.Description}" : $"{issue.Description} to {updateIssueDto.Description}",
-                CreatorUserId = updateIssueDto.ModificationUserId,
-                IssueId = issue.Id,
-            };
-            issueHistories.Add(updatedTheDescriptionHis);
-
-            issue.Description = updateIssueDto.Description;
+            ChangeDescriptionIssue(issue, updateIssueDto, issueHistories);
         }
         else if (updateIssueDto.ParentId is Guid parentId)
         {
-            string? oldParentName = issue.ParentId is not null ? await _issueRepository.GetNameOfIssue((Guid)issue.ParentId) : IssueConstants.None_IssueHistoryContent;
-            string? newParentName = await _issueRepository.GetNameOfIssue(parentId);
-            var changedTheParentHis = new IssueHistory()
-            {
-                Name = IssueConstants.Parent_IssueHistoryName,
-                Content = $"{oldParentName} to {newParentName}",
-                CreatorUserId = updateIssueDto.ModificationUserId,
-                IssueId = issue.Id,
-            };
-            issueHistories.Add(changedTheParentHis);
-
-            issue.ParentId = parentId;
+            await ChangeParentIssue(issue, updateIssueDto, issueHistories, parentId, senderName, projectName);
         }
         else if (updateIssueDto.SprintId is Guid newSprintId)
         {
-            if (issue.SprintId is Guid oldSprintId)
-            {
-                string? oldSprintName = await _sprintRepository.GetNameOfSprint(oldSprintId);
-                string? newSprintName = await _sprintRepository.GetNameOfSprint(newSprintId);
-                var changedTheParentHis = new IssueHistory()
-                {
-                    Name = IssueConstants.Parent_IssueHistoryName,
-                    Content = $"{oldSprintName} to {newSprintName}",
-                    CreatorUserId = updateIssueDto.ModificationUserId,
-                    IssueId = issue.Id,
-                };
-                issueHistories.Add(changedTheParentHis);
-            }
-            else if (issue.SprintId is null)
-            {
-                string? newSprintName = await _sprintRepository.GetNameOfSprint(newSprintId);
-                var changedTheParentHis = new IssueHistory()
-                {
-                    Name = IssueConstants.Parent_IssueHistoryName,
-                    Content = $"{IssueConstants.None_IssueHistoryContent} to {newSprintName}",
-                    CreatorUserId = updateIssueDto.ModificationUserId,
-                    IssueId = issue.Id,
-                };
-                issueHistories.Add(changedTheParentHis);
-            }
-
-            issue.SprintId = newSprintId;
+            await ChangeSprintIssue(issue, updateIssueDto, issueHistories, newSprintId, senderName, projectName);
         }
         else if (updateIssueDto.IssueTypeId is Guid newIssueTypeId)
         {
-            string? newIssueTypeName = await _issueTypeRepository.GetNameOfIssueType(newIssueTypeId);
-            string? oldIssueTypeName = await _issueTypeRepository.GetNameOfIssueType(issue.IssueTypeId);
-            var updatedTheIssueTypeHis = new IssueHistory()
-            {
-                Name = IssueConstants.IssueType_IssueHistoryName,
-                Content = $"{oldIssueTypeName} to {newIssueTypeName}",
-                CreatorUserId = updateIssueDto.ModificationUserId,
-                IssueId = issue.Id,
-            };
-            issueHistories.Add(updatedTheIssueTypeHis);
-
-            issue.IssueTypeId = newIssueTypeId;
+            await ChangeIssueTypeIssue(issue, updateIssueDto, issueHistories, newIssueTypeId, senderName, projectName);
         }
         else if (updateIssueDto.BacklogId is Guid backlogId)
         {
-            if (issue.SprintId is Guid oldSprintId)
-            {
-                string? oldSprintName = await _sprintRepository.GetNameOfSprint(oldSprintId);
-                var changedTheBacklogHis = new IssueHistory()
-                {
-                    Name = IssueConstants.Sprint_IssueHistoryName,
-                    Content = $"{oldSprintName} to {IssueConstants.None_IssueHistoryContent}",
-                    CreatorUserId = updateIssueDto.ModificationUserId,
-                    IssueId = issue.Id,
-                };
-                issueHistories.Add(changedTheBacklogHis);
-            }
-
-            issue.BacklogId = backlogId;
-        }
-        else if (updateIssueDto.AssigneeId is Guid newAssigneeId)
-        {
-            if (issueDetail.AssigneeId is Guid oldAssigneeId)
-            {
-                var changedTheAssigneeHis = new IssueHistory()
-                {
-                    Name = IssueConstants.Assignee_IssueHistoryName,
-                    Content = new AssigneeFromTo
-                    {
-                        From = oldAssigneeId,
-                        To = newAssigneeId,
-                    }.ToJson(),
-                    CreatorUserId = updateIssueDto.ModificationUserId,
-                    IssueId = issue.Id,
-                };
-                issueHistories.Add(changedTheAssigneeHis);
-            }
-            else if (issueDetail.AssigneeId is null)
-            {
-                var changedTheAssigneeHis = new IssueHistory()
-                {
-                    Name = IssueConstants.Assignee_IssueHistoryName,
-                    Content = new AssigneeFromTo
-                    {
-                        From = null,
-                        To = newAssigneeId,
-                    }.ToJson(),
-                    CreatorUserId = updateIssueDto.ModificationUserId,
-                    IssueId = issue.Id,
-                };
-                issueHistories.Add(changedTheAssigneeHis);
-            }
-
-            issueDetail.AssigneeId = newAssigneeId;
-        }
-        else if (updateIssueDto.AssigneeId is null && issueDetail.AssigneeId is Guid oldAssigneeId)
-        {
-            var changedTheAssigneeHis = new IssueHistory()
-            {
-                Name = IssueConstants.Assignee_IssueHistoryName,
-                Content = new AssigneeFromTo
-                {
-                    From = oldAssigneeId,
-                    To = null,
-                }.ToJson(),
-                CreatorUserId = updateIssueDto.ModificationUserId,
-                IssueId = issue.Id,
-            };
-            issueHistories.Add(changedTheAssigneeHis);
-
-            issueDetail.AssigneeId = null;
+            await ChangeBacklogIssue(issue, updateIssueDto, issueHistories, backlogId, senderName, projectName);
         }
         else if (updateIssueDto.StatusId is Guid newStatusId)
         {
-            if (issue.StatusId is Guid oldStatusId)
-            {
-                string? newStatusName = await _statusRepository.GetNameOfStatus(newStatusId);
-                string? oldStatusName = await _statusRepository.GetNameOfStatus(oldStatusId);
-                var changedTheStatusHis = new IssueHistory()
-                {
-                    Name = IssueConstants.Status_IssueHistoryName,
-                    Content = $"{oldStatusName} to {newStatusName}",
-                    CreatorUserId = updateIssueDto.ModificationUserId,
-                    IssueId = issue.Id,
-                };
-                issueHistories.Add(changedTheStatusHis);
-            }
-
-            issue.StatusId = newStatusId;
+            await ChangeStatusIssue(issue, updateIssueDto, issueHistories, newStatusId, senderName, projectName);
         }
         else if (updateIssueDto.PriorityId is Guid newPriorityId)
         {
-            if (issue.PriorityId is Guid oldPriorityId)
-            {
-                string? newPriorityName = await _priorityRepository.GetNameOfPriority(newPriorityId);
-                string? oldPriorityName = await _priorityRepository.GetNameOfPriority(oldPriorityId);
-                var changedThePriorityHis = new IssueHistory()
-                {
-                    Name = IssueConstants.Priority_IssueHistoryName,
-                    Content = $"{oldPriorityName} to {newPriorityName}",
-                    CreatorUserId = updateIssueDto.ModificationUserId,
-                    IssueId = issue.Id,
-                };
-
-                issueHistories.Add(changedThePriorityHis);
-            }
-            else
-            {
-                string? newPriorityName = await _priorityRepository.GetNameOfPriority(newPriorityId);
-                var changedThePriorityHis = new IssueHistory()
-                {
-                    Name = IssueConstants.Priority_IssueHistoryName,
-                    Content = $"{IssueConstants.None_IssueHistoryContent} to {newPriorityName}",
-                    CreatorUserId = updateIssueDto.ModificationUserId,
-                    IssueId = issue.Id,
-                };
-
-                issueHistories.Add(changedThePriorityHis);
-            }
-
-            issue.PriorityId = newPriorityId;
+            await ChangePriorityIssue(issue, updateIssueDto, issueHistories, newPriorityId, senderName, projectName);
         }
-        else if (updateIssueDto.StoryPointEstimate is not 0 && issueDetail.StoryPointEstimate is not 0)
+        else if (
+            updateIssueDto.StoryPointEstimate is not 0 && issueDetail.StoryPointEstimate is not 0
+            || updateIssueDto.StoryPointEstimate is not 0 && issueDetail.StoryPointEstimate is 0
+            || updateIssueDto.StoryPointEstimate is 0 && issueDetail.StoryPointEstimate is not 0
+            )
         {
-            var updatedTheSPEHis = new IssueHistory()
-            {
-                Name = IssueConstants.StoryPointEstimate_IssueHistoryName,
-                Content = $"{issueDetail.StoryPointEstimate} to {updateIssueDto.StoryPointEstimate}",
-                CreatorUserId = updateIssueDto.ModificationUserId,
-                IssueId = issue.Id,
-            };
-            issueHistories.Add(updatedTheSPEHis);
-
-            issueDetail.StoryPointEstimate = updateIssueDto.StoryPointEstimate ?? 0;
-        }
-        else if (updateIssueDto.StoryPointEstimate is not 0 && issueDetail.StoryPointEstimate is 0)
-        {
-            var updatedTheSPEHis = new IssueHistory()
-            {
-                Name = IssueConstants.StoryPointEstimate_IssueHistoryName,
-                Content = $"{issueDetail.StoryPointEstimate} to {updateIssueDto.StoryPointEstimate}",
-                CreatorUserId = updateIssueDto.ModificationUserId,
-                IssueId = issue.Id,
-            };
-            issueHistories.Add(updatedTheSPEHis);
-
-            issueDetail.StoryPointEstimate = updateIssueDto.StoryPointEstimate ?? 0;
-        }
-        else if (updateIssueDto.StoryPointEstimate is 0 && issueDetail.StoryPointEstimate is not 0)
-        {
-            var updatedTheSPEHis = new IssueHistory()
-            {
-                Name = IssueConstants.StoryPointEstimate_IssueHistoryName,
-                Content = $"{issueDetail.StoryPointEstimate} to {updateIssueDto.StoryPointEstimate}",
-                CreatorUserId = updateIssueDto.ModificationUserId,
-                IssueId = issue.Id,
-            };
-            issueHistories.Add(updatedTheSPEHis);
-
-            issueDetail.StoryPointEstimate = updateIssueDto.StoryPointEstimate ?? 0;
+            await ChangeSPEIssue(issue, issueDetail, updateIssueDto, issueHistories, senderName, projectName);
         }
         else if (updateIssueDto.ReporterId is Guid reporterId)
         {
-            var updatedTheReporterHis = new IssueHistory()
-            {
-                Name = IssueConstants.Reporter_IssueHistoryName,
-                Content = new ReporterFromTo
-                {
-                    From = issueDetail.ReporterId,
-                    To = reporterId
-                }.ToJson(),
-                CreatorUserId = updateIssueDto.ModificationUserId,
-                IssueId = issue.Id,
-            };
-            issueHistories.Add(updatedTheReporterHis);
-
-            issueDetail.ReporterId = reporterId;
+            await ChangeReporterIssue(issue, issueDetail, updateIssueDto, issueHistories, reporterId, senderName, projectName);
         }
+
+        await ChangeAssigneeIssue(issue, issueDetail, updateIssueDto, issueHistories, senderName, projectName);
+
         _issueHistoryRepository.AddRange(issueHistories);
         await _issueHistoryRepository.UnitOfWork.SaveChangesAsync();
-
-        foreach (var issueHistory in issueHistories)
-        {
-            if (issueHistory.Name is IssueConstants.Reporter_IssueHistoryName)
-            {
-                var reporterFromTo = issueHistory.Content.FromJson<ReporterFromTo>();
-                var fromName = await _userManager.Users.Where(u => u.Id == reporterFromTo.From).Select(u => u.Name).FirstOrDefaultAsync();
-                var toName = await _userManager.Users.Where(u => u.Id == reporterFromTo.To).Select(u => u.Name).FirstOrDefaultAsync();
-                string content = $"Reporter: {fromName} to {toName}";
-                await _emailSender.SendEmailWhenUpdateIssue(issueId: issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", content: content, from: updateIssueDto.ModificationUserId);
-            }
-            else if (issueHistory.Name is IssueConstants.Assignee_IssueHistoryName)
-            {
-                var assigneeFromTo = issueHistory.Content.FromJson<AssigneeFromTo>();
-                var fromName = assigneeFromTo.From is not null ? await _userManager.Users.Where(u => u.Id == assigneeFromTo.From).Select(u => u.Name).FirstOrDefaultAsync() : IssueConstants.Unassigned_IssueHistoryContent;
-
-                var toName = assigneeFromTo.To is not null ? await _userManager.Users.Where(u => u.Id == assigneeFromTo.To).Select(u => u.Name).FirstOrDefaultAsync() : IssueConstants.Unassigned_IssueHistoryContent;
-
-                string content = $"Assignee: {fromName} to {toName}";
-                await _emailSender.SendEmailWhenUpdateIssue(issueId: issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", content: content, from: updateIssueDto.ModificationUserId);
-            }
-            else
-            {
-                await _emailSender.SendEmailWhenUpdateIssue(issueId: issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", content: issueHistory.Content, from: updateIssueDto.ModificationUserId);
-            }
-        }
     }
 
     private async Task AddWatcher(Issue issue, UpdateIssueDto updateIssueDto)
@@ -638,6 +404,575 @@ public class IssueService : IIssueService
             await _labelRepository.UnitOfWork.SaveChangesAsync();
         }
     }
+
+    private async Task ChangeNameIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName)
+    {
+        var updatedTheSumaryHis = new IssueHistory()
+        {
+            Name = IssueConstants.Summary_IssueHistoryName,
+            Content = $"{issue.Name} to {updateIssueDto.Name}",
+            CreatorUserId = updateIssueDto.ModificationUserId,
+            IssueId = issue.Id,
+        };
+
+        issueHistories.Add(updatedTheSumaryHis);
+
+        var changeNameIssueEmailContentDto = new ChangeNameIssueEmailContentDto()
+        {
+            ReporterName = senderName,
+            IssueCreationTime = issue.CreationTime,
+            FromName = issue.Name,
+            ToName = updateIssueDto.Name ?? string.Empty,
+        };
+
+        string emailContent = EmailContentConstants.ChangeNameIssueContent(changeNameIssueEmailContentDto);
+
+        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+        {
+            SenderName = senderName,
+            ActionName = EmailConstants.MadeOneUpdate,
+            ProjectName = projectName,
+            IssueCode = issue.Code,
+            IssueName = issue.Name,
+            EmailContent = emailContent,
+        };
+
+        await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+
+        issue.Name = updateIssueDto.Name ?? string.Empty;
+    }
+
+    private static void ChangeDescriptionIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories)
+    {
+        var updatedTheDescriptionHis = new IssueHistory()
+        {
+            Name = IssueConstants.Description_IssueHistoryName,
+            Content = string.IsNullOrWhiteSpace(issue.Description) ? $"{IssueConstants.None_IssueHistoryContent} to {updateIssueDto.Description}" : $"{issue.Description} to {updateIssueDto.Description}",
+            CreatorUserId = updateIssueDto.ModificationUserId,
+            IssueId = issue.Id,
+        };
+        issueHistories.Add(updatedTheDescriptionHis);
+
+        issue.Description = updateIssueDto.Description;
+    }
+
+    private async Task ChangeParentIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid parentId, string senderName, string projectName)
+    {
+        string? oldParentName = issue.ParentId is not null ? await _issueRepository.GetNameOfIssue((Guid)issue.ParentId) : IssueConstants.None_IssueHistoryContent;
+        string? newParentName = await _issueRepository.GetNameOfIssue(parentId);
+        var changedTheParentHis = new IssueHistory()
+        {
+            Name = IssueConstants.Parent_IssueHistoryName,
+            Content = $"{oldParentName} to {newParentName}",
+            CreatorUserId = updateIssueDto.ModificationUserId,
+            IssueId = issue.Id,
+        };
+        issueHistories.Add(changedTheParentHis);
+
+        var changeParentIssueEmailContentDto = new ChangeParentIssueEmailContentDto()
+        {
+            ReporterName = senderName,
+            IssueCreationTime = issue.CreationTime,
+            FromParentName = oldParentName ?? string.Empty,
+            ToParentName = newParentName ?? string.Empty,
+        };
+
+        string emailContent = EmailContentConstants.ChangeParentIssueContent(changeParentIssueEmailContentDto);
+
+        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+        {
+            SenderName = senderName,
+            ActionName = EmailConstants.MadeOneUpdate,
+            ProjectName = projectName,
+            IssueCode = issue.Code,
+            IssueName = issue.Name,
+            EmailContent = emailContent,
+        };
+
+        await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+
+        issue.ParentId = parentId;
+    }
+
+    private async Task ChangeSprintIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid newSprintId, string senderName, string projectName)
+    {
+        if (issue.SprintId is Guid oldSprintId)
+        {
+            string? oldSprintName = await _sprintRepository.GetNameOfSprint(oldSprintId);
+            string? newSprintName = await _sprintRepository.GetNameOfSprint(newSprintId);
+            var changedTheParentHis = new IssueHistory()
+            {
+                Name = IssueConstants.Parent_IssueHistoryName,
+                Content = $"{oldSprintName} to {newSprintName}",
+                CreatorUserId = updateIssueDto.ModificationUserId,
+                IssueId = issue.Id,
+            };
+            issueHistories.Add(changedTheParentHis);
+
+            var changeSprintIssueEmailContentDto = new ChangeSprintIssueEmailContentDto()
+            {
+                ReporterName = senderName,
+                IssueCreationTime = issue.CreationTime,
+                FromSprintName = oldSprintName ?? string.Empty,
+                ToSprintName = newSprintName ?? string.Empty,
+            };
+
+            string emailContent = EmailContentConstants.ChangeSprintIssueContent(changeSprintIssueEmailContentDto);
+
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+            {
+                SenderName = senderName,
+                ActionName = EmailConstants.MadeOneUpdate,
+                ProjectName = projectName,
+                IssueCode = issue.Code,
+                IssueName = issue.Name,
+                EmailContent = emailContent,
+            };
+
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+        }
+        else if (issue.SprintId is null)
+        {
+            string? newSprintName = await _sprintRepository.GetNameOfSprint(newSprintId);
+            var changedTheParentHis = new IssueHistory()
+            {
+                Name = IssueConstants.Parent_IssueHistoryName,
+                Content = $"{IssueConstants.None_IssueHistoryContent} to {newSprintName}",
+                CreatorUserId = updateIssueDto.ModificationUserId,
+                IssueId = issue.Id,
+            };
+            issueHistories.Add(changedTheParentHis);
+
+            var changeSprintIssueEmailContentDto = new ChangeSprintIssueEmailContentDto()
+            {
+                ReporterName = senderName,
+                IssueCreationTime = issue.CreationTime,
+                FromSprintName = string.Empty,
+                ToSprintName = newSprintName ?? string.Empty,
+            };
+
+            string emailContent = EmailContentConstants.ChangeSprintIssueContent(changeSprintIssueEmailContentDto);
+
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+            {
+                SenderName = senderName,
+                ActionName = EmailConstants.MadeOneUpdate,
+                ProjectName = projectName,
+                IssueCode = issue.Code,
+                IssueName = issue.Name,
+                EmailContent = emailContent,
+            };
+
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+        }
+
+        issue.SprintId = newSprintId;
+    }
+
+    private async Task ChangeIssueTypeIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid newIssueTypeId, string senderName, string projectName)
+    {
+        string? newIssueTypeName = await _issueTypeRepository.GetNameOfIssueType(newIssueTypeId);
+        string? oldIssueTypeName = await _issueTypeRepository.GetNameOfIssueType(issue.IssueTypeId);
+        var updatedTheIssueTypeHis = new IssueHistory()
+        {
+            Name = IssueConstants.IssueType_IssueHistoryName,
+            Content = $"{oldIssueTypeName} to {newIssueTypeName}",
+            CreatorUserId = updateIssueDto.ModificationUserId,
+            IssueId = issue.Id,
+        };
+        issueHistories.Add(updatedTheIssueTypeHis);
+
+        var changeIssueTypeIssueEmailContentDto = new ChangeIssueTypeIssueEmailContentDto()
+        {
+            ReporterName = senderName,
+            IssueCreationTime = issue.CreationTime,
+            FromIssueTypeName = oldIssueTypeName ?? string.Empty,
+            ToIssueTypeName = newIssueTypeName ?? string.Empty,
+        };
+
+        string emailContent = EmailContentConstants.ChangeIssueTypeIssueContent(changeIssueTypeIssueEmailContentDto);
+
+        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+        {
+            SenderName = senderName,
+            ActionName = EmailConstants.MadeOneUpdate,
+            ProjectName = projectName,
+            IssueCode = issue.Code,
+            IssueName = issue.Name,
+            EmailContent = emailContent,
+        };
+
+        await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+
+        issue.IssueTypeId = newIssueTypeId;
+    }
+
+    private async Task ChangeBacklogIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid backlogId, string senderName, string projectName)
+    {
+        if (issue.SprintId is Guid oldSprintId)
+        {
+            string? oldSprintName = await _sprintRepository.GetNameOfSprint(oldSprintId);
+            var changedTheBacklogHis = new IssueHistory()
+            {
+                Name = IssueConstants.Sprint_IssueHistoryName,
+                Content = $"{oldSprintName} to {IssueConstants.None_IssueHistoryContent}",
+                CreatorUserId = updateIssueDto.ModificationUserId,
+                IssueId = issue.Id,
+            };
+            issueHistories.Add(changedTheBacklogHis);
+
+            var changeSprintIssueEmailContentDto = new ChangeSprintIssueEmailContentDto()
+            {
+                ReporterName = senderName,
+                IssueCreationTime = issue.CreationTime,
+                FromSprintName = oldSprintName ?? string.Empty,
+                ToSprintName = string.Empty,
+            };
+
+            string emailContent = EmailContentConstants.ChangeSprintIssueContent(changeSprintIssueEmailContentDto);
+
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+            {
+                SenderName = senderName,
+                ActionName = EmailConstants.MadeOneUpdate,
+                ProjectName = projectName,
+                IssueCode = issue.Code,
+                IssueName = issue.Name,
+                EmailContent = emailContent,
+            };
+
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+        }
+        issue.BacklogId = backlogId;
+    }
+
+    private async Task ChangeAssigneeIssue(Issue issue, IssueDetail issueDetail, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName)
+    {
+        if (updateIssueDto.AssigneeId is Guid newAssigneeId)
+        {
+            if (issueDetail.AssigneeId is Guid oldAssigneeId)
+            {
+                var changedTheAssigneeHis = new IssueHistory()
+                {
+                    Name = IssueConstants.Assignee_IssueHistoryName,
+                    Content = new AssigneeFromTo
+                    {
+                        From = oldAssigneeId,
+                        To = newAssigneeId,
+                    }.ToJson(),
+                    CreatorUserId = updateIssueDto.ModificationUserId,
+                    IssueId = issue.Id,
+                };
+                issueHistories.Add(changedTheAssigneeHis);
+
+                var fromAssigneeName = await _userManager.Users.Where(u => u.Id == oldAssigneeId).Select(u => u.Name).FirstOrDefaultAsync();
+
+                var toAssigneeName = await _userManager.Users.Where(u => u.Id == newAssigneeId).Select(u => u.Name).FirstOrDefaultAsync();
+
+                var changeAssigneeIssueEmailContentDto = new ChangeAssigneeIssueEmailContentDto()
+                {
+                    ReporterName = senderName,
+                    IssueCreationTime = issue.CreationTime,
+                    FromAssigneeName = fromAssigneeName ?? string.Empty,
+                    ToAssigneeName = toAssigneeName ?? string.Empty,
+                };
+
+                string emailContent = EmailContentConstants.ChangeAssigneeIssueContent(changeAssigneeIssueEmailContentDto);
+
+                var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+                {
+                    SenderName = senderName,
+                    ActionName = EmailConstants.MadeOneUpdate,
+                    ProjectName = projectName,
+                    IssueCode = issue.Code,
+                    IssueName = issue.Name,
+                    EmailContent = emailContent,
+                };
+
+                await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+            }
+            else if (issueDetail.AssigneeId is null)
+            {
+                var changedTheAssigneeHis = new IssueHistory()
+                {
+                    Name = IssueConstants.Assignee_IssueHistoryName,
+                    Content = new AssigneeFromTo
+                    {
+                        From = null,
+                        To = newAssigneeId,
+                    }.ToJson(),
+                    CreatorUserId = updateIssueDto.ModificationUserId,
+                    IssueId = issue.Id,
+                };
+                issueHistories.Add(changedTheAssigneeHis);
+
+                var toAssigneeName = await _userManager.Users.Where(u => u.Id == newAssigneeId).Select(u => u.Name).FirstOrDefaultAsync();
+
+                var changeAssigneeIssueEmailContentDto = new ChangeAssigneeIssueEmailContentDto()
+                {
+                    ReporterName = senderName,
+                    IssueCreationTime = issue.CreationTime,
+                    FromAssigneeName = IssueConstants.Unassigned_IssueHistoryContent,
+                    ToAssigneeName = toAssigneeName ?? string.Empty,
+                };
+
+                string emailContent = EmailContentConstants.ChangeAssigneeIssueContent(changeAssigneeIssueEmailContentDto);
+
+                var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+                {
+                    SenderName = senderName,
+                    ActionName = EmailConstants.MadeOneUpdate,
+                    ProjectName = projectName,
+                    IssueCode = issue.Code,
+                    IssueName = issue.Name,
+                    EmailContent = emailContent,
+                };
+
+                await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+            }
+
+            issueDetail.AssigneeId = newAssigneeId;
+        }
+        else if (updateIssueDto.AssigneeId is null && issueDetail.AssigneeId is Guid oldAssigneeId)
+        {
+            var changedTheAssigneeHis = new IssueHistory()
+            {
+                Name = IssueConstants.Assignee_IssueHistoryName,
+                Content = new AssigneeFromTo
+                {
+                    From = oldAssigneeId,
+                    To = null,
+                }.ToJson(),
+                CreatorUserId = updateIssueDto.ModificationUserId,
+                IssueId = issue.Id,
+            };
+            issueHistories.Add(changedTheAssigneeHis);
+
+            var fromAssigneeName = await _userManager.Users.Where(u => u.Id == oldAssigneeId).Select(u => u.Name).FirstOrDefaultAsync();
+
+            var changeAssigneeIssueEmailContentDto = new ChangeAssigneeIssueEmailContentDto()
+            {
+                ReporterName = senderName,
+                IssueCreationTime = issue.CreationTime,
+                FromAssigneeName = fromAssigneeName ?? string.Empty,
+                ToAssigneeName = IssueConstants.Unassigned_IssueHistoryContent,
+            };
+
+            string emailContent = EmailContentConstants.ChangeAssigneeIssueContent(changeAssigneeIssueEmailContentDto);
+
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+            {
+                SenderName = senderName,
+                ActionName = EmailConstants.MadeOneUpdate,
+                ProjectName = projectName,
+                IssueCode = issue.Code,
+                IssueName = issue.Name,
+                EmailContent = emailContent,
+            };
+
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+
+            issueDetail.AssigneeId = null;
+        }
+    }
+
+    private async Task ChangeStatusIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid newStatusId, string senderName, string projectName)
+    {
+        if (issue.StatusId is Guid oldStatusId)
+        {
+            string? newStatusName = await _statusRepository.GetNameOfStatus(newStatusId);
+            string? oldStatusName = await _statusRepository.GetNameOfStatus(oldStatusId);
+            var changedTheStatusHis = new IssueHistory()
+            {
+                Name = IssueConstants.Status_IssueHistoryName,
+                Content = $"{oldStatusName} to {newStatusName}",
+                CreatorUserId = updateIssueDto.ModificationUserId,
+                IssueId = issue.Id,
+            };
+            issueHistories.Add(changedTheStatusHis);
+
+            var changeStatusIssueEmailContentDto = new ChangeStatusIssueEmailContentDto()
+            {
+                ReporterName = senderName,
+                IssueCreationTime = issue.CreationTime,
+                FromStatusName = oldStatusName ?? string.Empty,
+                ToStatusName = newStatusName ?? string.Empty,
+            };
+
+            string emailContent = EmailContentConstants.ChangeStatusIssueContent(changeStatusIssueEmailContentDto);
+
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+            {
+                SenderName = senderName,
+                ActionName = EmailConstants.MadeOneUpdate,
+                ProjectName = projectName,
+                IssueCode = issue.Code,
+                IssueName = issue.Name,
+                EmailContent = emailContent,
+            };
+
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+        }
+
+        issue.StatusId = newStatusId;
+    }
+
+    private async Task ChangePriorityIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid newPriorityId, string senderName, string projectName)
+    {
+        if (issue.PriorityId is Guid oldPriorityId)
+        {
+            string? newPriorityName = await _priorityRepository.GetNameOfPriority(newPriorityId);
+            string? oldPriorityName = await _priorityRepository.GetNameOfPriority(oldPriorityId);
+            var changedThePriorityHis = new IssueHistory()
+            {
+                Name = IssueConstants.Priority_IssueHistoryName,
+                Content = $"{oldPriorityName} to {newPriorityName}",
+                CreatorUserId = updateIssueDto.ModificationUserId,
+                IssueId = issue.Id,
+            };
+
+            issueHistories.Add(changedThePriorityHis);
+
+            var changePriorityIssueEmailContentDto = new ChangePriorityIssueEmailContentDto()
+            {
+                ReporterName = senderName,
+                IssueCreationTime = issue.CreationTime,
+                FromPriorityName = oldPriorityName ?? string.Empty,
+                ToPriorityName = newPriorityName ?? string.Empty,
+            };
+
+            string emailContent = EmailContentConstants.ChangePriorityIssueContent(changePriorityIssueEmailContentDto);
+
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+            {
+                SenderName = senderName,
+                ActionName = EmailConstants.MadeOneUpdate,
+                ProjectName = projectName,
+                IssueCode = issue.Code,
+                IssueName = issue.Name,
+                EmailContent = emailContent,
+            };
+
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+        }
+        else
+        {
+            string? newPriorityName = await _priorityRepository.GetNameOfPriority(newPriorityId);
+            var changedThePriorityHis = new IssueHistory()
+            {
+                Name = IssueConstants.Priority_IssueHistoryName,
+                Content = $"{IssueConstants.None_IssueHistoryContent} to {newPriorityName}",
+                CreatorUserId = updateIssueDto.ModificationUserId,
+                IssueId = issue.Id,
+            };
+
+            issueHistories.Add(changedThePriorityHis);
+
+            var changePriorityIssueEmailContentDto = new ChangePriorityIssueEmailContentDto()
+            {
+                ReporterName = senderName,
+                IssueCreationTime = issue.CreationTime,
+                FromPriorityName = IssueConstants.None_IssueHistoryContent,
+                ToPriorityName = newPriorityName ?? string.Empty,
+            };
+
+            string emailContent = EmailContentConstants.ChangePriorityIssueContent(changePriorityIssueEmailContentDto);
+
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+            {
+                SenderName = senderName,
+                ActionName = EmailConstants.MadeOneUpdate,
+                ProjectName = projectName,
+                IssueCode = issue.Code,
+                IssueName = issue.Name,
+                EmailContent = emailContent,
+            };
+
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+        }
+
+        issue.PriorityId = newPriorityId;
+    }
+
+    private async Task ChangeSPEIssue(Issue issue, IssueDetail issueDetail, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName)
+    {
+        var updatedTheSPEHis = new IssueHistory()
+        {
+            Name = IssueConstants.StoryPointEstimate_IssueHistoryName,
+            Content = $"{issueDetail.StoryPointEstimate} to {updateIssueDto.StoryPointEstimate}",
+            CreatorUserId = updateIssueDto.ModificationUserId,
+            IssueId = issue.Id,
+        };
+        issueHistories.Add(updatedTheSPEHis);
+
+        var changeSPEIssueEmailContentDto = new ChangeSPEIssueEmailContentDto()
+        {
+            ReporterName = senderName,
+            IssueCreationTime = issue.CreationTime,
+            FromSPEName = issueDetail.StoryPointEstimate.ToString(),
+            ToSPEName = updateIssueDto.StoryPointEstimate?.ToString() ?? "0",
+        };
+
+        string emailContent = EmailContentConstants.ChangeSPEIssueContent(changeSPEIssueEmailContentDto);
+
+        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+        {
+            SenderName = senderName,
+            ActionName = EmailConstants.MadeOneUpdate,
+            ProjectName = projectName,
+            IssueCode = issue.Code,
+            IssueName = issue.Name,
+            EmailContent = emailContent,
+        };
+
+        await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+
+        issueDetail.StoryPointEstimate = updateIssueDto.StoryPointEstimate ?? 0;
+    }
+
+    private async Task ChangeReporterIssue(Issue issue, IssueDetail issueDetail, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid reporterId, string senderName, string projectName)
+    {
+        var updatedTheReporterHis = new IssueHistory()
+        {
+            Name = IssueConstants.Reporter_IssueHistoryName,
+            Content = new ReporterFromTo
+            {
+                From = issueDetail.ReporterId,
+                To = reporterId
+            }.ToJson(),
+            CreatorUserId = updateIssueDto.ModificationUserId,
+            IssueId = issue.Id,
+        };
+        issueHistories.Add(updatedTheReporterHis);
+
+        var fromReporterName = await _userManager.Users.Where(u => u.Id == issueDetail.ReporterId).Select(u => u.Name).FirstOrDefaultAsync();
+
+        var toReporterName = await _userManager.Users.Where(u => u.Id == reporterId).Select(u => u.Name).FirstOrDefaultAsync();
+
+        var changeReporterIssueEmailContentDto = new ChangeReporterIssueEmailContentDto()
+        {
+            ReporterName = senderName,
+            IssueCreationTime = issue.CreationTime,
+            FromReporterName = fromReporterName ?? string.Empty,
+            ToReporterName = toReporterName ?? string.Empty,
+        };
+
+        string emailContent = EmailContentConstants.ChangeReporterIssueContent(changeReporterIssueEmailContentDto);
+
+        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+        {
+            SenderName = senderName,
+            ActionName = EmailConstants.MadeOneUpdate,
+            ProjectName = projectName,
+            IssueCode = issue.Code,
+            IssueName = issue.Name,
+            EmailContent = emailContent,
+        };
+
+        await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+
+        issueDetail.ReporterId = reporterId;
+    }
     #endregion
 
     public async Task<IssueViewModel> CreateIssue(CreateIssueDto createIssueDto, Guid? sprintId = null, Guid? backlogId = null)
@@ -692,7 +1027,7 @@ public class IssueService : IIssueService
 
         await AddVersionOrLabel(issue, updateIssueDto);
 
-        //issue = updateIssueDto.Adapt(issue);
+        issue = updateIssueDto.Adapt(issue);
         _issueRepository.Update(issue);
         await _issueRepository.UnitOfWork.SaveChangesAsync();
 
@@ -795,6 +1130,28 @@ public class IssueService : IIssueService
         _projectConfigurationRepository.Update(projectConfiguration);
         await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
 
+        var createdIssueEmailContentDto = new CreatedIssueEmailContentDto()
+        {
+            ReporterName = await _userManager.Users.Where(u => u.Id == createIssueByNameDto.CreatorUserId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent,
+            IssueTypeName = await _issueTypeRepository.GetNameOfIssueType(createIssueByNameDto.IssueTypeId) ?? IssueConstants.None_IssueHistoryContent,
+            AssigneeName = await _userManager.Users.Where(u => u.Id == issueDetail.AssigneeId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.Unassigned_IssueHistoryContent,
+            PriorityName = issue.PriorityId is not null ? await _priorityRepository.GetNameOfPriority((Guid)issue.PriorityId) ?? IssueConstants.None_IssueHistoryContent : IssueConstants.None_IssueHistoryContent,
+            IssueCreationTime = issue.CreationTime,
+        };
+
+        string emailContent = EmailContentConstants.CreatedIssueContent(createdIssueEmailContentDto);
+
+        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+        {
+            SenderName = await _userManager.Users.Where(u => u.Id == createIssueByNameDto.CreatorUserId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent,
+            ActionName = EmailConstants.CreatedAnIssue,
+            ProjectName = await _projectRepository.GetProjectName(createIssueByNameDto.ProjectId),
+            IssueCode = issue.Code,
+            IssueName = issue.Name,
+            EmailContent = emailContent,
+        };
+
+        await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: createIssueByNameDto.CreatorUserId, buidEmailTemplateBaseDto);
         return await ToIssueViewModel(issue);
     }
 
