@@ -1,6 +1,7 @@
 ﻿using CoreApiResponse;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using TaskManager.API.Extensions;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
@@ -44,9 +45,10 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid issueId, Guid id)
         {
-            var res = await _commentService.DeleteComment(id);
+            var userId = User.GetUserId();
+            var res = await _commentService.DeleteComment(issueId, id, userId);
             return CustomResult(res, HttpStatusCode.OK);
         }
     }

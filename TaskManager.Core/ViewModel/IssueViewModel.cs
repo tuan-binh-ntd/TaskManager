@@ -45,6 +45,7 @@ namespace TaskManager.Core.ViewModel
         public Guid CreatorUserId { get; set; }
         public bool IsEdited { get; set; }
         public string Content { get; set; } = string.Empty;
+        public DateTime CreationTime { get; set; }
     }
 
     public class AttachmentViewModel

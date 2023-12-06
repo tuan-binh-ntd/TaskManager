@@ -47,12 +47,7 @@ namespace TaskManager.Infrastructure.Services
             var senderName = await _userManager.Users.Where(u => u.Id == createCommentDto.CreatorUserId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
             var projectName = await _issueRepository.GetProjectNameOfIssue(issueId);
 
-            var addNewCommentIssueEmailContentDto = new AddNewCommentIssueEmailContentDto()
-            {
-                ReporterName = senderName,
-                IssueCreationTime = DateTime.Now,
-                CommentContent = createCommentDto.Content,
-            };
+            var addNewCommentIssueEmailContentDto = new AddNewCommentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, createCommentDto.Content);
 
             string emailContent = EmailContentConstants.AddNewCommentIssueContent(addNewCommentIssueEmailContentDto);
 
@@ -70,10 +65,33 @@ namespace TaskManager.Infrastructure.Services
             return comment.Adapt<CommentViewModel>();
         }
 
-        public async Task<Guid> DeleteComment(Guid id)
+        public async Task<Guid> DeleteComment(Guid issueId, Guid id, Guid userId)
         {
-            _commentRepository.Delete(id);
+            var comment = await _commentRepository.GetById(id) ?? throw new CommentNullException();
+            _commentRepository.Delete(comment);
             await _commentRepository.UnitOfWork.SaveChangesAsync();
+
+            var issue = await _issueRepository.Get(issueId);
+
+            var senderName = await _userManager.Users.Where(u => u.Id == userId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
+            var projectName = await _issueRepository.GetProjectNameOfIssue(issueId);
+
+            var deleteCommentIssueEmailContentDto = new DeleteCommentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, comment.Content);
+
+            string emailContent = EmailContentConstants.DeleteCommentIssueContent(deleteCommentIssueEmailContentDto);
+
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+            {
+                SenderName = senderName,
+                ActionName = EmailConstants.DeleteOneComment,
+                ProjectName = projectName,
+                IssueCode = issue.Code,
+                IssueName = issue.Name,
+                EmailContent = emailContent,
+            };
+
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: userId, buidEmailTemplateBaseDto);
+
             return id;
         }
 

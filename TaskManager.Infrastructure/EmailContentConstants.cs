@@ -184,7 +184,7 @@ public static class EmailContentConstants
              </tr>
              <tr>
               <td style=""padding:0;padding:0;white-space:nowrap;width:1.0%;vertical-align:top;padding-right:5px;line-height:24px"">Due date:</td>
-              <td style=""padding:0;padding:0;line-height:24px""><span style=""max-width:700px;height:auto;display:inline-block;padding:0 4px;background-color:#e3fcef"" bgcolor=""#e3fcef"">{changeDueDateIssueEmailContentDto.DueDate:dd/MMM/yy}</span></td>
+              <td style=""padding:0;padding:0;line-height:24px""><span style=""max-width:700px;height:auto;display:inline-block;padding:0 4px;background-color:#ffebe6;text-decoration:line-through"" bgcolor=""#ffebe6"">{changeDueDateIssueEmailContentDto.FromDueDate}</span> <img alt=""→"" id=""m_7162377815005187315logo"" src=""https://mail.google.com/mail/u/0?ui=2&amp;ik=7fab67c955&amp;attid=0.2&amp;permmsgid=msg-f:1763385373260554372&amp;th=1878cda77750a084&amp;view=fimg&amp;fur=ip&amp;sz=s0-l75-ft&amp;attbid=ANGjdJ-UMf7vovLcqXm_neBVmIy2RP5aYf6TzezwbCNcvpwQifFUtONqykfHX-gNEask1n8zHX0fFElziZd71eILIyD8tDHH5moA_i2yCbnUsH686g3hI483yG9pqYU&amp;disp=emb"" style=""border:0;height:24px;width:24px;border:0;max-width:700px;height:auto;height:16px;width:16px;vertical-align:middle"" height=""16"" width=""16"" data-image-whitelisted="""" class=""CToWUd"" data-bit=""iit""> <span style=""max-width:700px;height:auto;display:inline-block;padding:0 4px;background-color:#e3fcef"" bgcolor=""#e3fcef"">{changeDueDateIssueEmailContentDto.ToDueDate}</span></td>
              </tr>
         </tbody>
     ";
@@ -197,7 +197,7 @@ public static class EmailContentConstants
              </tr>
              <tr>
               <td style=""padding:0;padding:0;white-space:nowrap;width:1.0%;vertical-align:top;padding-right:5px;line-height:24px"">Start date:</td>
-              <td style=""padding:0;padding:0;line-height:24px""><span style=""max-width:700px;height:auto;display:inline-block;padding:0 4px;background-color:#e3fcef"" bgcolor=""#e3fcef"">{changeStartDateIssueEmailContentDto.StartDate:dd/MMM/yy}</span></td>
+              <td style=""padding:0;padding:0;line-height:24px""><span style=""max-width:700px;height:auto;display:inline-block;padding:0 4px;background-color:#ffebe6;text-decoration:line-through"" bgcolor=""#ffebe6"">{changeStartDateIssueEmailContentDto.FromStartDate}</span> <img alt=""→"" id=""m_7162377815005187315logo"" src=""https://mail.google.com/mail/u/0?ui=2&amp;ik=7fab67c955&amp;attid=0.2&amp;permmsgid=msg-f:1763385373260554372&amp;th=1878cda77750a084&amp;view=fimg&amp;fur=ip&amp;sz=s0-l75-ft&amp;attbid=ANGjdJ-UMf7vovLcqXm_neBVmIy2RP5aYf6TzezwbCNcvpwQifFUtONqykfHX-gNEask1n8zHX0fFElziZd71eILIyD8tDHH5moA_i2yCbnUsH686g3hI483yG9pqYU&amp;disp=emb"" style=""border:0;height:24px;width:24px;border:0;max-width:700px;height:auto;height:16px;width:16px;vertical-align:middle"" height=""16"" width=""16"" data-image-whitelisted="""" class=""CToWUd"" data-bit=""iit""> <span style=""max-width:700px;height:auto;display:inline-block;padding:0 4px;background-color:#e3fcef"" bgcolor=""#e3fcef"">{changeStartDateIssueEmailContentDto.ToStartDate}</span></td>
              </tr>
         </tbody>
     ";
@@ -308,6 +308,23 @@ public static class EmailContentConstants
                <div>
                 <div style=""font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto','Oxygen','Ubuntu','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;font-size:14px;font-weight:400;line-height:24px;vertical-align:baseline"">
                  <span style=""max-width:700px;height:auto;display:inline-block;padding:0 4px;background-color:#ffebe6;text-decoration:line-through"" bgcolor=""#ffebe6"">{deleteNewAttachmentIssueEmailContentDto.AttachmentName}</span>
+                </div>
+               </div></td>
+             </tr>
+        </tbody>
+    ";
+
+    public static string DeleteCommentIssueContent(DeleteCommentIssueEmailContentDto deleteCommentIssueEmailContentDto) => $@"
+        <tbody style=""border-bottom:0"">
+             <tr>
+              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""https://ci3.googleusercontent.com/proxy/mpf1A_JzhEqCZH0kbRzOe9qU4MTbyxQBfvU25JNqSOnJn8fID_qjf3FrfACcM0moTdk0NBdn8M0H2Bw2OjESur73RpLeDlLCxHBenHWoN2I_yLtuTgbP7Pxk0NJXxs9GeUAgGq38SZin9TvA61ovE-HhkVWM6EKrWPEo0qIauZt5O-SO_t_VwDv14zAKf9GljA4vV0cKGMpaNjGWD5pkZbNhtdgqPH9oQLK7zp8RsBGWEgrpVAKyvg54wg=s0-d-e1-ft#https://secure.gravatar.com/avatar/346602f7edbee67d87c461aaed73cb72?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FBB-4.png"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
+              <td colspan=""2"" style=""padding:0;padding:0;padding-top:14px;padding-bottom:6px;line-height:20px;vertical-align:middle""><span style=""color:#42526e;font-weight:500;display:inline-block;vertical-align:middle"">{deleteCommentIssueEmailContentDto.ReporterName}</span> <span style=""color:#42526e;display:inline-block;vertical-align:middle""> {deleteCommentIssueEmailContentDto.IssueCreationTime}</span></td>
+             </tr>
+             <tr>
+              <td colspan=""2"" style=""padding:0;padding:0;line-height:24px"">
+               <div>
+                <div style=""font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto','Oxygen','Ubuntu','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;font-size:14px;font-weight:400;line-height:24px;vertical-align:baseline"">
+                 <span style=""max-width:700px;height:auto;display:inline-block;padding:0 4px;background-color:#ffebe6;text-decoration:line-through"" bgcolor=""#ffebe6"">{deleteCommentIssueEmailContentDto.CommentContent}</span>
                 </div>
                </div></td>
              </tr>

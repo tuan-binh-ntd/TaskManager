@@ -22,10 +22,9 @@ namespace TaskManager.Infrastructure.Repositories
             return _context.Add(comment).Entity.Adapt<CommentViewModel>();
         }
 
-        public void Delete(Guid id)
+        public void Delete(Comment comment)
         {
-            var comment = _context.Comments.SingleOrDefault(c => c.Id == id);
-            _context.Comments.Remove(comment!);
+            _context.Comments.Remove(comment);
         }
 
         public async Task<IReadOnlyCollection<CommentViewModel>> Gets()
@@ -41,7 +40,7 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<Comment>> GetByIssueId(Guid issueId)
         {
-            var comments = await _context.Comments.AsNoTracking().Where(c => c.IssueId == issueId).ToListAsync();
+            var comments = await _context.Comments.AsNoTracking().Where(c => c.IssueId == issueId).OrderBy(c => c.CreationTime).ToListAsync();
             return comments.AsReadOnly();
         }
 
