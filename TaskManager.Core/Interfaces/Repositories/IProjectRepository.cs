@@ -27,5 +27,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         Task LoadPermissionGroup(Project project);
         Task LoadSprints(Project project);
         Task LoadVersions(Project project);
+        Task<string> GetProjectName(Guid projectId);
     }
 }

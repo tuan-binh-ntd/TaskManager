@@ -158,5 +158,7 @@ namespace TaskManager.Core.Interfaces.Repositories
         Task DeleteByBacklogId(Guid backlogId);
         Task DeleteBySprintId(Guid sprintId);
         Task DeleteByProjectId(Guid projectId);
+        Task<IReadOnlyCollection<Guid>?> GetAllWatcherOfIssue(Guid issueId);
+        Task<string> GetProjectNameOfIssue(Guid issueId);
     }
 }

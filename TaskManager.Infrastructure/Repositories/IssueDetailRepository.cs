@@ -44,5 +44,18 @@ namespace TaskManager.Infrastructure.Repositories
             var issueDetail = await _context.IssueDetails.Where(i => i.IssueId == id).FirstOrDefaultAsync();
             return issueDetail!;
         }
+
+        public async Task<CurrentAssigneeAndReporterViewModel?> GetCurrentAssigneeAndReporter(Guid issueId)
+        {
+            var currentAssigneeAndReporterViewModel = _context.IssueDetails
+                .Where(id => id.IssueId == issueId)
+                .Select(id => new CurrentAssigneeAndReporterViewModel
+                {
+                    CurrentAssigness = id.AssigneeId,
+                    Reporter = id.ReporterId,
+                });
+
+            return await currentAssigneeAndReporterViewModel.FirstOrDefaultAsync();
+        }
     }
 }

@@ -10,5 +10,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         void Update(IssueDetail issueDetail);
         void Delete(Guid id);
         Task<IssueDetail> GetById(Guid id);
+        Task<CurrentAssigneeAndReporterViewModel?> GetCurrentAssigneeAndReporter(Guid issueId);
     }
 }
