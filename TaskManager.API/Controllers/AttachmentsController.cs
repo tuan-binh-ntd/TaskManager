@@ -1,4 +1,5 @@
 ﻿using CoreApiResponse;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TaskManager.API.Extensions;
@@ -18,6 +19,7 @@ namespace TaskManager.API.Controllers
             _attachmentService = attachmentService;
         }
 
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(typeof(IReadOnlyCollection<AttachmentViewModel>), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> Create(Guid issueId, List<IFormFile> files)
@@ -27,6 +29,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.Created);
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Delete(Guid id, Guid issueId)

@@ -171,10 +171,8 @@ namespace TaskManager.Infrastructure.Services
                 var senderName = await _userManager.Users.Where(u => u.Id == userId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
                 var projectName = await _issueRepository.GetProjectNameOfIssue(issueId);
 
-                var addNewAttachmentIssueEmailContentDto = new AddNewAttachmentIssueEmailContentDto()
+                var addNewAttachmentIssueEmailContentDto = new AddNewAttachmentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
                 {
-                    ReporterName = senderName,
-                    IssueCreationTime = DateTime.Now,
                     AttachmentName = attachment.Name,
                 };
 
@@ -215,10 +213,8 @@ namespace TaskManager.Infrastructure.Services
             var senderName = await _userManager.Users.Where(u => u.Id == userId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
             var projectName = await _issueRepository.GetProjectNameOfIssue(issueId);
 
-            var deleteNewAttachmentIssueEmailContentDto = new DeleteNewAttachmentIssueEmailContentDto()
+            var deleteNewAttachmentIssueEmailContentDto = new DeleteNewAttachmentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
             {
-                ReporterName = senderName,
-                IssueCreationTime = DateTime.Now,
                 AttachmentName = attachment.Name,
             };
 

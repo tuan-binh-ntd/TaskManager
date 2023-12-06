@@ -417,10 +417,8 @@ public class IssueService : IIssueService
 
         issueHistories.Add(updatedTheSumaryHis);
 
-        var changeNameIssueEmailContentDto = new ChangeNameIssueEmailContentDto()
+        var changeNameIssueEmailContentDto = new ChangeNameIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
         {
-            ReporterName = senderName,
-            IssueCreationTime = issue.CreationTime,
             FromName = issue.Name,
             ToName = updateIssueDto.Name ?? string.Empty,
         };
@@ -469,10 +467,8 @@ public class IssueService : IIssueService
         };
         issueHistories.Add(changedTheParentHis);
 
-        var changeParentIssueEmailContentDto = new ChangeParentIssueEmailContentDto()
+        var changeParentIssueEmailContentDto = new ChangeParentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
         {
-            ReporterName = senderName,
-            IssueCreationTime = issue.CreationTime,
             FromParentName = oldParentName ?? string.Empty,
             ToParentName = newParentName ?? string.Empty,
         };
@@ -509,10 +505,8 @@ public class IssueService : IIssueService
             };
             issueHistories.Add(changedTheParentHis);
 
-            var changeSprintIssueEmailContentDto = new ChangeSprintIssueEmailContentDto()
+            var changeSprintIssueEmailContentDto = new ChangeSprintIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
             {
-                ReporterName = senderName,
-                IssueCreationTime = issue.CreationTime,
                 FromSprintName = oldSprintName ?? string.Empty,
                 ToSprintName = newSprintName ?? string.Empty,
             };
@@ -543,10 +537,8 @@ public class IssueService : IIssueService
             };
             issueHistories.Add(changedTheParentHis);
 
-            var changeSprintIssueEmailContentDto = new ChangeSprintIssueEmailContentDto()
+            var changeSprintIssueEmailContentDto = new ChangeSprintIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
             {
-                ReporterName = senderName,
-                IssueCreationTime = issue.CreationTime,
                 FromSprintName = string.Empty,
                 ToSprintName = newSprintName ?? string.Empty,
             };
@@ -582,10 +574,8 @@ public class IssueService : IIssueService
         };
         issueHistories.Add(updatedTheIssueTypeHis);
 
-        var changeIssueTypeIssueEmailContentDto = new ChangeIssueTypeIssueEmailContentDto()
+        var changeIssueTypeIssueEmailContentDto = new ChangeIssueTypeIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
         {
-            ReporterName = senderName,
-            IssueCreationTime = issue.CreationTime,
             FromIssueTypeName = oldIssueTypeName ?? string.Empty,
             ToIssueTypeName = newIssueTypeName ?? string.Empty,
         };
@@ -621,10 +611,8 @@ public class IssueService : IIssueService
             };
             issueHistories.Add(changedTheBacklogHis);
 
-            var changeSprintIssueEmailContentDto = new ChangeSprintIssueEmailContentDto()
+            var changeSprintIssueEmailContentDto = new ChangeSprintIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
             {
-                ReporterName = senderName,
-                IssueCreationTime = issue.CreationTime,
                 FromSprintName = oldSprintName ?? string.Empty,
                 ToSprintName = string.Empty,
             };
@@ -669,10 +657,8 @@ public class IssueService : IIssueService
 
                 var toAssigneeName = await _userManager.Users.Where(u => u.Id == newAssigneeId).Select(u => u.Name).FirstOrDefaultAsync();
 
-                var changeAssigneeIssueEmailContentDto = new ChangeAssigneeIssueEmailContentDto()
+                var changeAssigneeIssueEmailContentDto = new ChangeAssigneeIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
                 {
-                    ReporterName = senderName,
-                    IssueCreationTime = issue.CreationTime,
                     FromAssigneeName = fromAssigneeName ?? string.Empty,
                     ToAssigneeName = toAssigneeName ?? string.Empty,
                 };
@@ -708,10 +694,8 @@ public class IssueService : IIssueService
 
                 var toAssigneeName = await _userManager.Users.Where(u => u.Id == newAssigneeId).Select(u => u.Name).FirstOrDefaultAsync();
 
-                var changeAssigneeIssueEmailContentDto = new ChangeAssigneeIssueEmailContentDto()
+                var changeAssigneeIssueEmailContentDto = new ChangeAssigneeIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
                 {
-                    ReporterName = senderName,
-                    IssueCreationTime = issue.CreationTime,
                     FromAssigneeName = IssueConstants.Unassigned_IssueHistoryContent,
                     ToAssigneeName = toAssigneeName ?? string.Empty,
                 };
@@ -750,10 +734,8 @@ public class IssueService : IIssueService
 
             var fromAssigneeName = await _userManager.Users.Where(u => u.Id == oldAssigneeId).Select(u => u.Name).FirstOrDefaultAsync();
 
-            var changeAssigneeIssueEmailContentDto = new ChangeAssigneeIssueEmailContentDto()
+            var changeAssigneeIssueEmailContentDto = new ChangeAssigneeIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
             {
-                ReporterName = senderName,
-                IssueCreationTime = issue.CreationTime,
                 FromAssigneeName = fromAssigneeName ?? string.Empty,
                 ToAssigneeName = IssueConstants.Unassigned_IssueHistoryContent,
             };
@@ -791,10 +773,8 @@ public class IssueService : IIssueService
             };
             issueHistories.Add(changedTheStatusHis);
 
-            var changeStatusIssueEmailContentDto = new ChangeStatusIssueEmailContentDto()
+            var changeStatusIssueEmailContentDto = new ChangeStatusIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
             {
-                ReporterName = senderName,
-                IssueCreationTime = issue.CreationTime,
                 FromStatusName = oldStatusName ?? string.Empty,
                 ToStatusName = newStatusName ?? string.Empty,
             };
@@ -833,10 +813,8 @@ public class IssueService : IIssueService
 
             issueHistories.Add(changedThePriorityHis);
 
-            var changePriorityIssueEmailContentDto = new ChangePriorityIssueEmailContentDto()
+            var changePriorityIssueEmailContentDto = new ChangePriorityIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
             {
-                ReporterName = senderName,
-                IssueCreationTime = issue.CreationTime,
                 FromPriorityName = oldPriorityName ?? string.Empty,
                 ToPriorityName = newPriorityName ?? string.Empty,
             };
@@ -868,10 +846,8 @@ public class IssueService : IIssueService
 
             issueHistories.Add(changedThePriorityHis);
 
-            var changePriorityIssueEmailContentDto = new ChangePriorityIssueEmailContentDto()
+            var changePriorityIssueEmailContentDto = new ChangePriorityIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
             {
-                ReporterName = senderName,
-                IssueCreationTime = issue.CreationTime,
                 FromPriorityName = IssueConstants.None_IssueHistoryContent,
                 ToPriorityName = newPriorityName ?? string.Empty,
             };
@@ -905,10 +881,8 @@ public class IssueService : IIssueService
         };
         issueHistories.Add(updatedTheSPEHis);
 
-        var changeSPEIssueEmailContentDto = new ChangeSPEIssueEmailContentDto()
+        var changeSPEIssueEmailContentDto = new ChangeSPEIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
         {
-            ReporterName = senderName,
-            IssueCreationTime = issue.CreationTime,
             FromSPEName = issueDetail.StoryPointEstimate.ToString(),
             ToSPEName = updateIssueDto.StoryPointEstimate?.ToString() ?? "0",
         };
@@ -949,10 +923,9 @@ public class IssueService : IIssueService
 
         var toReporterName = await _userManager.Users.Where(u => u.Id == reporterId).Select(u => u.Name).FirstOrDefaultAsync();
 
-        var changeReporterIssueEmailContentDto = new ChangeReporterIssueEmailContentDto()
+        var changeReporterIssueEmailContentDto = new ChangeReporterIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
         {
             ReporterName = senderName,
-            IssueCreationTime = issue.CreationTime,
             FromReporterName = fromReporterName ?? string.Empty,
             ToReporterName = toReporterName ?? string.Empty,
         };
@@ -1130,13 +1103,13 @@ public class IssueService : IIssueService
         _projectConfigurationRepository.Update(projectConfiguration);
         await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
 
-        var createdIssueEmailContentDto = new CreatedIssueEmailContentDto()
+        var reporterName = await _userManager.Users.Where(u => u.Id == createIssueByNameDto.CreatorUserId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
+
+        var createdIssueEmailContentDto = new CreatedIssueEmailContentDto(reporterName, issue.CreationTime)
         {
-            ReporterName = await _userManager.Users.Where(u => u.Id == createIssueByNameDto.CreatorUserId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent,
             IssueTypeName = await _issueTypeRepository.GetNameOfIssueType(createIssueByNameDto.IssueTypeId) ?? IssueConstants.None_IssueHistoryContent,
             AssigneeName = await _userManager.Users.Where(u => u.Id == issueDetail.AssigneeId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.Unassigned_IssueHistoryContent,
             PriorityName = issue.PriorityId is not null ? await _priorityRepository.GetNameOfPriority((Guid)issue.PriorityId) ?? IssueConstants.None_IssueHistoryContent : IssueConstants.None_IssueHistoryContent,
-            IssueCreationTime = issue.CreationTime,
         };
 
         string emailContent = EmailContentConstants.CreatedIssueContent(createdIssueEmailContentDto);
