@@ -1,5 +1,4 @@
-﻿using Mapster;
-using MapsterMapper;
+﻿using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.Core;
@@ -712,7 +711,7 @@ namespace TaskManager.Infrastructure.Services
 
             var changeStartDateIssueEmailContentDto = new ChangeStartDateIssueEmailContentDto(senderName, issue.CreationTime);
 
-            if (updateIssueDto.StartDate is DateTime newStartDate && issue.StartDate is null)
+            if (updateIssueDto.StartDate != DateTime.MinValue && updateIssueDto.StartDate is DateTime newStartDate && issue.StartDate is null)
             {
                 updatedTheStartDateHis.Content = $"{IssueConstants.None_IssueHistoryContent} to {newStartDate:MMM dd, yyyy}";
 
@@ -721,7 +720,7 @@ namespace TaskManager.Infrastructure.Services
 
                 issue.StartDate = newStartDate;
             }
-            if (updateIssueDto.StartDate is DateTime newStartDate1 && issue.StartDate is DateTime oldStartDate1)
+            if (updateIssueDto.StartDate != DateTime.MinValue && updateIssueDto.StartDate is DateTime newStartDate1 && issue.StartDate is DateTime oldStartDate1)
             {
                 updatedTheStartDateHis.Content = $"{oldStartDate1:MMM dd, yyyy} to {newStartDate1:MMM dd, yyyy}";
 
@@ -730,7 +729,7 @@ namespace TaskManager.Infrastructure.Services
 
                 issue.StartDate = newStartDate1;
             }
-            if (updateIssueDto.StartDate is null && issue.StartDate is DateTime oldStartDate2)
+            if (updateIssueDto.StartDate != DateTime.MinValue && updateIssueDto.StartDate is null && issue.StartDate is DateTime oldStartDate2)
             {
                 updatedTheStartDateHis.Content = $"{oldStartDate2:MMM dd, yyyy} to {IssueConstants.None_IssueHistoryContent}";
 
@@ -738,24 +737,28 @@ namespace TaskManager.Infrastructure.Services
                 changeStartDateIssueEmailContentDto.ToStartDate = IssueConstants.None_IssueHistoryContent;
 
                 issue.StartDate = null;
+                updateIssueDto.StartDate = null;
             }
 
-
-            string emailContent = EmailContentConstants.ChangeStartDateIssueContent(changeStartDateIssueEmailContentDto);
-
-            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+            if (updateIssueDto.StartDate != issue.StartDate)
             {
-                SenderName = senderName,
-                ActionName = EmailConstants.MadeOneUpdate,
-                ProjectName = projectName,
-                IssueCode = issue.Code,
-                IssueName = issue.Name,
-                EmailContent = emailContent,
-            };
 
-            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+                string emailContent = EmailContentConstants.ChangeStartDateIssueContent(changeStartDateIssueEmailContentDto);
 
-            issueHistories.Add(updatedTheStartDateHis);
+                var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+                {
+                    SenderName = senderName,
+                    ActionName = EmailConstants.MadeOneUpdate,
+                    ProjectName = projectName,
+                    IssueCode = issue.Code,
+                    IssueName = issue.Name,
+                    EmailContent = emailContent,
+                };
+
+                await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+
+                issueHistories.Add(updatedTheStartDateHis);
+            }
         }
 
         private async Task ChangeDueDateIssue(Issue issue, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName)
@@ -769,7 +772,7 @@ namespace TaskManager.Infrastructure.Services
 
             var changeDueDateIssueEmailContentDto = new ChangeDueDateIssueEmailContentDto(senderName, issue.CreationTime);
 
-            if (updateIssueDto.DueDate is DateTime newDueDate && issue.DueDate is null)
+            if (updateIssueDto.DueDate != DateTime.MinValue && updateIssueDto.DueDate is DateTime newDueDate && issue.DueDate is null)
             {
                 updatedTheDueDateHis.Content = $"{IssueConstants.None_IssueHistoryContent} to {newDueDate:MMM dd, yyyy}";
 
@@ -778,7 +781,7 @@ namespace TaskManager.Infrastructure.Services
 
                 issue.DueDate = newDueDate;
             }
-            if (updateIssueDto.DueDate is DateTime newDueDate1 && issue.DueDate is DateTime oldDueDate1)
+            if (updateIssueDto.DueDate != DateTime.MinValue && updateIssueDto.DueDate is DateTime newDueDate1 && issue.DueDate is DateTime oldDueDate1)
             {
                 updatedTheDueDateHis.Content = $"{oldDueDate1:MMM dd, yyyy} to {newDueDate1:MMM dd, yyyy}";
 
@@ -788,7 +791,7 @@ namespace TaskManager.Infrastructure.Services
                 issue.DueDate = newDueDate1;
 
             }
-            if (updateIssueDto.DueDate is null && issue.DueDate is DateTime oldDueDate2)
+            if (updateIssueDto.DueDate != DateTime.MinValue && updateIssueDto.DueDate is null && issue.DueDate is DateTime oldDueDate2)
             {
                 updatedTheDueDateHis.Content = $"{oldDueDate2:MMM dd, yyyy} to {IssueConstants.None_IssueHistoryContent}";
 
@@ -796,24 +799,28 @@ namespace TaskManager.Infrastructure.Services
                 changeDueDateIssueEmailContentDto.ToDueDate = IssueConstants.None_IssueHistoryContent;
 
                 issue.DueDate = null;
+                updateIssueDto.DueDate = null;
             }
 
-
-            string emailContent = EmailContentConstants.ChangeDueDateIssueContent(changeDueDateIssueEmailContentDto);
-
-            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+            if (updateIssueDto.DueDate != issue.DueDate)
             {
-                SenderName = senderName,
-                ActionName = EmailConstants.MadeOneUpdate,
-                ProjectName = projectName,
-                IssueCode = issue.Code,
-                IssueName = issue.Name,
-                EmailContent = emailContent,
-            };
+                string emailContent = EmailContentConstants.ChangeDueDateIssueContent(changeDueDateIssueEmailContentDto);
 
-            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+                var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+                {
+                    SenderName = senderName,
+                    ActionName = EmailConstants.MadeOneUpdate,
+                    ProjectName = projectName,
+                    IssueCode = issue.Code,
+                    IssueName = issue.Name,
+                    EmailContent = emailContent,
+                };
 
-            issueHistories.Add(updatedTheDueDateHis);
+                await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+
+                issueHistories.Add(updatedTheDueDateHis);
+            }
+
         }
         #endregion
 
@@ -913,7 +920,6 @@ namespace TaskManager.Infrastructure.Services
                 throw new ArgumentNullException(nameof(epic));
 #pragma warning restore CA2208 // Instantiate argument exceptions correctly
             }
-            epic = updateEpicDto.Adapt(epic);
             _issueRepository.Update(epic);
             await _issueRepository.UnitOfWork.SaveChangesAsync();
 
