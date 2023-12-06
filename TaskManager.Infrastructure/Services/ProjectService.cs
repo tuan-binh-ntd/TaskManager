@@ -527,13 +527,8 @@ namespace TaskManager.Infrastructure.Services
             await _priorityRepository.UnitOfWork.SaveChangesAsync();
         }
 
-        private async Task CreateRolesForProject(Project project)
+        private async Task<Guid> CreateRolesForProject(Project project)
         {
-            //var permissions = await _permissionRepository.GetAll();
-            //var productOwnerPermissionRoles = new List<PermissionRole>();
-            //var scrumMasterPermissionRoles = new List<PermissionRole>();
-            //var developerPermissionRoles = new List<PermissionRole>();
-
             var poPermissions = new Permissions()
             {
                 Timeline = new PermissionGroupDto { ViewPermission = true, EditPermission = true },
@@ -583,73 +578,10 @@ namespace TaskManager.Infrastructure.Services
                 productOwnerRole, scrumMasterRole, developerRole
             };
 
-            //foreach (var permission in permissions)
-            //{
-            //    var permissionRole = new PermissionRole()
-            //    {
-            //        PermissionId = permission.Id,
-            //        PermissionGroupId = productOwnerRole.Id,
-
-            //    };
-            //    productOwnerPermissionRoles.Add(permissionRole);
-
-            //    if (permission.Name != CoreConstants.ProjectPermissionName)
-            //    {
-            //        permissionRole = new PermissionRole()
-            //        {
-            //            PermissionId = permission.Id,
-            //            PermissionGroupId = scrumMasterRole.Id,
-            //            ViewPermission = true,
-            //            EditPermission = true,
-            //        };
-
-            //        scrumMasterPermissionRoles.Add(permissionRole);
-            //    }
-            //    else
-            //    {
-            //        permissionRole = new PermissionRole()
-            //        {
-            //            PermissionId = permission.Id,
-            //            PermissionGroupId = scrumMasterRole.Id,
-            //            ViewPermission = true,
-            //            EditPermission = false,
-            //        };
-
-            //        scrumMasterPermissionRoles.Add(permissionRole);
-            //    }
-            //    if (permission.Name == CoreConstants.BacklogPermissionName)
-            //    {
-
-            //        permissionRole = new PermissionRole()
-            //        {
-            //            PermissionId = permission.Id,
-            //            PermissionGroupId = developerRole.Id,
-            //            ViewPermission = true,
-            //            EditPermission = true,
-            //        };
-
-            //        developerPermissionRoles.Add(permissionRole);
-            //    }
-            //    else
-            //    {
-            //        permissionRole = new PermissionRole()
-            //        {
-            //            PermissionId = permission.Id,
-            //            PermissionGroupId = developerRole.Id,
-            //            ViewPermission = false,
-            //            EditPermission = false,
-            //        };
-
-            //        developerPermissionRoles.Add(permissionRole);
-            //    }
-            //}
-
-            //productOwnerRole.PermissionRoles = productOwnerPermissionRoles;
-            //scrumMasterRole.PermissionRoles = scrumMasterPermissionRoles;
-            //developerRole.PermissionRoles = developerPermissionRoles;
-
             _permissionGroupRepository.AddRange(permissionGroups);
             await _permissionGroupRepository.UnitOfWork.SaveChangesAsync();
+
+            return productOwnerRole.Id;
         }
         #endregion
 
@@ -696,17 +628,6 @@ namespace TaskManager.Infrastructure.Services
         {
             var project = projectDto.Adapt<Project>();
             project.AvatarUrl = "https://bs-uploads.toptal.io/blackfish-uploads/components/skill_page/content/logo_file/logo/195649/JIRA_logo-e5a9c767df8a60eb2d242a356ce3fdca.jpg";
-            UserProject userProject = new()
-            {
-                UserId = userId,
-                ProjectId = project.Id,
-                Role = "Leader"
-            };
-
-            project.UserProjects = new List<UserProject>()
-            {
-                userProject
-            };
 
             _projectRepository.Add(project);
             await _projectRepository.UnitOfWork.SaveChangesAsync();
@@ -721,7 +642,18 @@ namespace TaskManager.Infrastructure.Services
 
             await CreateIssueTypesForProject(project);
 
-            await CreateRolesForProject(project);
+            var productOwnerId = await CreateRolesForProject(project);
+
+            UserProject userProject = new()
+            {
+                UserId = userId,
+                ProjectId = project.Id,
+                Role = "Leader",
+                PermissionGroupId = productOwnerId
+            };
+
+            _projectRepository.Add(userProject);
+            await _projectRepository.UnitOfWork.SaveChangesAsync();
 
             return await ToProjectViewModel(project);
         }
@@ -841,6 +773,12 @@ namespace TaskManager.Infrastructure.Services
                 return null;
             }
             return await ToProjectViewModel(project);
+        }
+
+        public async Task<object> GetMembersOfProject(Guid projectId, PaginationInput paginationInput)
+        {
+            var members = await _projectRepository.GetMemberProjects(projectId, paginationInput);
+            return members;
         }
     }
 }

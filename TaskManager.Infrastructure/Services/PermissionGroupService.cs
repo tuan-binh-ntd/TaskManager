@@ -1,4 +1,5 @@
-﻿using TaskManager.Core.DTOs;
+﻿using TaskManager.Core.Core;
+using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Exceptions;
 using TaskManager.Core.Extensions;
@@ -75,7 +76,7 @@ namespace TaskManager.Infrastructure.Services
             }
         }
 
-        public async Task<PermissionGroupViewModel> Update(Guid id, UpdatePermissionGroupDto updatePermissionGroupDto)
+        public async Task<PermissionGroupViewModel> Update(Guid id, UpdatePermissionGroupDto updatePermissionGroupDto, Guid projectId)
         {
             var permissionGroup = await _permissionGroupRepository.GetById(id) ?? throw new PermissionGroupNullException();
             var permissions = new Permissions
@@ -90,7 +91,7 @@ namespace TaskManager.Infrastructure.Services
             permissionGroup.Permissions = permissions.ToJson();
 
             _permissionGroupRepository.Update(permissionGroup);
-            await _permissionGroupRepository.UnitOfWork.SaveChangesAsync();
+
             return await ToPermissionGroupViewModel(permissionGroup);
         }
     }

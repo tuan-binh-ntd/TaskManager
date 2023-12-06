@@ -10,5 +10,6 @@ namespace TaskManager.Core.ViewModel
         public string? Description { get; set; }
         public string Icon { get; set; } = string.Empty;
         public byte Level { get; set; }
+        public bool IsMain { get; set; }
     }
 }

@@ -22,4 +22,11 @@
         //        .Map(dest => dest.Role, src => src.UserRoles!.Where(ur => ur.UserId == src.Id).Select(ur => ur.Role).FirstOrDefault());
         //}
     }
+
+    public class MemberProjectViewModel
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public Guid PermissionGroupId { get; set; }
+    }
 }

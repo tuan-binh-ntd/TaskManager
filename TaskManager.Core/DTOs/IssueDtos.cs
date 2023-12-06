@@ -35,7 +35,7 @@ namespace TaskManager.Core.DTOs
         public Guid? AssigneeId { get; set; }
         public Guid? StatusId { get; set; }
         public Guid? PriorityId { get; set; }
-        public int? StoryPointEstimate { get; set; }
+        public int? StoryPointEstimate { get; set; } = 0;
         public Guid? VersionId { get; set; }
         public Guid? ReporterId { get; set; }
         [Required]
@@ -96,13 +96,13 @@ namespace TaskManager.Core.DTOs
         public DateTime? CompleteDate { get; set; }
         public ICollection<Guid>? UserIds { get; set; }
         public string? Voted { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? DueDate { get; set; }
+        public DateTime? StartDate { get; set; } = DateTime.MinValue;
+        public DateTime? DueDate { get; set; } = DateTime.MinValue;
         public Guid? ParentId { get; set; }
         public Guid? AssigneeId { get; set; }
         public Guid? StatusId { get; set; }
         public Guid? PriorityId { get; set; }
-        public int? StoryPointEstimate { get; set; }
+        public int? StoryPointEstimate { get; set; } = 0;
         public Guid? VersionId { get; set; }
         public Guid? ReporterId { get; set; }
         [Required]

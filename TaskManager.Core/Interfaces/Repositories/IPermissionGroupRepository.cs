@@ -13,5 +13,7 @@ namespace TaskManager.Core.Interfaces.Repositories
         void Delete(Guid id);
         void AddRange(IReadOnlyCollection<PermissionGroup> permissionGroups);
         Task<PaginationResult<PermissionGroupViewModel>> GetByProjectId(Guid projectId, PaginationInput paginationInput);
+        void AddRange(IReadOnlyCollection<UserProject> userProjects);
+        Task<IReadOnlyCollection<UserProject>> GetUserProjectsByPermissionGroupId(Guid permissionGroupId);
     }
 }

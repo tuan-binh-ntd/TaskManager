@@ -45,6 +45,7 @@ namespace TaskManager.Core.ViewModel
         public Guid CreatorUserId { get; set; }
         public bool IsEdited { get; set; }
         public string Content { get; set; } = string.Empty;
+        public DateTime CreationTime { get; set; }
     }
 
     public class AttachmentViewModel
@@ -124,6 +125,14 @@ namespace TaskManager.Core.ViewModel
         public DateTime? End { get; set; }
         public string Type { get; set; } = string.Empty;
         public double Progress { get; set; }
+        public Guid? Project { get; set; }
+        public bool? HideChildren { get; set; }
+    }
+
+    public class CurrentAssigneeAndReporterViewModel
+    {
+        public Guid? CurrentAssigness { get; set; }
+        public Guid Reporter { get; set; }
         public Guid? Project { get; set; }
     }
 }

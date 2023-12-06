@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TaskManager.Core.Core;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Extensions;
 using TaskManager.Core.Helper;
@@ -68,6 +69,17 @@ namespace TaskManager.Infrastructure.Repositories
                             Permissions = pg.Permissions.FromJson<Permissions>()
                         };
             return await query.Pagination(paginationInput);
+        }
+
+        public void AddRange(IReadOnlyCollection<UserProject> userProjects)
+        {
+            _context.UserProjects.AddRange(userProjects);
+        }
+
+        public async Task<IReadOnlyCollection<UserProject>> GetUserProjectsByPermissionGroupId(Guid permissionGroupId)
+        {
+            var userProjects = await _context.UserProjects.Where(up => up.PermissionGroupId == permissionGroupId && up.Role != CoreConstants.LeaderRole).ToListAsync();
+            return userProjects.AsReadOnly();
         }
     }
 }

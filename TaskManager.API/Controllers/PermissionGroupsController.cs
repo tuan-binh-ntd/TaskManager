@@ -38,9 +38,9 @@ namespace TaskManager.API.Controllers
 
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(PermissionGroupViewModel), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> Update(Guid id, [FromBody] UpdatePermissionGroupDto updatePermissionGroupDto)
+        public async Task<IActionResult> Update(Guid projectId, Guid id, [FromBody] UpdatePermissionGroupDto updatePermissionGroupDto)
         {
-            var res = await _permissionGroupService.Update(id, updatePermissionGroupDto);
+            var res = await _permissionGroupService.Update(id, updatePermissionGroupDto, projectId);
             return CustomResult(res, HttpStatusCode.OK);
         }
 

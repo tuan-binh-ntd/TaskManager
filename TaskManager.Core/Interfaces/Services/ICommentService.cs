@@ -7,7 +7,7 @@ namespace TaskManager.Core.Interfaces.Services
     {
         Task<CommentViewModel> CreateComment(Guid issueId, CreateCommentDto createCommentDto);
         Task<CommentViewModel> UpdateComment(Guid id, UpdateCommentDto updateCommentDto);
-        Task<Guid> DeleteComment(Guid id);
+        Task<Guid> DeleteComment(Guid issueId, Guid id, Guid userId);
         Task<IReadOnlyCollection<CommentViewModel>> GetCommentsByIssueId(Guid issueId);
     }
 }

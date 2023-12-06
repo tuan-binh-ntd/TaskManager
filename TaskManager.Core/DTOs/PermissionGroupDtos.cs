@@ -16,6 +16,7 @@ namespace TaskManager.Core.DTOs
         public PermissionGroupDto? Board { get; set; }
         [Required]
         public PermissionGroupDto? Project { get; set; }
+        public IReadOnlyCollection<Guid> UserIds { get; set; } = new List<Guid>();
     }
 
     public class UpdatePermissionGroupDto
@@ -29,6 +30,7 @@ namespace TaskManager.Core.DTOs
         public PermissionGroupDto? Board { get; set; }
         [Required]
         public PermissionGroupDto? Project { get; set; }
+        public IReadOnlyCollection<Guid> UserIds { get; set; } = new List<Guid>();
     }
 
     public class PermissionGroupDto

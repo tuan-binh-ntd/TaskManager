@@ -31,7 +31,13 @@
 
         public const string Version_IssueHistoryName = "updated the Fix verions";
 
+        public const string StartDate_EpicHistoryName = "updated the Start date";
+
+        public const string DueDate_EpicHistoryName = "updated the Due date";
+
         public const string None_IssueHistoryContent = "None";
         public const string Unassigned_IssueHistoryContent = "Unassigned";
+
+        public static DateTime UpdateTime_Issue = DateTime.Now;
     }
 }
