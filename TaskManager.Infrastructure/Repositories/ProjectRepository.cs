@@ -181,7 +181,8 @@ namespace TaskManager.Infrastructure.Repositories
                                      {
                                          Id = u.Id,
                                          Name = u.Name,
-                                         PermissionGroupId = up.PermissionGroupId
+                                         PermissionGroupId = up.PermissionGroupId,
+                                         Email = u.Email!
                                      };
 
                 return await query.Pagination(paginationInput);
@@ -193,7 +194,8 @@ namespace TaskManager.Infrastructure.Repositories
                                  {
                                      Id = u.Id,
                                      Name = u.Name,
-                                     PermissionGroupId = up.PermissionGroupId
+                                     PermissionGroupId = up.PermissionGroupId,
+                                     Email = u.Email!
                                  }).ToListAsync();
 
             return members.AsReadOnly();
