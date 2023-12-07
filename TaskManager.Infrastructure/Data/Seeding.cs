@@ -9,8 +9,6 @@ namespace TaskManager.Infrastructure.Data
     public class Seeding
     {
         public static async Task SeedUsers(
-            UserManager<AppUser> userManager,
-            RoleManager<AppRole> roleManager,
             AppDbContext appDbContext)
         {
             #region Permission
@@ -456,30 +454,6 @@ namespace TaskManager.Infrastructure.Data
             await appDbContext.SaveChangesAsync();
             #endregion
 
-            #region Seed User
-            if (await userManager.Users.AnyAsync()) return;
-
-            // Create role of system
-            var roles = new List<AppRole>
-            {
-                new() { Name = "Admin"},
-            };
-
-            foreach (var role in roles)
-            {
-                await roleManager.CreateAsync(role);
-            }
-
-            // Create Addmin Account
-            AppUser admin = new()
-            {
-                UserName = "admin",
-                Email = "admin@gmail.com",
-            };
-
-            await userManager.CreateAsync(admin, "Abcd1234!");
-            await userManager.AddToRolesAsync(admin, new[] { "Admin" });
-            #endregion
         }
     }
 }

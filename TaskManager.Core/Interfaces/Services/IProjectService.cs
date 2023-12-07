@@ -15,7 +15,7 @@ namespace TaskManager.Core.Interfaces.Services
         Task<Guid> Delete(Guid id);
         Task<object> GetProjectsByFilter(Guid userId, GetProjectByFilterDto filter, PaginationInput paginationInput);
         Task<ProjectViewModel> Get(Guid projectId);
-        Task<ProjectViewModel?> Get(string code);
+        Task<ProjectViewModel?> Get(string code, Guid userId);
         Task<ProjectViewModel> AddMember(AddMemberToProjectDto addMemberToProjectDto);
         Task<object> GetMembersOfProject(Guid projectId, PaginationInput paginationInput);
         Task<MemberProjectViewModel> UpdateMembder(Guid id, UpdateMemberProjectDto updateMemberProjectDto);

@@ -81,5 +81,21 @@ namespace TaskManager.Infrastructure.Repositories
             var userProjects = await _context.UserProjects.Where(up => up.PermissionGroupId == permissionGroupId && up.Role != CoreConstants.LeaderRole).ToListAsync();
             return userProjects.AsReadOnly();
         }
+
+        public async Task<PermissionGroupViewModel> GetPermissionGroupViewModelById(Guid projectId, Guid userId)
+        {
+            var permissionGroupId = await _context.UserProjects.AsNoTracking().Where(up => up.ProjectId == projectId && up.UserId == userId).Select(up => up.PermissionGroupId).FirstOrDefaultAsync();
+
+            var permissionGroup = await _context.PermissionGroups
+                .AsNoTracking()
+                .Select(pg => new PermissionGroupViewModel
+                {
+                    Id = pg.Id,
+                    Name = pg.Name,
+                    Permissions = pg.Permissions.FromJson<Permissions>()
+                })
+                .FirstOrDefaultAsync(pg => pg.Id == permissionGroupId);
+            return permissionGroup!;
+        }
     }
 }

@@ -62,9 +62,9 @@ namespace TaskManager.API.Controllers
 
         [HttpGet("{code}"), AllowAnonymous]
         [ProducesResponseType(typeof(ProjectViewModel), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> Get(string code)
+        public async Task<IActionResult> Get(string code, Guid id)
         {
-            var result = await _projectService.Get(code);
+            var result = await _projectService.Get(code, id);
             if (result is null)
             {
                 return CustomResult(result, HttpStatusCode.NoContent);

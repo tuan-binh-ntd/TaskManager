@@ -17,6 +17,8 @@
         public IReadOnlyCollection<EpicViewModel>? Epics { get; set; }
         public IReadOnlyCollection<PriorityViewModel>? Priorities { get; set; }
         public IReadOnlyCollection<StatusCategoryViewModel>? StatusCategories { get; set; }
+        public PermissionGroupViewModel? UserPermissionGroup { get; set; }
+        public IReadOnlyCollection<PermissionGroupViewModel> PermissionGroups { get; set; } = new List<PermissionGroupViewModel>();
     }
 
     public class BacklogViewModel

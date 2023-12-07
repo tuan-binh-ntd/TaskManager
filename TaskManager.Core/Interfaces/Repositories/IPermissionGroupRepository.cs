@@ -15,5 +15,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         Task<PaginationResult<PermissionGroupViewModel>> GetByProjectId(Guid projectId, PaginationInput paginationInput);
         void AddRange(IReadOnlyCollection<UserProject> userProjects);
         Task<IReadOnlyCollection<UserProject>> GetUserProjectsByPermissionGroupId(Guid permissionGroupId);
+        Task<PermissionGroupViewModel> GetPermissionGroupViewModelById(Guid projectId, Guid userId);
     }
 }

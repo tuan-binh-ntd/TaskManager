@@ -115,7 +115,7 @@ namespace TaskManager.Infrastructure.Services
             return issueViewModel;
         }
 
-        private async Task<ProjectViewModel> ToProjectViewModel(Project project)
+        private async Task<ProjectViewModel> ToProjectViewModel(Project project, Guid? userId = null)
         {
             var members = await _projectRepository.GetMembers(project.Id);
             var backlog = await _backlogRepository.GetBacklog(project.Id);
@@ -149,6 +149,12 @@ namespace TaskManager.Infrastructure.Services
             projectViewModel.Epics = epicViewModels.ToList();
             projectViewModel.Priorities = _mapper.Map<IReadOnlyCollection<PriorityViewModel>>(priorities);
             projectViewModel.StatusCategories = _mapper.Map<IReadOnlyCollection<StatusCategoryViewModel>>(statusCategories);
+            if (userId is Guid newUserId)
+            {
+
+                projectViewModel.UserPermissionGroup = await _permissionGroupRepository.GetPermissionGroupViewModelById(project.Id, newUserId);
+            }
+            projectViewModel.PermissionGroups = await _permissionGroupRepository.GetByProjectId(project.Id);
             return projectViewModel;
         }
 
@@ -768,14 +774,14 @@ namespace TaskManager.Infrastructure.Services
             return await ToProjectViewModel(project);
         }
 
-        public async Task<ProjectViewModel?> Get(string code)
+        public async Task<ProjectViewModel?> Get(string code, Guid id)
         {
             var project = await _projectRepository.GetByCode(code);
             if (project is null)
             {
                 return null;
             }
-            return await ToProjectViewModel(project);
+            return await ToProjectViewModel(project, id);
         }
 
         public async Task<object> GetMembersOfProject(Guid projectId, PaginationInput paginationInput)
