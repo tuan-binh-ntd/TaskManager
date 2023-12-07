@@ -93,5 +93,10 @@ namespace TaskManager.Infrastructure.Repositories
 
             return permissionGroupIds.AsReadOnly();
         }
+
+        public void Delete(UserProject userProject)
+        {
+            _context.UserProjects.Remove(userProject);
+        }
     }
 }

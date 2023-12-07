@@ -13,5 +13,6 @@ namespace TaskManager.Core.Interfaces.Repositories
         Task<UserProject?> GetMember(Guid id);
         Task<MemberProjectViewModel?> GetMemberProject(Guid id);
         Task<IReadOnlyCollection<Guid>> GetByUserId(Guid userId);
+        void Delete(UserProject userProject);
     }
 }

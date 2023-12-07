@@ -792,5 +792,13 @@ namespace TaskManager.Infrastructure.Services
             await _projectRepository.UnitOfWork.SaveChangesAsync();
             return await _userProjectRepository.GetMemberProject(id) ?? throw new MemberProjectViewModelNullException();
         }
+
+        public async Task<Guid> DeleteMember(Guid id)
+        {
+            var userProject = await _userProjectRepository.GetMember(id) ?? throw new MemberProjectNullException();
+            _userProjectRepository.Delete(userProject);
+            await _userProjectRepository.UnitOfWork.SaveChangesAsync();
+            return id;
+        }
     }
 }
