@@ -15,21 +15,12 @@ namespace TaskManager.API.Controllers
     public class UsersController : BaseController
     {
         private readonly IUserService _userService;
-        private readonly IUploadFileService _uploadFileService;
-        private readonly ILogger<UsersController> _logger;
-        private readonly IEmailSender _emailSender;
 
         public UsersController(
-            IUserService userService,
-            IUploadFileService uploadFileService,
-            ILogger<UsersController> logger,
-            IEmailSender emailSender
+            IUserService userService
             )
         {
             _userService = userService;
-            _uploadFileService = uploadFileService;
-            _logger = logger;
-            _emailSender = emailSender;
         }
 
 

@@ -557,20 +557,23 @@ namespace TaskManager.Infrastructure.Services
             {
                 Name = CoreConstants.ProductOwnerName,
                 ProjectId = project.Id,
-                Permissions = poPermissions.ToJson()
+                Permissions = poPermissions.ToJson(),
+                IsMain = true,
             };
 
             var scrumMasterRole = new PermissionGroup()
             {
                 Name = CoreConstants.ScrumMasterName,
                 ProjectId = project.Id,
-                Permissions = smPermissions.ToJson()
+                Permissions = smPermissions.ToJson(),
+                IsMain = true,
             };
             var developerRole = new PermissionGroup()
             {
                 Name = CoreConstants.DeveloperName,
                 ProjectId = project.Id,
-                Permissions = devPermissions.ToJson()
+                Permissions = devPermissions.ToJson(),
+                IsMain = true,
             };
 
             var permissionGroups = new List<PermissionGroup>()
@@ -652,7 +655,7 @@ namespace TaskManager.Infrastructure.Services
                 PermissionGroupId = productOwnerId
             };
 
-            _projectRepository.Add(userProject);
+            _userProjectRepository.Add(userProject);
             await _projectRepository.UnitOfWork.SaveChangesAsync();
 
             return await ToProjectViewModel(project);
@@ -777,8 +780,17 @@ namespace TaskManager.Infrastructure.Services
 
         public async Task<object> GetMembersOfProject(Guid projectId, PaginationInput paginationInput)
         {
-            var members = await _projectRepository.GetMemberProjects(projectId, paginationInput);
+            var members = await _userProjectRepository.GetMemberProjects(projectId, paginationInput);
             return members;
+        }
+
+        public async Task<MemberProjectViewModel> UpdateMembder(Guid id, UpdateMemberProjectDto updateMemberProjectDto)
+        {
+            var userProject = await _userProjectRepository.GetMember(id) ?? throw new MemberProjectNullException();
+            userProject.PermissionGroupId = updateMemberProjectDto.PermissionGroupId;
+            _userProjectRepository.Update(userProject);
+            await _projectRepository.UnitOfWork.SaveChangesAsync();
+            return await _userProjectRepository.GetMemberProject(id) ?? throw new MemberProjectViewModelNullException();
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using TaskManager.Core.Core;
-using TaskManager.Core.DTOs;
+﻿using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Exceptions;
 using TaskManager.Core.Extensions;

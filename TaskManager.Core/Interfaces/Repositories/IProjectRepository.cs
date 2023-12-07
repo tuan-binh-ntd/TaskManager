@@ -28,7 +28,5 @@ namespace TaskManager.Core.Interfaces.Repositories
         Task LoadSprints(Project project);
         Task LoadVersions(Project project);
         Task<string> GetProjectName(Guid projectId);
-        void Add(UserProject userProject);
-        Task<object> GetMemberProjects(Guid projectId, PaginationInput paginationInput);
     }
 }

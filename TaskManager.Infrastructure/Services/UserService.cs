@@ -17,6 +17,7 @@ namespace TaskManager.Infrastructure.Services
         private readonly IJWTTokenService _jwtTokenService;
         private readonly INotificationRepository _notificationRepository;
         private readonly IIssueEventRepository _issueEventRepository;
+        private readonly IUserProjectRepository _userProjectRepository;
         private readonly IMapper _mapper;
 
         public UserService(
@@ -25,6 +26,7 @@ namespace TaskManager.Infrastructure.Services
             IJWTTokenService jwtTokenService,
             INotificationRepository notificationRepository,
             IIssueEventRepository issueEventRepository,
+            IUserProjectRepository userProjectRepository,
             IMapper mapper
             )
         {
@@ -33,6 +35,7 @@ namespace TaskManager.Infrastructure.Services
             _jwtTokenService = jwtTokenService;
             _notificationRepository = notificationRepository;
             _issueEventRepository = issueEventRepository;
+            _userProjectRepository = userProjectRepository;
             _mapper = mapper;
         }
 
@@ -80,6 +83,9 @@ namespace TaskManager.Infrastructure.Services
             if (!result.Succeeded) return "Incorrect name or password";
 
             UserViewModel res = _mapper.Map<UserViewModel>(user);
+
+            var permissionGroups = await _userProjectRepository.GetByUserId(user.Id);
+            res.PermissionGroups = permissionGroups;
 
             res.Token = await _jwtTokenService.CreateToken(user);
 

@@ -1,6 +1,7 @@
 ﻿using CoreApiResponse;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using TaskManager.Core.DTOs;
 using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
@@ -25,6 +26,14 @@ namespace TaskManager.API.Controllers
         {
             var res = await _projectService.GetMembersOfProject(projectId, paginationInput);
 
+            return CustomResult(res, HttpStatusCode.OK);
+        }
+
+        [HttpPut("{id}")]
+        [ProducesResponseType(typeof(MemberProjectViewModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateMemberProjectDto updateMemberProjectDto)
+        {
+            var res = await _projectService.UpdateMembder(id, updateMemberProjectDto);
             return CustomResult(res, HttpStatusCode.OK);
         }
     }

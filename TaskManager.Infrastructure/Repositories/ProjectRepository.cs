@@ -165,40 +165,5 @@ namespace TaskManager.Infrastructure.Repositories
             var name = await _context.Projects.Where(p => p.Id == projectId).Select(p => p.Name).FirstOrDefaultAsync();
             return name!;
         }
-
-        public void Add(UserProject userProject)
-        {
-            _context.UserProjects.Add(userProject);
-        }
-
-        public async Task<object> GetMemberProjects(Guid projectId, PaginationInput paginationInput)
-        {
-            if(paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))
-            {
-                var query = from up in _context.UserProjects.AsNoTracking().Where(up => up.ProjectId == projectId)
-                                     join u in _context.Users.AsNoTracking() on up.UserId equals u.Id
-                                     select new MemberProjectViewModel
-                                     {
-                                         Id = u.Id,
-                                         Name = u.Name,
-                                         PermissionGroupId = up.PermissionGroupId,
-                                         Email = u.Email!
-                                     };
-
-                return await query.Pagination(paginationInput);
-            }
-
-            var members = await (from up in _context.UserProjects.AsNoTracking().Where(up => up.ProjectId == projectId)
-                                 join u in _context.Users.AsNoTracking() on up.UserId equals u.Id
-                                 select new MemberProjectViewModel
-                                 {
-                                     Id = u.Id,
-                                     Name = u.Name,
-                                     PermissionGroupId = up.PermissionGroupId,
-                                     Email = u.Email!
-                                 }).ToListAsync();
-
-            return members.AsReadOnly();
-        }
     }
 }

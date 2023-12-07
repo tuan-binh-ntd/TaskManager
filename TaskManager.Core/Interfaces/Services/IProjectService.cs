@@ -18,5 +18,6 @@ namespace TaskManager.Core.Interfaces.Services
         Task<ProjectViewModel?> Get(string code);
         Task<ProjectViewModel> AddMember(AddMemberToProjectDto addMemberToProjectDto);
         Task<object> GetMembersOfProject(Guid projectId, PaginationInput paginationInput);
+        Task<MemberProjectViewModel> UpdateMembder(Guid id, UpdateMemberProjectDto updateMemberProjectDto);
     }
 }
