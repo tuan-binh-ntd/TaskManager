@@ -557,20 +557,23 @@ namespace TaskManager.Infrastructure.Services
             {
                 Name = CoreConstants.ProductOwnerName,
                 ProjectId = project.Id,
-                Permissions = poPermissions.ToJson()
+                Permissions = poPermissions.ToJson(),
+                IsMain = true,
             };
 
             var scrumMasterRole = new PermissionGroup()
             {
                 Name = CoreConstants.ScrumMasterName,
                 ProjectId = project.Id,
-                Permissions = smPermissions.ToJson()
+                Permissions = smPermissions.ToJson(),
+                IsMain = true,
             };
             var developerRole = new PermissionGroup()
             {
                 Name = CoreConstants.DeveloperName,
                 ProjectId = project.Id,
-                Permissions = devPermissions.ToJson()
+                Permissions = devPermissions.ToJson(),
+                IsMain = true,
             };
 
             var permissionGroups = new List<PermissionGroup>()
@@ -779,6 +782,15 @@ namespace TaskManager.Infrastructure.Services
         {
             var members = await _projectRepository.GetMemberProjects(projectId, paginationInput);
             return members;
+        }
+
+        public async Task<MemberProjectViewModel> UpdateMembder(Guid id, UpdateMemberProjectDto updateMemberProjectDto)
+        {
+            var userProject = await _projectRepository.GetMember(id) ?? throw new MemberProjectNullException();
+            userProject.PermissionGroupId = updateMemberProjectDto.PermissionGroupId;
+            _projectRepository.UpdateMember(userProject);
+            await _projectRepository.UnitOfWork.SaveChangesAsync();
+            return await _projectRepository.GetMemberProject(id) ?? throw new MemberProjectViewModelNullException();
         }
     }
 }

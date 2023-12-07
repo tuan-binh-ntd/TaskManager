@@ -30,5 +30,8 @@ namespace TaskManager.Core.Interfaces.Repositories
         Task<string> GetProjectName(Guid projectId);
         void Add(UserProject userProject);
         Task<object> GetMemberProjects(Guid projectId, PaginationInput paginationInput);
+        void UpdateMember(UserProject userProject);
+        Task<UserProject?> GetMember(Guid id);
+        Task<MemberProjectViewModel?> GetMemberProject(Guid id);
     }
 }

@@ -173,17 +173,17 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<object> GetMemberProjects(Guid projectId, PaginationInput paginationInput)
         {
-            if(paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))
+            if (paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))
             {
                 var query = from up in _context.UserProjects.AsNoTracking().Where(up => up.ProjectId == projectId)
-                                     join u in _context.Users.AsNoTracking() on up.UserId equals u.Id
-                                     select new MemberProjectViewModel
-                                     {
-                                         Id = u.Id,
-                                         Name = u.Name,
-                                         PermissionGroupId = up.PermissionGroupId,
-                                         Email = u.Email!
-                                     };
+                            join u in _context.Users.AsNoTracking() on up.UserId equals u.Id
+                            select new MemberProjectViewModel
+                            {
+                                Id = up.Id,
+                                Name = u.Name,
+                                PermissionGroupId = up.PermissionGroupId,
+                                Email = u.Email!
+                            };
 
                 return await query.Pagination(paginationInput);
             }
@@ -192,13 +192,38 @@ namespace TaskManager.Infrastructure.Repositories
                                  join u in _context.Users.AsNoTracking() on up.UserId equals u.Id
                                  select new MemberProjectViewModel
                                  {
-                                     Id = u.Id,
+                                     Id = up.Id,
                                      Name = u.Name,
                                      PermissionGroupId = up.PermissionGroupId,
                                      Email = u.Email!
                                  }).ToListAsync();
 
             return members.AsReadOnly();
+        }
+
+        public void UpdateMember(UserProject userProject)
+        {
+            _context.Entry(userProject).State = EntityState.Modified;
+        }
+
+        public async Task<UserProject?> GetMember(Guid id)
+        {
+            var member = await _context.UserProjects.Where(up => up.Id == id).FirstOrDefaultAsync();
+            return member;
+        }
+
+        public async Task<MemberProjectViewModel?> GetMemberProject(Guid id)
+        {
+            var query = from up in _context.UserProjects.AsNoTracking().Where(up => up.Id == id)
+                        join u in _context.Users.AsNoTracking() on up.UserId equals u.Id
+                        select new MemberProjectViewModel
+                        {
+                            Id = up.Id,
+                            Name = u.Name,
+                            PermissionGroupId = up.PermissionGroupId,
+                            Email = u.Email!
+                        };
+            return await query.FirstOrDefaultAsync();
         }
     }
 }
