@@ -43,5 +43,13 @@ namespace TaskManager.API.Controllers
             var res = await _epicService.AddIssueToEpic(issueId: addIssueToEpicDto.IssueId, epicId: id);
             return CustomResult(res, HttpStatusCode.OK);
         }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var res = await _epicService.DeleteEpic(id);
+            return CustomResult(res, HttpStatusCode.OK);
+        }
     }
 }

@@ -9,5 +9,6 @@ namespace TaskManager.Core.Interfaces.Services
         Task<EpicViewModel> CreateEpic(CreateEpicDto createEpicDto);
         Task<GetIssuesByEpicIdViewModel> GetIssuesByEpicId(Guid epicId);
         Task<EpicViewModel> UpdateEpic(Guid id, UpdateEpicDto updateEpicDto);
+        Task<Guid> DeleteEpic(Guid id);
     }
 }
