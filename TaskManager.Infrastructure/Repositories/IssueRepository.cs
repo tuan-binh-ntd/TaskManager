@@ -193,16 +193,37 @@ namespace TaskManager.Infrastructure.Repositories
         {
             var subtaskTypeId = await _context.IssueTypes.AsNoTracking().Where(it => it.ProjectId == projectId && it.Name == CoreConstants.SubTaskName).Select(it => it.Id).FirstOrDefaultAsync();
 
-            var issues = await _context.Issues
+            var issueIds = await _context.LabelIssues.WhereIf(getSprintByFilterDto.LabelIds is not null && getSprintByFilterDto.LabelIds.Any(), l => getSprintByFilterDto.LabelIds!.Contains(l.LabelId)).Select(it => it.IssueId).ToListAsync();
+            if (issueIds.Any())
+            {
+                var issues = await _context.Issues
+                    .Include(i => i.IssueType)
+                    .WhereIf(issueIds.Any(), i => issueIds.Contains(i.Id))
+                    .Where(i => i.IssueTypeId != subtaskTypeId)
+                    .ToListAsync();
+
+                issues = issues
+                    .Where(i => sprintIds.Contains((Guid)i.SprintId!))
+                    .WhereIf(!string.IsNullOrWhiteSpace(getSprintByFilterDto.SearchKey), i => i.Name.Contains(getSprintByFilterDto.SearchKey!))
+                    .WhereIf(getSprintByFilterDto.IssueTypeIds is not null && getSprintByFilterDto.IssueTypeIds.Any(), i => getSprintByFilterDto.IssueTypeIds!.Contains(i.IssueTypeId))
+                    .WhereIf(getSprintByFilterDto.EpicIds is not null && getSprintByFilterDto.EpicIds.Any(), i => getSprintByFilterDto.EpicIds!.Contains((Guid)i.ParentId!))
+                    .ToList();
+
+                return issues.AsReadOnly();
+            }
+            else
+            {
+                var issues = await _context.Issues
                 .Include(i => i.IssueType)
-                .Where(i => sprintIds.Contains((Guid)i.SprintId!))
                 .Where(i => i.IssueTypeId != subtaskTypeId)
+                .Where(i => sprintIds.Contains((Guid)i.SprintId!))
                 .WhereIf(!string.IsNullOrWhiteSpace(getSprintByFilterDto.SearchKey), i => i.Name.Contains(getSprintByFilterDto.SearchKey!))
                 .WhereIf(getSprintByFilterDto.IssueTypeIds is not null && getSprintByFilterDto.IssueTypeIds.Any(), i => getSprintByFilterDto.IssueTypeIds!.Contains(i.IssueTypeId))
-                .WhereIf(getSprintByFilterDto.EpicIds.Any(), i => getSprintByFilterDto.EpicIds.Contains((Guid)i.ParentId!))
+                .WhereIf(getSprintByFilterDto.EpicIds is not null && getSprintByFilterDto.EpicIds.Any(), i => getSprintByFilterDto.EpicIds!.Contains((Guid)i.ParentId!))
                 .ToListAsync();
 
-            return issues.AsReadOnly();
+                return issues.AsReadOnly();
+            }
         }
 
         public async Task<string?> GetNameOfIssue(Guid issueId)
