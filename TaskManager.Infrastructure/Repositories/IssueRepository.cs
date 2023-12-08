@@ -275,7 +275,7 @@ namespace TaskManager.Infrastructure.Repositories
             }
         }
 
-        public async Task UpdateOneColumnForIssue(Guid oldValue, Guid newValue)
+        public async Task UpdateOneColumnForIssue(Guid oldValue, Guid? newValue)
         {
             await _context.Issues
                 .Where(i => i.PriorityId == oldValue)

@@ -292,12 +292,16 @@ namespace TaskManager.Infrastructure.Services
             {
                 await ChangeReporterIssue(issue, issueDetail, updateIssueDto, issueHistories, reporterId, senderName, projectName);
             }
+            else if (updateIssueDto.StartDate != DateTime.MinValue)
+            {
+                await ChangeStartDateIssue(issue, updateIssueDto, issueHistories, senderName, projectName);
+            }
+            else if (updateIssueDto.DueDate != DateTime.MinValue)
+            {
+                await ChangeDueDateIssue(issue, updateIssueDto, issueHistories, senderName, projectName);
+            }
 
             await ChangeAssigneeIssue(issue, issueDetail, updateIssueDto, issueHistories, senderName, projectName);
-
-            await ChangeStartDateIssue(issue, updateIssueDto, issueHistories, senderName, projectName);
-
-            await ChangeDueDateIssue(issue, updateIssueDto, issueHistories, senderName, projectName);
 
             _issueHistoryRepository.AddRange(issueHistories);
             await _issueHistoryRepository.UnitOfWork.SaveChangesAsync();
@@ -711,7 +715,7 @@ namespace TaskManager.Infrastructure.Services
 
             var changeStartDateIssueEmailContentDto = new ChangeStartDateIssueEmailContentDto(senderName, issue.CreationTime);
 
-            if (updateIssueDto.StartDate != DateTime.MinValue && updateIssueDto.StartDate is DateTime newStartDate && issue.StartDate is null)
+            if (updateIssueDto.StartDate is DateTime newStartDate && issue.StartDate is null)
             {
                 updatedTheStartDateHis.Content = $"{IssueConstants.None_IssueHistoryContent} to {newStartDate:MMM dd, yyyy}";
 
@@ -720,7 +724,7 @@ namespace TaskManager.Infrastructure.Services
 
                 issue.StartDate = newStartDate;
             }
-            if (updateIssueDto.StartDate != DateTime.MinValue && updateIssueDto.StartDate is DateTime newStartDate1 && issue.StartDate is DateTime oldStartDate1)
+            else if (updateIssueDto.StartDate is DateTime newStartDate1 && issue.StartDate is DateTime oldStartDate1)
             {
                 updatedTheStartDateHis.Content = $"{oldStartDate1:MMM dd, yyyy} to {newStartDate1:MMM dd, yyyy}";
 
@@ -729,7 +733,7 @@ namespace TaskManager.Infrastructure.Services
 
                 issue.StartDate = newStartDate1;
             }
-            if (updateIssueDto.StartDate != DateTime.MinValue && updateIssueDto.StartDate is null && issue.StartDate is DateTime oldStartDate2)
+            else if (updateIssueDto.StartDate is null && issue.StartDate is DateTime oldStartDate2)
             {
                 updatedTheStartDateHis.Content = $"{oldStartDate2:MMM dd, yyyy} to {IssueConstants.None_IssueHistoryContent}";
 
@@ -740,25 +744,21 @@ namespace TaskManager.Infrastructure.Services
                 updateIssueDto.StartDate = null;
             }
 
-            if (updateIssueDto.StartDate != issue.StartDate)
+            string emailContent = EmailContentConstants.ChangeStartDateIssueContent(changeStartDateIssueEmailContentDto);
+
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
             {
+                SenderName = senderName,
+                ActionName = EmailConstants.MadeOneUpdate,
+                ProjectName = projectName,
+                IssueCode = issue.Code,
+                IssueName = issue.Name,
+                EmailContent = emailContent,
+            };
 
-                string emailContent = EmailContentConstants.ChangeStartDateIssueContent(changeStartDateIssueEmailContentDto);
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
 
-                var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-                {
-                    SenderName = senderName,
-                    ActionName = EmailConstants.MadeOneUpdate,
-                    ProjectName = projectName,
-                    IssueCode = issue.Code,
-                    IssueName = issue.Name,
-                    EmailContent = emailContent,
-                };
-
-                await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
-
-                issueHistories.Add(updatedTheStartDateHis);
-            }
+            issueHistories.Add(updatedTheStartDateHis);
         }
 
         private async Task ChangeDueDateIssue(Issue issue, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName)
@@ -772,7 +772,7 @@ namespace TaskManager.Infrastructure.Services
 
             var changeDueDateIssueEmailContentDto = new ChangeDueDateIssueEmailContentDto(senderName, issue.CreationTime);
 
-            if (updateIssueDto.DueDate != DateTime.MinValue && updateIssueDto.DueDate is DateTime newDueDate && issue.DueDate is null)
+            if (updateIssueDto.DueDate is DateTime newDueDate && issue.DueDate is null)
             {
                 updatedTheDueDateHis.Content = $"{IssueConstants.None_IssueHistoryContent} to {newDueDate:MMM dd, yyyy}";
 
@@ -781,7 +781,7 @@ namespace TaskManager.Infrastructure.Services
 
                 issue.DueDate = newDueDate;
             }
-            if (updateIssueDto.DueDate != DateTime.MinValue && updateIssueDto.DueDate is DateTime newDueDate1 && issue.DueDate is DateTime oldDueDate1)
+            else if (updateIssueDto.DueDate is DateTime newDueDate1 && issue.DueDate is DateTime oldDueDate1)
             {
                 updatedTheDueDateHis.Content = $"{oldDueDate1:MMM dd, yyyy} to {newDueDate1:MMM dd, yyyy}";
 
@@ -791,7 +791,7 @@ namespace TaskManager.Infrastructure.Services
                 issue.DueDate = newDueDate1;
 
             }
-            if (updateIssueDto.DueDate != DateTime.MinValue && updateIssueDto.DueDate is null && issue.DueDate is DateTime oldDueDate2)
+            else if (updateIssueDto.DueDate is null && issue.DueDate is DateTime oldDueDate2)
             {
                 updatedTheDueDateHis.Content = $"{oldDueDate2:MMM dd, yyyy} to {IssueConstants.None_IssueHistoryContent}";
 
@@ -801,25 +801,21 @@ namespace TaskManager.Infrastructure.Services
                 issue.DueDate = null;
                 updateIssueDto.DueDate = null;
             }
+            string emailContent = EmailContentConstants.ChangeDueDateIssueContent(changeDueDateIssueEmailContentDto);
 
-            if (updateIssueDto.DueDate != issue.DueDate)
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
             {
-                string emailContent = EmailContentConstants.ChangeDueDateIssueContent(changeDueDateIssueEmailContentDto);
+                SenderName = senderName,
+                ActionName = EmailConstants.MadeOneUpdate,
+                ProjectName = projectName,
+                IssueCode = issue.Code,
+                IssueName = issue.Name,
+                EmailContent = emailContent,
+            };
 
-                var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-                {
-                    SenderName = senderName,
-                    ActionName = EmailConstants.MadeOneUpdate,
-                    ProjectName = projectName,
-                    IssueCode = issue.Code,
-                    IssueName = issue.Name,
-                    EmailContent = emailContent,
-                };
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
 
-                await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
-
-                issueHistories.Add(updatedTheDueDateHis);
-            }
+            issueHistories.Add(updatedTheDueDateHis);
 
         }
         #endregion
@@ -937,6 +933,14 @@ namespace TaskManager.Infrastructure.Services
             }
             await _issueDetailRepository.UnitOfWork.SaveChangesAsync();
             return await ToEpicViewModel(epic);
+        }
+
+        public async Task<Guid> DeleteEpic(Guid id)
+        {
+            await _issueRepository.UpdateOneColumnForIssue(id, null);
+            _issueRepository.Delete(id);
+            await _issueRepository.UnitOfWork.SaveChangesAsync();
+            return id;
         }
     }
 }
