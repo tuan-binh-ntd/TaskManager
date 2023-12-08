@@ -8,7 +8,7 @@ namespace TaskManager.Core.Interfaces.Services
     {
         Task<StatusViewModel> Create(CreateStatusDto createStatusDto);
         Task<StatusViewModel> Update(Guid id, UpdateStatusDto updateStatusDto);
-        Task<Guid> Delete(Guid id);
+        Task<Guid> Delete(Guid id, Guid newId);
         Task<object> Gets(Guid projectId, PaginationInput paginationInput);
         Task<IReadOnlyCollection<StatusCategoryViewModel>> GetStatusCategoryViewModels();
     }

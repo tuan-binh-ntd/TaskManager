@@ -37,15 +37,15 @@ namespace TaskManager.API.Controllers
 
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.Created)]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id, [FromQuery] Guid newId)
         {
-            var res = await _statusService.Delete(id);
+            var res = await _statusService.Delete(id, newId);
             return CustomResult(res, HttpStatusCode.OK);
         }
 
         [HttpGet]
         [ProducesResponseType(typeof(IReadOnlyCollection<StatusViewModel>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> Get(Guid projectId , [FromQuery] PaginationInput paginationInput)
+        public async Task<IActionResult> Get(Guid projectId, [FromQuery] PaginationInput paginationInput)
         {
             var res = await _statusService.Gets(projectId, paginationInput);
             return CustomResult(res, HttpStatusCode.OK);

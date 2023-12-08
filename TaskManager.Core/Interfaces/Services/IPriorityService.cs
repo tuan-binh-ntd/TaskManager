@@ -10,6 +10,6 @@ namespace TaskManager.Core.Interfaces.Services
         Task<PriorityViewModel> GetById(Guid id);
         Task<PriorityViewModel> Create(CreatePriorityDto createPriorityDto);
         Task<PriorityViewModel> Update(Guid id, UpdatePriorityDto updatePriorityDto);
-        Task<Guid> Delete(Guid id);
+        Task<Guid> Delete(Guid id, Guid newId);
     }
 }

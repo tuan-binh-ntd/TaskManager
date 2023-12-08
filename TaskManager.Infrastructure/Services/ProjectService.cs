@@ -151,10 +151,11 @@ namespace TaskManager.Infrastructure.Services
             projectViewModel.StatusCategories = _mapper.Map<IReadOnlyCollection<StatusCategoryViewModel>>(statusCategories);
             if (userId is Guid newUserId)
             {
-
                 projectViewModel.UserPermissionGroup = await _permissionGroupRepository.GetPermissionGroupViewModelById(project.Id, newUserId);
             }
             projectViewModel.PermissionGroups = await _permissionGroupRepository.GetByProjectId(project.Id);
+            var projectConfiguration = _projectConfigurationRepository.GetByProjectId(project.Id);
+            projectViewModel.ProjectConfiguration = projectConfiguration.Adapt<ProjectConfigurationViewModel>();
             return projectViewModel;
         }
 

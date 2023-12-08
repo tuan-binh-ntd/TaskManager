@@ -274,5 +274,27 @@ namespace TaskManager.Infrastructure.Repositories
                 return string.Empty;
             }
         }
+
+        public async Task UpdateOneColumnForIssue(Guid oldValue, Guid newValue)
+        {
+            await _context.Issues
+                .Where(i => i.PriorityId == oldValue)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(i => i.PriorityId, newValue));
+        }
+
+        public async Task<int> CountIssueByPriorityId(Guid priorityId)
+        {
+            return await _context.Issues.Where(i => i.PriorityId == priorityId).CountAsync();
+        }
+
+        public async Task<int> CountIssueByStatusId(Guid statusId)
+        {
+            return await _context.Issues.Where(i => i.StatusId == statusId).CountAsync();
+        }
+
+        public async Task<int> CountIssueByIssueTypeId(Guid issueTypeId)
+        {
+            return await _context.Issues.Where(i => i.IssueTypeId == issueTypeId).CountAsync();
+        }
     }
 }

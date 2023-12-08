@@ -44,9 +44,9 @@ namespace TaskManager.API.Controllers
 
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id, [FromQuery] Guid newId)
         {
-            var res = await _priorityService.Delete(id);
+            var res = await _priorityService.Delete(id, newId);
             return CustomResult(res, HttpStatusCode.OK);
         }
     }

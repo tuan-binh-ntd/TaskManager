@@ -13,16 +13,19 @@ namespace TaskManager.Infrastructure.Services
     {
         private readonly IStatusRepository _statusRepository;
         private readonly IStatusCategoryRepository _statusCategoryRepository;
+        private readonly IIssueRepository _issueRepository;
         private readonly IMapper _mapper;
 
         public StatusService(
             IStatusRepository statusRepository,
             IStatusCategoryRepository statusCategoryRepository,
+            IIssueRepository issueRepository,
             IMapper mapper
             )
         {
             _statusRepository = statusRepository;
             _statusCategoryRepository = statusCategoryRepository;
+            _issueRepository = issueRepository;
             _mapper = mapper;
         }
 
@@ -34,8 +37,13 @@ namespace TaskManager.Infrastructure.Services
             return status.Adapt<StatusViewModel>();
         }
 
-        public async Task<Guid> Delete(Guid id)
+        public async Task<Guid> Delete(Guid id, Guid newId)
         {
+            int count = await _issueRepository.CountIssueByStatusId(id);
+            if (count > 0)
+            {
+                await _issueRepository.UpdateOneColumnForIssue(id, newId);
+            }
             _statusRepository.Delete(id);
             await _statusRepository.UnitOfWork.SaveChangesAsync();
             return id;

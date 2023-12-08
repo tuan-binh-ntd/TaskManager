@@ -12,14 +12,17 @@ namespace TaskManager.Infrastructure.Services
     public class IssueTypeService : IIssueTypeService
     {
         private readonly IIssueTypeRepository _issueTypeRepository;
+        private readonly IIssueRepository _issueRepository;
         private readonly IMapper _mapper;
 
         public IssueTypeService(
             IIssueTypeRepository issueTypeRepository,
+            IIssueRepository issueRepository,
             IMapper mapper
             )
         {
             _issueTypeRepository = issueTypeRepository;
+            _issueRepository = issueRepository;
             _mapper = mapper;
         }
 
@@ -33,8 +36,13 @@ namespace TaskManager.Infrastructure.Services
             return issueTypeViewModel;
         }
 
-        public async Task<Guid> Delete(Guid issueTypeId)
+        public async Task<Guid> Delete(Guid issueTypeId, Guid newIssueTypeId)
         {
+            int count = await _issueRepository.CountIssueByIssueTypeId(issueTypeId);
+            if (count > 0)
+            {
+                await _issueRepository.UpdateOneColumnForIssue(issueTypeId, newIssueTypeId);
+            }
             _issueTypeRepository.Delete(issueTypeId);
             await _issueTypeRepository.UnitOfWork.SaveChangesAsync();
             return issueTypeId;
