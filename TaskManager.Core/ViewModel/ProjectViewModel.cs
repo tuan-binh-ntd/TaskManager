@@ -1,4 +1,6 @@
-﻿namespace TaskManager.Core.ViewModel
+﻿using Mapster;
+
+namespace TaskManager.Core.ViewModel
 {
     public class ProjectViewModel
     {
@@ -18,6 +20,7 @@
         public IReadOnlyCollection<PriorityViewModel>? Priorities { get; set; }
         public IReadOnlyCollection<StatusCategoryViewModel>? StatusCategories { get; set; }
         public PermissionGroupViewModel? UserPermissionGroup { get; set; }
+        [AdaptIgnore]
         public IReadOnlyCollection<PermissionGroupViewModel> PermissionGroups { get; set; } = new List<PermissionGroupViewModel>();
     }
 

@@ -6,7 +6,6 @@ namespace TaskManager.Core.ViewModel
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        //public IReadOnlyCollection<PermissionViewModel>? Permissions { get; set; }
         public Permissions? Permissions { get; set; }
     }
 
