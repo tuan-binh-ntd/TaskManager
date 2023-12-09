@@ -670,13 +670,7 @@ namespace TaskManager.Infrastructure.Services
 
         public async Task<ProjectViewModel> Update(Guid userId, Guid projectId, UpdateProjectDto updateProjectDto)
         {
-            Project? project = await _projectRepository.GetById(projectId);
-            if (project is null)
-            {
-#pragma warning disable CA2208 // Instantiate argument exceptions correctly
-                throw new ArgumentNullException(nameof(project));
-#pragma warning restore CA2208 // Instantiate argument exceptions correctly
-            }
+            Project? project = await _projectRepository.GetById(projectId) ?? throw new ProjectNullException();
 
             project = updateProjectDto.Adapt(project);
             if (updateProjectDto.LeaderId is Guid newLeaderId && newLeaderId != userId)
@@ -711,6 +705,8 @@ namespace TaskManager.Infrastructure.Services
 
             var projectConfiguration = _projectConfigurationRepository.GetByProjectId(projectId);
             projectConfiguration.DefaultAssigneeId = updateProjectDto.DefaultAssigneeId;
+            projectConfiguration.DefaultPriorityId = updateProjectDto.DefaultPriorityId;
+            _ = string.IsNullOrWhiteSpace(updateProjectDto.Code) ? null : projectConfiguration.Code = updateProjectDto.Code;
             await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
 
             _projectRepository.Update(project);
