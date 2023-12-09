@@ -132,4 +132,9 @@ namespace TaskManager.Core.DTOs
     {
         public Guid IssueId { get; set; }
     }
+
+    public class DeleteLabelToIssueDto
+    {
+        public Guid LabelId { get; set; }
+    }
 }

@@ -82,5 +82,13 @@ namespace TaskManager.API.Controllers
             var res = await _issueService.GetIssuesForProject(projectId);
             return CustomResult(res, HttpStatusCode.OK);
         }
+
+        [HttpDelete("api/[controller]/{id}/labels:delete")]
+        [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> DeleteLabel(Guid id, [FromQuery] Guid labelId)
+        {
+            var res = await _issueService.DeleteLabelToIssue(id, labelId);
+            return CustomResult(res, HttpStatusCode.OK);
+        }
     }
 }

@@ -15,7 +15,6 @@ namespace TaskManager.Infrastructure.Services
         private readonly ISprintRepository _sprintRepository;
         private readonly IProjectConfigurationRepository _projectConfigurationRepository;
         private readonly IIssueRepository _issueRepository;
-        private readonly ITransitionRepository _transitionRepository;
         private readonly IBacklogRepository _backlogRepository;
         private readonly IStatusRepository _statusRepository;
         private readonly IMapper _mapper;
@@ -24,7 +23,6 @@ namespace TaskManager.Infrastructure.Services
             ISprintRepository sprintRepository,
             IProjectConfigurationRepository projectConfigurationRepository,
             IIssueRepository issueRepository,
-            ITransitionRepository transitionRepository,
             IBacklogRepository backlogRepository,
             IStatusRepository statusRepository,
             IMapper mapper
@@ -33,7 +31,6 @@ namespace TaskManager.Infrastructure.Services
             _sprintRepository = sprintRepository;
             _projectConfigurationRepository = projectConfigurationRepository;
             _issueRepository = issueRepository;
-            _transitionRepository = transitionRepository;
             _backlogRepository = backlogRepository;
             _statusRepository = statusRepository;
             _mapper = mapper;

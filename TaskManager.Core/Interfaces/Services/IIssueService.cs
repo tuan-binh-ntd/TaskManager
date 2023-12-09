@@ -15,5 +15,6 @@ namespace TaskManager.Core.Interfaces.Services
         Task<IssueViewModel> GetById(Guid id);
         Task<IReadOnlyCollection<IssueHistoryViewModel>> GetHistoriesByIssueId(Guid issueId);
         Task<IReadOnlyCollection<IssueForProjectViewModel>> GetIssuesForProject(Guid projectId);
+        Task<Guid> DeleteLabelToIssue(Guid issueId, Guid labelId);
     }
 }

@@ -46,4 +46,15 @@ public class LabelRepository : ILabelRepository
     {
         _context.LabelIssues.Add(labelIssue);
     }
+
+    public void RemoveLabelIssue(LabelIssue labelIssue)
+    {
+        _context.LabelIssues.Remove(labelIssue);
+    }
+
+    public async Task<LabelIssue?> GetById(Guid labelId, Guid issueId)
+    {
+        var query = _context.LabelIssues.Where(x => x.IssueId == issueId && x.LabelId == labelId).Select(l => l);
+        return await query.FirstOrDefaultAsync();
+    }
 }

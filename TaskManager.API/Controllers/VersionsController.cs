@@ -50,7 +50,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        [HttpPut("issues:add")]
+        [HttpPut("{id}/issues:add")]
         [ProducesResponseType(typeof(VersionViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> AddIssues(AddIssuesToVersionDto addIssuesToVersionDto)
         {

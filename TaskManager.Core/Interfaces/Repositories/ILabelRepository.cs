@@ -10,4 +10,6 @@ public interface ILabelRepository : IRepository<Label>
     void Update(Label label);
     void Delete(Label label);
     void AddLabelIssue(LabelIssue labelIssue);
+    void RemoveLabelIssue(LabelIssue labelIssue);
+    Task<LabelIssue?> GetById(Guid labelId, Guid issueId);
 }

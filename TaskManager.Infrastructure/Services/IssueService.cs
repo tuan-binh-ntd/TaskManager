@@ -1250,4 +1250,12 @@ public class IssueService : IIssueService
 
         return await ToIssueForProjectViewModels(issues);
     }
+
+    public async Task<Guid> DeleteLabelToIssue(Guid issueId, Guid labelId)
+    {
+        var labelIssue = await _labelRepository.GetById(labelId, issueId) ?? throw new LabelIssueNullException();
+        _labelRepository.RemoveLabelIssue(labelIssue);
+        await _labelRepository.UnitOfWork.SaveChangesAsync();
+        return labelId;
+    }
 }
