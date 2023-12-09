@@ -711,6 +711,8 @@ namespace TaskManager.Infrastructure.Services
 
             var projectConfiguration = _projectConfigurationRepository.GetByProjectId(projectId);
             projectConfiguration.DefaultAssigneeId = updateProjectDto.DefaultAssigneeId;
+            projectConfiguration.DefaultPriorityId = updateProjectDto.DefaultPriorityId;
+            _ = string.IsNullOrWhiteSpace(updateProjectDto.Code) ? null : projectConfiguration.Code = updateProjectDto.Code;
             await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
 
             _projectRepository.Update(project);

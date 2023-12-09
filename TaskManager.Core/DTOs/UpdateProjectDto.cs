@@ -13,6 +13,7 @@ namespace TaskManager.Core.DTOs
         public bool IsFavourite { get; set; }
         public Guid? LeaderId { get; set; }
         public Guid? DefaultAssigneeId { get; set; }
+        public Guid? DefaultPriorityId { get; set; }
 
         public override void Register(TypeAdapterConfig config)
         {
