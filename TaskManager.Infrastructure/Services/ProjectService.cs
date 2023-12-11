@@ -9,6 +9,7 @@ using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
+using TaskManager.Infrastructure.Repositories;
 
 namespace TaskManager.Infrastructure.Services
 {
@@ -28,6 +29,8 @@ namespace TaskManager.Infrastructure.Services
         private readonly IPriorityRepository _priorityRepository;
         private readonly IPermissionGroupRepository _permissionGroupRepository;
         private readonly IStatusCategoryRepository _stateCategoryRepository;
+        private readonly INotificationRepository _notificationRepository;
+        private readonly IIssueEventRepository _issueEventRepository;
         private readonly IMapper _mapper;
 
         public ProjectService(
@@ -45,6 +48,8 @@ namespace TaskManager.Infrastructure.Services
             IPriorityRepository priorityRepository,
             IPermissionGroupRepository permissionGroupRepository,
             IStatusCategoryRepository stateCategoryRepository,
+            INotificationRepository notificationRepository,
+            IIssueEventRepository issueEventRepository,
             IMapper mapper
             )
         {
@@ -62,6 +67,8 @@ namespace TaskManager.Infrastructure.Services
             _priorityRepository = priorityRepository;
             _permissionGroupRepository = permissionGroupRepository;
             _stateCategoryRepository = stateCategoryRepository;
+            _notificationRepository = notificationRepository;
+            _issueEventRepository = issueEventRepository;
             _mapper = mapper;
         }
 
@@ -593,6 +600,33 @@ namespace TaskManager.Infrastructure.Services
 
             return productOwnerRole.Id;
         }
+
+        private async Task<bool> CreateNotificationScheme(Project project, Guid userId)
+        {
+            var issueEvents = await _issueEventRepository.Gets();
+            var notification = new Notification()
+            {
+                Name = "Default Notification Scheme",
+                NotificationIssueEvents = new List<NotificationIssueEvent>(),
+                CreatorUserId = userId,
+                ProjectId = project.Id
+            };
+            foreach (var item in issueEvents)
+            {
+                var notificationIssueEvent = new NotificationIssueEvent()
+                {
+                    NotificationId = notification.Id,
+                    IssueEventId = item.Id,
+                    AllWatcher = true,
+                    CurrentAssignee = true,
+                    ProjectLead = true,
+                    Reporter = true,
+                };
+                notification.NotificationIssueEvents!.Add(notificationIssueEvent);
+            }
+            _notificationRepository.Add(notification);
+            return await _notificationRepository.UnitOfWork.SaveChangesAsync() > 0;
+        }
         #endregion
 
         public async Task<Guid> Delete(Guid id)
@@ -664,6 +698,8 @@ namespace TaskManager.Infrastructure.Services
 
             _userProjectRepository.Add(userProject);
             await _projectRepository.UnitOfWork.SaveChangesAsync();
+
+            await CreateNotificationScheme(project, userId);
 
             return await ToProjectViewModel(project);
         }

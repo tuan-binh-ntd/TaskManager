@@ -107,6 +107,7 @@ builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IAttachmentService, AttachmentService>();
 builder.Services.AddScoped<ILabelService, LabelService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<INotificationEventService, NotificationEventService>();
 // Add EmailService
 // End  Declaration DI
 

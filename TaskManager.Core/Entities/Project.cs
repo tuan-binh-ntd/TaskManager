@@ -23,4 +23,5 @@ public class Project : BaseEntity
     public ICollection<Sprint>? Sprints { get; set; }
     public ICollection<Version>? Versions { get; set; }
     public ICollection<Label>? Labels { get; set; }
+    public Notification? Notification { get; set; }
 }

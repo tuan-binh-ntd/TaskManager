@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskManager.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using TaskManager.Infrastructure.Data;
 namespace TaskManager.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231211141548_Add-Many-Col")]
+    partial class AddManyCol
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -715,15 +718,9 @@ namespace TaskManager.Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CreatorUserId");
-
-                    b.HasIndex("ProjectId")
-                        .IsUnique();
 
                     b.ToTable("Notifications");
                 });
@@ -1633,14 +1630,6 @@ namespace TaskManager.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TaskManager.Core.Entities.Project", "Project")
-                        .WithOne("Notification")
-                        .HasForeignKey("TaskManager.Core.Entities.Notification", "ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-
                     b.Navigation("User");
                 });
 
@@ -1978,8 +1967,6 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.Navigation("IssueTypes");
 
                     b.Navigation("Labels");
-
-                    b.Navigation("Notification");
 
                     b.Navigation("PermissionGroups");
 

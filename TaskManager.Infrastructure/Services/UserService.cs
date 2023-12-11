@@ -40,35 +40,7 @@ namespace TaskManager.Infrastructure.Services
         }
 
         #region PrivateMethod
-        private async Task<bool> CreateNotificationScheme(Guid userId)
-        {
-            var issueEvents = await _issueEventRepository.Gets();
-            var notification = new Notification()
-            {
-                Name = "Default Notification Scheme",
-                NotificationIssueEvents = new List<NotificationIssueEvent>(),
-                CreatorUserId = userId,
-            };
-            foreach (var item in issueEvents)
-            {
-                var notificationIssueEvent = new NotificationIssueEvent()
-                {
-                    NotificationId = notification.Id,
-                    IssueEventId = item.Id,
-                    CurrentAssignee = true,
-                    Reporter = true,
-                    CurrentUser = true,
-                    ComponentLead = true,
-                    AllWatcher = true,
-                    SingleUser = string.Empty,
-                    Team = string.Empty,
-                    Role = string.Empty,
-                };
-                notification.NotificationIssueEvents!.Add(notificationIssueEvent);
-            }
-            _notificationRepository.Add(notification);
-            return await _notificationRepository.UnitOfWork.SaveChangesAsync() > 0;
-        }
+        
         #endregion
 
         public async Task<object> SignIn(LoginDto loginDto)
@@ -103,8 +75,6 @@ namespace TaskManager.Infrastructure.Services
             var result = await _userManager.CreateAsync(user, signUpDto.Password);
 
             if (!result.Succeeded) return result.Errors;
-
-            await CreateNotificationScheme(user.Id);
 
             UserViewModel res = new()
             {

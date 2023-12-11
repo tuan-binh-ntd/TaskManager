@@ -4,14 +4,10 @@ namespace TaskManager.Core.Entities
 {
     public class NotificationIssueEvent : BaseEntity
     {
+        public bool AllWatcher { get; set; }
         public bool CurrentAssignee { get; set; }
         public bool Reporter { get; set; }
-        public bool CurrentUser { get; set; }
-        public bool ComponentLead { get; set; }
-        public bool AllWatcher { get; set; }
-        public string SingleUser { get; set; } = string.Empty;
-        public string Team { get; set; } = string.Empty;
-        public string Role { get; set; } = string.Empty;
+        public bool ProjectLead { get; set; }
 
         //Relationship
         public Guid NotificationId { get; set; }
