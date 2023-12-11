@@ -300,8 +300,10 @@ namespace TaskManager.Infrastructure.Services
             {
                 await ChangeDueDateIssue(issue, updateIssueDto, issueHistories, senderName, projectName);
             }
-
-            await ChangeAssigneeIssue(issue, issueDetail, updateIssueDto, issueHistories, senderName, projectName);
+            else if (updateIssueDto.AssigneeId != Guid.Empty)
+            {
+                await ChangeAssigneeIssue(issue, issueDetail, updateIssueDto, issueHistories, senderName, projectName);
+            }
 
             _issueHistoryRepository.AddRange(issueHistories);
             await _issueHistoryRepository.UnitOfWork.SaveChangesAsync();
@@ -394,121 +396,92 @@ namespace TaskManager.Infrastructure.Services
 
         private async Task ChangeAssigneeIssue(Issue issue, IssueDetail issueDetail, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName)
         {
-            if (updateIssueDto.AssigneeId is Guid newAssigneeId)
+            var changedTheAssigneeHis = new IssueHistory()
             {
-                if (issueDetail.AssigneeId is Guid oldAssigneeId)
-                {
-                    var changedTheAssigneeHis = new IssueHistory()
-                    {
-                        Name = IssueConstants.Assignee_IssueHistoryName,
-                        Content = new AssigneeFromTo
-                        {
-                            From = oldAssigneeId,
-                            To = newAssigneeId,
-                        }.ToJson(),
-                        CreatorUserId = updateIssueDto.ModificationUserId,
-                        IssueId = issue.Id,
-                    };
-                    issueHistories.Add(changedTheAssigneeHis);
+                Name = IssueConstants.Assignee_IssueHistoryName,
 
-                    var fromAssigneeName = await _userManager.Users.Where(u => u.Id == oldAssigneeId).Select(u => u.Name).FirstOrDefaultAsync();
+                CreatorUserId = updateIssueDto.ModificationUserId,
+                IssueId = issue.Id,
+            };
 
-                    var toAssigneeName = await _userManager.Users.Where(u => u.Id == newAssigneeId).Select(u => u.Name).FirstOrDefaultAsync();
-
-                    var changeAssigneeIssueEmailContentDto = new ChangeAssigneeIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
-                    {
-                        FromAssigneeName = fromAssigneeName ?? string.Empty,
-                        ToAssigneeName = toAssigneeName ?? string.Empty,
-                    };
-
-                    string emailContent = EmailContentConstants.ChangeAssigneeIssueContent(changeAssigneeIssueEmailContentDto);
-
-                    var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-                    {
-                        SenderName = senderName,
-                        ActionName = EmailConstants.MadeOneUpdate,
-                        ProjectName = projectName,
-                        IssueCode = issue.Code,
-                        IssueName = issue.Name,
-                        EmailContent = emailContent,
-                    };
-
-                    await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
-                }
-                else if (issueDetail.AssigneeId is null)
-                {
-                    var changedTheAssigneeHis = new IssueHistory()
-                    {
-                        Name = IssueConstants.Assignee_IssueHistoryName,
-                        Content = new AssigneeFromTo
-                        {
-                            From = null,
-                            To = newAssigneeId,
-                        }.ToJson(),
-                        CreatorUserId = updateIssueDto.ModificationUserId,
-                        IssueId = issue.Id,
-                    };
-                    issueHistories.Add(changedTheAssigneeHis);
-
-                    var toAssigneeName = await _userManager.Users.Where(u => u.Id == newAssigneeId).Select(u => u.Name).FirstOrDefaultAsync();
-
-                    var changeAssigneeIssueEmailContentDto = new ChangeAssigneeIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
-                    {
-                        FromAssigneeName = IssueConstants.Unassigned_IssueHistoryContent,
-                        ToAssigneeName = toAssigneeName ?? string.Empty,
-                    };
-
-                    string emailContent = EmailContentConstants.ChangeAssigneeIssueContent(changeAssigneeIssueEmailContentDto);
-
-                    var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-                    {
-                        SenderName = senderName,
-                        ActionName = EmailConstants.MadeOneUpdate,
-                        ProjectName = projectName,
-                        IssueCode = issue.Code,
-                        IssueName = issue.Name,
-                        EmailContent = emailContent,
-                    };
-
-                    await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
-                }
-
-                issueDetail.AssigneeId = newAssigneeId;
-            }
-            else if (updateIssueDto.AssigneeId is null && issueDetail.AssigneeId is Guid oldAssigneeId)
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
             {
-                var changedTheAssigneeHis = new IssueHistory()
+                SenderName = senderName,
+                ActionName = EmailConstants.MadeOneUpdate,
+                ProjectName = projectName,
+                IssueCode = issue.Code,
+                IssueName = issue.Name,
+            };
+
+            var changeAssigneeIssueEmailContentDto = new ChangeAssigneeIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue);
+
+            if (updateIssueDto.AssigneeId is Guid newAssigneeId && issueDetail.AssigneeId is Guid oldAssigneeId)
+            {
+                changedTheAssigneeHis.Content = new AssigneeFromTo
                 {
-                    Name = IssueConstants.Assignee_IssueHistoryName,
-                    Content = new AssigneeFromTo
-                    {
-                        From = oldAssigneeId,
-                        To = null,
-                    }.ToJson(),
-                    CreatorUserId = updateIssueDto.ModificationUserId,
-                    IssueId = issue.Id,
-                };
+                    From = oldAssigneeId,
+                    To = newAssigneeId,
+                }.ToJson();
                 issueHistories.Add(changedTheAssigneeHis);
 
                 var fromAssigneeName = await _userManager.Users.Where(u => u.Id == oldAssigneeId).Select(u => u.Name).FirstOrDefaultAsync();
 
-                var changeAssigneeIssueEmailContentDto = new ChangeAssigneeIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
-                {
-                    FromAssigneeName = fromAssigneeName ?? string.Empty,
-                    ToAssigneeName = IssueConstants.Unassigned_IssueHistoryContent,
-                };
+                var toAssigneeName = await _userManager.Users.Where(u => u.Id == newAssigneeId).Select(u => u.Name).FirstOrDefaultAsync();
+
+                changeAssigneeIssueEmailContentDto.FromAssigneeName = fromAssigneeName ?? string.Empty;
+                changeAssigneeIssueEmailContentDto.ToAssigneeName = toAssigneeName ?? string.Empty;
 
                 string emailContent = EmailContentConstants.ChangeAssigneeIssueContent(changeAssigneeIssueEmailContentDto);
 
-                var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+                buidEmailTemplateBaseDto.EmailContent = emailContent;
+
+                await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+
+                issueDetail.AssigneeId = newAssigneeId;
+            }
+
+            else if (updateIssueDto.AssigneeId is Guid newAssigneeId1 && issueDetail.AssigneeId is null)
+            {
+                changedTheAssigneeHis.Content = new AssigneeFromTo
                 {
-                    SenderName = senderName,
-                    ActionName = EmailConstants.MadeOneUpdate,
-                    ProjectName = projectName,
-                    IssueCode = issue.Code,
-                    IssueName = issue.Name,
-                    EmailContent = emailContent,
-                };
+                    From = null,
+                    To = newAssigneeId1,
+                }.ToJson();
+
+                issueHistories.Add(changedTheAssigneeHis);
+
+                var toAssigneeName = await _userManager.Users.Where(u => u.Id == newAssigneeId1).Select(u => u.Name).FirstOrDefaultAsync();
+
+                changeAssigneeIssueEmailContentDto.FromAssigneeName = IssueConstants.Unassigned_IssueHistoryContent;
+                changeAssigneeIssueEmailContentDto.ToAssigneeName = toAssigneeName ?? string.Empty;
+
+                var emailContent = EmailContentConstants.ChangeAssigneeIssueContent(changeAssigneeIssueEmailContentDto);
+
+                buidEmailTemplateBaseDto.EmailContent = emailContent;
+
+
+                await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+
+                issueDetail.AssigneeId = newAssigneeId1;
+            }
+
+            else if (updateIssueDto.AssigneeId is null && issueDetail.AssigneeId is Guid oldAssigneeId1)
+            {
+                changedTheAssigneeHis.Content = new AssigneeFromTo
+                {
+                    From = oldAssigneeId1,
+                    To = null,
+                }.ToJson();
+
+                issueHistories.Add(changedTheAssigneeHis);
+
+                var fromAssigneeName = await _userManager.Users.Where(u => u.Id == oldAssigneeId1).Select(u => u.Name).FirstOrDefaultAsync();
+
+                changeAssigneeIssueEmailContentDto.FromAssigneeName = fromAssigneeName ?? string.Empty;
+                changeAssigneeIssueEmailContentDto.ToAssigneeName = IssueConstants.Unassigned_IssueHistoryContent;
+
+                string emailContent = EmailContentConstants.ChangeAssigneeIssueContent(changeAssigneeIssueEmailContentDto);
+                buidEmailTemplateBaseDto.EmailContent = emailContent;
 
                 await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
 

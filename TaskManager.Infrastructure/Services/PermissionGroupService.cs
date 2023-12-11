@@ -90,6 +90,7 @@ namespace TaskManager.Infrastructure.Services
             permissionGroup.Permissions = permissions.ToJson();
 
             _permissionGroupRepository.Update(permissionGroup);
+            await _permissionGroupRepository.UnitOfWork.SaveChangesAsync();
 
             return await ToPermissionGroupViewModel(permissionGroup);
         }
