@@ -1,4 +1,5 @@
 ﻿using TaskManager.Core.Entities;
+using TaskManager.Core.ViewModel;
 
 namespace TaskManager.Core.Interfaces.Repositories;
 
@@ -12,4 +13,5 @@ public interface ILabelRepository : IRepository<Label>
     void AddLabelIssue(LabelIssue labelIssue);
     void RemoveLabelIssue(LabelIssue labelIssue);
     Task<LabelIssue?> GetById(Guid labelId, Guid issueId);
+    Task<IReadOnlyCollection<LabelViewModel>> GetByIssueId(Guid issueId);
 }

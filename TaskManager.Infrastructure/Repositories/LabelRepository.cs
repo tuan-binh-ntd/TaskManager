@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
+using TaskManager.Core.ViewModel;
 using TaskManager.Infrastructure.Data;
 
 namespace TaskManager.Infrastructure.Repositories;
@@ -56,5 +57,20 @@ public class LabelRepository : ILabelRepository
     {
         var query = _context.LabelIssues.Where(x => x.IssueId == issueId && x.LabelId == labelId).Select(l => l);
         return await query.FirstOrDefaultAsync();
+    }
+
+    public async Task<IReadOnlyCollection<LabelViewModel>> GetByIssueId(Guid issueId)
+    {
+        var labels = await (from li in _context.LabelIssues.Where(li => li.IssueId == issueId)
+                            join l in _context.Labels on li.LabelId equals l.Id
+                            select new LabelViewModel
+                            {
+                                Id = l.Id,
+                                Name = l.Name,
+                                Color = l.Color,
+                                Description = l.Description,
+                            }).ToListAsync();
+
+        return labels.AsReadOnly();
     }
 }

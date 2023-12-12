@@ -56,4 +56,10 @@ public class LabelService : ILabelService
         await _labelRepository.UnitOfWork.SaveChangesAsync();
         return label.Adapt<LabelViewModel>();
     }
+
+    public async Task<IReadOnlyCollection<LabelViewModel>> GetByIssueId(Guid issueId)
+    {
+        var labels = await _labelRepository.GetByIssueId(issueId);
+        return labels;
+    }
 }
