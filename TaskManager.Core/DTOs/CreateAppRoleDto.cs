@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TaskManager.Core.DTOs
+namespace TaskManager.Core.DTOs;
+
+public class CreateAppRoleDto
 {
-    public class CreateAppRoleDto
-    {
-        [Required]
-        public string Name { get; set; } = string.Empty;
-    }
+    [Required]
+    public string Name { get; set; } = string.Empty;
 }

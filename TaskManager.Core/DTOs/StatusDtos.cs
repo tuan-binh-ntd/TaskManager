@@ -2,35 +2,34 @@
 using TaskManager.Core.Entities;
 using static TaskManager.Core.Extensions.CoreExtensions;
 
-namespace TaskManager.Core.DTOs
+namespace TaskManager.Core.DTOs;
+
+public class CreateStatusDto
 {
-    public class CreateStatusDto
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    //Relationship
+    public Guid? ProjectId { get; set; }
+    public Guid StatusCategoryId { get; set; }
+}
+
+public class UpdateStatusDto : BaseDto<UpdateStatusDto, Status>
+{
+    public string? Name { get; set; } = string.Empty;
+    public string? Description { get; set; } = string.Empty;
+    //Relationship
+    public Guid? StatusCategoryId { get; set; }
+
+    public override void Register(TypeAdapterConfig config)
     {
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        //Relationship
-        public Guid? ProjectId { get; set; }
-        public Guid StatusCategoryId { get; set; }
-    }
+        base.Register(config);
 
-    public class UpdateStatusDto : BaseDto<UpdateStatusDto, Status>
-    {
-        public string? Name { get; set; } = string.Empty;
-        public string? Description { get; set; } = string.Empty;
-        //Relationship
-        public Guid? StatusCategoryId { get; set; }
-
-        public override void Register(TypeAdapterConfig config)
-        {
-            base.Register(config);
-
-            config.NewConfig<UpdateStatusDto, Status>()
-                .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Name), dest => dest.Name)
-                .IgnoreIf((src, dest) => src.StatusCategoryId == null, dest => dest.StatusCategoryId!)
-                .Ignore(dest => dest.Id)
-                .Ignore(dest => dest.CreationTime)
-                .Ignore(dest => dest.ModificationTime!)
-                .IgnoreNullValues(true);
-        }
+        config.NewConfig<UpdateStatusDto, Status>()
+            .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Name), dest => dest.Name)
+            .IgnoreIf((src, dest) => src.StatusCategoryId == null, dest => dest.StatusCategoryId!)
+            .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.CreationTime)
+            .Ignore(dest => dest.ModificationTime!)
+            .IgnoreNullValues(true);
     }
 }

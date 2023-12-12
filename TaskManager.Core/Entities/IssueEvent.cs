@@ -1,13 +1,12 @@
 ﻿using TaskManager.Core.Core;
 
-namespace TaskManager.Core.Entities
+namespace TaskManager.Core.Entities;
+
+public class IssueEvent : BaseEntity
 {
-    public class IssueEvent : BaseEntity
-    {
-        public string Name { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
 
-        // Relationship
-        public ICollection<NotificationIssueEvent>? NotificationIssueEvents { get; set; }
+    // Relationship
+    public ICollection<NotificationIssueEvent>? NotificationIssueEvents { get; set; }
 
-    }
 }

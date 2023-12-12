@@ -3,48 +3,47 @@ using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Infrastructure.Data;
 
-namespace TaskManager.Infrastructure.Repositories
+namespace TaskManager.Infrastructure.Repositories;
+
+public class PermissionRepository : IPermissionRepository
 {
-    public class PermissionRepository : IPermissionRepository
+    private readonly AppDbContext _context;
+    public IUnitOfWork UnitOfWork => throw new NotImplementedException();
+
+    public PermissionRepository(AppDbContext context)
     {
-        private readonly AppDbContext _context;
-        public IUnitOfWork UnitOfWork => throw new NotImplementedException();
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
 
-        public PermissionRepository(AppDbContext context)
-        {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-        }
+    public Permission Add(Permission permission)
+    {
+        return _context.Permissions.Add(permission).Entity;
+    }
 
-        public Permission Add(Permission permission)
-        {
-            return _context.Permissions.Add(permission).Entity;
-        }
+    public void Delete(Permission permission)
+    {
+        _context.Permissions.Remove(permission);
+    }
 
-        public void Delete(Permission permission)
-        {
-            _context.Permissions.Remove(permission);
-        }
+    public async Task<Permission> GetById(Guid id)
+    {
+        var permission = await _context.Permissions.Where(e => e.Id == id).FirstOrDefaultAsync();
+        return permission!;
+    }
 
-        public async Task<Permission> GetById(Guid id)
-        {
-            var permission = await _context.Permissions.Where(e => e.Id == id).FirstOrDefaultAsync();
-            return permission!;
-        }
+    public void Update(Permission permission)
+    {
+        _context.Entry(permission).State = EntityState.Modified;
+    }
 
-        public void Update(Permission permission)
-        {
-            _context.Entry(permission).State = EntityState.Modified;
-        }
+    public async Task<IReadOnlyCollection<Permission>> GetAll()
+    {
+        var permissions = await _context.Permissions.ToListAsync();
+        return permissions.AsReadOnly();
+    }
 
-        public async Task<IReadOnlyCollection<Permission>> GetAll()
-        {
-            var permissions = await _context.Permissions.ToListAsync();
-            return permissions.AsReadOnly();
-        }
-
-        public async Task LoadPermissionRoles(Permission permission)
-        {
-            await _context.Entry(permission).Collection(p => p.PermissionRoles!).LoadAsync();
-        }
+    public async Task LoadPermissionRoles(Permission permission)
+    {
+        await _context.Entry(permission).Collection(p => p.PermissionRoles!).LoadAsync();
     }
 }

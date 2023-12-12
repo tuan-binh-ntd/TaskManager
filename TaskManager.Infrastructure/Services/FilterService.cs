@@ -8,142 +8,142 @@ using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
 
-namespace TaskManager.Infrastructure.Services
+namespace TaskManager.Infrastructure.Services;
+
+public class FilterService : IFilterService
 {
-    public class FilterService : IFilterService
+    private readonly IIssueRepository _issueRepository;
+    private readonly IConnectionFactory _connectionFactory;
+    private readonly IFilterRepository _filterRepository;
+    private readonly IMapper _mapper;
+
+    public FilterService(
+        IIssueRepository issueRepository,
+        IConnectionFactory connectionFactory,
+        IFilterRepository filterRepository,
+        IMapper mapper
+        )
     {
-        private readonly IIssueRepository _issueRepository;
-        private readonly IConnectionFactory _connectionFactory;
-        private readonly IFilterRepository _filterRepository;
-        private readonly IMapper _mapper;
+        _issueRepository = issueRepository;
+        _connectionFactory = connectionFactory;
+        _filterRepository = filterRepository;
+        _mapper = mapper;
+    }
 
-        public FilterService(
-            IIssueRepository issueRepository,
-            IConnectionFactory connectionFactory,
-            IFilterRepository filterRepository,
-            IMapper mapper
-            )
+    #region Private Method
+    private async Task<IReadOnlyCollection<IssueViewModel>> ToIssueViewModels(IReadOnlyCollection<Issue> issues)
+    {
+        var issueViewModels = new List<IssueViewModel>();
+        if (issues.Any())
         {
-            _issueRepository = issueRepository;
-            _connectionFactory = connectionFactory;
-            _filterRepository = filterRepository;
-            _mapper = mapper;
+            foreach (var issue in issues)
+            {
+                var issueViewModel = await ToIssueViewModel(issue);
+                issueViewModels.Add(issueViewModel);
+            }
         }
+        return issueViewModels.AsReadOnly();
+    }
 
-        #region Private Method
-        private async Task<IReadOnlyCollection<IssueViewModel>> ToIssueViewModels(IReadOnlyCollection<Issue> issues)
+    private async Task<IssueViewModel> ToIssueViewModel(Issue issue)
+    {
+        await _issueRepository.LoadEntitiesRelationship(issue);
+        var issueViewModel = _mapper.Map<IssueViewModel>(issue);
+        if (issue.IssueDetail is not null)
         {
-            var issueViewModels = new List<IssueViewModel>();
-            if (issues.Any())
-            {
-                foreach (var issue in issues)
-                {
-                    var issueViewModel = await ToIssueViewModel(issue);
-                    issueViewModels.Add(issueViewModel);
-                }
-            }
-            return issueViewModels.AsReadOnly();
+            var issueDetail = _mapper.Map<IssueDetailViewModel>(issue.IssueDetail);
+            issueViewModel.IssueDetail = issueDetail;
         }
-
-        private async Task<IssueViewModel> ToIssueViewModel(Issue issue)
+        if (issue.IssueHistories is not null && issue.IssueHistories.Any())
         {
-            await _issueRepository.LoadEntitiesRelationship(issue);
-            var issueViewModel = _mapper.Map<IssueViewModel>(issue);
-            if (issue.IssueDetail is not null)
-            {
-                var issueDetail = _mapper.Map<IssueDetailViewModel>(issue.IssueDetail);
-                issueViewModel.IssueDetail = issueDetail;
-            }
-            if (issue.IssueHistories is not null && issue.IssueHistories.Any())
-            {
-                var issueHistories = _mapper.Map<ICollection<IssueHistoryViewModel>>(issue.IssueHistories);
-                issueViewModel.IssueHistories = issueHistories;
-            }
-            if (issue.Comments is not null && issue.Comments.Any())
-            {
-                var comments = _mapper.Map<ICollection<CommentViewModel>>(issue.Comments);
-                issueViewModel.Comments = comments;
-            }
-            if (issue.Attachments is not null && issue.Attachments.Any())
-            {
-                var attachments = _mapper.Map<ICollection<AttachmentViewModel>>(issue.Attachments);
-                issueViewModel.Attachments = attachments;
-            }
-            if (issue.IssueType is not null)
-            {
-                var issueType = _mapper.Map<IssueTypeViewModel>(issue.IssueType);
-                issueViewModel.IssueType = issueType;
-            }
-            if (issue.Status is not null)
-            {
-                var status = _mapper.Map<StatusViewModel>(issue.Status);
-                issueViewModel.Status = status;
-            }
-            if (issue.ParentId is Guid parentId)
-            {
-                issueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
-            }
-            var childIssues = await _issueRepository.GetChildIssueOfIssue(issue.Id);
-            if (childIssues.Any())
-            {
-                issueViewModel.ChildIssues = await ToChildIssueViewModels(childIssues);
-            }
-            return issueViewModel;
+            var issueHistories = _mapper.Map<ICollection<IssueHistoryViewModel>>(issue.IssueHistories);
+            issueViewModel.IssueHistories = issueHistories;
         }
-
-        private async Task<IReadOnlyCollection<ChildIssueViewModel>> ToChildIssueViewModels(IReadOnlyCollection<Issue> issues)
+        if (issue.Comments is not null && issue.Comments.Any())
         {
-            var childIssueViewModels = new List<ChildIssueViewModel>();
-            if (issues.Any())
-            {
-                foreach (var issue in issues)
-                {
-                    var childIssueViewModel = await ToChildIssueViewModel(issue);
-                    childIssueViewModels.Add(childIssueViewModel);
-                }
-            }
-            return childIssueViewModels.AsReadOnly();
+            var comments = _mapper.Map<ICollection<CommentViewModel>>(issue.Comments);
+            issueViewModel.Comments = comments;
         }
-
-        private async Task<ChildIssueViewModel> ToChildIssueViewModel(Issue childIssue)
+        if (issue.Attachments is not null && issue.Attachments.Any())
         {
-            await _issueRepository.LoadAttachments(childIssue);
-            await _issueRepository.LoadIssueDetail(childIssue);
-            await _issueRepository.LoadIssueType(childIssue);
-            await _issueRepository.LoadStatus(childIssue);
-
-            var childIssueViewModel = _mapper.Map<ChildIssueViewModel>(childIssue);
-
-            if (childIssue.IssueDetail is not null)
-            {
-                var issueDetail = _mapper.Map<IssueDetailViewModel>(childIssue.IssueDetail);
-                childIssueViewModel.IssueDetail = issueDetail;
-            }
-            if (childIssue.Attachments is not null && childIssue.Attachments.Any())
-            {
-                var attachments = _mapper.Map<ICollection<AttachmentViewModel>>(childIssue.Attachments);
-                childIssueViewModel.Attachments = attachments;
-            }
-            if (childIssue.IssueType is not null)
-            {
-                var issueType = _mapper.Map<IssueTypeViewModel>(childIssue.IssueType);
-                childIssueViewModel.IssueType = issueType;
-            }
-            if (childIssue.Status is not null)
-            {
-                var status = _mapper.Map<StatusViewModel>(childIssue.Status);
-                childIssueViewModel.Status = status;
-            }
-            if (childIssue.ParentId is Guid parentId)
-            {
-                childIssueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
-            }
-            return childIssueViewModel;
+            var attachments = _mapper.Map<ICollection<AttachmentViewModel>>(issue.Attachments);
+            issueViewModel.Attachments = attachments;
         }
-        #endregion
-        public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByMyOpenIssuesFilter(Guid userId)
+        if (issue.IssueType is not null)
         {
-            string query = @"
+            var issueType = _mapper.Map<IssueTypeViewModel>(issue.IssueType);
+            issueViewModel.IssueType = issueType;
+        }
+        if (issue.Status is not null)
+        {
+            var status = _mapper.Map<StatusViewModel>(issue.Status);
+            issueViewModel.Status = status;
+        }
+        if (issue.ParentId is Guid parentId)
+        {
+            issueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
+        }
+        var childIssues = await _issueRepository.GetChildIssueOfIssue(issue.Id);
+        if (childIssues.Any())
+        {
+            issueViewModel.ChildIssues = await ToChildIssueViewModels(childIssues);
+        }
+        return issueViewModel;
+    }
+
+    private async Task<IReadOnlyCollection<ChildIssueViewModel>> ToChildIssueViewModels(IReadOnlyCollection<Issue> issues)
+    {
+        var childIssueViewModels = new List<ChildIssueViewModel>();
+        if (issues.Any())
+        {
+            foreach (var issue in issues)
+            {
+                var childIssueViewModel = await ToChildIssueViewModel(issue);
+                childIssueViewModels.Add(childIssueViewModel);
+            }
+        }
+        return childIssueViewModels.AsReadOnly();
+    }
+
+    private async Task<ChildIssueViewModel> ToChildIssueViewModel(Issue childIssue)
+    {
+        await _issueRepository.LoadAttachments(childIssue);
+        await _issueRepository.LoadIssueDetail(childIssue);
+        await _issueRepository.LoadIssueType(childIssue);
+        await _issueRepository.LoadStatus(childIssue);
+
+        var childIssueViewModel = _mapper.Map<ChildIssueViewModel>(childIssue);
+
+        if (childIssue.IssueDetail is not null)
+        {
+            var issueDetail = _mapper.Map<IssueDetailViewModel>(childIssue.IssueDetail);
+            childIssueViewModel.IssueDetail = issueDetail;
+        }
+        if (childIssue.Attachments is not null && childIssue.Attachments.Any())
+        {
+            var attachments = _mapper.Map<ICollection<AttachmentViewModel>>(childIssue.Attachments);
+            childIssueViewModel.Attachments = attachments;
+        }
+        if (childIssue.IssueType is not null)
+        {
+            var issueType = _mapper.Map<IssueTypeViewModel>(childIssue.IssueType);
+            childIssueViewModel.IssueType = issueType;
+        }
+        if (childIssue.Status is not null)
+        {
+            var status = _mapper.Map<StatusViewModel>(childIssue.Status);
+            childIssueViewModel.Status = status;
+        }
+        if (childIssue.ParentId is Guid parentId)
+        {
+            childIssueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
+        }
+        return childIssueViewModel;
+    }
+    #endregion
+    public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByMyOpenIssuesFilter(Guid userId)
+    {
+        string query = @"
                 SELECT 
                   IssueId Id
                 FROM IssueDetails id
@@ -154,53 +154,53 @@ namespace TaskManager.Infrastructure.Services
                   AND id.AssigneeId = @UserId
             ";
 
-            var param = new
-            {
-                UserId = userId,
-            };
-
-            var issueIds = await _connectionFactory.QueryAsync<Guid>(query, param);
-
-            if (issueIds.Any())
-            {
-                var issues = await _issueRepository.GetByIds(issueIds.ToList());
-                return await ToIssueViewModels(issues);
-            }
-            else
-            {
-                return new List<IssueViewModel>();
-            }
-        }
-
-        public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByReportedByMeFilter(Guid userId)
+        var param = new
         {
-            string query = @"
+            UserId = userId,
+        };
+
+        var issueIds = await _connectionFactory.QueryAsync<Guid>(query, param);
+
+        if (issueIds.Any())
+        {
+            var issues = await _issueRepository.GetByIds(issueIds.ToList());
+            return await ToIssueViewModels(issues);
+        }
+        else
+        {
+            return new List<IssueViewModel>();
+        }
+    }
+
+    public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByReportedByMeFilter(Guid userId)
+    {
+        string query = @"
                 SELECT 
                   IssueId Id
                 FROM IssueDetails
                 WHERE ReporterId = @UserId
             ";
 
-            var param = new
-            {
-                UserId = userId,
-            };
-
-            var issueIds = await _connectionFactory.QueryAsync<Guid>(query, param);
-            if (issueIds.Any())
-            {
-                var issues = await _issueRepository.GetByIds(issueIds.ToList());
-                return await ToIssueViewModels(issues);
-            }
-            else
-            {
-                return new List<IssueViewModel>();
-            }
-        }
-
-        public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByAllIssueFilter(Guid userId)
+        var param = new
         {
-            string query = @"
+            UserId = userId,
+        };
+
+        var issueIds = await _connectionFactory.QueryAsync<Guid>(query, param);
+        if (issueIds.Any())
+        {
+            var issues = await _issueRepository.GetByIds(issueIds.ToList());
+            return await ToIssueViewModels(issues);
+        }
+        else
+        {
+            return new List<IssueViewModel>();
+        }
+    }
+
+    public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByAllIssueFilter(Guid userId)
+    {
+        string query = @"
                 SELECT 
                   i.Id
                 FROM UserProjects up
@@ -211,26 +211,26 @@ namespace TaskManager.Infrastructure.Services
                 WHERE up.UserId = @UserId
             ";
 
-            var param = new
-            {
-                UserId = userId,
-            };
-
-            var issueIds = await _connectionFactory.QueryAsync<Guid>(query, param);
-            if (issueIds.Any())
-            {
-                var issues = await _issueRepository.GetByIds(issueIds.ToList());
-                return await ToIssueViewModels(issues);
-            }
-            else
-            {
-                return new List<IssueViewModel>();
-            }
-        }
-
-        public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByOpenIssuesFilter()
+        var param = new
         {
-            string query = @"
+            UserId = userId,
+        };
+
+        var issueIds = await _connectionFactory.QueryAsync<Guid>(query, param);
+        if (issueIds.Any())
+        {
+            var issues = await _issueRepository.GetByIds(issueIds.ToList());
+            return await ToIssueViewModels(issues);
+        }
+        else
+        {
+            return new List<IssueViewModel>();
+        }
+    }
+
+    public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByOpenIssuesFilter()
+    {
+        string query = @"
                 SELECT 
                   IssueId Id
                 FROM IssueDetails id
@@ -240,21 +240,21 @@ namespace TaskManager.Infrastructure.Services
                 WHERE sc.Code <> 'Done'
             ";
 
-            var issueIds = await _connectionFactory.QueryAsync<Guid>(query);
-            if (issueIds.Any())
-            {
-                var issues = await _issueRepository.GetByIds(issueIds.ToList());
-                return await ToIssueViewModels(issues);
-            }
-            else
-            {
-                return new List<IssueViewModel>();
-            }
-        }
-
-        public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByDoneIssuesFilter()
+        var issueIds = await _connectionFactory.QueryAsync<Guid>(query);
+        if (issueIds.Any())
         {
-            string query = @"
+            var issues = await _issueRepository.GetByIds(issueIds.ToList());
+            return await ToIssueViewModels(issues);
+        }
+        else
+        {
+            return new List<IssueViewModel>();
+        }
+    }
+
+    public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByDoneIssuesFilter()
+    {
+        string query = @"
                 SELECT 
                   IssueId Id
                 FROM IssueDetails id
@@ -264,94 +264,93 @@ namespace TaskManager.Infrastructure.Services
                 WHERE sc.Code = 'Done'
             ";
 
-            var issueIds = await _connectionFactory.QueryAsync<Guid>(query);
-            if (issueIds.Any())
-            {
-                var issues = await _issueRepository.GetByIds(issueIds.ToList());
-                return await ToIssueViewModels(issues);
-            }
-            else
-            {
-                return new List<IssueViewModel>();
-            }
-        }
-
-        public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByCreatedRecentlyFilter()
+        var issueIds = await _connectionFactory.QueryAsync<Guid>(query);
+        if (issueIds.Any())
         {
-            var issues = await _issueRepository.GetCreatedAWeekAgo();
+            var issues = await _issueRepository.GetByIds(issueIds.ToList());
             return await ToIssueViewModels(issues);
         }
-
-        public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByResolvedRecentlyFilter()
+        else
         {
-            var issues = await _issueRepository.GetResolvedAWeekAgo();
-            return await ToIssueViewModels(issues);
+            return new List<IssueViewModel>();
         }
-
-        public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByUpdatedRecentlyFilter()
-        {
-            var issues = await _issueRepository.GetUpdatedAWeekAgo();
-            return await ToIssueViewModels(issues);
-        }
-
-        public async Task<FilterViewModel> CreateFilter(CreateFilterDto createFilterDto)
-        {
-            var filterConfiguration = new FilterConfiguration()
-            {
-                Project = createFilterDto.Project,
-                Type = createFilterDto.Type,
-                Status = createFilterDto.Status,
-                Assginee = createFilterDto.Assginee,
-                Created = createFilterDto.Created,
-                DueDate = createFilterDto.DueDate,
-                FixVersions = createFilterDto.FixVersions,
-                Labels = createFilterDto.Labels,
-                Priority = createFilterDto.Priority,
-                Reporter = createFilterDto.Reporter,
-                Resolution = createFilterDto.Resolution,
-                Resolved = createFilterDto.Resolved,
-                Sprints = createFilterDto.Sprints,
-                StatusCategory = createFilterDto.StatusCategory,
-                Updated = createFilterDto.Updated,
-            };
-
-            var filter = new Filter()
-            {
-                Name = createFilterDto.Name,
-                Stared = createFilterDto.Stared,
-                Type = createFilterDto.Stared ? CoreConstants.StaredFiltersType : CoreConstants.CreatedUserFiltersType,
-                Configuration = filterConfiguration.ToJson()
-            };
-
-            _filterRepository.Add(filter);
-            await _filterRepository.UnitOfWork.SaveChangesAsync();
-
-            return new FilterViewModel()
-            {
-                Id = filter.Id,
-                Name = filter.Name,
-                Stared = filter.Stared,
-                Type = filter.Type,
-                Configuration = filter.Configuration.FromJson<FilterConfiguration>()
-            };
-        }
-
-        public async Task<Guid> DeleteFilter(Guid id)
-        {
-            var filter = await _filterRepository.GetById(id) ?? throw new FilterNullException();
-            _filterRepository.Delete(filter);
-            await _filterRepository.UnitOfWork.SaveChangesAsync();
-            return filter.Id;
-        }
-
-        //public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByFilterConfiguration(Guid id)
-        //{
-        //    var filterConfiguration = await _filterRepository.GetConfigurationOfFilter(id);
-        //    if (filterConfiguration is not null)
-        //    {
-        //        var issueIds = await _issueRepository.GetIssueIdsByFilterConfiguration(filterConfiguration);
-        //    }
-
-        //}
     }
+
+    public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByCreatedRecentlyFilter()
+    {
+        var issues = await _issueRepository.GetCreatedAWeekAgo();
+        return await ToIssueViewModels(issues);
+    }
+
+    public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByResolvedRecentlyFilter()
+    {
+        var issues = await _issueRepository.GetResolvedAWeekAgo();
+        return await ToIssueViewModels(issues);
+    }
+
+    public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByUpdatedRecentlyFilter()
+    {
+        var issues = await _issueRepository.GetUpdatedAWeekAgo();
+        return await ToIssueViewModels(issues);
+    }
+
+    public async Task<FilterViewModel> CreateFilter(CreateFilterDto createFilterDto)
+    {
+        var filterConfiguration = new FilterConfiguration()
+        {
+            Project = createFilterDto.Project,
+            Type = createFilterDto.Type,
+            Status = createFilterDto.Status,
+            Assginee = createFilterDto.Assginee,
+            Created = createFilterDto.Created,
+            DueDate = createFilterDto.DueDate,
+            FixVersions = createFilterDto.FixVersions,
+            Labels = createFilterDto.Labels,
+            Priority = createFilterDto.Priority,
+            Reporter = createFilterDto.Reporter,
+            Resolution = createFilterDto.Resolution,
+            Resolved = createFilterDto.Resolved,
+            Sprints = createFilterDto.Sprints,
+            StatusCategory = createFilterDto.StatusCategory,
+            Updated = createFilterDto.Updated,
+        };
+
+        var filter = new Filter()
+        {
+            Name = createFilterDto.Name,
+            Stared = createFilterDto.Stared,
+            Type = createFilterDto.Stared ? CoreConstants.StaredFiltersType : CoreConstants.CreatedUserFiltersType,
+            Configuration = filterConfiguration.ToJson()
+        };
+
+        _filterRepository.Add(filter);
+        await _filterRepository.UnitOfWork.SaveChangesAsync();
+
+        return new FilterViewModel()
+        {
+            Id = filter.Id,
+            Name = filter.Name,
+            Stared = filter.Stared,
+            Type = filter.Type,
+            Configuration = filter.Configuration.FromJson<FilterConfiguration>()
+        };
+    }
+
+    public async Task<Guid> DeleteFilter(Guid id)
+    {
+        var filter = await _filterRepository.GetById(id) ?? throw new FilterNullException();
+        _filterRepository.Delete(filter);
+        await _filterRepository.UnitOfWork.SaveChangesAsync();
+        return filter.Id;
+    }
+
+    //public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByFilterConfiguration(Guid id)
+    //{
+    //    var filterConfiguration = await _filterRepository.GetConfigurationOfFilter(id);
+    //    if (filterConfiguration is not null)
+    //    {
+    //        var issueIds = await _issueRepository.GetIssueIdsByFilterConfiguration(filterConfiguration);
+    //    }
+
+    //}
 }

@@ -5,48 +5,47 @@ using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.ViewModel;
 using TaskManager.Infrastructure.Data;
 
-namespace TaskManager.Infrastructure.Repositories
+namespace TaskManager.Infrastructure.Repositories;
+
+public class AttachmentRepository : IAttachmentRepository
 {
-    public class AttachmentRepository : IAttachmentRepository
+    private readonly AppDbContext _context;
+    public IUnitOfWork UnitOfWork => _context;
+
+    public AttachmentRepository(AppDbContext context)
     {
-        private readonly AppDbContext _context;
-        public IUnitOfWork UnitOfWork => _context;
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
 
-        public AttachmentRepository(AppDbContext context)
-        {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-        }
+    public AttachmentViewModel Add(Attachment attachment)
+    {
+        return _context.Attachments.Add(attachment).Entity.Adapt<AttachmentViewModel>();
+    }
 
-        public AttachmentViewModel Add(Attachment attachment)
-        {
-            return _context.Attachments.Add(attachment).Entity.Adapt<AttachmentViewModel>();
-        }
+    public async Task<IReadOnlyCollection<AttachmentViewModel>> GetByIssueId(Guid issueId)
+    {
+        var attachments = await _context.Attachments.AsNoTracking().Where(a => a.IssueId == issueId).ProjectToType<AttachmentViewModel>().ToListAsync();
+        return attachments.AsReadOnly();
+    }
 
-        public async Task<IReadOnlyCollection<AttachmentViewModel>> GetByIssueId(Guid issueId)
-        {
-            var attachments = await _context.Attachments.AsNoTracking().Where(a => a.IssueId == issueId).ProjectToType<AttachmentViewModel>().ToListAsync();
-            return attachments.AsReadOnly();
-        }
+    public void Update(Attachment attachment)
+    {
+        _context.Entry(attachment).State = EntityState.Modified;
+    }
 
-        public void Update(Attachment attachment)
-        {
-            _context.Entry(attachment).State = EntityState.Modified;
-        }
+    public void Delete(Attachment attachment)
+    {
+        _context.Attachments.Remove(attachment);
+    }
 
-        public void Delete(Attachment attachment)
-        {
-            _context.Attachments.Remove(attachment);
-        }
+    public async Task<Attachment?> GetById(Guid id)
+    {
+        var attachment = await _context.Attachments.Where(a => a.Id == id).FirstOrDefaultAsync();
+        return attachment;
+    }
 
-        public async Task<Attachment?> GetById(Guid id)
-        {
-            var attachment = await _context.Attachments.Where(a => a.Id == id).FirstOrDefaultAsync();
-            return attachment;
-        }
-
-        public void AddRange(IReadOnlyCollection<Attachment> attachments)
-        {
-            _context.Attachments.AddRange(attachments);
-        }
+    public void AddRange(IReadOnlyCollection<Attachment> attachments)
+    {
+        _context.Attachments.AddRange(attachments);
     }
 }

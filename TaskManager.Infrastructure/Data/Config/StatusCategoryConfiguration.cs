@@ -2,15 +2,14 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TaskManager.Core.Entities;
 
-namespace TaskManager.Infrastructure.Data.Config
+namespace TaskManager.Infrastructure.Data.Config;
+
+public class StatusCategoryConfiguration : IEntityTypeConfiguration<StatusCategory>
 {
-    public class StatusCategoryConfiguration : IEntityTypeConfiguration<StatusCategory>
+    public void Configure(EntityTypeBuilder<StatusCategory> builder)
     {
-        public void Configure(EntityTypeBuilder<StatusCategory> builder)
-        {
-            builder
-                .HasIndex(sc => sc.Code)
-                .IsUnique();
-        }
+        builder
+            .HasIndex(sc => sc.Code)
+            .IsUnique();
     }
 }

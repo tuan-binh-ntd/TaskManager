@@ -1,9 +1,8 @@
-﻿namespace TaskManager.Core.Exceptions
+﻿namespace TaskManager.Core.Exceptions;
+
+public class PermissionGroupNullException : Exception
 {
-    public class PermissionGroupNullException : Exception
-    {
-        private const string _message = "The an instance of PermissionGroup is null!";
-        public PermissionGroupNullException()
-            : base(_message) { }
-    }
+    private const string _message = "The an instance of PermissionGroup is null!";
+    public PermissionGroupNullException()
+        : base(_message) { }
 }

@@ -1,9 +1,8 @@
-﻿namespace TaskManager.Core.DTOs
+﻿namespace TaskManager.Core.DTOs;
+
+public class AttachmentDtos
 {
-    public class AttachmentDtos
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Link { get; set; } = string.Empty;
-    }
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Link { get; set; } = string.Empty;
 }

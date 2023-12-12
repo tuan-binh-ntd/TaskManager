@@ -1,7 +1,6 @@
-﻿namespace TaskManager.Core.Core
+﻿namespace TaskManager.Core.Core;
+
+public interface IHasCreationTime
 {
-    public interface IHasCreationTime
-    {
-        DateTime CreationTime { get; set; }
-    }
+    DateTime CreationTime { get; set; }
 }

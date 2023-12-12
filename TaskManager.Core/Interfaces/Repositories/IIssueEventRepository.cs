@@ -1,9 +1,8 @@
 ﻿using TaskManager.Core.Entities;
 
-namespace TaskManager.Core.Interfaces.Repositories
+namespace TaskManager.Core.Interfaces.Repositories;
+
+public interface IIssueEventRepository : IRepository<IssueEvent>
 {
-    public interface IIssueEventRepository : IRepository<IssueEvent>
-    {
-        Task<IReadOnlyCollection<IssueEvent>> Gets();
-    }
+    Task<IReadOnlyCollection<IssueEvent>> Gets();
 }

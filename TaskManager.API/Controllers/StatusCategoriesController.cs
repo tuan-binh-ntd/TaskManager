@@ -4,27 +4,26 @@ using System.Net;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
 
-namespace TaskManager.API.Controllers
+namespace TaskManager.API.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class StatusCategoriesController : BaseController
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class StatusCategoriesController : BaseController
+    private readonly IStatusService _statusService;
+
+    public StatusCategoriesController(
+        IStatusService statusService
+        )
     {
-        private readonly IStatusService _statusService;
+        _statusService = statusService;
+    }
 
-        public StatusCategoriesController(
-            IStatusService statusService
-            )
-        {
-            _statusService = statusService;
-        }
-
-        [HttpGet]
-        [ProducesResponseType(typeof(IReadOnlyCollection<StatusCategoryViewModel>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> Gets()
-        {
-            var res = await _statusService.GetStatusCategoryViewModels();
-            return CustomResult(res, HttpStatusCode.OK);
-        }
+    [HttpGet]
+    [ProducesResponseType(typeof(IReadOnlyCollection<StatusCategoryViewModel>), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> Gets()
+    {
+        var res = await _statusService.GetStatusCategoryViewModels();
+        return CustomResult(res, HttpStatusCode.OK);
     }
 }

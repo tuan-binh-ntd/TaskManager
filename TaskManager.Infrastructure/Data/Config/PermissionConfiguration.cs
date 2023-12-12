@@ -2,17 +2,16 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TaskManager.Core.Entities;
 
-namespace TaskManager.Infrastructure.Data.Config
+namespace TaskManager.Infrastructure.Data.Config;
+
+public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
 {
-    public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
+    public void Configure(EntityTypeBuilder<Permission> builder)
     {
-        public void Configure(EntityTypeBuilder<Permission> builder)
-        {
-            builder
-                .HasMany(pg => pg.PermissionRoles)
-                .WithOne(pr => pr.Permission)
-                .HasForeignKey(pr => pr.PermissionId)
-                .IsRequired();
-        }
+        builder
+            .HasMany(pg => pg.PermissionRoles)
+            .WithOne(pr => pr.Permission)
+            .HasForeignKey(pr => pr.PermissionId)
+            .IsRequired();
     }
 }

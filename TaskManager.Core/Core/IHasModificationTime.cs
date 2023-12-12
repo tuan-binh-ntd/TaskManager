@@ -1,7 +1,6 @@
-﻿namespace TaskManager.Core.Core
+﻿namespace TaskManager.Core.Core;
+
+public interface IHasModificationTime
 {
-    public interface IHasModificationTime
-    {
-        DateTime? ModificationTime { get; set; }
-    }
+    DateTime? ModificationTime { get; set; }
 }

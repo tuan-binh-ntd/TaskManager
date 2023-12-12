@@ -7,92 +7,91 @@ using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
 
-namespace TaskManager.Infrastructure.Services
+namespace TaskManager.Infrastructure.Services;
+
+public class PermissionGroupService : IPermissionGroupService
 {
-    public class PermissionGroupService : IPermissionGroupService
+
+    private readonly IPermissionGroupRepository _permissionGroupRepository;
+
+    public PermissionGroupService(IPermissionGroupRepository permissionGroupRepository)
     {
+        _permissionGroupRepository = permissionGroupRepository;
+    }
 
-        private readonly IPermissionGroupRepository _permissionGroupRepository;
-
-        public PermissionGroupService(IPermissionGroupRepository permissionGroupRepository)
+    #region Private methods
+    private static async Task<PermissionGroupViewModel> ToPermissionGroupViewModel(PermissionGroup permissionGroup)
+    {
+        var permissionGroupViewModel = new PermissionGroupViewModel()
         {
-            _permissionGroupRepository = permissionGroupRepository;
-        }
+            Id = permissionGroup.Id,
+            Name = permissionGroup.Name,
+            Permissions = permissionGroup.Permissions.FromJson<Permissions>()
+        };
 
-        #region Private methods
-        private static async Task<PermissionGroupViewModel> ToPermissionGroupViewModel(PermissionGroup permissionGroup)
+        return await Task.FromResult(permissionGroupViewModel);
+    }
+    #endregion
+
+    public async Task<PermissionGroupViewModel> Create(CreatePermissionGroupDto createPermissionGroupDto)
+    {
+        var permissions = new Permissions
         {
-            var permissionGroupViewModel = new PermissionGroupViewModel()
-            {
-                Id = permissionGroup.Id,
-                Name = permissionGroup.Name,
-                Permissions = permissionGroup.Permissions.FromJson<Permissions>()
-            };
+            Timeline = createPermissionGroupDto.Timeline,
+            Backlog = createPermissionGroupDto.Backlog,
+            Board = createPermissionGroupDto.Board,
+            Project = createPermissionGroupDto.Project,
+        };
 
-            return await Task.FromResult(permissionGroupViewModel);
-        }
-        #endregion
-
-        public async Task<PermissionGroupViewModel> Create(CreatePermissionGroupDto createPermissionGroupDto)
+        var permissionGroup = new PermissionGroup()
         {
-            var permissions = new Permissions
-            {
-                Timeline = createPermissionGroupDto.Timeline,
-                Backlog = createPermissionGroupDto.Backlog,
-                Board = createPermissionGroupDto.Board,
-                Project = createPermissionGroupDto.Project,
-            };
+            Name = createPermissionGroupDto.Name,
+            ProjectId = createPermissionGroupDto.ProjectId,
+            Permissions = permissions.ToJson(),
+        };
+        _permissionGroupRepository.Add(permissionGroup);
+        await _permissionGroupRepository.UnitOfWork.SaveChangesAsync();
+        return await ToPermissionGroupViewModel(permissionGroup);
+    }
 
-            var permissionGroup = new PermissionGroup()
-            {
-                Name = createPermissionGroupDto.Name,
-                ProjectId = createPermissionGroupDto.ProjectId,
-                Permissions = permissions.ToJson(),
-            };
-            _permissionGroupRepository.Add(permissionGroup);
-            await _permissionGroupRepository.UnitOfWork.SaveChangesAsync();
-            return await ToPermissionGroupViewModel(permissionGroup);
-        }
+    public async Task<Guid> Delete(Guid id)
+    {
+        _permissionGroupRepository.Delete(id);
+        await _permissionGroupRepository.UnitOfWork.SaveChangesAsync();
+        return id;
+    }
 
-        public async Task<Guid> Delete(Guid id)
+    public async Task<object> GetPermissionGroupsByProjectId(Guid projectId, PaginationInput paginationInput)
+    {
+        if (paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))
         {
-            _permissionGroupRepository.Delete(id);
-            await _permissionGroupRepository.UnitOfWork.SaveChangesAsync();
-            return id;
+            var permissionGroups = await _permissionGroupRepository.GetByProjectId(projectId, paginationInput);
+            return permissionGroups;
         }
-
-        public async Task<object> GetPermissionGroupsByProjectId(Guid projectId, PaginationInput paginationInput)
+        else
         {
-            if (paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))
-            {
-                var permissionGroups = await _permissionGroupRepository.GetByProjectId(projectId, paginationInput);
-                return permissionGroups;
-            }
-            else
-            {
-                var permissionGroups = await _permissionGroupRepository.GetByProjectId(projectId);
-                return permissionGroups;
-            }
+            var permissionGroups = await _permissionGroupRepository.GetByProjectId(projectId);
+            return permissionGroups;
         }
+    }
 
-        public async Task<PermissionGroupViewModel> Update(Guid id, UpdatePermissionGroupDto updatePermissionGroupDto, Guid projectId)
+    public async Task<PermissionGroupViewModel> Update(Guid id, UpdatePermissionGroupDto updatePermissionGroupDto, Guid projectId)
+    {
+        var permissionGroup = await _permissionGroupRepository.GetById(id) ?? throw new PermissionGroupNullException();
+        var permissions = new Permissions
         {
-            var permissionGroup = await _permissionGroupRepository.GetById(id) ?? throw new PermissionGroupNullException();
-            var permissions = new Permissions
-            {
-                Timeline = updatePermissionGroupDto.Timeline,
-                Backlog = updatePermissionGroupDto.Backlog,
-                Board = updatePermissionGroupDto.Board,
-                Project = updatePermissionGroupDto.Project,
-            };
+            Timeline = updatePermissionGroupDto.Timeline,
+            Backlog = updatePermissionGroupDto.Backlog,
+            Board = updatePermissionGroupDto.Board,
+            Project = updatePermissionGroupDto.Project,
+        };
 
-            permissionGroup.Name = string.IsNullOrWhiteSpace(updatePermissionGroupDto.Name) ? permissionGroup.Name : updatePermissionGroupDto.Name;
-            permissionGroup.Permissions = permissions.ToJson();
+        permissionGroup.Name = string.IsNullOrWhiteSpace(updatePermissionGroupDto.Name) ? permissionGroup.Name : updatePermissionGroupDto.Name;
+        permissionGroup.Permissions = permissions.ToJson();
 
-            _permissionGroupRepository.Update(permissionGroup);
-            await _permissionGroupRepository.UnitOfWork.SaveChangesAsync();
+        _permissionGroupRepository.Update(permissionGroup);
+        await _permissionGroupRepository.UnitOfWork.SaveChangesAsync();
 
-            return await ToPermissionGroupViewModel(permissionGroup);
-        }
+        return await ToPermissionGroupViewModel(permissionGroup);
     }
 }

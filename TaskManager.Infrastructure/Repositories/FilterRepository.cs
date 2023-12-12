@@ -5,70 +5,69 @@ using TaskManager.Core.Extensions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Infrastructure.Data;
 
-namespace TaskManager.Infrastructure.Repositories
+namespace TaskManager.Infrastructure.Repositories;
+
+public class FilterRepository : IFilterRepository
 {
-    public class FilterRepository : IFilterRepository
+    private readonly AppDbContext _context;
+    public IUnitOfWork UnitOfWork => _context;
+
+    public FilterRepository(AppDbContext context)
     {
-        private readonly AppDbContext _context;
-        public IUnitOfWork UnitOfWork => _context;
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
 
-        public FilterRepository(AppDbContext context)
-        {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-        }
+    public Filter Add(Filter filter)
+    {
+        return _context.Filters.Add(filter).Entity;
+    }
 
-        public Filter Add(Filter filter)
-        {
-            return _context.Filters.Add(filter).Entity;
-        }
+    public void AddRange(IReadOnlyCollection<Filter> filters)
+    {
+        _context.Filters.AddRange(filters);
+    }
 
-        public void AddRange(IReadOnlyCollection<Filter> filters)
-        {
-            _context.Filters.AddRange(filters);
-        }
+    public void Delete(Filter filter)
+    {
+        _context.Filters.Remove(filter);
+    }
 
-        public void Delete(Filter filter)
-        {
-            _context.Filters.Remove(filter);
-        }
+    public async Task<Filter> GetById(Guid id)
+    {
+        var filter = await _context.Filters.AsNoTracking().FirstOrDefaultAsync(filter => filter.Id == id);
+        return filter!;
+    }
 
-        public async Task<Filter> GetById(Guid id)
-        {
-            var filter = await _context.Filters.AsNoTracking().FirstOrDefaultAsync(filter => filter.Id == id);
-            return filter!;
-        }
+    public async Task<IReadOnlyCollection<Filter>> GetByUserId(Guid userId)
+    {
+        var filters = await (from f in _context.Filters.AsNoTracking()
+                             join uf in _context.UserFilters.AsNoTracking().Where(uf => uf.UserId == userId) on f.Id equals uf.FilterId
+                             select f).ToListAsync();
+        return filters.AsReadOnly();
+    }
 
-        public async Task<IReadOnlyCollection<Filter>> GetByUserId(Guid userId)
-        {
-            var filters = await (from f in _context.Filters.AsNoTracking()
-                                 join uf in _context.UserFilters.AsNoTracking().Where(uf => uf.UserId == userId) on f.Id equals uf.FilterId
-                                 select f).ToListAsync();
-            return filters.AsReadOnly();
-        }
+    public void Update(Filter filter)
+    {
+        _context.Entry(filter).State = EntityState.Modified;
+    }
 
-        public void Update(Filter filter)
-        {
-            _context.Entry(filter).State = EntityState.Modified;
-        }
+    public async Task<Filter> GetByName(string name)
+    {
+        var filter = await _context.Filters
+            .Include(f => f.FilterCriterias)!
+            .ThenInclude(fc => fc.Criteria)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(filter => filter.Name == name);
+        return filter!;
+    }
 
-        public async Task<Filter> GetByName(string name)
+    public async Task<FilterConfiguration?> GetConfigurationOfFilter(Guid id)
+    {
+        string? configuration = await _context.Filters.Where(f => f.Id == id).Select(f => f.Configuration).SingleOrDefaultAsync();
+        if (string.IsNullOrWhiteSpace(configuration))
         {
-            var filter = await _context.Filters
-                .Include(f => f.FilterCriterias)!
-                .ThenInclude(fc => fc.Criteria)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(filter => filter.Name == name);
-            return filter!;
+            return null;
         }
-
-        public async Task<FilterConfiguration?> GetConfigurationOfFilter(Guid id)
-        {
-            string? configuration = await _context.Filters.Where(f => f.Id == id).Select(f => f.Configuration).SingleOrDefaultAsync();
-            if (string.IsNullOrWhiteSpace(configuration))
-            {
-                return null;
-            }
-            return configuration.FromJson<FilterConfiguration>();
-        }
+        return configuration.FromJson<FilterConfiguration>();
     }
 }

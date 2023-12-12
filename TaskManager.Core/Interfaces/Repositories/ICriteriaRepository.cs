@@ -1,9 +1,8 @@
 ﻿using TaskManager.Core.Entities;
 
-namespace TaskManager.Core.Interfaces.Repositories
+namespace TaskManager.Core.Interfaces.Repositories;
+
+public interface ICriteriaRepository : IRepository<Criteria>
 {
-    public interface ICriteriaRepository : IRepository<Criteria>
-    {
-        Task<IReadOnlyCollection<Criteria>> Gets();
-    }
+    Task<IReadOnlyCollection<Criteria>> Gets();
 }

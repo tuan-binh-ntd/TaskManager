@@ -1,7 +1,6 @@
-﻿namespace TaskManager.Core.Core
+﻿namespace TaskManager.Core.Core;
+
+public interface IEntity
 {
-    public interface IEntity
-    {
-        Guid Id { get; set; }
-    }
+    Guid Id { get; set; }
 }

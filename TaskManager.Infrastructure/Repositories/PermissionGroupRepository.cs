@@ -7,95 +7,94 @@ using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.ViewModel;
 using TaskManager.Infrastructure.Data;
 
-namespace TaskManager.Infrastructure.Repositories
+namespace TaskManager.Infrastructure.Repositories;
+
+public class PermissionGroupRepository : IPermissionGroupRepository
 {
-    public class PermissionGroupRepository : IPermissionGroupRepository
+    private readonly AppDbContext _context;
+
+    public IUnitOfWork UnitOfWork => _context;
+
+    public PermissionGroupRepository(AppDbContext context)
     {
-        private readonly AppDbContext _context;
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
 
-        public IUnitOfWork UnitOfWork => _context;
+    public PermissionGroup Add(PermissionGroup permissionGroup)
+    {
+        return _context.PermissionGroups.Add(permissionGroup).Entity;
+    }
 
-        public PermissionGroupRepository(AppDbContext context)
-        {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-        }
+    public void Delete(Guid id)
+    {
+        var permissionGroup = _context.PermissionGroups.FirstOrDefault(pg => pg.Id == id);
+        _context.PermissionGroups.Remove(permissionGroup!);
+    }
 
-        public PermissionGroup Add(PermissionGroup permissionGroup)
-        {
-            return _context.PermissionGroups.Add(permissionGroup).Entity;
-        }
+    public async Task<PermissionGroup> GetById(Guid id)
+    {
+        var permissionGroup = await _context.PermissionGroups.FirstOrDefaultAsync(pg => pg.Id == id);
+        return permissionGroup!;
+    }
 
-        public void Delete(Guid id)
-        {
-            var permissionGroup = _context.PermissionGroups.FirstOrDefault(pg => pg.Id == id);
-            _context.PermissionGroups.Remove(permissionGroup!);
-        }
+    public async Task<IReadOnlyCollection<PermissionGroupViewModel>> GetByProjectId(Guid projectId)
+    {
+        var query = from pg in _context.PermissionGroups.Where(pg => pg.ProjectId == projectId)
+                    select new PermissionGroupViewModel
+                    {
+                        Id = pg.Id,
+                        Name = pg.Name,
+                        Permissions = pg.Permissions.FromJson<Permissions>()
+                    };
+        return await query.ToListAsync();
+    }
 
-        public async Task<PermissionGroup> GetById(Guid id)
-        {
-            var permissionGroup = await _context.PermissionGroups.FirstOrDefaultAsync(pg => pg.Id == id);
-            return permissionGroup!;
-        }
+    public void Update(PermissionGroup permissionGroup)
+    {
+        _context.Entry(permissionGroup).State = EntityState.Modified;
+    }
 
-        public async Task<IReadOnlyCollection<PermissionGroupViewModel>> GetByProjectId(Guid projectId)
-        {
-            var query = from pg in _context.PermissionGroups.Where(pg => pg.ProjectId == projectId)
-                        select new PermissionGroupViewModel
-                        {
-                            Id = pg.Id,
-                            Name = pg.Name,
-                            Permissions = pg.Permissions.FromJson<Permissions>()
-                        };
-            return await query.ToListAsync();
-        }
+    public void AddRange(IReadOnlyCollection<PermissionGroup> permissionGroups)
+    {
+        _context.PermissionGroups.AddRange(permissionGroups);
+    }
 
-        public void Update(PermissionGroup permissionGroup)
-        {
-            _context.Entry(permissionGroup).State = EntityState.Modified;
-        }
+    public async Task<PaginationResult<PermissionGroupViewModel>> GetByProjectId(Guid projectId, PaginationInput paginationInput)
+    {
+        var query = from pg in _context.PermissionGroups.Where(pg => pg.ProjectId == projectId)
+                    select new PermissionGroupViewModel
+                    {
+                        Id = pg.Id,
+                        Name = pg.Name,
+                        Permissions = pg.Permissions.FromJson<Permissions>()
+                    };
+        return await query.Pagination(paginationInput);
+    }
 
-        public void AddRange(IReadOnlyCollection<PermissionGroup> permissionGroups)
-        {
-            _context.PermissionGroups.AddRange(permissionGroups);
-        }
+    public void AddRange(IReadOnlyCollection<UserProject> userProjects)
+    {
+        _context.UserProjects.AddRange(userProjects);
+    }
 
-        public async Task<PaginationResult<PermissionGroupViewModel>> GetByProjectId(Guid projectId, PaginationInput paginationInput)
-        {
-            var query = from pg in _context.PermissionGroups.Where(pg => pg.ProjectId == projectId)
-                        select new PermissionGroupViewModel
-                        {
-                            Id = pg.Id,
-                            Name = pg.Name,
-                            Permissions = pg.Permissions.FromJson<Permissions>()
-                        };
-            return await query.Pagination(paginationInput);
-        }
+    public async Task<IReadOnlyCollection<UserProject>> GetUserProjectsByPermissionGroupId(Guid permissionGroupId)
+    {
+        var userProjects = await _context.UserProjects.Where(up => up.PermissionGroupId == permissionGroupId && up.Role != CoreConstants.LeaderRole).ToListAsync();
+        return userProjects.AsReadOnly();
+    }
 
-        public void AddRange(IReadOnlyCollection<UserProject> userProjects)
-        {
-            _context.UserProjects.AddRange(userProjects);
-        }
+    public async Task<PermissionGroupViewModel> GetPermissionGroupViewModelById(Guid projectId, Guid userId)
+    {
+        var permissionGroupId = await _context.UserProjects.AsNoTracking().Where(up => up.ProjectId == projectId && up.UserId == userId).Select(up => up.PermissionGroupId).FirstOrDefaultAsync();
 
-        public async Task<IReadOnlyCollection<UserProject>> GetUserProjectsByPermissionGroupId(Guid permissionGroupId)
-        {
-            var userProjects = await _context.UserProjects.Where(up => up.PermissionGroupId == permissionGroupId && up.Role != CoreConstants.LeaderRole).ToListAsync();
-            return userProjects.AsReadOnly();
-        }
-
-        public async Task<PermissionGroupViewModel> GetPermissionGroupViewModelById(Guid projectId, Guid userId)
-        {
-            var permissionGroupId = await _context.UserProjects.AsNoTracking().Where(up => up.ProjectId == projectId && up.UserId == userId).Select(up => up.PermissionGroupId).FirstOrDefaultAsync();
-
-            var permissionGroup = await _context.PermissionGroups
-                .AsNoTracking()
-                .Select(pg => new PermissionGroupViewModel
-                {
-                    Id = pg.Id,
-                    Name = pg.Name,
-                    Permissions = pg.Permissions.FromJson<Permissions>()
-                })
-                .FirstOrDefaultAsync(pg => pg.Id == permissionGroupId);
-            return permissionGroup!;
-        }
+        var permissionGroup = await _context.PermissionGroups
+            .AsNoTracking()
+            .Select(pg => new PermissionGroupViewModel
+            {
+                Id = pg.Id,
+                Name = pg.Name,
+                Permissions = pg.Permissions.FromJson<Permissions>()
+            })
+            .FirstOrDefaultAsync(pg => pg.Id == permissionGroupId);
+        return permissionGroup!;
     }
 }
