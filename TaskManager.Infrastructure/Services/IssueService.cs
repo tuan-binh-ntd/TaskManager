@@ -132,7 +132,7 @@ public class IssueService : IIssueService
         {
             issueViewModel.ChildIssues = await ToChildIssueViewModels(childIssues);
         }
-        issueViewModel.IssueDetail.Labels = labelsOfIssue;
+        issueViewModel.IssueDetail!.Labels = labelsOfIssue;
         return issueViewModel;
     }
 
