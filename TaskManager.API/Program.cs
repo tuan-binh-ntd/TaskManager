@@ -108,6 +108,7 @@ builder.Services.AddScoped<IAttachmentService, AttachmentService>();
 builder.Services.AddScoped<ILabelService, LabelService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<INotificationEventService, NotificationEventService>();
+builder.Services.AddScoped<IConnectionFactory, SqlConnectionFactory>();
 // Add EmailService
 // End  Declaration DI
 

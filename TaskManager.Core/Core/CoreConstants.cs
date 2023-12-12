@@ -98,6 +98,7 @@
         // Filter
         public const string DefaultFiltersType = "DEFAULT FILTERS";
         public const string StaredFiltersType = "STARED FILTERS";
+        public const string CreatedUserFiltersType = "CREATED USER FILTERS";
 
         public const string MyOpenIssuesFilterName = "My open issues";
         public const string ReportedByMeFilterName = "Reported by me";
