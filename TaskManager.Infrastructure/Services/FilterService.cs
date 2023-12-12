@@ -1,8 +1,9 @@
-﻿using Dapper;
-using MapsterMapper;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Options;
+﻿using MapsterMapper;
+using TaskManager.Core.Core;
+using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Exceptions;
+using TaskManager.Core.Extensions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
@@ -11,20 +12,24 @@ namespace TaskManager.Infrastructure.Services
 {
     public class FilterService : IFilterService
     {
-        private readonly ConnectionStrings _connectionStrings;
         private readonly IIssueRepository _issueRepository;
+        private readonly IConnectionFactory _connectionFactory;
+        private readonly IFilterRepository _filterRepository;
         private readonly IMapper _mapper;
 
         public FilterService(
             IIssueRepository issueRepository,
-            IOptionsMonitor<ConnectionStrings> optionsMonitor,
+            IConnectionFactory connectionFactory,
+            IFilterRepository filterRepository,
             IMapper mapper
             )
         {
-            _connectionStrings = optionsMonitor.CurrentValue;
             _issueRepository = issueRepository;
+            _connectionFactory = connectionFactory;
+            _filterRepository = filterRepository;
             _mapper = mapper;
         }
+
         #region Private Method
         private async Task<IReadOnlyCollection<IssueViewModel>> ToIssueViewModels(IReadOnlyCollection<Issue> issues)
         {
@@ -154,8 +159,8 @@ namespace TaskManager.Infrastructure.Services
                 UserId = userId,
             };
 
-            using SqlConnection connection = new(_connectionStrings.DefaultConnection);
-            var issueIds = await connection.QueryAsync<Guid>(query, param);
+            var issueIds = await _connectionFactory.QueryAsync<Guid>(query, param);
+
             if (issueIds.Any())
             {
                 var issues = await _issueRepository.GetByIds(issueIds.ToList());
@@ -181,8 +186,7 @@ namespace TaskManager.Infrastructure.Services
                 UserId = userId,
             };
 
-            using SqlConnection connection = new(_connectionStrings.DefaultConnection);
-            var issueIds = await connection.QueryAsync<Guid>(query, param);
+            var issueIds = await _connectionFactory.QueryAsync<Guid>(query, param);
             if (issueIds.Any())
             {
                 var issues = await _issueRepository.GetByIds(issueIds.ToList());
@@ -212,8 +216,7 @@ namespace TaskManager.Infrastructure.Services
                 UserId = userId,
             };
 
-            using SqlConnection connection = new(_connectionStrings.DefaultConnection);
-            var issueIds = await connection.QueryAsync<Guid>(query, param);
+            var issueIds = await _connectionFactory.QueryAsync<Guid>(query, param);
             if (issueIds.Any())
             {
                 var issues = await _issueRepository.GetByIds(issueIds.ToList());
@@ -237,8 +240,7 @@ namespace TaskManager.Infrastructure.Services
                 WHERE sc.Code <> 'Done'
             ";
 
-            using SqlConnection connection = new(_connectionStrings.DefaultConnection);
-            var issueIds = await connection.QueryAsync<Guid>(query);
+            var issueIds = await _connectionFactory.QueryAsync<Guid>(query);
             if (issueIds.Any())
             {
                 var issues = await _issueRepository.GetByIds(issueIds.ToList());
@@ -262,8 +264,7 @@ namespace TaskManager.Infrastructure.Services
                 WHERE sc.Code = 'Done'
             ";
 
-            using SqlConnection connection = new(_connectionStrings.DefaultConnection);
-            var issueIds = await connection.QueryAsync<Guid>(query);
+            var issueIds = await _connectionFactory.QueryAsync<Guid>(query);
             if (issueIds.Any())
             {
                 var issues = await _issueRepository.GetByIds(issueIds.ToList());
@@ -292,5 +293,65 @@ namespace TaskManager.Infrastructure.Services
             var issues = await _issueRepository.GetUpdatedAWeekAgo();
             return await ToIssueViewModels(issues);
         }
+
+        public async Task<FilterViewModel> CreateFilter(CreateFilterDto createFilterDto)
+        {
+            var filterConfiguration = new FilterConfiguration()
+            {
+                Project = createFilterDto.Project,
+                Type = createFilterDto.Type,
+                Status = createFilterDto.Status,
+                Assginee = createFilterDto.Assginee,
+                Created = createFilterDto.Created,
+                DueDate = createFilterDto.DueDate,
+                FixVersions = createFilterDto.FixVersions,
+                Labels = createFilterDto.Labels,
+                Priority = createFilterDto.Priority,
+                Reporter = createFilterDto.Reporter,
+                Resolution = createFilterDto.Resolution,
+                Resolved = createFilterDto.Resolved,
+                Sprints = createFilterDto.Sprints,
+                StatusCategory = createFilterDto.StatusCategory,
+                Updated = createFilterDto.Updated,
+            };
+
+            var filter = new Filter()
+            {
+                Name = createFilterDto.Name,
+                Stared = createFilterDto.Stared,
+                Type = createFilterDto.Stared ? CoreConstants.StaredFiltersType : CoreConstants.CreatedUserFiltersType,
+                Configuration = filterConfiguration.ToJson()
+            };
+
+            _filterRepository.Add(filter);
+            await _filterRepository.UnitOfWork.SaveChangesAsync();
+
+            return new FilterViewModel()
+            {
+                Id = filter.Id,
+                Name = filter.Name,
+                Stared = filter.Stared,
+                Type = filter.Type,
+                Configuration = filter.Configuration.FromJson<FilterConfiguration>()
+            };
+        }
+
+        public async Task<Guid> DeleteFilter(Guid id)
+        {
+            var filter = await _filterRepository.GetById(id) ?? throw new FilterNullException();
+            _filterRepository.Delete(filter);
+            await _filterRepository.UnitOfWork.SaveChangesAsync();
+            return filter.Id;
+        }
+
+        //public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByFilterConfiguration(Guid id)
+        //{
+        //    var filterConfiguration = await _filterRepository.GetConfigurationOfFilter(id);
+        //    if (filterConfiguration is not null)
+        //    {
+        //        var issueIds = await _issueRepository.GetIssueIdsByFilterConfiguration(filterConfiguration);
+        //    }
+
+        //}
     }
 }

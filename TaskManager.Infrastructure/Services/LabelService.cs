@@ -22,7 +22,9 @@ public class LabelService : ILabelService
         var label = new Label
         {
             ProjectId = projectId,
-            Name = createLabelDto.Name
+            Name = createLabelDto.Name,
+            Description = createLabelDto.Description,
+            Color = createLabelDto.Color,
         };
 
         _labelRepository.Add(label);
@@ -48,6 +50,8 @@ public class LabelService : ILabelService
     {
         var label = await _labelRepository.GetById(id) ?? throw new LabelNullException();
         label.Name = updateLabelDto.Name;
+        label.Color = updateLabelDto.Color;
+        label.Description = updateLabelDto.Description;
         _labelRepository.Update(label);
         await _labelRepository.UnitOfWork.SaveChangesAsync();
         return label.Adapt<LabelViewModel>();

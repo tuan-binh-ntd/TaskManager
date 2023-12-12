@@ -1,98 +1,106 @@
 ﻿using TaskManager.Core.Core;
 
-namespace TaskManager.Core.Entities
+namespace TaskManager.Core.Entities;
+
+public class FilterCriteria : BaseEntity
 {
-    public class FilterCriteria : BaseEntity
-    {
-        public string Configuration { get; set; } = string.Empty;
-        public string Query { get; set; } = string.Empty;
+    public string Configuration { get; set; } = string.Empty;
+    public string Query { get; set; } = string.Empty;
 
-        //Relationship
-        public Guid FilterId { get; set; }
-        public Filter? Filter { get; set; }
-        public Guid CriteriaId { get; set; }
-        public Criteria? Criteria { get; set; }
-    }
+    //Relationship
+    public Guid FilterId { get; set; }
+    public Filter? Filter { get; set; }
+    public Guid CriteriaId { get; set; }
+    public Criteria? Criteria { get; set; }
+}
 
-    public class AssigneeCriteria
-    {
-        public bool CurrentUser { get; set; }
-        public bool Unassigned { get; set; }
-        public ICollection<Guid>? SuggestedUsers { get; set; }
-        public ICollection<Guid>? SuggestedGroups { get; set; }
+public record MoreThan(int Quantity, string Unit);
+public record Between(DateTime StartDate, DateTime EndDate);
 
-        public string BuildCurrentUserSqlQuery()
-        {
-            if (CurrentUser is true)
-            {
-                return @"AssigneeId = @UserId";
-            }
-            else
-            {
-                return string.Empty;
-            }
-        }
+public class ProjectCriteria
+{
+    public ICollection<Guid>? ProjectIds { get; set; }
+}
 
-        public string BuildUnassignedSqlQuery()
-        {
-            if (Unassigned is true)
-            {
-                return @"AssigneeId IS NULL";
-            }
-            else
-            {
-                return string.Empty;
-            }
-        }
-    }
+public class TypeCriteria
+{
+    public ICollection<Guid>? IssueTypeIds { get; set; }
+}
 
-    public class ResolutionCriteria
-    {
-        public bool Unresolved { get; set; }
-        public bool Done { get; set; }
-    }
+public class StatusCriteria
+{
+    public ICollection<Guid>? StatusIds { get; set; }
+}
 
-    public class ReporterCriteria
-    {
-        public bool CurrentUser { get; set; }
-        public bool Unassigned { get; set; }
-        public ICollection<Guid>? SuggestedUsers { get; set; }
-        public ICollection<Guid>? SuggestedGroups { get; set; }
-    }
+public class AssigneeCriteria
+{
+    public Guid? CurrentUserId { get; set; }
+    public bool Unassigned { get; set; }
+    public ICollection<Guid>? UserIds { get; set; }
+}
 
-    public class StatusCategoryCriteria
-    {
-        public bool Todo { get; set; }
-        public bool InProgress { get; set; }
-        public bool Done { get; set; }
-    }
+public class CreatedCriteria
+{
+    public MoreThan? MoreThan { get; set; }
+    public Between? Between { get; set; }
+}
 
-    public class CreatedCriteria
-    {
-        public WithinTheLast? WithinTheLast { get; set; }
-        public MoreThan? MoreThan { get; set; }
-        public Between? Between { get; set; }
-        public InTheRange? InTheRange { get; set; }
-    }
+public class DueDateCriteria
+{
+    public MoreThan? MoreThan { get; set; }
+    public Between? Between { get; set; }
+}
 
-    public record WithinTheLast(int Quantity, string Unit);
-    public record MoreThan(int Quantity, string Unit);
-    public record Between(DateTime StartDate, DateTime EndDate);
-    public record InTheRange(DateTime From, DateTime To);
+public class FixVersionsCriteria
+{
+    public bool NoVersion { get; set; }
+    public ICollection<Guid>? VersionIds { get; set; }
+}
 
-    public class ResolvedCriteria
-    {
-        public WithinTheLast? WithinTheLast { get; set; }
-        public MoreThan? MoreThan { get; set; }
-        public Between? Between { get; set; }
-        public InTheRange? InTheRange { get; set; }
-    }
+public class LabelsCriteria
+{
+    public ICollection<Guid>? LabelIds { get; set; }
+}
 
-    public class UpdatedCriteria
-    {
-        public WithinTheLast? WithinTheLast { get; set; }
-        public MoreThan? MoreThan { get; set; }
-        public Between? Between { get; set; }
-        public InTheRange? InTheRange { get; set; }
-    }
+public class PriorityCriteria
+{
+    public ICollection<Guid>? PriorityIds { get; set; }
+}
+
+public class ReporterCriteria
+{
+    public Guid? CurrentUserId { get; set; }
+    public bool Unassigned { get; set; }
+    public ICollection<Guid>? UserIds { get; set; }
+}
+
+public class ResolutionCriteria
+{
+    public bool Unresolved { get; set; }
+    public bool Done { get; set; }
+}
+
+public class ResolvedCriteria
+{
+    public MoreThan? MoreThan { get; set; }
+    public Between? Between { get; set; }
+}
+
+public class SprintCriteria
+{
+    public bool NoSprint { get; set; }
+    public ICollection<Guid>? SprintIds { get; set; }
+}
+
+public class StatusCategoryCriteria
+{
+    public bool Todo { get; set; }
+    public bool InProgress { get; set; }
+    public bool Done { get; set; }
+}
+
+public class UpdatedCriteria
+{
+    public MoreThan? MoreThan { get; set; }
+    public Between? Between { get; set; }
 }

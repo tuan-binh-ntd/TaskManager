@@ -2,9 +2,11 @@
 using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Exceptions;
+using TaskManager.Core.Extensions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
@@ -17,6 +19,8 @@ namespace TaskManager.Infrastructure.Services
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IJWTTokenService _jwtTokenService;
         private readonly IUserProjectRepository _userProjectRepository;
+        private readonly ICriteriaRepository _criteriaRepository;
+        private readonly IFilterRepository _filterRepository;
         private readonly IMapper _mapper;
 
         public UserService(
@@ -24,6 +28,8 @@ namespace TaskManager.Infrastructure.Services
             SignInManager<AppUser> signInManager,
             IJWTTokenService jwtTokenService,
             IUserProjectRepository userProjectRepository,
+            ICriteriaRepository criteriaRepository,
+            IFilterRepository filterRepository,
             IMapper mapper
             )
         {
@@ -31,11 +37,160 @@ namespace TaskManager.Infrastructure.Services
             _signInManager = signInManager;
             _jwtTokenService = jwtTokenService;
             _userProjectRepository = userProjectRepository;
+            _criteriaRepository = criteriaRepository;
+            _filterRepository = filterRepository;
             _mapper = mapper;
         }
 
         #region PrivateMethod
+        private async Task CreateDefaultFilters(Guid userId)
+        {
+            var criterias = await _criteriaRepository.Gets();
 
+            var assigneeCriteria = criterias.Where(c => c.Name == CoreConstants.AssigneeCriteriaName).FirstOrDefault();
+            var resolutionCriteria = criterias.Where(c => c.Name == CoreConstants.ResolutionCriteriaName).FirstOrDefault();
+            var reporterCriteria = criterias.Where(c => c.Name == CoreConstants.ReporterCriteriaName).FirstOrDefault();
+            var statusCategoryCriteria = criterias.Where(c => c.Name == CoreConstants.StatusCategoryCriteriaName).FirstOrDefault();
+            var createdCriteria = criterias.Where(c => c.Name == CoreConstants.CreatedCriteriaName).FirstOrDefault();
+            var resolvedCriteria = criterias.Where(c => c.Name == CoreConstants.ResolvedCriteriaName).FirstOrDefault();
+            var updatedCriteria = criterias.Where(c => c.Name == CoreConstants.UpdatedCriteriaName).FirstOrDefault();
+
+            var filterConfiguration = new FilterConfiguration()
+            {
+                Assginee = new AssigneeCriteria()
+                {
+                    CurrentUserId = userId,
+                },
+            };
+
+            #region Create My open issues filter
+            var myOpenIssues = new Filter()
+            {
+                Name = CoreConstants.MyOpenIssuesFilterName,
+                Type = CoreConstants.DefaultFiltersType,
+                Configuration = filterConfiguration.ToJson(),
+            };
+            #endregion
+
+            #region Create Reported by me filter
+            filterConfiguration = new FilterConfiguration()
+            {
+                Reporter = new ReporterCriteria()
+                {
+                    CurrentUserId = userId,
+                },
+            };
+
+            var reportedByMe = new Filter()
+            {
+                Name = CoreConstants.ReportedByMeFilterName,
+                Type = CoreConstants.DefaultFiltersType,
+                Configuration = filterConfiguration.ToJson(),
+            };
+            #endregion
+
+            #region Create All issues filter
+            var allIssues = new Filter()
+            {
+                Name = CoreConstants.AllIssuesFilterName,
+                Type = CoreConstants.DefaultFiltersType,
+                Configuration = null!
+            };
+            #endregion
+
+            #region Create open issues
+            filterConfiguration = new FilterConfiguration()
+            {
+                Resolution = new ResolutionCriteria()
+                {
+                    Unresolved = true,
+                    Done = false,
+                },
+            };
+
+            var openIssues = new Filter()
+            {
+                Name = CoreConstants.OpenIssuesFilterName,
+                Type = CoreConstants.DefaultFiltersType,
+            };
+            #endregion
+
+            #region Create done issues
+            filterConfiguration = new FilterConfiguration()
+            {
+                StatusCategory = new StatusCategoryCriteria()
+                {
+                    Todo = false,
+                    InProgress = false,
+                    Done = true,
+                },
+            };
+            var doneIssues = new Filter()
+            {
+                Name = CoreConstants.DoneIssuesFilterName,
+                Type = CoreConstants.DefaultFiltersType,
+            };
+            #endregion
+
+            #region Create Created recently filter
+            filterConfiguration = new FilterConfiguration()
+            {
+                Created = new CreatedCriteria()
+                {
+                    MoreThan = new MoreThan(1, CoreConstants.WeekUnit)
+                },
+            };
+
+            var createdRecently = new Filter()
+            {
+                Name = CoreConstants.CreatedRecentlyFilterName,
+                Type = CoreConstants.DefaultFiltersType,
+                Configuration = filterConfiguration.ToJson()
+            };
+            #endregion
+
+            #region Create resolved recently filter
+            filterConfiguration = new FilterConfiguration()
+            {
+                Resolved = new ResolvedCriteria()
+                {
+                    MoreThan = new MoreThan(1, CoreConstants.WeekUnit)
+                },
+            };
+
+            var resolvedRecently = new Filter()
+            {
+                Name = CoreConstants.ResolvedRecentlyFilterName,
+                Type = CoreConstants.DefaultFiltersType,
+                Configuration = filterConfiguration.ToJson(),
+            };
+            #endregion
+
+            #region Create updated recently filter
+            filterConfiguration = new FilterConfiguration()
+            {
+                Updated = new UpdatedCriteria()
+                {
+                    MoreThan = new MoreThan(1, CoreConstants.WeekUnit)
+                },
+            };
+
+            var updatedRecently = new Filter()
+            {
+                Name = CoreConstants.UpdatedRecentlyFilterName,
+                Type = CoreConstants.DefaultFiltersType,
+                Configuration = filterConfiguration.ToJson()
+            };
+            #endregion
+
+            var filters = new List<Filter>
+            {
+                myOpenIssues, reportedByMe, allIssues, openIssues, doneIssues, createdRecently, resolvedRecently,updatedRecently
+            };
+
+            _filterRepository.AddRange(filters);
+            await _filterRepository.UnitOfWork.SaveChangesAsync();
+        }
         #endregion
 
         public async Task<object> SignIn(LoginDto loginDto)
@@ -70,6 +225,8 @@ namespace TaskManager.Infrastructure.Services
             var result = await _userManager.CreateAsync(user, signUpDto.Password);
 
             if (!result.Succeeded) return result.Errors;
+
+            await CreateDefaultFilters(user.Id);
 
             UserViewModel res = new()
             {

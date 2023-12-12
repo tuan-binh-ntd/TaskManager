@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Extensions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Infrastructure.Data;
 
@@ -25,13 +27,9 @@ namespace TaskManager.Infrastructure.Repositories
             _context.Filters.AddRange(filters);
         }
 
-        public void Delete(Guid id)
+        public void Delete(Filter filter)
         {
-            var filter = _context.Filters.FirstOrDefault(filter => filter.Id == id);
-            if (filter != null)
-            {
-                _context.Filters.Remove(filter);
-            }
+            _context.Filters.Remove(filter);
         }
 
         public async Task<Filter> GetById(Guid id)
@@ -61,6 +59,16 @@ namespace TaskManager.Infrastructure.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync(filter => filter.Name == name);
             return filter!;
+        }
+
+        public async Task<FilterConfiguration?> GetConfigurationOfFilter(Guid id)
+        {
+            string? configuration = await _context.Filters.Where(f => f.Id == id).Select(f => f.Configuration).SingleOrDefaultAsync();
+            if (string.IsNullOrWhiteSpace(configuration))
+            {
+                return null;
+            }
+            return configuration.FromJson<FilterConfiguration>();
         }
     }
 }

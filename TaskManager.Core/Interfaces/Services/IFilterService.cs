@@ -1,4 +1,5 @@
-﻿using TaskManager.Core.ViewModel;
+﻿using TaskManager.Core.DTOs;
+using TaskManager.Core.ViewModel;
 
 namespace TaskManager.Core.Interfaces.Services
 {
@@ -12,5 +13,8 @@ namespace TaskManager.Core.Interfaces.Services
         Task<IReadOnlyCollection<IssueViewModel>> GetIssueByCreatedRecentlyFilter();
         Task<IReadOnlyCollection<IssueViewModel>> GetIssueByResolvedRecentlyFilter();
         Task<IReadOnlyCollection<IssueViewModel>> GetIssueByUpdatedRecentlyFilter();
+        Task<FilterViewModel> CreateFilter(CreateFilterDto createFilterDto);
+        Task<Guid> DeleteFilter(Guid id);
+        //Task<IReadOnlyCollection<IssueViewModel>> GetIssueByFilterConfiguration(Guid id);
     }
 }
