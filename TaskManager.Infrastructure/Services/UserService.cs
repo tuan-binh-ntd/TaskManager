@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Exceptions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
@@ -15,8 +16,6 @@ namespace TaskManager.Infrastructure.Services
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IJWTTokenService _jwtTokenService;
-        private readonly INotificationRepository _notificationRepository;
-        private readonly IIssueEventRepository _issueEventRepository;
         private readonly IUserProjectRepository _userProjectRepository;
         private readonly IMapper _mapper;
 
@@ -24,8 +23,6 @@ namespace TaskManager.Infrastructure.Services
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
             IJWTTokenService jwtTokenService,
-            INotificationRepository notificationRepository,
-            IIssueEventRepository issueEventRepository,
             IUserProjectRepository userProjectRepository,
             IMapper mapper
             )
@@ -33,14 +30,12 @@ namespace TaskManager.Infrastructure.Services
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtTokenService = jwtTokenService;
-            _notificationRepository = notificationRepository;
-            _issueEventRepository = issueEventRepository;
             _userProjectRepository = userProjectRepository;
             _mapper = mapper;
         }
 
         #region PrivateMethod
-        
+
         #endregion
 
         public async Task<object> SignIn(LoginDto loginDto)
@@ -119,6 +114,26 @@ namespace TaskManager.Infrastructure.Services
                 Contains(filter.Name.ToLower().Trim())).ToList();
             }
             return users.Adapt<IReadOnlyCollection<UserViewModel>>();
+        }
+
+        public async Task<UserViewModel?> GetById(Guid id)
+        {
+            AppUser? user = await _userManager.FindByIdAsync(id.ToString());
+            if (user is null) return null;
+            return user.Adapt<UserViewModel>();
+        }
+
+        public async Task<UserViewModel> Update(Guid id, UpdateUserDto updateUserDto)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString()) ?? throw new UserNullException();
+            user.Name = !string.IsNullOrWhiteSpace(updateUserDto.Name) ? updateUserDto.Name : user.Name;
+            user.Department = !string.IsNullOrWhiteSpace(updateUserDto.Department) ? updateUserDto.Department : user.Department;
+            user.Organization = !string.IsNullOrWhiteSpace(updateUserDto.Organization) ? updateUserDto.Organization : user.Organization;
+            user.AvatarUrl = !string.IsNullOrWhiteSpace(updateUserDto.AvatarUrl) ? updateUserDto.AvatarUrl : user.AvatarUrl;
+            user.JobTitle = !string.IsNullOrWhiteSpace(updateUserDto.JobTitle) ? updateUserDto.JobTitle : user.JobTitle;
+            user.Location = !string.IsNullOrWhiteSpace(updateUserDto.Location) ? updateUserDto.Location : user.Location;
+            await _userManager.UpdateAsync(user);
+            return user.Adapt<UserViewModel>();
         }
     }
 }

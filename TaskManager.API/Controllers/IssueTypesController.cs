@@ -43,7 +43,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(res, HttpStatusCode.OK);
         }
 
-        [HttpDelete("issueTypeId")]
+        [HttpDelete("{issueTypeId}")]
         [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Delete(Guid issueTypeId, [FromQuery] Guid newIssueTypeId)
         {

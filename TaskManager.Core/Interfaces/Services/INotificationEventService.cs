@@ -9,4 +9,5 @@ public interface INotificationEventService
     Task<NotificationEventViewModel> Create(Guid notificationId, CreateNotificationEventDto createNotificationEventDto);
     Task<NotificationEventViewModel> Update(Guid id, UpdateNotificationEventDto updateNotificationEventDto);
     Task<Guid> Delete(Guid id);
+    Task<NotificationViewModel> GetNotificationViewModelByProjectId(Guid projectId);
 }

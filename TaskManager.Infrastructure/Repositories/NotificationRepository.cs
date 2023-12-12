@@ -46,13 +46,14 @@ public class NotificationRepository : INotificationRepository
 
     public async Task<IReadOnlyCollection<NotificationEventViewModel>> GetByNotificationId(Guid id)
     {
-        var notificationEventViewModels = await (from n in _context.Notifications.Where(n => n.Id == id)
-                                                 join nie in _context.NotificationIssueEvents on n.Id equals nie.NotificationId
-                                                 join ie in _context.IssueEvents on nie.IssueEventId equals ie.Id
+        var notificationEventViewModels = await (from n in _context.Notifications.AsNoTracking().Where(n => n.Id == id)
+                                                 join nie in _context.NotificationIssueEvents.AsNoTracking() on n.Id equals nie.NotificationId
+                                                 join ie in _context.IssueEvents.AsNoTracking() on nie.IssueEventId equals ie.Id
                                                  select new NotificationEventViewModel
                                                  {
                                                      Id = nie.Id,
                                                      EventName = ie.Name,
+                                                     EventId = ie.Id,
                                                      AllWatcher = nie.AllWatcher,
                                                      CurrentAssignee = nie.CurrentAssignee,
                                                      Reporter = nie.Reporter,
@@ -87,5 +88,30 @@ public class NotificationRepository : INotificationRepository
     {
         string? name = await _context.IssueEvents.Where(ie => ie.Id == issueEventId).Select(ie => ie.Name).FirstOrDefaultAsync();
         return name;
+    }
+
+    public async Task<NotificationViewModel> GetByProjectId(Guid projectId)
+    {
+        var notification = await (from n in _context.Notifications.AsNoTracking().Where(n => n.ProjectId == projectId)
+                                  join nie in _context.NotificationIssueEvents.AsNoTracking() on n.Id equals nie.NotificationId
+                                  join ie in _context.IssueEvents.AsNoTracking() on nie.IssueEventId equals ie.Id
+                                  select new NotificationViewModel
+                                  {
+                                      Id = n.Id,
+                                      Name = n.Name,
+                                      Description = n.Description,
+                                      NotificationEvent = _context.NotificationIssueEvents.Select(sd => new NotificationEventViewModel
+                                      {
+                                          Id = nie.Id,
+                                          EventId = ie.Id,
+                                          EventName = ie.Name,
+                                          AllWatcher = nie.AllWatcher,
+                                          CurrentAssignee = nie.CurrentAssignee,
+                                          Reporter = nie.Reporter,
+                                          ProjectLead = nie.ProjectLead,
+                                      }).ToList()
+                                  }).FirstOrDefaultAsync();
+
+        return notification!;
     }
 }

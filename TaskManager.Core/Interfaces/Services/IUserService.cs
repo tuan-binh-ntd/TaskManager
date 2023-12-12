@@ -11,5 +11,7 @@ namespace TaskManager.Core.Interfaces.Services
         Task<bool> CheckUsernameExists(string username);
         Task<object?> ChangePassword(string id, PasswordDto passwordDto);
         Task<IReadOnlyCollection<UserViewModel>> Gets(GetUserByFilterDto filter);
+        Task<UserViewModel?> GetById(Guid id);
+        Task<UserViewModel> Update(Guid id, UpdateUserDto updateUserDto);
     }
 }

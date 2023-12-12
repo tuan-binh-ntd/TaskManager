@@ -76,4 +76,10 @@ public class NotificationEventService : INotificationEventService
 
         return await ToviewModel(notificationIssueEvent);
     }
+
+    public async Task<NotificationViewModel> GetNotificationViewModelByProjectId(Guid projectId)
+    {
+        var notification = await _notificationRepository.GetByProjectId(projectId);
+        return notification;
+    }
 }

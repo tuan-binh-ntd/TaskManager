@@ -7,7 +7,6 @@ using TaskManager.Core.ViewModel;
 
 namespace TaskManager.API.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
 public class NotificationsController : BaseController
 {
@@ -18,7 +17,7 @@ public class NotificationsController : BaseController
         _notificationEventService = notificationEventService;
     }
 
-    [HttpGet("{id}/notificationevents")]
+    [HttpGet("api/[controller]/{id}/notificationevents")]
     [ProducesResponseType(typeof(IReadOnlyCollection<NotificationEventViewModel>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Get(Guid id)
     {
@@ -26,7 +25,7 @@ public class NotificationsController : BaseController
         return CustomResult(res, HttpStatusCode.OK);
     }
 
-    [HttpPost("{id}/notificationevents")]
+    [HttpPost("api/[controller]/{id}/notificationevents")]
     [ProducesResponseType(typeof(NotificationEventViewModel), (int)HttpStatusCode.Created)]
     public async Task<IActionResult> Create(Guid id, CreateNotificationEventDto createNotificationEventDto)
     {
@@ -34,7 +33,7 @@ public class NotificationsController : BaseController
         return CustomResult(res, HttpStatusCode.Created);
     }
 
-    [HttpPut("{id}/notificationevents/{notificationEventId}")]
+    [HttpPut("api/[controller]/{id}/notificationevents/{notificationEventId}")]
     [ProducesResponseType(typeof(NotificationEventViewModel), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Update(Guid notificationEventId, UpdateNotificationEventDto updateNotificationEventDto)
     {
@@ -42,11 +41,19 @@ public class NotificationsController : BaseController
         return CustomResult(res, HttpStatusCode.OK);
     }
 
-    [HttpDelete("{id}/notificationevents/{notificationEventId}")]
+    [HttpDelete("api/[controller]/{id}/notificationevents/{notificationEventId}")]
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
-    public async Task <IActionResult> Delete(Guid notificationEventId)
+    public async Task<IActionResult> Delete(Guid notificationEventId)
     {
         var res = await _notificationEventService.Delete(notificationEventId);
+        return CustomResult(res, HttpStatusCode.OK);
+    }
+
+    [HttpGet("api/projects/{projectId}/[controller]")]
+    [ProducesResponseType(typeof(NotificationViewModel), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> GetNotification(Guid projectId)
+    {
+        var res = await _notificationEventService.GetNotificationViewModelByProjectId(projectId);
         return CustomResult(res, HttpStatusCode.OK);
     }
 }

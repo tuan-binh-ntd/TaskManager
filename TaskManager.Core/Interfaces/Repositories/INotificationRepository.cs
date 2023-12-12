@@ -16,4 +16,5 @@ public interface INotificationRepository : IRepository<Notification>
     void DeleteNotificationIssueEvent(NotificationIssueEvent notificationIssueEvent);
     Task<NotificationIssueEvent?> GetNotificationIssueEventById(Guid id);
     Task<string?> GetIssueEventName(Guid issueEventId);
+    Task<NotificationViewModel> GetByProjectId(Guid projectId);
 }

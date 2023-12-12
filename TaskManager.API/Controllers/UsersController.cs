@@ -76,7 +76,7 @@ namespace TaskManager.API.Controllers
             return CustomResult(new { Invalid = res }, HttpStatusCode.OK);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id}/change-password")]
         [ProducesResponseType(typeof(UserViewModel), (int)HttpStatusCode.OK)]
         [ProducesErrorResponseType(typeof(IEnumerable<IdentityError>))]
         public async Task<IActionResult> ChangePassword(string id, PasswordDto input)
@@ -88,7 +88,7 @@ namespace TaskManager.API.Controllers
             }
             else if (res is IEnumerable<IdentityError> errors)
             {
-                return CustomResult(errors, HttpStatusCode.BadRequest);
+                return CustomResult("Password incorrect", errors, HttpStatusCode.BadRequest);
             }
             else if (res is UserViewModel userViewModel)
             {
@@ -98,6 +98,23 @@ namespace TaskManager.API.Controllers
             {
                 return CustomResult(HttpStatusCode.NoContent);
             }
+        }
+
+        [HttpPut("{id}")]
+        [ProducesResponseType(typeof(UserViewModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Update(Guid id, UpdateUserDto input)
+        {
+            var res = await _userService.Update(id, input);
+            return CustomResult(res, HttpStatusCode.OK);
+        }
+
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(UserViewModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Get(Guid id)
+        {
+            var res = await _userService.GetById(id);
+            if (res is null) return CustomResult(res, HttpStatusCode.NotFound);
+            return CustomResult(res, HttpStatusCode.OK);
         }
 
         [HttpGet, AllowAnonymous]
