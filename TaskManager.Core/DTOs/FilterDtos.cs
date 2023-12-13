@@ -53,6 +53,7 @@ public class FilterConfiguration
             INNER JOIN IssueDetails id ON i.Id = id.IssueId
             LEFT JOIN LabelIssues li ON i.Id = li.IssueId
             LEFT JOIN VersionIssues vi ON i.Id = vi.IssueId
+            WHERE 1 = 1
         ";
     }
 

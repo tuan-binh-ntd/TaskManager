@@ -1,4 +1,5 @@
 ﻿using MapsterMapper;
+using Microsoft.Extensions.Logging;
 using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
@@ -17,6 +18,7 @@ public class FilterService : IFilterService
     private readonly IFilterRepository _filterRepository;
     private readonly ISprintRepository _sprintRepository;
     private readonly IBacklogRepository _backlogRepository;
+    private readonly ILogger<FilterService> _logger;
     private readonly IMapper _mapper;
 
     public FilterService(
@@ -25,6 +27,7 @@ public class FilterService : IFilterService
         IFilterRepository filterRepository,
         ISprintRepository sprintRepository,
         IBacklogRepository backlogRepository,
+        ILogger<FilterService> logger,
         IMapper mapper
         )
     {
@@ -33,6 +36,7 @@ public class FilterService : IFilterService
         _filterRepository = filterRepository;
         _sprintRepository = sprintRepository;
         _backlogRepository = backlogRepository;
+        _logger = logger;
         _mapper = mapper;
     }
 
@@ -361,6 +365,7 @@ public class FilterService : IFilterService
         if (filterConfiguration is not null)
         {
             string query = filterConfiguration.QueryAfterBuild();
+            _logger.LogInformation(query);
             var issueIds = await _connectionFactory.QueryAsync<Guid>(query);
             if (issueIds.Any())
             {
