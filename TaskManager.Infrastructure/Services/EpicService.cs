@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Exceptions;
 using TaskManager.Core.Extensions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
@@ -25,6 +26,8 @@ public class EpicService : IEpicService
     private readonly IPriorityRepository _priorityRepository;
     private readonly IStatusRepository _statusRepository;
     private readonly IEmailSender _emailSender;
+    private readonly IVersionRepository _versionRepository;
+    private readonly ILabelRepository _labelRepository;
     private readonly IMapper _mapper;
 
     public EpicService(
@@ -40,6 +43,8 @@ public class EpicService : IEpicService
         IPriorityRepository priorityRepository,
         IStatusRepository statusRepository,
         IEmailSender emailSender,
+        IVersionRepository versionRepository,
+        ILabelRepository labelRepository,
         IMapper mapper
         )
     {
@@ -55,6 +60,8 @@ public class EpicService : IEpicService
         _priorityRepository = priorityRepository;
         _statusRepository = statusRepository;
         _emailSender = emailSender;
+        _versionRepository = versionRepository;
+        _labelRepository = labelRepository;
         _mapper = mapper;
     }
 
@@ -791,6 +798,37 @@ public class EpicService : IEpicService
         issueHistories.Add(updatedTheDueDateHis);
 
     }
+
+    private async Task AddVersionOrLabel(Issue issue, UpdateEpicDto updateIssueDto)
+    {
+        if (updateIssueDto.VersionId is Guid versionId)
+        {
+            var versionIssue = new VersionIssue()
+            {
+                IssueId = issue.Id,
+                VersionId = versionId
+            };
+            _versionRepository.AddVersionIssue(versionIssue);
+            await _versionRepository.UnitOfWork.SaveChangesAsync();
+        }
+
+        if (updateIssueDto.LabelIds is not null && updateIssueDto.LabelIds.Any())
+        {
+            var labelIssues = new List<LabelIssue>();
+            foreach (var labelId in updateIssueDto.LabelIds)
+            {
+                var labelIssue = new LabelIssue()
+                {
+                    LabelId = labelId,
+                    IssueId = issue.Id,
+                };
+                labelIssues.Add(labelIssue);
+            }
+
+            _labelRepository.AddRange(labelIssues);
+            await _labelRepository.UnitOfWork.SaveChangesAsync();
+        }
+    }
     #endregion
 
     public async Task<EpicViewModel> AddIssueToEpic(Guid issueId, Guid epicId)
@@ -880,30 +918,13 @@ public class EpicService : IEpicService
 
     public async Task<EpicViewModel> UpdateEpic(Guid id, UpdateEpicDto updateEpicDto)
     {
-        var epic = await _issueRepository.Get(id);
-        var issueDetail = await _issueDetailRepository.GetById(id);
+        var epic = await _issueRepository.Get(id) ?? throw new IssueNullException();
+        var issueDetail = await _issueDetailRepository.GetById(id) ?? throw new IssueDetailNullException();
+
         await DetachUpdateField(epic, issueDetail, updateEpicDto);
-        if (epic is null)
-        {
-#pragma warning disable CA2208 // Instantiate argument exceptions correctly
-            throw new ArgumentNullException(nameof(epic));
-#pragma warning restore CA2208 // Instantiate argument exceptions correctly
-        }
+        await AddVersionOrLabel(epic, updateEpicDto);
         _issueRepository.Update(epic);
         await _issueRepository.UnitOfWork.SaveChangesAsync();
-
-        if (updateEpicDto.StoryPointEstimate is not null)
-        {
-            issueDetail.StoryPointEstimate = (int)updateEpicDto.StoryPointEstimate;
-        }
-        if (updateEpicDto.ReporterId is not null)
-        {
-            issueDetail.ReporterId = (Guid)updateEpicDto.ReporterId;
-        }
-        if (updateEpicDto.AssigneeId is not null)
-        {
-            issueDetail.AssigneeId = updateEpicDto.AssigneeId;
-        }
         await _issueDetailRepository.UnitOfWork.SaveChangesAsync();
         return await ToEpicViewModel(epic);
     }

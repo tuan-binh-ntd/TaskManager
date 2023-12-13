@@ -40,7 +40,7 @@ public class UpdateIssueDto : BaseDto<UpdateIssueDto, Issue>
     public Guid? ReporterId { get; set; }
     [Required]
     public Guid ModificationUserId { get; set; }
-    public Guid? LabelId { get; set; }
+    public IReadOnlyCollection<Guid>? LabelIds { get; set; }
 
     public override void Register(TypeAdapterConfig config)
     {
@@ -107,6 +107,7 @@ public class UpdateEpicDto : BaseDto<UpdateEpicDto, Issue>
     public Guid? ReporterId { get; set; }
     [Required]
     public Guid ModificationUserId { get; set; }
+    public IReadOnlyCollection<Guid>? LabelIds { get; set; }
 
     public override void Register(TypeAdapterConfig config)
     {

@@ -2,6 +2,7 @@
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Exceptions;
+using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
@@ -40,8 +41,13 @@ public class LabelService : ILabelService
         return id;
     }
 
-    public async Task<IReadOnlyCollection<LabelViewModel>> GetLabelsByProjectId(Guid projectId)
+    public async Task<object> GetLabelsByProjectId(Guid projectId, PaginationInput paginationInput)
     {
+        if (paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))
+        {
+            var paginationResult = await _labelRepository.GetByProjectId(projectId, paginationInput);
+            return paginationResult;
+        }
         var labels = await _labelRepository.GetByProjectId(projectId);
         return labels.Adapt<IReadOnlyCollection<LabelViewModel>>();
     }

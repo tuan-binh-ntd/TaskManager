@@ -397,15 +397,20 @@ public class IssueService : IIssueService
             await _versionRepository.UnitOfWork.SaveChangesAsync();
         }
 
-        if (updateIssueDto.LabelId is Guid labelId)
+        if (updateIssueDto.LabelIds is not null && updateIssueDto.LabelIds.Any())
         {
-            var labelIssue = new LabelIssue()
+            var labelIssues = new List<LabelIssue>();
+            foreach (var labelId in updateIssueDto.LabelIds)
             {
-                LabelId = labelId,
-                IssueId = issue.Id,
-            };
+                var labelIssue = new LabelIssue()
+                {
+                    LabelId = labelId,
+                    IssueId = issue.Id,
+                };
+                labelIssues.Add(labelIssue);
+            }
 
-            _labelRepository.AddLabelIssue(labelIssue);
+            _labelRepository.AddRange(labelIssues);
             await _labelRepository.UnitOfWork.SaveChangesAsync();
         }
     }

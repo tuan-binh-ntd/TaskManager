@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.Entities;
+using TaskManager.Core.Extensions;
+using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.ViewModel;
 using TaskManager.Infrastructure.Data;
@@ -72,5 +74,23 @@ public class LabelRepository : ILabelRepository
                             }).ToListAsync();
 
         return labels.AsReadOnly();
+    }
+
+    public async Task<PaginationResult<LabelViewModel>> GetByProjectId(Guid projectId, PaginationInput paginationInput)
+    {
+        var labels = await (from l in _context.Labels.Where(l => l.ProjectId == projectId)
+                            select new LabelViewModel
+                            {
+                                Id = l.Id,
+                                Name = l.Name,
+                                Color = l.Color,
+                                Description = l.Description,
+                            }).Pagination(paginationInput);
+        return labels;
+    }
+
+    public void AddRange(IReadOnlyCollection<LabelIssue> labelIssues)
+    {
+        _context.LabelIssues.AddRange(labelIssues);
     }
 }
