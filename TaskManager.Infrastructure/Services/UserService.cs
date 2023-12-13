@@ -200,7 +200,7 @@ public class UserService : IUserService
 
         var filters = new List<Filter>
         {
-            myOpenIssues, reportedByMe, allIssues, openIssues, doneIssues, createdRecently, resolvedRecently,updatedRecently
+            myOpenIssues, reportedByMe, allIssues, openIssues, doneIssues, createdRecently, resolvedRecently, updatedRecently
         };
 
         _filterRepository.AddRange(filters);
