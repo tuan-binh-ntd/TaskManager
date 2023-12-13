@@ -19,24 +19,26 @@ public record Between(DateTime StartDate, DateTime EndDate);
 
 public class ProjectCriteria
 {
-    public ICollection<Guid>? ProjectIds { get; set; }
+    public IReadOnlyCollection<Guid>? ProjectIds { get; set; }
+    public IReadOnlyCollection<Guid>? SprintIds { get; set; }
+    public IReadOnlyCollection<Guid>? BacklogIds { get; set; }
 }
 
 public class TypeCriteria
 {
-    public ICollection<Guid>? IssueTypeIds { get; set; }
+    public IReadOnlyCollection<Guid>? IssueTypeIds { get; set; }
 }
 
 public class StatusCriteria
 {
-    public ICollection<Guid>? StatusIds { get; set; }
+    public IReadOnlyCollection<Guid>? StatusIds { get; set; }
 }
 
 public class AssigneeCriteria
 {
     public Guid? CurrentUserId { get; set; }
     public bool Unassigned { get; set; }
-    public ICollection<Guid>? UserIds { get; set; }
+    public IReadOnlyCollection<Guid>? UserIds { get; set; }
 }
 
 public class CreatedCriteria
@@ -54,24 +56,24 @@ public class DueDateCriteria
 public class FixVersionsCriteria
 {
     public bool NoVersion { get; set; }
-    public ICollection<Guid>? VersionIds { get; set; }
+    public IReadOnlyCollection<Guid>? VersionIds { get; set; }
 }
 
 public class LabelsCriteria
 {
-    public ICollection<Guid>? LabelIds { get; set; }
+    public IReadOnlyCollection<Guid>? LabelIds { get; set; }
 }
 
 public class PriorityCriteria
 {
-    public ICollection<Guid>? PriorityIds { get; set; }
+    public IReadOnlyCollection<Guid>? PriorityIds { get; set; }
 }
 
 public class ReporterCriteria
 {
     public Guid? CurrentUserId { get; set; }
     public bool Unassigned { get; set; }
-    public ICollection<Guid>? UserIds { get; set; }
+    public IReadOnlyCollection<Guid>? UserIds { get; set; }
 }
 
 public class ResolutionCriteria
@@ -89,14 +91,12 @@ public class ResolvedCriteria
 public class SprintCriteria
 {
     public bool NoSprint { get; set; }
-    public ICollection<Guid>? SprintIds { get; set; }
+    public IReadOnlyCollection<Guid>? SprintIds { get; set; }
 }
 
 public class StatusCategoryCriteria
 {
-    public bool Todo { get; set; }
-    public bool InProgress { get; set; }
-    public bool Done { get; set; }
+    public IReadOnlyCollection<Guid>? StatusCategoryIds { get; set; }
 }
 
 public class UpdatedCriteria

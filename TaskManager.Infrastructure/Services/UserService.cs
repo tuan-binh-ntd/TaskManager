@@ -21,6 +21,7 @@ public class UserService : IUserService
     private readonly IUserProjectRepository _userProjectRepository;
     private readonly ICriteriaRepository _criteriaRepository;
     private readonly IFilterRepository _filterRepository;
+    private readonly IStatusCategoryRepository _statusCategoryRepository;
     private readonly IMapper _mapper;
 
     public UserService(
@@ -30,6 +31,7 @@ public class UserService : IUserService
         IUserProjectRepository userProjectRepository,
         ICriteriaRepository criteriaRepository,
         IFilterRepository filterRepository,
+        IStatusCategoryRepository statusCategoryRepository,
         IMapper mapper
         )
     {
@@ -39,6 +41,7 @@ public class UserService : IUserService
         _userProjectRepository = userProjectRepository;
         _criteriaRepository = criteriaRepository;
         _filterRepository = filterRepository;
+        _statusCategoryRepository = statusCategoryRepository;
         _mapper = mapper;
     }
 
@@ -54,6 +57,7 @@ public class UserService : IUserService
         var createdCriteria = criterias.Where(c => c.Name == CoreConstants.CreatedCriteriaName).FirstOrDefault();
         var resolvedCriteria = criterias.Where(c => c.Name == CoreConstants.ResolvedCriteriaName).FirstOrDefault();
         var updatedCriteria = criterias.Where(c => c.Name == CoreConstants.UpdatedCriteriaName).FirstOrDefault();
+        var doneStatusCategory = await _statusCategoryRepository.GetDone() ?? throw new StatusCategoryNullException();
 
         var filterConfiguration = new FilterConfiguration()
         {
@@ -69,6 +73,7 @@ public class UserService : IUserService
             Name = CoreConstants.MyOpenIssuesFilterName,
             Type = CoreConstants.DefaultFiltersType,
             Configuration = filterConfiguration.ToJson(),
+            CreatorUserId = userId,
         };
         #endregion
 
@@ -86,6 +91,7 @@ public class UserService : IUserService
             Name = CoreConstants.ReportedByMeFilterName,
             Type = CoreConstants.DefaultFiltersType,
             Configuration = filterConfiguration.ToJson(),
+            CreatorUserId = userId,
         };
         #endregion
 
@@ -94,7 +100,8 @@ public class UserService : IUserService
         {
             Name = CoreConstants.AllIssuesFilterName,
             Type = CoreConstants.DefaultFiltersType,
-            Configuration = null!
+            Configuration = null!,
+            CreatorUserId = userId,
         };
         #endregion
 
@@ -112,6 +119,8 @@ public class UserService : IUserService
         {
             Name = CoreConstants.OpenIssuesFilterName,
             Type = CoreConstants.DefaultFiltersType,
+            Configuration = filterConfiguration.ToJson(),
+            CreatorUserId = userId,
         };
         #endregion
 
@@ -120,15 +129,18 @@ public class UserService : IUserService
         {
             StatusCategory = new StatusCategoryCriteria()
             {
-                Todo = false,
-                InProgress = false,
-                Done = true,
+                StatusCategoryIds = new List<Guid>()
+                {
+                    doneStatusCategory.Id
+                }
             },
         };
         var doneIssues = new Filter()
         {
             Name = CoreConstants.DoneIssuesFilterName,
             Type = CoreConstants.DefaultFiltersType,
+            Configuration = filterConfiguration.ToJson(),
+            CreatorUserId = userId,
         };
         #endregion
 
@@ -145,7 +157,8 @@ public class UserService : IUserService
         {
             Name = CoreConstants.CreatedRecentlyFilterName,
             Type = CoreConstants.DefaultFiltersType,
-            Configuration = filterConfiguration.ToJson()
+            Configuration = filterConfiguration.ToJson(),
+            CreatorUserId = userId,
         };
         #endregion
 
@@ -163,6 +176,7 @@ public class UserService : IUserService
             Name = CoreConstants.ResolvedRecentlyFilterName,
             Type = CoreConstants.DefaultFiltersType,
             Configuration = filterConfiguration.ToJson(),
+            CreatorUserId = userId,
         };
         #endregion
 
@@ -179,7 +193,8 @@ public class UserService : IUserService
         {
             Name = CoreConstants.UpdatedRecentlyFilterName,
             Type = CoreConstants.DefaultFiltersType,
-            Configuration = filterConfiguration.ToJson()
+            Configuration = filterConfiguration.ToJson(),
+            CreatorUserId = userId,
         };
         #endregion
 

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskManager.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using TaskManager.Infrastructure.Data;
 namespace TaskManager.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231213023549_Add-CreatorUserId-Col")]
+    partial class AddCreatorUserIdCol
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -782,6 +785,30 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.ToTable("NotificationIssueEvents");
                 });
 
+            modelBuilder.Entity("TaskManager.Core.Entities.Permission", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ModificationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Permissions");
+                });
+
             modelBuilder.Entity("TaskManager.Core.Entities.PermissionGroup", b =>
                 {
                     b.Property<Guid>("Id")
@@ -813,6 +840,42 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.HasIndex("ProjectId");
 
                     b.ToTable("PermissionGroups");
+                });
+
+            modelBuilder.Entity("TaskManager.Core.Entities.PermissionRole", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("EditPermission")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModificationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("PermissionGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PermissionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("ViewPermission")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PermissionGroupId");
+
+                    b.HasIndex("PermissionId");
+
+                    b.ToTable("PermissionRoles");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.Priority", b =>
@@ -1106,6 +1169,37 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.HasIndex("ToStatusId");
 
                     b.ToTable("Transitions");
+                });
+
+            modelBuilder.Entity("TaskManager.Core.Entities.UserFilter", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("FilterId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModificationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FilterId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserFilters");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.UserProject", b =>
@@ -1598,6 +1692,25 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.Navigation("Project");
                 });
 
+            modelBuilder.Entity("TaskManager.Core.Entities.PermissionRole", b =>
+                {
+                    b.HasOne("TaskManager.Core.Entities.PermissionGroup", "PermissionGroup")
+                        .WithMany("PermissionRoles")
+                        .HasForeignKey("PermissionGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TaskManager.Core.Entities.Permission", "Permission")
+                        .WithMany("PermissionRoles")
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("PermissionGroup");
+                });
+
             modelBuilder.Entity("TaskManager.Core.Entities.Priority", b =>
                 {
                     b.HasOne("TaskManager.Core.Entities.Project", "Project")
@@ -1669,6 +1782,23 @@ namespace TaskManager.Infrastructure.Data.Migrations
                     b.Navigation("Project");
 
                     b.Navigation("ToStatus");
+                });
+
+            modelBuilder.Entity("TaskManager.Core.Entities.UserFilter", b =>
+                {
+                    b.HasOne("TaskManager.Core.Entities.Filter", "Filter")
+                        .WithMany("UserFilters")
+                        .HasForeignKey("FilterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TaskManager.Core.Entities.AppUser", "User")
+                        .WithMany("UserFilters")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Filter");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.UserProject", b =>
@@ -1786,6 +1916,8 @@ namespace TaskManager.Infrastructure.Data.Migrations
                 {
                     b.Navigation("Notifications");
 
+                    b.Navigation("UserFilters");
+
                     b.Navigation("UserProjects");
 
                     b.Navigation("UserRoles");
@@ -1806,6 +1938,8 @@ namespace TaskManager.Infrastructure.Data.Migrations
             modelBuilder.Entity("TaskManager.Core.Entities.Filter", b =>
                 {
                     b.Navigation("FilterCriterias");
+
+                    b.Navigation("UserFilters");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.Issue", b =>
@@ -1843,6 +1977,16 @@ namespace TaskManager.Infrastructure.Data.Migrations
             modelBuilder.Entity("TaskManager.Core.Entities.Notification", b =>
                 {
                     b.Navigation("NotificationIssueEvents");
+                });
+
+            modelBuilder.Entity("TaskManager.Core.Entities.Permission", b =>
+                {
+                    b.Navigation("PermissionRoles");
+                });
+
+            modelBuilder.Entity("TaskManager.Core.Entities.PermissionGroup", b =>
+                {
+                    b.Navigation("PermissionRoles");
                 });
 
             modelBuilder.Entity("TaskManager.Core.Entities.Project", b =>

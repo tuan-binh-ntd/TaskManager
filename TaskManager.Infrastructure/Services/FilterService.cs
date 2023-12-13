@@ -15,18 +15,24 @@ public class FilterService : IFilterService
     private readonly IIssueRepository _issueRepository;
     private readonly IConnectionFactory _connectionFactory;
     private readonly IFilterRepository _filterRepository;
+    private readonly ISprintRepository _sprintRepository;
+    private readonly IBacklogRepository _backlogRepository;
     private readonly IMapper _mapper;
 
     public FilterService(
         IIssueRepository issueRepository,
         IConnectionFactory connectionFactory,
         IFilterRepository filterRepository,
+        ISprintRepository sprintRepository,
+        IBacklogRepository backlogRepository,
         IMapper mapper
         )
     {
         _issueRepository = issueRepository;
         _connectionFactory = connectionFactory;
         _filterRepository = filterRepository;
+        _sprintRepository = sprintRepository;
+        _backlogRepository = backlogRepository;
         _mapper = mapper;
     }
 
@@ -296,6 +302,11 @@ public class FilterService : IFilterService
 
     public async Task<FilterViewModel> CreateFilter(CreateFilterDto createFilterDto)
     {
+        if (createFilterDto.Project is not null && createFilterDto.Project.ProjectIds is not null && createFilterDto.Project.ProjectIds.Any())
+        {
+            createFilterDto.Project.BacklogIds = await _backlogRepository.GetBacklogIdsByProjectIds(createFilterDto.Project.ProjectIds);
+            createFilterDto.Project.SprintIds = await _sprintRepository.GetSprintIdsByProjectIds(createFilterDto.Project.ProjectIds);
+        }
         var filterConfiguration = new FilterConfiguration()
         {
             Project = createFilterDto.Project,
@@ -344,13 +355,19 @@ public class FilterService : IFilterService
         return filter.Id;
     }
 
-    //public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByFilterConfiguration(Guid id)
-    //{
-    //    var filterConfiguration = await _filterRepository.GetConfigurationOfFilter(id);
-    //    if (filterConfiguration is not null)
-    //    {
-    //        var issueIds = await _issueRepository.GetIssueIdsByFilterConfiguration(filterConfiguration);
-    //    }
-
-    //}
+    public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByFilterConfiguration(Guid id)
+    {
+        var filterConfiguration = await _filterRepository.GetConfigurationOfFilter(id);
+        if (filterConfiguration is not null)
+        {
+            string query = filterConfiguration.QueryAfterBuild();
+            var issueIds = await _connectionFactory.QueryAsync<Guid>(query);
+            if (issueIds.Any())
+            {
+                var issues = await _issueRepository.GetByIds(issueIds.ToList());
+                return await ToIssueViewModels(issues);
+            }
+        }
+        return new List<IssueViewModel>();
+    }
 }

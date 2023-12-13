@@ -9,7 +9,6 @@ public class PermissionGroup : BaseEntity
     public string Permissions { get; set; } = string.Empty;
     public bool IsMain { get; set; }
     // Relationship
-    public ICollection<PermissionRole>? PermissionRoles { get; set; }
     public Guid ProjectId { get; set; }
     public Project? Project { get; set; }
 }

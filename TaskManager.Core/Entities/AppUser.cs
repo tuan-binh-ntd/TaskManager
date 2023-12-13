@@ -15,5 +15,4 @@ public class AppUser : IdentityUser<Guid>
     public ICollection<UserProject>? UserProjects { get; set; }
     public ICollection<UserTeam>? UserTeams { get; set; }
     public ICollection<Notification>? Notifications { get; set; }
-    public ICollection<UserFilter>? UserFilters { get; set; }
 }

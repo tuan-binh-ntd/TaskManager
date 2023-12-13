@@ -5,7 +5,6 @@ namespace TaskManager.Core.Interfaces.Repositories;
 
 public interface IFilterRepository : IRepository<Filter>
 {
-    Task<IReadOnlyCollection<Filter>> GetByUserId(Guid userId);
     Task<Filter> GetById(Guid id);
     Filter Add(Filter filter);
     void Update(Filter filter);

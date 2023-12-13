@@ -52,9 +52,6 @@ public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid,
     public DbSet<Filter> Filters => Set<Filter>();
     public DbSet<FilterCriteria> FilterCriterias => Set<FilterCriteria>();
     public DbSet<Criteria> Criterias => Set<Criteria>();
-    public DbSet<UserFilter> UserFilters => Set<UserFilter>();
-    public DbSet<Permission> Permissions => Set<Permission>();
-    public DbSet<PermissionRole> PermissionRoles => Set<PermissionRole>();
     public DbSet<PermissionGroup> PermissionGroups => Set<PermissionGroup>();
     public DbSet<VersionIssue> VersionIssues => Set<VersionIssue>();
     public DbSet<Label> Labels => Set<Label>();

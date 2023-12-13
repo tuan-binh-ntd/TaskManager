@@ -16,4 +16,5 @@ public interface ISprintRepository : IRepository<Sprint>
     Task<IReadOnlyCollection<Guid>> GetSprintIdsByProjectId(Guid projectId, GetSprintByFilterDto getSprintByFilterDto);
     Task<IReadOnlyCollection<Issue>> GetIssues(Guid sprintId);
     Task<string?> GetNameOfSprint(Guid sprintId);
+    Task<IReadOnlyCollection<Guid>> GetSprintIdsByProjectIds(IReadOnlyCollection<Guid> projectIds);
 }

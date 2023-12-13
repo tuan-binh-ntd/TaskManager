@@ -87,4 +87,10 @@ public class SprintRepository : ISprintRepository
         string? name = await _context.Sprints.AsNoTracking().Where(s => s.Id == sprintId).Select(s => s.Name).FirstOrDefaultAsync();
         return name;
     }
+
+    public async Task<IReadOnlyCollection<Guid>> GetSprintIdsByProjectIds(IReadOnlyCollection<Guid> projectIds)
+    {
+        var sprintIds = await _context.Sprints.AsNoTracking().Where(s => projectIds.Contains(s.ProjectId)).Select(s => s.Id).ToListAsync();
+        return sprintIds.AsReadOnly();
+    }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TaskManager.Core.DTOs;
+using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
 
@@ -20,9 +21,10 @@ public class LabelsController : BaseController
 
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyCollection<LabelViewModel>), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> Get(Guid projectId)
+    [ProducesResponseType(typeof(PaginationResult<LabelViewModel>), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> Get(Guid projectId, [FromQuery] PaginationInput paginationInput)
     {
-        var res = await _labelService.GetLabelsByProjectId(projectId);
+        var res = await _labelService.GetLabelsByProjectId(projectId, paginationInput);
         return CustomResult(res, HttpStatusCode.OK);
     }
 

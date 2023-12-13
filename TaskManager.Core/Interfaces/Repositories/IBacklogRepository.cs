@@ -10,4 +10,5 @@ public interface IBacklogRepository : IRepository<Backlog>
     Task<IReadOnlyCollection<Issue>> GetIssues(Guid backlogId);
     Task<BacklogViewModel> GetBacklog(Guid projectId);
     Task<Backlog?> GetByProjectId(Guid projectId);
+    Task<IReadOnlyCollection<Guid>> GetBacklogIdsByProjectIds(IReadOnlyCollection<Guid> projectIds);
 }

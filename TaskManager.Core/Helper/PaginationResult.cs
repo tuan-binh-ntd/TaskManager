@@ -1,4 +1,4 @@
-﻿namespace TaskManager.Core.Helper;;
+﻿namespace TaskManager.Core.Helper;
 
 public class PaginationResult<TList>
 {

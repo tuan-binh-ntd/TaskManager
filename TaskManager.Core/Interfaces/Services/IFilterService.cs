@@ -15,5 +15,5 @@ public interface IFilterService
     Task<IReadOnlyCollection<IssueViewModel>> GetIssueByUpdatedRecentlyFilter();
     Task<FilterViewModel> CreateFilter(CreateFilterDto createFilterDto);
     Task<Guid> DeleteFilter(Guid id);
-    //Task<IReadOnlyCollection<IssueViewModel>> GetIssueByFilterConfiguration(Guid id);
+    Task<IReadOnlyCollection<IssueViewModel>> GetIssueByFilterConfiguration(Guid id);
 }

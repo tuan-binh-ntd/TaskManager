@@ -8,8 +8,8 @@ public class Filter : BaseEntity
     public bool Stared { get; set; } = true;
     public string Type { get; set; } = string.Empty;
     public string Configuration { get; set; } = string.Empty;
+    public Guid CreatorUserId { get; set; }
 
     //Relationship
-    public ICollection<UserFilter>? UserFilters { get; set; }
     public ICollection<FilterCriteria>? FilterCriterias { get; set; }
 }

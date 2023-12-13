@@ -38,14 +38,6 @@ public class FilterRepository : IFilterRepository
         return filter!;
     }
 
-    public async Task<IReadOnlyCollection<Filter>> GetByUserId(Guid userId)
-    {
-        var filters = await (from f in _context.Filters.AsNoTracking()
-                             join uf in _context.UserFilters.AsNoTracking().Where(uf => uf.UserId == userId) on f.Id equals uf.FilterId
-                             select f).ToListAsync();
-        return filters.AsReadOnly();
-    }
-
     public void Update(Filter filter)
     {
         _context.Entry(filter).State = EntityState.Modified;

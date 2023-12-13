@@ -59,4 +59,10 @@ public class BacklogRepository : IBacklogRepository
         var backlog = await _context.Backlogs.Where(b => b.ProjectId == projectId).SingleOrDefaultAsync();
         return backlog;
     }
+
+    public async Task<IReadOnlyCollection<Guid>> GetBacklogIdsByProjectIds(IReadOnlyCollection<Guid> projectIds)
+    {
+        var backlogIds = await _context.Backlogs.AsNoTracking().Where(s => projectIds.Contains(s.ProjectId)).Select(s => s.Id).ToListAsync();
+        return backlogIds.AsReadOnly();
+    }
 }

@@ -25,7 +25,7 @@ public class StatusCategoryRepository : IStatusCategoryRepository
 
     public async Task<StatusCategory?> GetDone()
     {
-        var doneStatusCategory = await _context.StatusCategories.Where(sc => sc.Code == CoreConstants.DoneCode).FirstOrDefaultAsync();
+        var doneStatusCategory = await _context.StatusCategories.AsNoTracking().Where(sc => sc.Code == CoreConstants.DoneCode).FirstOrDefaultAsync();
         return doneStatusCategory;
     }
 
