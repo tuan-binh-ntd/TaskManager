@@ -416,7 +416,7 @@ public class IssueService : IIssueService
             _labelRepository.AddRange(labelIssues);
             await _labelRepository.UnitOfWork.SaveChangesAsync();
         }
-        else if (updateIssueDto.LabelIds is not null && updateIssueDto.LabelIds.Count() == 0)
+        else if (updateIssueDto.LabelIds is not null && updateIssueDto.LabelIds.Count == 0)
         {
             var removedLabelIssues = await _labelRepository.GetLabelIssuesByIssueId(issue.Id);
             _labelRepository.RemoveRange(removedLabelIssues);
