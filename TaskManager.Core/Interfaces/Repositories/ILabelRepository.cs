@@ -17,4 +17,6 @@ public interface ILabelRepository : IRepository<Label>
     Task<IReadOnlyCollection<LabelViewModel>> GetByIssueId(Guid issueId);
     Task<PaginationResult<LabelViewModel>> GetByProjectId(Guid projectId, PaginationInput paginationInput);
     void AddRange(IReadOnlyCollection<LabelIssue> labelIssues);
+    Task<IReadOnlyCollection<LabelIssue>> GetLabelIssuesByIssueId(Guid issueId);
+    void RemoveRange(IReadOnlyCollection<LabelIssue> labelIssues);
 }

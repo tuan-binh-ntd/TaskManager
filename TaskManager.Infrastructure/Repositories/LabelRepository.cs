@@ -93,4 +93,18 @@ public class LabelRepository : ILabelRepository
     {
         _context.LabelIssues.AddRange(labelIssues);
     }
+
+    public async Task<IReadOnlyCollection<LabelIssue>> GetLabelIssuesByIssueId(Guid issueId)
+    {
+        var labels = await (from li in _context.LabelIssues.Where(li => li.IssueId == issueId)
+                            join l in _context.Labels on li.LabelId equals l.Id
+                            select li).ToListAsync();
+
+        return labels.AsReadOnly();
+    }
+
+    public void RemoveRange(IReadOnlyCollection<LabelIssue> labelIssues)
+    {
+        _context.LabelIssues.RemoveRange(labelIssues);
+    }
 }
