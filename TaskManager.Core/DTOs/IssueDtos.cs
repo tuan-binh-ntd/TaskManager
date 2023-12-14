@@ -36,7 +36,7 @@ public class UpdateIssueDto : BaseDto<UpdateIssueDto, Issue>
     public Guid? StatusId { get; set; }
     public Guid? PriorityId { get; set; }
     public int? StoryPointEstimate { get; set; } = 0;
-    public Guid? VersionId { get; set; }
+    public IReadOnlyCollection<Guid>? VersionIds { get; set; }
     public Guid? ReporterId { get; set; }
     [Required]
     public Guid ModificationUserId { get; set; }
@@ -103,7 +103,7 @@ public class UpdateEpicDto : BaseDto<UpdateEpicDto, Issue>
     public Guid? StatusId { get; set; }
     public Guid? PriorityId { get; set; }
     public int? StoryPointEstimate { get; set; } = 0;
-    public Guid? VersionId { get; set; }
+    public IReadOnlyCollection<Guid>? VersionIds { get; set; }
     public Guid? ReporterId { get; set; }
     [Required]
     public Guid ModificationUserId { get; set; }

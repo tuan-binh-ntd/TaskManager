@@ -386,15 +386,30 @@ public class IssueService : IIssueService
 
     private async Task AddVersionOrLabel(Issue issue, UpdateIssueDto updateIssueDto)
     {
-        if (updateIssueDto.VersionId is Guid versionId)
+        if (updateIssueDto.VersionIds is not null && updateIssueDto.VersionIds.Any())
         {
-            var versionIssue = new VersionIssue()
+            var removedVersionIssues = await _versionRepository.GetVersionIssuesByIssueId(issue.Id);
+            _versionRepository.RemoveRange(removedVersionIssues);
+
+            var versionIssues = new List<VersionIssue>();
+            foreach (var versionId in updateIssueDto.VersionIds)
             {
-                IssueId = issue.Id,
-                VersionId = versionId
-            };
-            _versionRepository.AddVersionIssue(versionIssue);
-            await _versionRepository.UnitOfWork.SaveChangesAsync();
+                var versionIssue = new VersionIssue()
+                {
+                    VersionId = versionId,
+                    IssueId = issue.Id,
+                };
+                versionIssues.Add(versionIssue);
+            }
+
+            _versionRepository.AddRange(versionIssues);
+            await _labelRepository.UnitOfWork.SaveChangesAsync();
+        }
+        else if (updateIssueDto.VersionIds is not null && updateIssueDto.VersionIds.Count == 0)
+        {
+            var removedVersionIssues = await _versionRepository.GetVersionIssuesByIssueId(issue.Id);
+            _versionRepository.RemoveRange(removedVersionIssues);
+            await _labelRepository.UnitOfWork.SaveChangesAsync();
         }
 
         if (updateIssueDto.LabelIds is not null && updateIssueDto.LabelIds.Any())
@@ -416,7 +431,7 @@ public class IssueService : IIssueService
             _labelRepository.AddRange(labelIssues);
             await _labelRepository.UnitOfWork.SaveChangesAsync();
         }
-        else if (updateIssueDto.LabelIds is not null && updateIssueDto.LabelIds.Count() == 0)
+        else if (updateIssueDto.LabelIds is not null && updateIssueDto.LabelIds.Count == 0)
         {
             var removedLabelIssues = await _labelRepository.GetLabelIssuesByIssueId(issue.Id);
             _labelRepository.RemoveRange(removedLabelIssues);

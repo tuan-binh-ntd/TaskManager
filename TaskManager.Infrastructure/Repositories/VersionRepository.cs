@@ -59,4 +59,15 @@ public class VersionRepository : IVersionRepository
     {
         _context.VersionIssues.Add(versionIssue);
     }
+
+    public void RemoveRange(IReadOnlyCollection<VersionIssue> versionIssues)
+    {
+        _context.VersionIssues.RemoveRange(versionIssues);
+    }
+
+    public async Task<IReadOnlyCollection<VersionIssue>> GetVersionIssuesByIssueId(Guid issueId)
+    {
+        var versionIssues = await _context.VersionIssues.Where(vi => vi.IssueId == issueId).ToListAsync();
+        return versionIssues.AsReadOnly();
+    }
 }

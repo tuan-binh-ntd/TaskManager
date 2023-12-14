@@ -13,4 +13,6 @@ public interface IVersionRepository : IRepository<Version>
     void AddRange(IReadOnlyCollection<VersionIssue> versionIssues);
     Task<IReadOnlyCollection<Guid>> GetIssueIdsByVersionId(Guid versionId);
     void AddVersionIssue(VersionIssue versionIssue);
+    void RemoveRange(IReadOnlyCollection<VersionIssue> versionIssues);
+    Task<IReadOnlyCollection<VersionIssue>> GetVersionIssuesByIssueId(Guid issueId);
 }
