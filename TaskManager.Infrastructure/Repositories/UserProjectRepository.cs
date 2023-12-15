@@ -37,7 +37,7 @@ public class UserProjectRepository : IUserProjectRepository
 
     public async Task<object> GetMemberProjects(Guid projectId, PaginationInput paginationInput)
     {
-        if (paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))
+        if (paginationInput.IsPaging())
         {
             var query = from up in _context.UserProjects.AsNoTracking().Where(up => up.ProjectId == projectId)
                         join u in _context.Users.AsNoTracking() on up.UserId equals u.Id

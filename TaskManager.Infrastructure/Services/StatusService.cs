@@ -51,7 +51,7 @@ public class StatusService : IStatusService
 
     public async Task<object> Gets(Guid projectId, PaginationInput paginationInput)
     {
-        if (paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))
+        if (paginationInput.IsPaging())
         {
             var statuses = await _statusRepository.GetByProjectIdPaging(projectId, paginationInput);
             return statuses;

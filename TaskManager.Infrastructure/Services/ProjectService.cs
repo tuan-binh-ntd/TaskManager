@@ -752,7 +752,7 @@ public class ProjectService : IProjectService
 
     public async Task<object> GetProjectsByFilter(Guid userId, GetProjectByFilterDto filter, PaginationInput paginationInput)
     {
-        if (paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))
+        if (paginationInput.IsPaging())
         {
             var pagedProjects = await _projectRepository.GetByUserId(userId, filter, paginationInput);
             var res = new PaginationResult<ProjectViewModel>()

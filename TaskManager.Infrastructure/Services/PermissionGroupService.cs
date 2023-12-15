@@ -63,7 +63,7 @@ public class PermissionGroupService : IPermissionGroupService
 
     public async Task<object> GetPermissionGroupsByProjectId(Guid projectId, PaginationInput paginationInput)
     {
-        if (paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))
+        if (paginationInput.IsPaging())
         {
             var permissionGroups = await _permissionGroupRepository.GetByProjectId(projectId, paginationInput);
             return permissionGroups;

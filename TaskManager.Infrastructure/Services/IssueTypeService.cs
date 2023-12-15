@@ -50,7 +50,7 @@ public class IssueTypeService : IIssueTypeService
 
     public async Task<object> GetIssueTypesByProjectId(Guid projectId, PaginationInput paginationInput)
     {
-        if (paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))
+        if (paginationInput.IsPaging())
         {
             var issueTypes = await _issueTypeRepository.GetsByProjectIdPaging(projectId, paginationInput);
             return issueTypes;

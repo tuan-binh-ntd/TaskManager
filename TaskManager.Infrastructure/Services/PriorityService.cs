@@ -53,7 +53,7 @@ public class PriorityService : IPriorityService
 
     public async Task<object> GetByProjectId(Guid projectId, PaginationInput paginationInput)
     {
-        if (paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))
+        if (paginationInput.IsPaging())
         {
             var priorities = await _priorityRepository.GetByProjectId(projectId, paginationInput);
             return priorities;

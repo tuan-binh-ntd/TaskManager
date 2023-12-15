@@ -43,7 +43,7 @@ public class LabelService : ILabelService
 
     public async Task<object> GetLabelsByProjectId(Guid projectId, PaginationInput paginationInput)
     {
-        if (paginationInput.pagenum is not default(int) && paginationInput.pagesize is not default(int))
+        if (paginationInput.IsPaging())
         {
             var paginationResult = await _labelRepository.GetByProjectId(projectId, paginationInput);
             return paginationResult;
