@@ -23,6 +23,7 @@ public class ProjectViewModel
     [AdaptIgnore]
     public IReadOnlyCollection<PermissionGroupViewModel> PermissionGroups { get; set; } = new List<PermissionGroupViewModel>();
     public ProjectConfigurationViewModel? ProjectConfiguration { get; set; }
+    public IReadOnlyCollection<LabelViewModel>? Labels { get; set; }
 }
 
 public class BacklogViewModel

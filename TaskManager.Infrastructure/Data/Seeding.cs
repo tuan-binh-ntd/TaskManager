@@ -9,6 +9,48 @@ public class Seeding
     public static async Task SeedUsers(
         AppDbContext appDbContext)
     {
+        #region Seed Issue Event
+        if (await appDbContext.IssueEvents.AnyAsync()) return;
+        var issueEvemts = new List<IssueEvent>()
+        {
+            new()
+            {
+                Name = CoreConstants.IssueCreatedName
+            },
+            new()
+            {
+                Name = CoreConstants.IssueEditedName
+            },
+            new()
+            {
+                Name = CoreConstants.SomeoneAssignedToAIssueName
+            },
+            new()
+            {
+                Name = CoreConstants.IssueDeletedName
+            },
+            new()
+            {
+                Name = CoreConstants.IssueMovedName
+            },
+            new()
+            {
+                Name = CoreConstants.SomeoneMadeACommentName
+            },
+            new()
+            {
+                Name = CoreConstants.CommentEditedName
+            },
+            new()
+            {
+                Name = CoreConstants.CommentDeletedName
+            },
+        };
+
+        appDbContext.IssueEvents.AddRange(issueEvemts);
+        await appDbContext.SaveChangesAsync();
+        #endregion
+
         #region Seed Criteria
         if (await appDbContext.Criterias.AnyAsync()) return;
         var criterias = new List<Criteria>
@@ -60,84 +102,6 @@ public class Seeding
             },
         };
         appDbContext.Criterias.AddRange(criterias);
-        await appDbContext.SaveChangesAsync();
-        #endregion
-
-        #region Seed Issue Event
-        if (await appDbContext.IssueEvents.AnyAsync()) return;
-        var issueEvemts = new List<IssueEvent>()
-        {
-            new()
-            {
-                Name = CoreConstants.IssueCreatedName
-            },
-            new()
-            {
-                Name = CoreConstants.IssueUpdatedName
-            },
-            new()
-            {
-                Name = CoreConstants.IssueAssignedName
-            },
-            new()
-            {
-                Name = CoreConstants.IssueResolvedName
-            },
-            new()
-            {
-                Name = CoreConstants.IssueClosedName
-            },
-            new()
-            {
-                Name = CoreConstants.IssueCommentedName
-            },
-            new()
-            {
-                Name = CoreConstants.IssueCommentEditedName
-            },
-            new()
-            {
-                Name = CoreConstants.IssueCommentDeletedName
-            },
-            new()
-            {
-                Name = CoreConstants.IssueReopenedName
-            },
-            new()
-            {
-                Name = CoreConstants.IssueDeletedName
-            },
-            new()
-            {
-                Name = CoreConstants.IssueMovedName
-            },
-            new()
-            {
-                Name = CoreConstants.WorkLoggedOnIssueName
-            },
-            new()
-            {
-                Name = CoreConstants.WorkStartedOnIssueName
-            },
-            new()
-            {
-                Name = CoreConstants.WorkStoppedOnIssueName
-            },
-            new()
-            {
-                Name = CoreConstants.IssueWorklogUpdatedName
-            },
-            new()
-            {
-                Name = CoreConstants.IssueWorklogDeletedName
-            },
-            new()
-            {
-                Name = CoreConstants.GenericEventName
-            },
-        };
-
-        appDbContext.IssueEvents.AddRange(issueEvemts);
         await appDbContext.SaveChangesAsync();
         #endregion
 

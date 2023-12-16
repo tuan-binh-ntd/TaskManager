@@ -30,6 +30,7 @@ public class ProjectService : IProjectService
     private readonly IStatusCategoryRepository _stateCategoryRepository;
     private readonly INotificationRepository _notificationRepository;
     private readonly IIssueEventRepository _issueEventRepository;
+    private readonly ILabelRepository _labelRepository;
     private readonly IMapper _mapper;
 
     public ProjectService(
@@ -49,6 +50,7 @@ public class ProjectService : IProjectService
         IStatusCategoryRepository stateCategoryRepository,
         INotificationRepository notificationRepository,
         IIssueEventRepository issueEventRepository,
+        ILabelRepository labelRepository,
         IMapper mapper
         )
     {
@@ -68,6 +70,7 @@ public class ProjectService : IProjectService
         _stateCategoryRepository = stateCategoryRepository;
         _notificationRepository = notificationRepository;
         _issueEventRepository = issueEventRepository;
+        _labelRepository = labelRepository;
         _mapper = mapper;
     }
 
@@ -162,6 +165,8 @@ public class ProjectService : IProjectService
         projectViewModel.PermissionGroups = await _permissionGroupRepository.GetByProjectId(project.Id);
         var projectConfiguration = _projectConfigurationRepository.GetByProjectId(project.Id);
         projectViewModel.ProjectConfiguration = projectConfiguration.Adapt<ProjectConfigurationViewModel>();
+        var labels = await _labelRepository.GetByProjectId(project.Id); ;
+        projectViewModel.Labels = labels.Adapt<IReadOnlyCollection<LabelViewModel>>();
         return projectViewModel;
     }
 
@@ -618,7 +623,7 @@ public class ProjectService : IProjectService
                 IssueEventId = item.Id,
                 AllWatcher = true,
                 CurrentAssignee = true,
-                ProjectLead = true,
+                ProjectLead = false,
                 Reporter = true,
             };
             notification.NotificationIssueEvents!.Add(notificationIssueEvent);
