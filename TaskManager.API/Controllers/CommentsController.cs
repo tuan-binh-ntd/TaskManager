@@ -39,9 +39,9 @@ public class CommentsController : BaseController
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, UpdateCommentDto updateCommentDto)
+    public async Task<IActionResult> Update(Guid issueId, Guid id, UpdateCommentDto updateCommentDto)
     {
-        var res = await _commentService.UpdateComment(id, updateCommentDto);
+        var res = await _commentService.UpdateComment(id, updateCommentDto, issueId);
         return CustomResult(res, HttpStatusCode.OK);
     }
 

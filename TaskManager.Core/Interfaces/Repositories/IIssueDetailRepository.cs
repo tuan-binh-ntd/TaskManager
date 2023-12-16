@@ -11,4 +11,6 @@ public interface IIssueDetailRepository : IRepository<IssueDetail>
     void Delete(Guid id);
     Task<IssueDetail> GetById(Guid id);
     Task<CurrentAssigneeAndReporterViewModel?> GetCurrentAssigneeAndReporter(Guid issueId);
+    Task<Guid?> GetCurrentAssignee(Guid issueId);
+    Task<Guid> GetReporter(Guid issueId);
 }

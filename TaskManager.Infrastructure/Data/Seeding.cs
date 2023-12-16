@@ -45,6 +45,14 @@ public class Seeding
             {
                 Name = CoreConstants.CommentDeletedName
             },
+            new()
+            {
+                Name = CoreConstants.SomeoneMadeAAttachmentName
+            },
+            new()
+            {
+                Name = CoreConstants.AttachmentDeletedName
+            },
         };
 
         appDbContext.IssueEvents.AddRange(issueEvemts);
@@ -150,6 +158,5 @@ public class Seeding
 
         await appDbContext.SaveChangesAsync();
         #endregion
-
     }
 }

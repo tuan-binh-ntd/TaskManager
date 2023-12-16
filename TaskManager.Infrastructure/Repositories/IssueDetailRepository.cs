@@ -57,4 +57,20 @@ public class IssueDetailRepository : IIssueDetailRepository
 
         return await currentAssigneeAndReporterViewModel.FirstOrDefaultAsync();
     }
+
+    public async Task<Guid?> GetCurrentAssignee(Guid issueId)
+    {
+        var currentAssigneeId = await _context.IssueDetails
+            .Where(id => id.IssueId == issueId)
+            .Select(id => id.AssigneeId).FirstOrDefaultAsync();
+        return currentAssigneeId;
+    }
+
+    public async Task<Guid> GetReporter(Guid issueId)
+    {
+        var reporterId = await _context.IssueDetails
+            .Where(id => id.IssueId == issueId)
+            .Select(id => id.ReporterId).FirstOrDefaultAsync();
+        return reporterId;
+    }
 }

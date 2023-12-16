@@ -65,6 +65,8 @@ public static class CoreConstants
     public const string SomeoneMadeACommentName = "Someone made a comment";
     public const string CommentEditedName = "A comment is edited";
     public const string CommentDeletedName = "A comment is deleted";
+    public const string SomeoneMadeAAttachmentName = "Someone added a attachment";
+    public const string AttachmentDeletedName = "A attachment is deleted";
     // User Filter
     public const string EditorType = "Editor";
     public const string ViewerType = "Viewer";

@@ -114,4 +114,23 @@ public class NotificationRepository : INotificationRepository
 
         return notification!;
     }
+
+    public async Task<IReadOnlyCollection<NotificationEventViewModel>> GetNotificationIssueEventByProjectId(Guid projectId)
+    {
+        var notificationEventViewModels = await (from n in _context.Notifications.AsNoTracking().Where(n => n.ProjectId == projectId)
+                                                 join nie in _context.NotificationIssueEvents.AsNoTracking() on n.Id equals nie.NotificationId
+                                                 join ie in _context.IssueEvents.AsNoTracking() on nie.IssueEventId equals ie.Id
+                                                 select new NotificationEventViewModel
+                                                 {
+                                                     Id = nie.Id,
+                                                     EventName = ie.Name,
+                                                     EventId = ie.Id,
+                                                     AllWatcher = nie.AllWatcher,
+                                                     CurrentAssignee = nie.CurrentAssignee,
+                                                     Reporter = nie.Reporter,
+                                                     ProjectLead = nie.ProjectLead,
+                                                 }).ToListAsync();
+
+        return notificationEventViewModels.AsReadOnly();
+    }
 }

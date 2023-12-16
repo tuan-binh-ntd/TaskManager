@@ -317,4 +317,49 @@ public class IssueRepository : IIssueRepository
     {
         return await _context.Issues.Where(i => i.IssueTypeId == issueTypeId).CountAsync();
     }
+
+    public async Task<Guid> GetProjectIdOfIssue(Guid issueId)
+    {
+        var issue = await _context.Issues.AsNoTracking().Where(i => i.Id == issueId).FirstOrDefaultAsync();
+        if (issue is not null && issue.SprintId is Guid sprintId)
+        {
+            return await _context.Sprints.AsNoTracking().Where(s => s.Id == sprintId).Select(s => s.ProjectId).FirstOrDefaultAsync();
+        }
+        else if (issue is not null && issue.BacklogId is Guid backlogId)
+        {
+            return await _context.Backlogs.AsNoTracking().Where(s => s.Id == backlogId).Select(s => s.ProjectId).FirstOrDefaultAsync();
+        }
+        else if (issue is not null && issue.ProjectId is Guid projectId)
+        {
+            return projectId;
+        }
+        else
+        {
+            return Guid.Empty;
+        }
+    }
+
+    public async Task<Guid> GetProjectLeadIdOfIssue(Guid issueId)
+    {
+        var issue = await _context.Issues.AsNoTracking().Where(i => i.Id == issueId).FirstOrDefaultAsync();
+        if (issue is not null && issue.SprintId is Guid sprintId)
+        {
+            var projectId = await _context.Sprints.AsNoTracking().Where(s => s.Id == sprintId).Select(s => s.ProjectId).FirstOrDefaultAsync();
+
+            return await _context.UserProjects.Where(up => up.ProjectId == projectId && up.Role == CoreConstants.LeaderRole).Select(up => up.UserId).FirstOrDefaultAsync();
+        }
+        else if (issue is not null && issue.BacklogId is Guid backlogId)
+        {
+            var projectId = await _context.Backlogs.AsNoTracking().Where(s => s.Id == backlogId).Select(s => s.ProjectId).FirstOrDefaultAsync();
+            return await _context.UserProjects.Where(up => up.ProjectId == projectId && up.Role == CoreConstants.LeaderRole).Select(up => up.UserId).FirstOrDefaultAsync();
+        }
+        else if (issue is not null && issue.ProjectId is Guid projectId)
+        {
+            return await _context.UserProjects.Where(up => up.ProjectId == projectId && up.Role == CoreConstants.LeaderRole).Select(up => up.UserId).FirstOrDefaultAsync();
+        }
+        else
+        {
+            return Guid.Empty;
+        }
+    }
 }

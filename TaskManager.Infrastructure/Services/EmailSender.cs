@@ -10,6 +10,7 @@ using TaskManager.Core.Entities;
 using TaskManager.Core.Exceptions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
+using TaskManager.Core.ViewModel;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 namespace TaskManager.Infrastructure.Services;
@@ -76,6 +77,42 @@ public class EmailSender : IEmailSender
 
         return emailMessage;
     }
+
+    private async Task<IReadOnlyCollection<string>> GetEmailsByNotificationConfig(Guid issueId, NotificationEventViewModel notificationEventViewModel)
+    {
+        if (notificationEventViewModel is null)
+        {
+            return new List<string>();
+        }
+
+        var userIds = new List<Guid>();
+        if (notificationEventViewModel.AllWatcher)
+        {
+            var watcherIds = await _issueRepository.GetAllWatcherOfIssue(issueId) ?? throw new IssueNullException();
+            userIds.AddRange(watcherIds);
+        }
+        if (notificationEventViewModel.CurrentAssignee)
+        {
+            var currentAssigneeId = await _issueDetailRepository.GetCurrentAssignee(issueId) ?? throw new IssueDetailNullException();
+
+            userIds.Add(currentAssigneeId);
+        }
+        if (notificationEventViewModel.Reporter)
+        {
+            var reporterId = await _issueDetailRepository.GetCurrentAssignee(issueId) ?? throw new IssueDetailNullException();
+            userIds.Add(reporterId);
+        }
+        if (notificationEventViewModel.ProjectLead)
+        {
+            var projectLeadId = await _issueRepository.GetProjectLeadIdOfIssue(issueId);
+            userIds.Add(projectLeadId);
+        }
+
+        userIds = userIds.Distinct().ToList();
+        var emails = await _userManager.Users.Where(u => userIds.Contains(u.Id)).Select(u => u.Email!).ToListAsync();
+
+        return emails;
+    }
     #endregion
 
     public async Task SendEmailAsync(EmailMessageDto message, TextFormat textFormat = TextFormat.Text)
@@ -85,19 +122,10 @@ public class EmailSender : IEmailSender
         await SendAsync(mailMessage);
     }
 
-    public async Task SendEmailWhenUpdateIssue(Guid issueId, string subjectOfEmail, Guid from, BuidEmailTemplateBaseDto buidEmailTemplateBase)
+    public async Task SendEmailWhenUpdateIssue(Guid issueId, string subjectOfEmail, Guid from, BuidEmailTemplateBaseDto buidEmailTemplateBase, NotificationEventViewModel notificationEventViewModel)
     {
-        var userIds = new List<Guid>();
-        var watcherIds = await _issueRepository.GetAllWatcherOfIssue(issueId) ?? throw new IssueNullException();
-        var currentAssigneeAndReporterId = await _issueDetailRepository.GetCurrentAssigneeAndReporter(issueId) ?? throw new IssueDetailNullException();
-        userIds.AddRange(watcherIds);
-        userIds.Add(currentAssigneeAndReporterId.Reporter);
-        if (currentAssigneeAndReporterId.CurrentAssigness is Guid currentAssigness)
-        {
-            userIds.Add(currentAssigness);
-        }
-        userIds = userIds.Distinct().ToList();
-        var emails = await _userManager.Users.Where(u => userIds.Contains(u.Id)).Select(u => u.Email!).ToListAsync();
+        var emails = await GetEmailsByNotificationConfig(issueId, notificationEventViewModel);
+
         if (emails.Any())
         {
             var senderName = await _userManager.Users.Where(u => u.Id == from).Select(u => u.Name).FirstOrDefaultAsync();
@@ -109,19 +137,10 @@ public class EmailSender : IEmailSender
         }
     }
 
-    public async Task SendEmailWhenCreatedIssue(Guid issueId, string subjectOfEmail, Guid from, BuidEmailTemplateBaseDto buidEmailTemplateBase)
+    public async Task SendEmailWhenCreatedIssue(Guid issueId, string subjectOfEmail, Guid from, BuidEmailTemplateBaseDto buidEmailTemplateBase, NotificationEventViewModel notificationEventViewModel)
     {
-        var userIds = new List<Guid>();
-        var watcherIds = await _issueRepository.GetAllWatcherOfIssue(issueId) ?? throw new IssueNullException();
-        var currentAssigneeAndReporterId = await _issueDetailRepository.GetCurrentAssigneeAndReporter(issueId) ?? throw new IssueDetailNullException();
-        userIds.AddRange(watcherIds);
-        userIds.Add(currentAssigneeAndReporterId.Reporter);
-        if (currentAssigneeAndReporterId.CurrentAssigness is Guid currentAssigness)
-        {
-            userIds.Add(currentAssigness);
-        }
-        userIds = userIds.Distinct().ToList();
-        var emails = await _userManager.Users.Where(u => userIds.Contains(u.Id)).Select(u => u.Email!).ToListAsync();
+        var emails = await GetEmailsByNotificationConfig(issueId, notificationEventViewModel);
+
         if (emails.Any())
         {
             var senderName = await _userManager.Users.Where(u => u.Id == from).Select(u => u.Name).FirstOrDefaultAsync();

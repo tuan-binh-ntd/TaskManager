@@ -18,6 +18,7 @@ public class CommentService : ICommentService
     private readonly IEmailSender _emailSender;
     private readonly UserManager<AppUser> _userManager;
     private readonly IIssueRepository _issueRepository;
+    private readonly INotificationRepository _notificationRepository;
     private readonly IMapper _mapper;
 
     public CommentService(
@@ -25,6 +26,7 @@ public class CommentService : ICommentService
         IEmailSender emailSender,
         UserManager<AppUser> userManager,
         IIssueRepository issueRepository,
+        INotificationRepository notificationRepository,
         IMapper mapper
         )
     {
@@ -32,6 +34,7 @@ public class CommentService : ICommentService
         _emailSender = emailSender;
         _userManager = userManager;
         _issueRepository = issueRepository;
+        _notificationRepository = notificationRepository;
         _mapper = mapper;
     }
 
@@ -43,6 +46,9 @@ public class CommentService : ICommentService
         await _commentRepository.UnitOfWork.SaveChangesAsync();
 
         var issue = await _issueRepository.Get(issueId);
+        var projectId = await _issueRepository.GetProjectIdOfIssue(issue.Id);
+        var notificationConfig = await _notificationRepository.GetNotificationIssueEventByProjectId(projectId);
+        var someoneMadeCommentEvent = notificationConfig.Where(n => n.EventName == CoreConstants.SomeoneMadeACommentName).FirstOrDefault();
 
         var senderName = await _userManager.Users.Where(u => u.Id == createCommentDto.CreatorUserId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
         var projectName = await _issueRepository.GetProjectNameOfIssue(issueId);
@@ -60,8 +66,10 @@ public class CommentService : ICommentService
             IssueName = issue.Name,
             EmailContent = emailContent,
         };
-
-        await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: createCommentDto.CreatorUserId, buidEmailTemplateBaseDto);
+        if (someoneMadeCommentEvent is not null)
+        {
+            await _emailSender.SendEmailWhenUpdateIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: createCommentDto.CreatorUserId, buidEmailTemplateBaseDto, someoneMadeCommentEvent);
+        }
         return comment.Adapt<CommentViewModel>();
     }
 
@@ -72,6 +80,9 @@ public class CommentService : ICommentService
         await _commentRepository.UnitOfWork.SaveChangesAsync();
 
         var issue = await _issueRepository.Get(issueId);
+        var projectId = await _issueRepository.GetProjectIdOfIssue(issue.Id);
+        var notificationConfig = await _notificationRepository.GetNotificationIssueEventByProjectId(projectId);
+        var commentDeletedEvent = notificationConfig.Where(n => n.EventName == CoreConstants.CommentDeletedName).FirstOrDefault();
 
         var senderName = await _userManager.Users.Where(u => u.Id == userId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
         var projectName = await _issueRepository.GetProjectNameOfIssue(issueId);
@@ -89,8 +100,10 @@ public class CommentService : ICommentService
             IssueName = issue.Name,
             EmailContent = emailContent,
         };
-
-        await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: userId, buidEmailTemplateBaseDto);
+        if (commentDeletedEvent is not null)
+        {
+            await _emailSender.SendEmailWhenUpdateIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: userId, buidEmailTemplateBaseDto, commentDeletedEvent);
+        }
 
         return id;
     }
@@ -101,10 +114,15 @@ public class CommentService : ICommentService
         return comments.Adapt<IReadOnlyCollection<CommentViewModel>>();
     }
 
-    public async Task<CommentViewModel> UpdateComment(Guid id, UpdateCommentDto updateCommentDto)
+    public async Task<CommentViewModel> UpdateComment(Guid id, UpdateCommentDto updateCommentDto, Guid issueId)
     {
+        var projectId = await _issueRepository.GetProjectIdOfIssue(issueId);
+        var notificationConfig = await _notificationRepository.GetNotificationIssueEventByProjectId(projectId);
+        var commentEditedEvent = notificationConfig.Where(n => n.EventName == CoreConstants.CommentEditedName).FirstOrDefault();
+
         var comment = await _commentRepository.GetById(id) ?? throw new CommentNullException();
         comment.Content = updateCommentDto.Content;
+        comment.IsEdited = true;
         _commentRepository.Update(comment);
         await _commentRepository.UnitOfWork.SaveChangesAsync();
         return comment.Adapt<CommentViewModel>();

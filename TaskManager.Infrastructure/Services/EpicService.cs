@@ -28,6 +28,8 @@ public class EpicService : IEpicService
     private readonly IEmailSender _emailSender;
     private readonly IVersionRepository _versionRepository;
     private readonly ILabelRepository _labelRepository;
+    private readonly INotificationRepository _notificationRepository;
+    private readonly IProjectRepository _projectRepository;
     private readonly IMapper _mapper;
 
     public EpicService(
@@ -45,6 +47,8 @@ public class EpicService : IEpicService
         IEmailSender emailSender,
         IVersionRepository versionRepository,
         ILabelRepository labelRepository,
+        INotificationRepository notificationRepository,
+        IProjectRepository projectRepository,
         IMapper mapper
         )
     {
@@ -62,6 +66,8 @@ public class EpicService : IEpicService
         _emailSender = emailSender;
         _versionRepository = versionRepository;
         _labelRepository = labelRepository;
+        _notificationRepository = notificationRepository;
+        _projectRepository = projectRepository;
         _mapper = mapper;
     }
 
@@ -265,11 +271,18 @@ public class EpicService : IEpicService
     {
         var senderName = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
         var projectName = await _issueRepository.GetProjectNameOfIssue(issue.Id);
+        var projectId = await _issueRepository.GetProjectIdOfIssue(issue.Id);
+        var notificationConfig = await _notificationRepository.GetNotificationIssueEventByProjectId(projectId);
+
+        var issueEditedEvent = notificationConfig.Where(n => n.EventName == CoreConstants.IssueEditedName).FirstOrDefault();
+        var someoneAssignedEvent = notificationConfig.Where(n => n.EventName == CoreConstants.SomeoneAssignedToAIssueName).FirstOrDefault();
+        var issueDeletedEvent = notificationConfig.Where(n => n.EventName == CoreConstants.IssueDeletedName).FirstOrDefault();
+        var issueMovedEvent = notificationConfig.Where(n => n.EventName == CoreConstants.IssueMovedName).FirstOrDefault();
 
         var issueHistories = new List<IssueHistory>();
         if (!string.IsNullOrWhiteSpace(updateIssueDto.Name))
         {
-            await ChangeNameIssue(issue, updateIssueDto, issueHistories, senderName, projectName);
+            await ChangeNameIssue(issue, updateIssueDto, issueHistories, senderName, projectName, issueEditedEvent);
         }
         else if (!string.IsNullOrWhiteSpace(updateIssueDto.Description))
         {
@@ -277,15 +290,15 @@ public class EpicService : IEpicService
         }
         else if (updateIssueDto.ParentId is Guid parentId)
         {
-            await ChangeParentIssue(issue, updateIssueDto, issueHistories, parentId, senderName, projectName);
+            await ChangeParentIssue(issue, updateIssueDto, issueHistories, parentId, senderName, projectName, issueEditedEvent);
         }
         else if (updateIssueDto.StatusId is Guid newStatusId)
         {
-            await ChangeStatusIssue(issue, updateIssueDto, issueHistories, newStatusId, senderName, projectName);
+            await ChangeStatusIssue(issue, updateIssueDto, issueHistories, newStatusId, senderName, projectName, issueMovedEvent);
         }
         else if (updateIssueDto.PriorityId is Guid newPriorityId)
         {
-            await ChangePriorityIssue(issue, updateIssueDto, issueHistories, newPriorityId, senderName, projectName);
+            await ChangePriorityIssue(issue, updateIssueDto, issueHistories, newPriorityId, senderName, projectName, issueEditedEvent);
         }
         else if (
             updateIssueDto.StoryPointEstimate is not 0 && issueDetail.StoryPointEstimate is not 0
@@ -293,30 +306,30 @@ public class EpicService : IEpicService
             || updateIssueDto.StoryPointEstimate is 0 && issueDetail.StoryPointEstimate is not 0
             )
         {
-            await ChangeSPEIssue(issue, issueDetail, updateIssueDto, issueHistories, senderName, projectName);
+            await ChangeSPEIssue(issue, issueDetail, updateIssueDto, issueHistories, senderName, projectName, issueEditedEvent);
         }
         else if (updateIssueDto.ReporterId is Guid reporterId)
         {
-            await ChangeReporterIssue(issue, issueDetail, updateIssueDto, issueHistories, reporterId, senderName, projectName);
+            await ChangeReporterIssue(issue, issueDetail, updateIssueDto, issueHistories, reporterId, senderName, projectName, issueEditedEvent);
         }
         else if (updateIssueDto.StartDate != DateTime.MinValue)
         {
-            await ChangeStartDateIssue(issue, updateIssueDto, issueHistories, senderName, projectName);
+            await ChangeStartDateIssue(issue, updateIssueDto, issueHistories, senderName, projectName, issueEditedEvent);
         }
         else if (updateIssueDto.DueDate != DateTime.MinValue)
         {
-            await ChangeDueDateIssue(issue, updateIssueDto, issueHistories, senderName, projectName);
+            await ChangeDueDateIssue(issue, updateIssueDto, issueHistories, senderName, projectName, issueEditedEvent);
         }
         else if (updateIssueDto.AssigneeId != Guid.Empty)
         {
-            await ChangeAssigneeIssue(issue, issueDetail, updateIssueDto, issueHistories, senderName, projectName);
+            await ChangeAssigneeIssue(issue, issueDetail, updateIssueDto, issueHistories, senderName, projectName, someoneAssignedEvent);
         }
 
         _issueHistoryRepository.AddRange(issueHistories);
         await _issueHistoryRepository.UnitOfWork.SaveChangesAsync();
     }
 
-    private async Task ChangeNameIssue(Issue issue, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName)
+    private async Task ChangeNameIssue(Issue issue, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel)
     {
         var updatedTheSumaryHis = new IssueHistory()
         {
@@ -346,7 +359,10 @@ public class EpicService : IEpicService
             EmailContent = emailContent,
         };
 
-        await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+        if (notificationEventViewModel is not null)
+        {
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto, notificationEventViewModel);
+        }
 
         issue.Name = updateIssueDto.Name ?? string.Empty;
     }
@@ -365,7 +381,7 @@ public class EpicService : IEpicService
         issue.Description = updateIssueDto.Description;
     }
 
-    private async Task ChangeParentIssue(Issue issue, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, Guid parentId, string senderName, string projectName)
+    private async Task ChangeParentIssue(Issue issue, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, Guid parentId, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel)
     {
         string? oldParentName = issue.ParentId is not null ? await _issueRepository.GetNameOfIssue((Guid)issue.ParentId) : IssueConstants.None_IssueHistoryContent;
         string? newParentName = await _issueRepository.GetNameOfIssue(parentId);
@@ -396,12 +412,15 @@ public class EpicService : IEpicService
             EmailContent = emailContent,
         };
 
-        await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+        if (notificationEventViewModel is not null)
+        {
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto, notificationEventViewModel);
+        }
 
         issue.ParentId = parentId;
     }
 
-    private async Task ChangeAssigneeIssue(Issue issue, IssueDetail issueDetail, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName)
+    private async Task ChangeAssigneeIssue(Issue issue, IssueDetail issueDetail, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel)
     {
         var changedTheAssigneeHis = new IssueHistory()
         {
@@ -442,7 +461,10 @@ public class EpicService : IEpicService
 
             buidEmailTemplateBaseDto.EmailContent = emailContent;
 
-            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+            if (notificationEventViewModel is not null)
+            {
+                await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto, notificationEventViewModel);
+            }
 
             issueDetail.AssigneeId = newAssigneeId;
         }
@@ -467,7 +489,10 @@ public class EpicService : IEpicService
             buidEmailTemplateBaseDto.EmailContent = emailContent;
 
 
-            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+            if (notificationEventViewModel is not null)
+            {
+                await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto, notificationEventViewModel);
+            }
 
             issueDetail.AssigneeId = newAssigneeId1;
         }
@@ -490,13 +515,16 @@ public class EpicService : IEpicService
             string emailContent = EmailContentConstants.ChangeAssigneeIssueContent(changeAssigneeIssueEmailContentDto);
             buidEmailTemplateBaseDto.EmailContent = emailContent;
 
-            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+            if (notificationEventViewModel is not null)
+            {
+                await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto, notificationEventViewModel);
+            }
 
             issueDetail.AssigneeId = null;
         }
     }
 
-    private async Task ChangeStatusIssue(Issue issue, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, Guid newStatusId, string senderName, string projectName)
+    private async Task ChangeStatusIssue(Issue issue, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, Guid newStatusId, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel)
     {
         if (issue.StatusId is Guid oldStatusId)
         {
@@ -529,13 +557,16 @@ public class EpicService : IEpicService
                 EmailContent = emailContent,
             };
 
-            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+            if (notificationEventViewModel is not null)
+            {
+                await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto, notificationEventViewModel);
+            }
         }
 
         issue.StatusId = newStatusId;
     }
 
-    private async Task ChangePriorityIssue(Issue issue, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, Guid newPriorityId, string senderName, string projectName)
+    private async Task ChangePriorityIssue(Issue issue, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, Guid newPriorityId, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel)
     {
         if (issue.PriorityId is Guid oldPriorityId)
         {
@@ -569,7 +600,10 @@ public class EpicService : IEpicService
                 EmailContent = emailContent,
             };
 
-            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+            if (notificationEventViewModel is not null)
+            {
+                await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto, notificationEventViewModel);
+            }
         }
         else
         {
@@ -602,13 +636,16 @@ public class EpicService : IEpicService
                 EmailContent = emailContent,
             };
 
-            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+            if (notificationEventViewModel is not null)
+            {
+                await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto, notificationEventViewModel);
+            }
         }
 
         issue.PriorityId = newPriorityId;
     }
 
-    private async Task ChangeSPEIssue(Issue issue, IssueDetail issueDetail, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName)
+    private async Task ChangeSPEIssue(Issue issue, IssueDetail issueDetail, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel)
     {
         var updatedTheSPEHis = new IssueHistory()
         {
@@ -637,12 +674,15 @@ public class EpicService : IEpicService
             EmailContent = emailContent,
         };
 
-        await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+        if (notificationEventViewModel is not null)
+        {
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto, notificationEventViewModel);
+        }
 
         issueDetail.StoryPointEstimate = updateIssueDto.StoryPointEstimate ?? 0;
     }
 
-    private async Task ChangeReporterIssue(Issue issue, IssueDetail issueDetail, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, Guid reporterId, string senderName, string projectName)
+    private async Task ChangeReporterIssue(Issue issue, IssueDetail issueDetail, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, Guid reporterId, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel)
     {
         var updatedTheReporterHis = new IssueHistory()
         {
@@ -679,12 +719,15 @@ public class EpicService : IEpicService
             EmailContent = emailContent,
         };
 
-        await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+        if (notificationEventViewModel is not null)
+        {
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto, notificationEventViewModel);
+        }
 
         issueDetail.ReporterId = reporterId;
     }
 
-    private async Task ChangeStartDateIssue(Issue issue, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName)
+    private async Task ChangeStartDateIssue(Issue issue, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel)
     {
         var updatedTheStartDateHis = new IssueHistory()
         {
@@ -736,12 +779,15 @@ public class EpicService : IEpicService
             EmailContent = emailContent,
         };
 
-        await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+        if (notificationEventViewModel is not null)
+        {
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto, notificationEventViewModel);
+        }
 
         issueHistories.Add(updatedTheStartDateHis);
     }
 
-    private async Task ChangeDueDateIssue(Issue issue, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName)
+    private async Task ChangeDueDateIssue(Issue issue, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel)
     {
         var updatedTheDueDateHis = new IssueHistory()
         {
@@ -793,7 +839,10 @@ public class EpicService : IEpicService
             EmailContent = emailContent,
         };
 
-        await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto);
+        if (notificationEventViewModel is not null)
+        {
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto, notificationEventViewModel);
+        }
 
         issueHistories.Add(updatedTheDueDateHis);
 
@@ -877,6 +926,7 @@ public class EpicService : IEpicService
         int issueIndex = projectConfiguration.IssueCode + 1;
         var createTransition = _transitionRepository.GetCreateTransitionByProjectId(createEpicDto.ProjectId);
         var creatorUser = await _userManager.FindByIdAsync(createEpicDto.CreatorUserId.ToString());
+        var notificationConfig = await _notificationRepository.GetNotificationIssueEventByProjectId(createEpicDto.ProjectId);
 
         var issueType = await _issueTypeRepository.GetEpic(createEpicDto.ProjectId);
 
@@ -929,6 +979,34 @@ public class EpicService : IEpicService
         projectConfiguration.IssueCode = issueIndex;
         _projectConfigurationRepository.Update(projectConfiguration);
         await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
+
+        var issueCreatedEvent = notificationConfig.Where(n => n.EventName == CoreConstants.IssueCreatedName).FirstOrDefault();
+
+        if (issueCreatedEvent is not null)
+        {
+            var reporterName = await _userManager.Users.Where(u => u.Id == createEpicDto.CreatorUserId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
+
+            var createdIssueEmailContentDto = new CreatedIssueEmailContentDto(reporterName, issue.CreationTime)
+            {
+                IssueTypeName = await _issueTypeRepository.GetNameOfIssueType(epicViewModel.IssueTypeId) ?? IssueConstants.None_IssueHistoryContent,
+                AssigneeName = await _userManager.Users.Where(u => u.Id == issueDetail.AssigneeId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.Unassigned_IssueHistoryContent,
+                PriorityName = issue.PriorityId is not null ? await _priorityRepository.GetNameOfPriority((Guid)issue.PriorityId) ?? IssueConstants.None_IssueHistoryContent : IssueConstants.None_IssueHistoryContent,
+            };
+
+            string emailContent = EmailContentConstants.CreatedIssueContent(createdIssueEmailContentDto);
+
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
+            {
+                SenderName = await _userManager.Users.Where(u => u.Id == createEpicDto.CreatorUserId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent,
+                ActionName = EmailConstants.CreatedAnIssue,
+                ProjectName = await _projectRepository.GetProjectName(createEpicDto.ProjectId),
+                IssueCode = issue.Code,
+                IssueName = issue.Name,
+                EmailContent = emailContent,
+            };
+
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: createEpicDto.CreatorUserId, buidEmailTemplateBaseDto, issueCreatedEvent);
+        }
 
         return epicViewModel;
     }

@@ -27,6 +27,7 @@ public class AttachmentService : IAttachmentService
     private readonly IIssueRepository _issueRepository;
     private readonly IEmailSender _emailSender;
     private readonly UserManager<AppUser> _userManager;
+    private readonly INotificationRepository _notificationRepository;
     private readonly BlobServiceClient _blobClient;
     private readonly BlobContainerClient _containerClient;
 
@@ -37,7 +38,8 @@ public class AttachmentService : IAttachmentService
         IIssueHistoryRepository issueHistoryRepository,
         IIssueRepository issueRepository,
         IEmailSender emailSender,
-        UserManager<AppUser> userManager
+        UserManager<AppUser> userManager,
+        INotificationRepository notificationRepository
         )
     {
         _fileShareSettings = optionsMonitor.CurrentValue;
@@ -47,6 +49,7 @@ public class AttachmentService : IAttachmentService
         _issueRepository = issueRepository;
         _emailSender = emailSender;
         _userManager = userManager;
+        _notificationRepository = notificationRepository;
         _blobClient = new BlobServiceClient(_blobContainerSettings.ConnectionStrings);
         _containerClient = _blobClient.GetBlobContainerClient("attachmentofissue");
     }
@@ -132,6 +135,9 @@ public class AttachmentService : IAttachmentService
         var attachments = new List<Attachment>();
         var issueHistories = new List<IssueHistory>();
         var issue = await _issueRepository.Get(issueId);
+        var projectId = await _issueRepository.GetProjectIdOfIssue(issue.Id);
+        var notificationConfig = await _notificationRepository.GetNotificationIssueEventByProjectId(projectId);
+        var someoneAddedAttachmentEvent = notificationConfig.Where(n => n.EventName == CoreConstants.SomeoneMadeAAttachmentName).FirstOrDefault();
 
         foreach (var file in files)
         {
@@ -187,8 +193,10 @@ public class AttachmentService : IAttachmentService
                 IssueName = issue.Name,
                 EmailContent = emailContent,
             };
-
-            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: userId, buidEmailTemplateBaseDto);
+            if (someoneAddedAttachmentEvent is not null)
+            {
+                await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: userId, buidEmailTemplateBaseDto, someoneAddedAttachmentEvent);
+            }
         }
 
         return attachments.Adapt<IReadOnlyCollection<AttachmentViewModel>>();
@@ -198,6 +206,10 @@ public class AttachmentService : IAttachmentService
     {
         var attachment = await _attachmentRepository.GetById(id) ?? throw new AttachmentNullException();
         var issue = await _issueRepository.Get(issueId);
+        var projectId = await _issueRepository.GetProjectIdOfIssue(issue.Id);
+        var notificationConfig = await _notificationRepository.GetNotificationIssueEventByProjectId(projectId);
+        var attachmentDeletedEvent = notificationConfig.Where(n => n.EventName == CoreConstants.AttachmentDeletedName).FirstOrDefault();
+
         var issueHistory = new IssueHistory()
         {
             Name = IssueConstants.Deleted_Attachment_IssueHistoryName,
@@ -230,7 +242,10 @@ public class AttachmentService : IAttachmentService
             EmailContent = emailContent,
         };
 
-        await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: userId, buidEmailTemplateBaseDto);
+        if (attachmentDeletedEvent is not null)
+        {
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: userId, buidEmailTemplateBaseDto, attachmentDeletedEvent);
+        }
 
         if (rowAffected > 0)
         {
