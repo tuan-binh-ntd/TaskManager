@@ -1,12 +1,10 @@
-﻿using Azure;
-using Azure.Storage.Files.Shares;
+﻿using Azure.Storage.Files.Shares;
 using Azure.Storage.Files.Shares.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using System.Net.Sockets;
-using TaskManager.Core.DTOs;
 using TaskManager.Core.Interfaces.Services;
 
 namespace TaskManager.Infrastructure.Services;
@@ -24,6 +22,7 @@ public class UploadFileService : IUploadFileService
         _sftpServerSettings = sftpSettingsOption.CurrentValue;
         _fileShareSettings = fileShareSettings.CurrentValue;
     }
+
     public bool UploadFile(IFormFile file)
     {
         using SftpClient client = new(_sftpServerSettings.Localhost, _sftpServerSettings.Port, _sftpServerSettings.UserName, _sftpServerSettings.Password);
@@ -60,40 +59,6 @@ public class UploadFileService : IUploadFileService
         {
             Console.WriteLine($"Sftp Error: {e.Message}");
             return false;
-        }
-    }
-
-    public async Task FileUploadAsync(FileDetails fileDetails)
-    {
-        // Get the configurations and create share object
-        ShareClient share = new(_fileShareSettings.ConnectionStrings, _fileShareSettings.FileShareName);
-
-        // Create the share if it doesn't already exist
-        await share.CreateIfNotExistsAsync();
-
-        // Check the file share is present or not
-        if (await share.ExistsAsync())
-        {
-            // Get a reference to the sample directory
-            ShareDirectoryClient directory = share.GetDirectoryClient("FileShareDemoFiles");
-
-            // Create the directory if it doesn't already exist
-            await directory.CreateIfNotExistsAsync();
-
-            // Ensure that the directory exists
-            if (await directory.ExistsAsync())
-            {
-                // Get a reference to a file and upload it
-                ShareFileClient file = directory.GetFileClient(fileDetails.FileDetail!.FileName);
-
-                using Stream stream = fileDetails.FileDetail.OpenReadStream();
-                file.Create(stream.Length);
-                file.UploadRange(new HttpRange(0, stream.Length), stream);
-            }
-        }
-        else
-        {
-            Console.WriteLine($"File is not upload successfully");
         }
     }
 

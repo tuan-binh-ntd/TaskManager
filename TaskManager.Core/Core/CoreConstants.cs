@@ -57,23 +57,14 @@ public static class CoreConstants
     public const string HighColor = "#ff8d71";
     public const string HighestColor = "#fe6d4b";
     // Issue Event
-    public const string IssueCreatedName = "Issue Created (System)";
-    public const string IssueUpdatedName = "Issue Updated (System)";
-    public const string IssueAssignedName = "Issue Assigned (System)";
-    public const string IssueResolvedName = "Issue Resolved (System)";
-    public const string IssueClosedName = "Issue Closed (System)";
-    public const string IssueCommentedName = "Issue Commented (System)";
-    public const string IssueCommentEditedName = "Issue Comment Edited (System)";
-    public const string IssueCommentDeletedName = "Issue Comment Deleted (System)";
-    public const string IssueReopenedName = "Issue Reopened (System)";
-    public const string IssueDeletedName = "Issue Deleted (System)";
-    public const string IssueMovedName = "Issue Moved (System)";
-    public const string WorkLoggedOnIssueName = "Work Logged On Issue (System)";
-    public const string WorkStartedOnIssueName = "Work Started On Issue (System)";
-    public const string WorkStoppedOnIssueName = "Work Stopped On Issue (System)";
-    public const string IssueWorklogUpdatedName = "Issue Worklog Updated (System)";
-    public const string IssueWorklogDeletedName = "Issue Worklog Deleted (System)";
-    public const string GenericEventName = "Generic Event (System)";
+    public const string IssueCreatedName = "An issue ís created";
+    public const string IssueEditedName = "An issue ís edited";
+    public const string SomeoneAssignedToAIssueName = "Someone assigned to an issue";
+    public const string IssueDeletedName = "An issue is deleted";
+    public const string IssueMovedName = "An issue is moved";
+    public const string SomeoneMadeACommentName = "Someone made a comment";
+    public const string CommentEditedName = "A comment is edited";
+    public const string CommentDeletedName = "A comment is deleted";
     // User Filter
     public const string EditorType = "Editor";
     public const string ViewerType = "Viewer";

@@ -618,7 +618,7 @@ public class ProjectService : IProjectService
                 IssueEventId = item.Id,
                 AllWatcher = true,
                 CurrentAssignee = true,
-                ProjectLead = true,
+                ProjectLead = false,
                 Reporter = true,
             };
             notification.NotificationIssueEvents!.Add(notificationIssueEvent);
