@@ -375,4 +375,35 @@ public class FilterService : IFilterService
         }
         return new List<IssueViewModel>();
     }
+
+    public async Task<IReadOnlyCollection<IssueViewModel>> GetIssuesByConfiguration(GetIssueByConfigurationDto getIssueByConfigurationDto)
+    {
+        FilterConfiguration filterConfiguration = new()
+        {
+            Project = getIssueByConfigurationDto.Project,
+            Type = getIssueByConfigurationDto.Type,
+            Status = getIssueByConfigurationDto.Status,
+            Assginee = getIssueByConfigurationDto.Assginee,
+            Created = getIssueByConfigurationDto.Created,
+            DueDate = getIssueByConfigurationDto.DueDate,
+            FixVersions = getIssueByConfigurationDto.FixVersions,
+            Labels = getIssueByConfigurationDto.Labels,
+            Priority = getIssueByConfigurationDto.Priority,
+            Reporter = getIssueByConfigurationDto.Reporter,
+            Resolution = getIssueByConfigurationDto.Resolution,
+            Resolved = getIssueByConfigurationDto.Resolved,
+            Sprints = getIssueByConfigurationDto.Sprints,
+            StatusCategory = getIssueByConfigurationDto.StatusCategory,
+            Updated = getIssueByConfigurationDto.Updated,
+        };
+        string query = filterConfiguration.QueryAfterBuild();
+        _logger.LogInformation(query);
+        var issueIds = await _connectionFactory.QueryAsync<Guid>(query);
+        if (issueIds.Any())
+        {
+            var issues = await _issueRepository.GetByIds(issueIds.ToList());
+            return await ToIssueViewModels(issues);
+        }
+        return new List<IssueViewModel>();
+    }
 }

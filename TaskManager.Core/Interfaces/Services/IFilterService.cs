@@ -21,4 +21,5 @@ public interface IFilterService
     /// <param name="id">Id of filter</param>
     /// <returns>List of issues</returns>
     Task<IReadOnlyCollection<IssueViewModel>> GetIssueByFilterConfiguration(Guid id);
+    Task<IReadOnlyCollection<IssueViewModel>> GetIssuesByConfiguration(GetIssueByConfigurationDto getIssueByConfigurationDto);
 }

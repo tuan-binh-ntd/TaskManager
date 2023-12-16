@@ -504,3 +504,22 @@ public class FilterConfiguration
         + UpdatedCriteriaQuery()
         ;
 }
+
+public class GetIssueByConfigurationDto
+{
+    public ProjectCriteria? Project { get; set; }
+    public TypeCriteria? Type { get; set; }
+    public StatusCriteria? Status { get; set; }
+    public AssigneeCriteria? Assginee { get; set; }
+    public CreatedCriteria? Created { get; set; }
+    public DueDateCriteria? DueDate { get; set; }
+    public FixVersionsCriteria? FixVersions { get; set; }
+    public LabelsCriteria? Labels { get; set; }
+    public PriorityCriteria? Priority { get; set; }
+    public ReporterCriteria? Reporter { get; set; }
+    public ResolutionCriteria? Resolution { get; set; }
+    public ResolvedCriteria? Resolved { get; set; }
+    public SprintCriteria? Sprints { get; set; }
+    public StatusCategoryCriteria? StatusCategory { get; set; }
+    public UpdatedCriteria? Updated { get; set; }
+}

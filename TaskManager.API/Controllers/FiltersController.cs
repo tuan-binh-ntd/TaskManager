@@ -41,4 +41,12 @@ public class FiltersController : BaseController
         var res = await _filterService.DeleteFilter(id);
         return CustomResult(res, HttpStatusCode.Created);
     }
+
+    [HttpPost("get-issues")]
+    [ProducesResponseType(typeof(IReadOnlyCollection<IssueViewModel>), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> Get([FromBody] GetIssueByConfigurationDto getIssueByConfigurationDto)
+    {
+        var res = await _filterService.GetIssuesByConfiguration(getIssueByConfigurationDto);
+        return CustomResult(res, HttpStatusCode.OK);
+    }
 }

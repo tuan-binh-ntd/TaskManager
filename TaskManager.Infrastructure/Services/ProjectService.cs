@@ -746,10 +746,9 @@ public class ProjectService : IProjectService
         var projectConfiguration = _projectConfigurationRepository.GetByProjectId(projectId);
         projectConfiguration.DefaultAssigneeId = updateProjectDto.DefaultAssigneeId;
         projectConfiguration.DefaultPriorityId = updateProjectDto.DefaultPriorityId;
-        _ = string.IsNullOrWhiteSpace(updateProjectDto.Code) ? null : projectConfiguration.Code = updateProjectDto.Code;
-        _projectConfigurationRepository.Update(projectConfiguration);
-        await _projectConfigurationRepository.UnitOfWork.SaveChangesAsync();
+        projectConfiguration.Code = string.IsNullOrWhiteSpace(updateProjectDto.Code) ? projectConfiguration.Code : updateProjectDto.Code;
 
+        _projectConfigurationRepository.Update(projectConfiguration);
         _projectRepository.Update(project);
         await _projectRepository.UnitOfWork.SaveChangesAsync();
         return await ToProjectViewModel(project);
