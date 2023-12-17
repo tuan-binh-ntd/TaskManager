@@ -59,17 +59,28 @@ public class FilterConfiguration
 
     private string ProjectCriteriaQuery()
     {
-        if (Project?.SprintIds is not null && Project.SprintIds.Any() && Project?.BacklogIds is not null && Project.BacklogIds.Any())
-        {
-            return @$"
-                AND
-                    SprintId IN ({string.Join(",", Project.SprintIds.Select(x => $"'{x}'"))})
-                OR
-                    BacklogId IN ({string.Join(",", Project.BacklogIds.Select(x => $"'{x}'"))})
-            ";
-        }
+        string query = "AND";
+        List<string> querys = new();
 
-        return string.Empty;
+        if (Project?.SprintIds is not null && Project.SprintIds.Any())
+        {
+            string sprintQuery = @$"
+                SprintId IN ({string.Join(",", Project.SprintIds.Select(x => $"'{x}'"))})
+            ";
+            querys.Add(sprintQuery);
+        }
+        if (Project?.BacklogIds is not null && Project.BacklogIds.Any())
+        {
+            string backlogQuery = $@"
+                BacklogId IN ({string.Join(",", Project.BacklogIds.Select(x => $"'{x}'"))})
+            ";
+            querys.Add(backlogQuery);
+        }
+        if (querys.Any())
+        {
+            query = $"{query} {string.Join(" OR ", querys.Select(x => x))}";
+        }
+        return query.Equals("AND") ? string.Empty : query;
     }
 
     private string IssueTypeCriteriaQuery()
