@@ -88,18 +88,21 @@ public class EmailSender : IEmailSender
         var userIds = new List<Guid>();
         if (notificationEventViewModel.AllWatcher)
         {
-            var watcherIds = await _issueRepository.GetAllWatcherOfIssue(issueId) ?? throw new IssueNullException();
-            userIds.AddRange(watcherIds);
+            var watcherIds = await _issueRepository.GetAllWatcherOfIssue(issueId);
+            userIds.AddRange(watcherIds!);
         }
         if (notificationEventViewModel.CurrentAssignee)
         {
-            var currentAssigneeId = await _issueDetailRepository.GetCurrentAssignee(issueId) ?? throw new IssueDetailNullException();
+            var currentAssigneeId = await _issueDetailRepository.GetCurrentAssignee(issueId);
+            if (currentAssigneeId is Guid id)
+            {
+                userIds.Add(id);
+            }
 
-            userIds.Add(currentAssigneeId);
         }
         if (notificationEventViewModel.Reporter)
         {
-            var reporterId = await _issueDetailRepository.GetCurrentAssignee(issueId) ?? throw new IssueDetailNullException();
+            var reporterId = await _issueDetailRepository.GetReporter(issueId);
             userIds.Add(reporterId);
         }
         if (notificationEventViewModel.ProjectLead)
