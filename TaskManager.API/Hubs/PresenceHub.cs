@@ -22,8 +22,6 @@ public class PresenceHub : Hub
 
     public override async Task OnConnectedAsync()
     {
-        var httpContext = Context.GetHttpContext();
-
         var isOnline = await _tracker.UserConnected(Context!.User!.Identity!.Name!, Context.ConnectionId);
 
         if (isOnline)
