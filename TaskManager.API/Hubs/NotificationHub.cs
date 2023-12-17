@@ -4,4 +4,5 @@ namespace TaskManager.API.Hubs;
 
 public class NotificationHub : Hub
 {
+
 }

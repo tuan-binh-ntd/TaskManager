@@ -93,6 +93,7 @@ public class IssueTypeRepository : IIssueTypeRepository
                 Description = e.Description,
                 Icon = e.Icon,
                 Level = e.Level,
+                IsMain = e.IsMain,
             });
 
         return await query.Pagination(paginationInput);

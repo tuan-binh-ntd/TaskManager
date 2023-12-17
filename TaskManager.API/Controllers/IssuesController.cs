@@ -1,6 +1,8 @@
 ﻿using CoreApiResponse;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Net;
+using TaskManager.API.Hubs;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
@@ -11,12 +13,15 @@ namespace TaskManager.API.Controllers;
 public class IssuesController : BaseController
 {
     private readonly IIssueService _issueService;
+    private readonly IHubContext<NotificationHub> _hubContext;
 
     public IssuesController(
-        IIssueService issueService
+        IIssueService issueService,
+        IHubContext<NotificationHub> hubContext
         )
     {
         _issueService = issueService;
+        _hubContext = hubContext;
     }
 
     [HttpPost("api/sprints/{sprintId}/[controller]")]
