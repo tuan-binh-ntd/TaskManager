@@ -13,15 +13,12 @@ namespace TaskManager.API.Controllers;
 public class IssuesController : BaseController
 {
     private readonly IIssueService _issueService;
-    private readonly IHubContext<NotificationHub> _hubContext;
 
     public IssuesController(
-        IIssueService issueService,
-        IHubContext<NotificationHub> hubContext
+        IIssueService issueService
         )
     {
         _issueService = issueService;
-        _hubContext = hubContext;
     }
 
     [HttpPost("api/sprints/{sprintId}/[controller]")]
