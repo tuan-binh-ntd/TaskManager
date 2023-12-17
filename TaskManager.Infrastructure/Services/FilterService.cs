@@ -396,6 +396,11 @@ public class FilterService : IFilterService
             StatusCategory = getIssueByConfigurationDto.StatusCategory,
             Updated = getIssueByConfigurationDto.Updated,
         };
+        if (getIssueByConfigurationDto.Project is not null && getIssueByConfigurationDto.Project.ProjectIds is not null && getIssueByConfigurationDto.Project.ProjectIds.Any())
+        {
+            filterConfiguration.Project!.BacklogIds = await _backlogRepository.GetBacklogIdsByProjectIds(getIssueByConfigurationDto.Project.ProjectIds);
+            filterConfiguration.Project.SprintIds = await _sprintRepository.GetSprintIdsByProjectIds(getIssueByConfigurationDto.Project.ProjectIds);
+        }
         string query = filterConfiguration.QueryAfterBuild();
         _logger.LogInformation(query);
         var issueIds = await _connectionFactory.QueryAsync<Guid>(query);
