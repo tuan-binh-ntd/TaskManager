@@ -10,7 +10,9 @@ public class NotificationHub : Hub
 {
     private readonly IUserNotificationService _userNotificationService;
 
-    public NotificationHub(IUserNotificationService userNotificationService)
+    public NotificationHub(
+        IUserNotificationService userNotificationService
+        )
     {
         _userNotificationService = userNotificationService;
     }

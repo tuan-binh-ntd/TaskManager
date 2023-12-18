@@ -270,7 +270,7 @@ public class EpicService : IEpicService
         return childIssueViewModel;
     }
 
-    private async Task DetachUpdateField(Issue issue, IssueDetail issueDetail, UpdateEpicDto updateIssueDto)
+    private async Task<(IReadOnlyCollection<Guid>, UserNotificationViewModel)> DetachUpdateField(Issue issue, IssueDetail issueDetail, UpdateEpicDto updateIssueDto)
     {
         var senderName = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
         var projectName = await _issueRepository.GetProjectNameOfIssue(issue.Id);
@@ -345,6 +345,9 @@ public class EpicService : IEpicService
         _userNotificationRepository.AddRange(userNotifications);
 
         await _issueHistoryRepository.UnitOfWork.SaveChangesAsync();
+
+        var userNotificationViewModel = await _userNotificationRepository.ToUserNotificationViewMode(userNotifications.Select(un => un.Id).FirstOrDefault());
+        return (userIds, userNotificationViewModel!);
     }
 
     private async Task ChangeNameIssue(Issue issue, UpdateEpicDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel)
@@ -965,7 +968,7 @@ public class EpicService : IEpicService
         if (notificationEventViewModel.CurrentAssignee)
         {
             var currentAssigneeId = await _issueDetailRepository.GetCurrentAssignee(issueId);
-            if (currentAssigneeId is Guid id)
+            if (currentAssigneeId is Guid id && id != Guid.Empty)
             {
                 userIds.Add(id);
             }
@@ -1002,7 +1005,7 @@ public class EpicService : IEpicService
         return await ToEpicViewModel(epic);
     }
 
-    public async Task<EpicViewModel> CreateEpic(CreateEpicDto createEpicDto)
+    public async Task<RealtimeNotificationViewModel> CreateEpic(CreateEpicDto createEpicDto)
     {
         var projectConfiguration = _projectConfigurationRepository.GetByProjectId(createEpicDto.ProjectId);
         int issueIndex = projectConfiguration.IssueCode + 1;
@@ -1090,7 +1093,25 @@ public class EpicService : IEpicService
             await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: createEpicDto.CreatorUserId, buidEmailTemplateBaseDto, issueCreatedEvent);
         }
 
-        return epicViewModel;
+        var userIds = await GetUserIdsByNotificationConfig(issue.Id, issueCreatedEvent);
+        var userNotifications = AddUserNotifications(
+            new List<IssueHistory>()
+            {
+                issueHis
+            },
+            issue.Id,
+            userIds);
+        _userNotificationRepository.AddRange(userNotifications);
+        await _userNotificationRepository.UnitOfWork.SaveChangesAsync();
+
+        var userNotificationViewModel = await _userNotificationRepository.ToUserNotificationViewMode(userNotifications.Select(un => un.Id).FirstOrDefault());
+
+        return new RealtimeNotificationViewModel()
+        {
+            UserIds = userIds,
+            Notification = userNotificationViewModel!,
+            Epic = await ToEpicViewModel(issue),
+        };
     }
 
     public async Task<GetIssuesByEpicIdViewModel> GetIssuesByEpicId(Guid epicId)
@@ -1100,17 +1121,22 @@ public class EpicService : IEpicService
         return await ToGetIssuesByEpicIdViewModel(epic, childIssues);
     }
 
-    public async Task<EpicViewModel> UpdateEpic(Guid id, UpdateEpicDto updateEpicDto)
+    public async Task<RealtimeNotificationViewModel> UpdateEpic(Guid id, UpdateEpicDto updateEpicDto)
     {
         var epic = await _issueRepository.Get(id) ?? throw new IssueNullException();
         var issueDetail = await _issueDetailRepository.GetById(id) ?? throw new IssueDetailNullException();
 
-        await DetachUpdateField(epic, issueDetail, updateEpicDto);
+        var (userIds, userNotificationViewModel) = await DetachUpdateField(epic, issueDetail, updateEpicDto);
         await AddVersionOrLabel(epic, updateEpicDto);
         _issueRepository.Update(epic);
         await _issueRepository.UnitOfWork.SaveChangesAsync();
         await _issueDetailRepository.UnitOfWork.SaveChangesAsync();
-        return await ToEpicViewModel(epic);
+        return new RealtimeNotificationViewModel()
+        {
+            UserIds = userIds,
+            Notification = userNotificationViewModel,
+            Epic = await ToEpicViewModel(epic),
+        };
     }
 
     public async Task<Guid> DeleteEpic(Guid id)

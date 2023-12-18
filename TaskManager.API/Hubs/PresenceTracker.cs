@@ -2,9 +2,9 @@
 
 public class PresenceTracker
 {
-    private static readonly Dictionary<string, List<string>> _onlineUsers = new();
+    private static readonly Dictionary<Guid, List<string>> _onlineUsers = new();
 
-    public Task<bool> UserConnected(string userId, string connectionId)
+    public Task<bool> UserConnected(Guid userId, string connectionId)
     {
         var isOnline = false;
         lock (_onlineUsers)
@@ -21,7 +21,7 @@ public class PresenceTracker
         }
         return Task.FromResult(isOnline);
     }
-    public Task<bool> UserDisconnected(string userId, string connectionId)
+    public Task<bool> UserDisconnected(Guid userId, string connectionId)
     {
         var isOffline = false;
         lock (_onlineUsers)
@@ -38,9 +38,9 @@ public class PresenceTracker
         return Task.FromResult(isOffline);
     }
 
-    public Task<string[]> GetOnlineUsers()
+    public Task<Guid[]> GetOnlineUsers()
     {
-        string[] onlineUsers;
+        Guid[] onlineUsers;
         lock (_onlineUsers)
         {
             onlineUsers = _onlineUsers.OrderBy(k => k.Key).Select(k => k.Key).ToArray();
@@ -49,7 +49,7 @@ public class PresenceTracker
         return Task.FromResult(onlineUsers);
     }
 
-    public Task<List<string>> GetConnectionsForUser(string userId)
+    public Task<List<string>> GetConnectionsForUser(Guid userId)
     {
         List<string> connectionIds;
         lock (_onlineUsers)
@@ -57,5 +57,22 @@ public class PresenceTracker
             connectionIds = _onlineUsers.GetValueOrDefault(userId)!;
         }
         return Task.FromResult(connectionIds);
+    }
+
+    public IReadOnlyCollection<string> GetConnectionsForUserIds(IReadOnlyCollection<Guid> userIds)
+    {
+        List<string> connectionIds = new();
+        lock (_onlineUsers)
+        {
+            foreach (var userId in userIds)
+            {
+                var list = _onlineUsers.GetValueOrDefault(userId);
+                if (list is not null && list.Count > 0)
+                {
+                    connectionIds.AddRange(list!);
+                }
+            }
+        }
+        return connectionIds.AsReadOnly();
     }
 }

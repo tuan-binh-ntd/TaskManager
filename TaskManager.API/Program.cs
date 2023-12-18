@@ -115,6 +115,7 @@ builder.Services.AddScoped<IConnectionFactory, SqlConnectionFactory>();
 builder.Services.AddScoped<IUserNotificationService, UserNotificationService>();
 // Add EmailService
 // End  Declaration DI
+builder.Services.AddSingleton<PresenceTracker>();
 
 // Set up connection SQL Server
 builder.Services.AddDbContext<AppDbContext>(options =>

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
-using TaskManager.Core.Entities;
+using TaskManager.API.Extensions;
 
 namespace TaskManager.API.Hubs;
 
@@ -9,45 +8,33 @@ namespace TaskManager.API.Hubs;
 public class PresenceHub : Hub
 {
     private readonly PresenceTracker _tracker;
-    private readonly UserManager<AppUser> _userManager;
 
     public PresenceHub(
-        PresenceTracker tracker,
-        UserManager<AppUser> userManager
+        PresenceTracker tracker
         )
     {
         _tracker = tracker;
-        _userManager = userManager;
     }
 
     public override async Task OnConnectedAsync()
     {
-        var isOnline = await _tracker.UserConnected(Context!.User!.Identity!.Name!, Context.ConnectionId);
+        var isOnline = await _tracker.UserConnected(Context!.User!.GetUserId(), Context.ConnectionId);
 
         if (isOnline)
         {
-            await Clients.Others.SendAsync("UserIsOnline", Context!.User!.Identity!.Name);
+            await Clients.Others.SendAsync("UserIsOnline", Context!.User!.GetUserId().ToString());
         }
-
-        var currentUsers = await _tracker.GetOnlineUsers();
-        await Clients.Caller.SendAsync("GetOnlineUsers", currentUsers);
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
 
-        var isOffline = await _tracker.UserDisconnected(Context!.User!.Identity!.Name!, Context.ConnectionId);
+        var isOffline = await _tracker.UserDisconnected(Context!.User!.GetUserId(), Context.ConnectionId);
         if (isOffline)
         {
-            await Clients.Others.SendAsync("UserIsOffline", Context!.User!.Identity!.Name);
+            await Clients.Others.SendAsync("UserIsOffline", Context!.User!.GetUserId().ToString());
         }
 
         await base.OnDisconnectedAsync(exception);
-    }
-
-    private string GetGroupName(string caller, string other)
-    {
-        var stringCompare = string.CompareOrdinal(caller, other) < 0;
-        return stringCompare ? $"{caller}-{other}" : $"{other}-{caller}";
     }
 }

@@ -42,7 +42,7 @@ public class UserNotificationRepository : IUserNotificationRepository
                                                 select new UserNotificationViewModel
                                                 {
                                                     Id = un.Id,
-                                                    Name = u.Name,
+                                                    Name = un.Name,
                                                     CreatorUsername = u.Name,
                                                     CreatorUserId = u.Id,
                                                     IssueId = u.Id,

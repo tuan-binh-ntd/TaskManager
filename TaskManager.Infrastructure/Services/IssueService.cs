@@ -248,7 +248,7 @@ public class IssueService : IIssueService
         return issueViewModels.AsReadOnly();
     }
 
-    private async Task DetachUpdateField(Issue issue, IssueDetail issueDetail, UpdateIssueDto updateIssueDto)
+    private async Task<(IReadOnlyCollection<Guid>, UserNotificationViewModel)> DetachUpdateField(Issue issue, IssueDetail issueDetail, UpdateIssueDto updateIssueDto)
     {
         var senderName = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
         var projectName = await _issueRepository.GetProjectNameOfIssue(issue.Id);
@@ -328,7 +328,6 @@ public class IssueService : IIssueService
         {
             await ChangeAssigneeIssue(issue, issueDetail, updateIssueDto, issueHistories, senderName, projectName, someoneAssignedEvent);
             userIds = await GetUserIdsByNotificationConfig(issue.Id, someoneAssignedEvent);
-
         }
 
         var userNotifications = AddUserNotifications(issueHistories, issue.Id, userIds);
@@ -336,6 +335,9 @@ public class IssueService : IIssueService
 
         _issueHistoryRepository.AddRange(issueHistories);
         await _issueHistoryRepository.UnitOfWork.SaveChangesAsync();
+
+        var userNotificationViewModel = await _userNotificationRepository.ToUserNotificationViewMode(userNotifications.Select(un => un.Id).FirstOrDefault());
+        return (userIds, userNotificationViewModel!);
     }
 
     private async Task AddWatcher(Issue issue, UpdateIssueDto updateIssueDto)
@@ -1074,7 +1076,7 @@ public class IssueService : IIssueService
         if (notificationEventViewModel.CurrentAssignee)
         {
             var currentAssigneeId = await _issueDetailRepository.GetCurrentAssignee(issueId);
-            if (currentAssigneeId is Guid id)
+            if (currentAssigneeId is Guid id && id != Guid.Empty)
             {
                 userIds.Add(id);
             }
@@ -1134,12 +1136,12 @@ public class IssueService : IIssueService
         return await ToIssueViewModel(issue);
     }
 
-    public async Task<IssueViewModel> UpdateIssue(Guid id, UpdateIssueDto updateIssueDto)
+    public async Task<RealtimeNotificationViewModel> UpdateIssue(Guid id, UpdateIssueDto updateIssueDto)
     {
         var issue = await _issueRepository.Get(id) ?? throw new SprintNullException();
         var issueDetail = await _issueDetailRepository.GetById(id);
 
-        await DetachUpdateField(issue, issueDetail, updateIssueDto);
+        var (userIds, userNotificationViewModel) = await DetachUpdateField(issue, issueDetail, updateIssueDto);
 
         await AddWatcher(issue, updateIssueDto);
 
@@ -1155,7 +1157,12 @@ public class IssueService : IIssueService
         _issueDetailRepository.Update(issueDetail);
         await _issueDetailRepository.UnitOfWork.SaveChangesAsync();
 
-        return await ToIssueViewModel(issue);
+        return new RealtimeNotificationViewModel()
+        {
+            UserIds = userIds,
+            Notification = userNotificationViewModel,
+            Issue = await ToIssueViewModel(issue),
+        };
     }
 
     public async Task<IReadOnlyCollection<IssueViewModel>> GetBySprintId(Guid sprintId)
@@ -1170,7 +1177,7 @@ public class IssueService : IIssueService
         return await ToIssueViewModels(issues);
     }
 
-    public async Task<IssueViewModel> CreateIssueByName(CreateIssueByNameDto createIssueByNameDto, Guid? sprintId = null, Guid? backlogId = null)
+    public async Task<RealtimeNotificationViewModel> CreateIssueByName(CreateIssueByNameDto createIssueByNameDto, Guid? sprintId = null, Guid? backlogId = null)
     {
         var projectConfiguration = _projectConfigurationRepository.GetByProjectId(createIssueByNameDto.ProjectId);
         int issueIndex = projectConfiguration.IssueCode + 1;
@@ -1278,7 +1285,26 @@ public class IssueService : IIssueService
 
             await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: createIssueByNameDto.CreatorUserId, buidEmailTemplateBaseDto, issueCreatedEvent);
         }
-        return await ToIssueViewModel(issue);
+
+        var userIds = await GetUserIdsByNotificationConfig(issue.Id, issueCreatedEvent);
+        var userNotifications = AddUserNotifications(
+            new List<IssueHistory>()
+            {
+                issueHis
+            },
+            issue.Id,
+            userIds);
+        _userNotificationRepository.AddRange(userNotifications);
+        await _userNotificationRepository.UnitOfWork.SaveChangesAsync();
+
+        var userNotificationViewModel = await _userNotificationRepository.ToUserNotificationViewMode(userNotifications.Select(un => un.Id).FirstOrDefault());
+
+        return new RealtimeNotificationViewModel()
+        {
+            UserIds = userIds,
+            Notification = userNotificationViewModel!,
+            Issue = await ToIssueViewModel(issue),
+        };
     }
 
     public async Task<Guid> DeleteIssue(Guid id)

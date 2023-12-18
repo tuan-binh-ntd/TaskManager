@@ -1,6 +1,8 @@
 ﻿using CoreApiResponse;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Net;
+using TaskManager.API.Hubs;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
@@ -12,10 +14,18 @@ namespace TaskManager.API.Controllers;
 public class BacklogsController : BaseController
 {
     private readonly IIssueService _issueService;
+    private readonly IHubContext<NotificationHub> _hubContext;
+    private readonly PresenceTracker _presenceTracker;
 
-    public BacklogsController(IIssueService issueService)
+    public BacklogsController(
+        IIssueService issueService,
+        IHubContext<NotificationHub> hubContext,
+        PresenceTracker presenceTracker
+        )
     {
         _issueService = issueService;
+        _hubContext = hubContext;
+        _presenceTracker = presenceTracker;
     }
 
     [HttpGet("{backlogId}/issues")]
@@ -39,6 +49,10 @@ public class BacklogsController : BaseController
     public async Task<IActionResult> CreateIssueByName(Guid backlogId, CreateIssueByNameDto createIssueByNameDto)
     {
         var res = await _issueService.CreateIssueByName(createIssueByNameDto, sprintId: null, backlogId: backlogId);
+
+        var connectionIds = _presenceTracker.GetConnectionsForUserIds(res.UserIds);
+        await _hubContext.Clients.Clients(connectionIds).SendAsync("NewNotification", res.Notification);
+
         return CustomResult(res, HttpStatusCode.Created);
     }
 
@@ -47,14 +61,10 @@ public class BacklogsController : BaseController
     public async Task<IActionResult> Patch(Guid id, UpdateIssueDto updateIssueDto)
     {
         var res = await _issueService.UpdateIssue(id, updateIssueDto);
+
+        var connectionIds = _presenceTracker.GetConnectionsForUserIds(res.UserIds);
+        await _hubContext.Clients.Clients(connectionIds).SendAsync("NewNotification", res.Notification);
+
         return CustomResult(res, HttpStatusCode.OK);
     }
-
-    //[HttpGet("{backlogId}/issues/{id}")]
-    //[ProducesResponseType(typeof(IssueViewModel), (int)HttpStatusCode.OK)]
-    //public async Task<IActionResult> GetById(Guid id)
-    //{
-    //    var res = await _issueService.GetById(id);
-    //    return CustomResult(res, HttpStatusCode.OK);
-    //}
 }

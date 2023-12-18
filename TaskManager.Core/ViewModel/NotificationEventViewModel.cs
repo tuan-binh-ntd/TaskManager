@@ -33,3 +33,11 @@ public class UserNotificationViewModel
     public string StatusName { get; set; } = string.Empty;
     public bool IsRead { get; set; }
 }
+
+public class RealtimeNotificationViewModel
+{
+    public IReadOnlyCollection<Guid> UserIds { get; set; } = new List<Guid>();
+    public IssueViewModel? Issue { get; set; }
+    public EpicViewModel? Epic { get; set; }
+    public UserNotificationViewModel Notification { get; set; } = new();
+}

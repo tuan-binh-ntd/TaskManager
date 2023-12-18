@@ -13,12 +13,18 @@ namespace TaskManager.API.Controllers;
 public class IssuesController : BaseController
 {
     private readonly IIssueService _issueService;
+    private readonly IHubContext<NotificationHub> _hubContext;
+    private readonly PresenceTracker _presenceTracker;
 
     public IssuesController(
-        IIssueService issueService
+        IIssueService issueService,
+        IHubContext<NotificationHub> hubContext,
+        PresenceTracker presenceTracker
         )
     {
         _issueService = issueService;
+        _hubContext = hubContext;
+        _presenceTracker = presenceTracker;
     }
 
     [HttpPost("api/sprints/{sprintId}/[controller]")]
@@ -34,7 +40,11 @@ public class IssuesController : BaseController
     public async Task<IActionResult> Update(Guid id, UpdateIssueDto updateIssueDto)
     {
         var res = await _issueService.UpdateIssue(id, updateIssueDto);
-        return CustomResult(res, HttpStatusCode.OK);
+
+        var connectionIds = _presenceTracker.GetConnectionsForUserIds(res.UserIds);
+        await _hubContext.Clients.Clients(connectionIds).SendAsync("NewNotification", res.Notification);
+
+        return CustomResult(res.Issue, HttpStatusCode.OK);
     }
 
     [HttpGet("api/sprints/{sprintId}/[controller]")]
@@ -50,7 +60,11 @@ public class IssuesController : BaseController
     public async Task<IActionResult> CreateIssueByName(Guid sprintId, CreateIssueByNameDto createIssueByNameDto)
     {
         var res = await _issueService.CreateIssueByName(createIssueByNameDto, sprintId: sprintId, null);
-        return CustomResult(res, HttpStatusCode.Created);
+
+        var connectionIds = _presenceTracker.GetConnectionsForUserIds(res.UserIds);
+        await _hubContext.Clients.Clients(connectionIds).SendAsync("NewNotification", res.Notification);
+
+        return CustomResult(res.Issue, HttpStatusCode.Created);
     }
 
     [HttpPatch("api/sprints/{sprintId}/[controller]/{id}")]
@@ -58,7 +72,11 @@ public class IssuesController : BaseController
     public async Task<IActionResult> Patch(Guid id, UpdateIssueDto updateIssueDto)
     {
         var res = await _issueService.UpdateIssue(id, updateIssueDto);
-        return CustomResult(res, HttpStatusCode.OK);
+
+        var connectionIds = _presenceTracker.GetConnectionsForUserIds(res.UserIds);
+        await _hubContext.Clients.Users(res.UserIds.Select(u => u.ToString()).ToList()).SendAsync("NewNotification", res.Notification);
+
+        return CustomResult(res.Issue, HttpStatusCode.OK);
     }
 
     [HttpDelete("api/sprints/{sprintId}/[controller]/{id}")]
