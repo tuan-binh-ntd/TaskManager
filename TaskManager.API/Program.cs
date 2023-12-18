@@ -83,6 +83,7 @@ builder.Services.AddScoped<IFilterRepository, FilterRepository>();
 builder.Services.AddScoped<ICriteriaRepository, CriteriaRepository>();
 builder.Services.AddScoped<IPermissionGroupRepository, PermissionGroupRepository>();
 builder.Services.AddScoped<ILabelRepository, LabelRepository>();
+builder.Services.AddScoped<IUserNotificationRepository, UserNotificationRepository>();
 
 // Services
 builder.Services.AddScoped<IJWTTokenService, JWTTokenService>();

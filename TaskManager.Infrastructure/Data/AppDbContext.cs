@@ -56,6 +56,7 @@ public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid,
     public DbSet<VersionIssue> VersionIssues => Set<VersionIssue>();
     public DbSet<Label> Labels => Set<Label>();
     public DbSet<LabelIssue> LabelIssues => Set<LabelIssue>();
+    public DbSet<UserNotification> UserNotifications => Set<UserNotification>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

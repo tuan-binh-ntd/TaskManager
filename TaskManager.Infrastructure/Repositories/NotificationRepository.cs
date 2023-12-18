@@ -33,12 +33,6 @@ public class NotificationRepository : INotificationRepository
         return notification!;
     }
 
-    public async Task<IReadOnlyCollection<Notification>> GetByUserId(Guid userId)
-    {
-        var notifications = await _context.Notifications.AsNoTracking().Where(o => o.CreatorUserId == userId).ToListAsync();
-        return notifications.AsReadOnly();
-    }
-
     public void Update(Notification notification)
     {
         _context.Entry(notification).State = EntityState.Modified;

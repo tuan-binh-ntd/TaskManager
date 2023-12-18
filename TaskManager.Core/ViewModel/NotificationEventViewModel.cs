@@ -18,3 +18,17 @@ public class NotificationViewModel
     public string Description { get; set; } = string.Empty;
     public IReadOnlyCollection<NotificationEventViewModel> NotificationEvent { get; set; } = new List<NotificationEventViewModel>();
 }
+
+
+public class UserNotificationViewModel
+{
+    public string Name { get; set; } = string.Empty;
+    public string CreatorUsername { get; set; } = string.Empty;
+    public Guid CreatorUserId { get; set; }
+    public Guid IssueId { get; set; }
+    public string IssueName { get; set; } = string.Empty;
+    public string IssueCode { get; set; } = string.Empty;
+    public IssueTypeViewModel IssueType { get; set; } = new();
+    public string StatusName { get; set; } = string.Empty;
+    public bool IsRead { get; set; }
+}

@@ -7,7 +7,6 @@ using TaskManager.Core.ViewModel;
 
 namespace TaskManager.API.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
 public class FiltersController : BaseController
 {
@@ -18,7 +17,7 @@ public class FiltersController : BaseController
         _filterService = filterService;
     }
 
-    [HttpGet("{id}/issues")]
+    [HttpGet("api/[controller]/{id}/issues")]
     [ProducesResponseType(typeof(IReadOnlyCollection<IssueViewModel>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Get(Guid id)
     {
@@ -26,7 +25,7 @@ public class FiltersController : BaseController
         return CustomResult(res, HttpStatusCode.OK);
     }
 
-    [HttpPost]
+    [HttpPost("api/[controller]")]
     [ProducesResponseType(typeof(FilterViewModel), (int)HttpStatusCode.Created)]
     public async Task<IActionResult> Create(CreateFilterDto createFilterDto)
     {
@@ -34,19 +33,35 @@ public class FiltersController : BaseController
         return CustomResult(res, HttpStatusCode.Created);
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("api/[controller]/{id}")]
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Delete(Guid id)
     {
         var res = await _filterService.DeleteFilter(id);
-        return CustomResult(res, HttpStatusCode.Created);
+        return CustomResult(res, HttpStatusCode.OK);
     }
 
-    [HttpPost("get-issues")]
+    [HttpPost("api/[controller]/get-issues")]
     [ProducesResponseType(typeof(IReadOnlyCollection<IssueViewModel>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Get([FromBody] GetIssueByConfigurationDto getIssueByConfigurationDto)
     {
         var res = await _filterService.GetIssuesByConfiguration(getIssueByConfigurationDto);
+        return CustomResult(res, HttpStatusCode.OK);
+    }
+
+    [HttpGet("api/users/{userId}/[controller]")]
+    [ProducesResponseType(typeof(IReadOnlyCollection<FilterViewModel>), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> Gets(Guid userId)
+    {
+        var res = await _filterService.GetFilterViewModelsByUserId(userId);
+        return CustomResult(res, HttpStatusCode.OK);
+    }
+
+    [HttpPut("api/[controller]/{id}")]
+    [ProducesResponseType(typeof(FilterViewModel), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> Update(Guid id, UpdateFilterDto updateFilterDto)
+    {
+        var res = await _filterService.UpdateFilter(id, updateFilterDto);
         return CustomResult(res, HttpStatusCode.OK);
     }
 }

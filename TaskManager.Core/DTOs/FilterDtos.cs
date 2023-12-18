@@ -1,11 +1,14 @@
-﻿using TaskManager.Core.Core;
+﻿using System.ComponentModel.DataAnnotations;
+using TaskManager.Core.Core;
 using TaskManager.Core.Entities;
 
 namespace TaskManager.Core.DTOs;
 
 public class CreateFilterDto
 {
+    [Required]
     public string Name { get; set; } = string.Empty;
+    [Required]
     public bool Stared { get; set; } = true;
     public ProjectCriteria? Project { get; set; }
     public TypeCriteria? Type { get; set; }
@@ -22,6 +25,8 @@ public class CreateFilterDto
     public SprintCriteria? Sprints { get; set; }
     public StatusCategoryCriteria? StatusCategory { get; set; }
     public UpdatedCriteria? Updated { get; set; }
+    [Required]
+    public Guid CreatorUserId { get; set; }
 }
 
 public class FilterConfiguration
@@ -59,7 +64,9 @@ public class FilterConfiguration
 
     private string ProjectCriteriaQuery()
     {
-        string query = "AND";
+        string query = @"AND
+            (
+        ";
         List<string> querys = new();
 
         if (Project?.SprintIds is not null && Project.SprintIds.Any())
@@ -78,7 +85,9 @@ public class FilterConfiguration
         }
         if (querys.Any())
         {
-            query = $"{query} {string.Join(" OR ", querys.Select(x => x))}";
+            query = $@"{query} {string.Join(" OR ", querys.Select(x => x))}
+                )
+            ";
         }
         return query.Equals("AND") ? string.Empty : query;
     }
@@ -533,4 +542,10 @@ public class GetIssueByConfigurationDto
     public SprintCriteria? Sprints { get; set; }
     public StatusCategoryCriteria? StatusCategory { get; set; }
     public UpdatedCriteria? Updated { get; set; }
+}
+
+public class UpdateFilterDto
+{
+    public string? Name { get; set; }
+    public bool? Stared { get; set; }
 }

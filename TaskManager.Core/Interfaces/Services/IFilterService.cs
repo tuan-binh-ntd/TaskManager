@@ -5,15 +5,8 @@ namespace TaskManager.Core.Interfaces.Services;
 
 public interface IFilterService
 {
-    Task<IReadOnlyCollection<IssueViewModel>> GetIssueByMyOpenIssuesFilter(Guid userId);
-    Task<IReadOnlyCollection<IssueViewModel>> GetIssueByReportedByMeFilter(Guid userId);
-    Task<IReadOnlyCollection<IssueViewModel>> GetIssueByAllIssueFilter(Guid userId);
-    Task<IReadOnlyCollection<IssueViewModel>> GetIssueByOpenIssuesFilter();
-    Task<IReadOnlyCollection<IssueViewModel>> GetIssueByDoneIssuesFilter();
-    Task<IReadOnlyCollection<IssueViewModel>> GetIssueByCreatedRecentlyFilter();
-    Task<IReadOnlyCollection<IssueViewModel>> GetIssueByResolvedRecentlyFilter();
-    Task<IReadOnlyCollection<IssueViewModel>> GetIssueByUpdatedRecentlyFilter();
     Task<FilterViewModel> CreateFilter(CreateFilterDto createFilterDto);
+    Task<FilterViewModel> UpdateFilter(Guid id, UpdateFilterDto updateFilterDto);
     Task<Guid> DeleteFilter(Guid id);
     /// <summary>
     /// Get all issue
@@ -22,4 +15,5 @@ public interface IFilterService
     /// <returns>List of issues</returns>
     Task<IReadOnlyCollection<IssueViewModel>> GetIssueByFilterConfiguration(Guid id);
     Task<IReadOnlyCollection<IssueViewModel>> GetIssuesByConfiguration(GetIssueByConfigurationDto getIssueByConfigurationDto);
+    Task<IReadOnlyCollection<FilterViewModel>> GetFilterViewModelsByUserId(Guid userId);
 }

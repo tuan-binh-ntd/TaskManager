@@ -1,5 +1,6 @@
 ﻿using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
+using TaskManager.Core.ViewModel;
 
 namespace TaskManager.Core.Interfaces.Repositories;
 
@@ -12,4 +13,5 @@ public interface IFilterRepository : IRepository<Filter>
     void AddRange(IReadOnlyCollection<Filter> filters);
     Task<Filter> GetByName(string name);
     Task<FilterConfiguration?> GetConfigurationOfFilter(Guid id);
+    Task<IReadOnlyCollection<FilterViewModel>> GetFiltersByUserId(Guid userId);
 }

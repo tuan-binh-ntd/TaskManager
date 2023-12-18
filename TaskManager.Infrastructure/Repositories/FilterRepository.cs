@@ -3,6 +3,7 @@ using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Extensions;
 using TaskManager.Core.Interfaces.Repositories;
+using TaskManager.Core.ViewModel;
 using TaskManager.Infrastructure.Data;
 
 namespace TaskManager.Infrastructure.Repositories;
@@ -61,5 +62,19 @@ public class FilterRepository : IFilterRepository
             return null;
         }
         return configuration.FromJson<FilterConfiguration>();
+    }
+    public async Task<IReadOnlyCollection<FilterViewModel>> GetFiltersByUserId(Guid userId)
+    {
+        var filters = await (from f in _context.Filters.AsNoTracking().Where(f => f.CreatorUserId == userId)
+                             select new FilterViewModel
+                             {
+                                 Id = f.Id,
+                                 Name = f.Name,
+                                 Type = f.Type,
+                                 Stared = f.Stared,
+                                 Configuration = string.IsNullOrWhiteSpace(f.Configuration) ? new FilterConfiguration() : f.Configuration.FromJson<FilterConfiguration>()
+                             }).ToListAsync();
+
+        return filters.AsReadOnly();
     }
 }

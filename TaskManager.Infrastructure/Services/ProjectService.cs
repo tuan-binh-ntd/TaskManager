@@ -612,7 +612,6 @@ public class ProjectService : IProjectService
         {
             Name = "Default Notification Scheme",
             NotificationIssueEvents = new List<NotificationIssueEvent>(),
-            CreatorUserId = userId,
             ProjectId = project.Id
         };
         foreach (var item in issueEvents)
