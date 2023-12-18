@@ -59,7 +59,9 @@ public class FilterConfiguration
 
     private string ProjectCriteriaQuery()
     {
-        string query = "AND";
+        string query = @"AND
+            (
+        ";
         List<string> querys = new();
 
         if (Project?.SprintIds is not null && Project.SprintIds.Any())
@@ -78,7 +80,9 @@ public class FilterConfiguration
         }
         if (querys.Any())
         {
-            query = $"{query} {string.Join(" OR ", querys.Select(x => x))}";
+            query = $@"{query} {string.Join(" OR ", querys.Select(x => x))}
+                )
+            ";
         }
         return query.Equals("AND") ? string.Empty : query;
     }
