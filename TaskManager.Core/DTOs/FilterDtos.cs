@@ -89,7 +89,9 @@ public class FilterConfiguration
                 )
             ";
         }
-        return query.Equals("AND") ? string.Empty : query;
+        return query.Equals(@"AND
+            (
+        ") ? string.Empty : query;
     }
 
     private string IssueTypeCriteriaQuery()
