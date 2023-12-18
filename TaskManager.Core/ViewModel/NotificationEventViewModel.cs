@@ -22,6 +22,7 @@ public class NotificationViewModel
 
 public class UserNotificationViewModel
 {
+    public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string CreatorUsername { get; set; } = string.Empty;
     public Guid CreatorUserId { get; set; }

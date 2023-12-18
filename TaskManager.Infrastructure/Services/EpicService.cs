@@ -30,6 +30,7 @@ public class EpicService : IEpicService
     private readonly ILabelRepository _labelRepository;
     private readonly INotificationRepository _notificationRepository;
     private readonly IProjectRepository _projectRepository;
+    private readonly IUserNotificationRepository _userNotificationRepository;
     private readonly IMapper _mapper;
 
     public EpicService(
@@ -49,6 +50,7 @@ public class EpicService : IEpicService
         ILabelRepository labelRepository,
         INotificationRepository notificationRepository,
         IProjectRepository projectRepository,
+        IUserNotificationRepository userNotificationRepository,
         IMapper mapper
         )
     {
@@ -68,6 +70,7 @@ public class EpicService : IEpicService
         _labelRepository = labelRepository;
         _notificationRepository = notificationRepository;
         _projectRepository = projectRepository;
+        _userNotificationRepository = userNotificationRepository;
         _mapper = mapper;
     }
 
@@ -280,9 +283,12 @@ public class EpicService : IEpicService
         var issueMovedEvent = notificationConfig.Where(n => n.EventName == CoreConstants.IssueMovedName).FirstOrDefault();
 
         var issueHistories = new List<IssueHistory>();
+        IReadOnlyCollection<Guid> userIds = new List<Guid>();
+
         if (!string.IsNullOrWhiteSpace(updateIssueDto.Name))
         {
             await ChangeNameIssue(issue, updateIssueDto, issueHistories, senderName, projectName, issueEditedEvent);
+            userIds = await GetUserIdsByNotificationConfig(issue.Id, issueEditedEvent);
         }
         else if (!string.IsNullOrWhiteSpace(updateIssueDto.Description))
         {
@@ -291,14 +297,17 @@ public class EpicService : IEpicService
         else if (updateIssueDto.ParentId is Guid parentId)
         {
             await ChangeParentIssue(issue, updateIssueDto, issueHistories, parentId, senderName, projectName, issueEditedEvent);
+            userIds = await GetUserIdsByNotificationConfig(issue.Id, issueEditedEvent);
         }
         else if (updateIssueDto.StatusId is Guid newStatusId)
         {
             await ChangeStatusIssue(issue, updateIssueDto, issueHistories, newStatusId, senderName, projectName, issueMovedEvent);
+            userIds = await GetUserIdsByNotificationConfig(issue.Id, issueMovedEvent);
         }
         else if (updateIssueDto.PriorityId is Guid newPriorityId)
         {
             await ChangePriorityIssue(issue, updateIssueDto, issueHistories, newPriorityId, senderName, projectName, issueEditedEvent);
+            userIds = await GetUserIdsByNotificationConfig(issue.Id, issueEditedEvent);
         }
         else if (
             updateIssueDto.StoryPointEstimate is not 0 && issueDetail.StoryPointEstimate is not 0
@@ -307,25 +316,34 @@ public class EpicService : IEpicService
             )
         {
             await ChangeSPEIssue(issue, issueDetail, updateIssueDto, issueHistories, senderName, projectName, issueEditedEvent);
+            userIds = await GetUserIdsByNotificationConfig(issue.Id, issueEditedEvent);
         }
         else if (updateIssueDto.ReporterId is Guid reporterId)
         {
             await ChangeReporterIssue(issue, issueDetail, updateIssueDto, issueHistories, reporterId, senderName, projectName, issueEditedEvent);
+            userIds = await GetUserIdsByNotificationConfig(issue.Id, issueEditedEvent);
         }
         else if (updateIssueDto.StartDate != DateTime.MinValue)
         {
             await ChangeStartDateIssue(issue, updateIssueDto, issueHistories, senderName, projectName, issueEditedEvent);
+            userIds = await GetUserIdsByNotificationConfig(issue.Id, issueEditedEvent);
         }
         else if (updateIssueDto.DueDate != DateTime.MinValue)
         {
             await ChangeDueDateIssue(issue, updateIssueDto, issueHistories, senderName, projectName, issueEditedEvent);
+            userIds = await GetUserIdsByNotificationConfig(issue.Id, issueEditedEvent);
         }
         else if (updateIssueDto.AssigneeId != Guid.Empty)
         {
             await ChangeAssigneeIssue(issue, issueDetail, updateIssueDto, issueHistories, senderName, projectName, someoneAssignedEvent);
+            userIds = await GetUserIdsByNotificationConfig(issue.Id, someoneAssignedEvent);
         }
 
         _issueHistoryRepository.AddRange(issueHistories);
+
+        var userNotifications = AddUserNotifications(issueHistories, issue.Id, userIds);
+        _userNotificationRepository.AddRange(userNotifications);
+
         await _issueHistoryRepository.UnitOfWork.SaveChangesAsync();
     }
 
@@ -901,6 +919,67 @@ public class EpicService : IEpicService
             _labelRepository.RemoveRange(removedLabelIssues);
             await _labelRepository.UnitOfWork.SaveChangesAsync();
         }
+    }
+
+    private static IReadOnlyCollection<UserNotification> AddUserNotifications(IReadOnlyCollection<IssueHistory> issueHistories, Guid issueId, IReadOnlyCollection<Guid> userIds)
+    {
+        var userNotifications = new List<UserNotification>();
+        if (issueHistories.Any())
+        {
+            foreach (var issueHistory in issueHistories)
+            {
+                foreach (var userId in userIds)
+                {
+                    var userNotification = new UserNotification()
+                    {
+                        Name = issueHistory.Name,
+                        CreatorUserId = issueHistory.CreatorUserId,
+                        IssueId = issueId,
+                        IsRead = false,
+                        UserId = userId,
+                    };
+                    userNotifications.Add(userNotification);
+                }
+            }
+        }
+
+        return userNotifications;
+    }
+
+    private async Task<IReadOnlyCollection<Guid>> GetUserIdsByNotificationConfig(Guid issueId, NotificationEventViewModel? notificationEventViewModel)
+    {
+        if (notificationEventViewModel is null)
+        {
+            return new List<Guid>();
+        }
+
+        var userIds = new List<Guid>();
+        if (notificationEventViewModel.AllWatcher)
+        {
+            var watcherIds = await _issueRepository.GetAllWatcherOfIssue(issueId);
+            userIds.AddRange(watcherIds!);
+        }
+        if (notificationEventViewModel.CurrentAssignee)
+        {
+            var currentAssigneeId = await _issueDetailRepository.GetCurrentAssignee(issueId);
+            if (currentAssigneeId is Guid id)
+            {
+                userIds.Add(id);
+            }
+
+        }
+        if (notificationEventViewModel.Reporter)
+        {
+            var reporterId = await _issueDetailRepository.GetReporter(issueId);
+            userIds.Add(reporterId);
+        }
+        if (notificationEventViewModel.ProjectLead)
+        {
+            var projectLeadId = await _issueRepository.GetProjectLeadIdOfIssue(issueId);
+            userIds.Add(projectLeadId);
+        }
+
+        return userIds.Distinct().ToList();
     }
     #endregion
 
