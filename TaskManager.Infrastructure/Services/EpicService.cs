@@ -930,15 +930,18 @@ public class EpicService : IEpicService
             {
                 foreach (var userId in userIds)
                 {
-                    var userNotification = new UserNotification()
+                    if (userId != Guid.Empty)
                     {
-                        Name = issueHistory.Name,
-                        CreatorUserId = issueHistory.CreatorUserId,
-                        IssueId = issueId,
-                        IsRead = false,
-                        UserId = userId,
-                    };
-                    userNotifications.Add(userNotification);
+                        var userNotification = new UserNotification()
+                        {
+                            Name = issueHistory.Name,
+                            CreatorUserId = issueHistory.CreatorUserId,
+                            IssueId = issueId,
+                            IsRead = false,
+                            UserId = userId,
+                        };
+                        userNotifications.Add(userNotification);
+                    }
                 }
             }
         }
