@@ -306,4 +306,17 @@ public class FilterService : IFilterService
             Description = filter.Descrption
         };
     }
+
+    public async Task<FilterViewModel> GetFilterViewModelById(Guid id)
+    {
+        var filter = await _filterRepository.GetById(id) ?? throw new FilterNullException();
+        return new FilterViewModel()
+        {
+            Id = filter.Id,
+            Name = filter.Name,
+            Stared = filter.Stared,
+            Type = filter.Type,
+            Configuration = filter.Configuration!.FromJson<FilterConfiguration>()
+        };
+    }
 }
