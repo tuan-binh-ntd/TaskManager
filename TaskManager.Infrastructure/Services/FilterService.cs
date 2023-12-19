@@ -8,6 +8,7 @@ using TaskManager.Core.Extensions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace TaskManager.Infrastructure.Services;
 
@@ -223,8 +224,21 @@ public class FilterService : IFilterService
                 var issues = await _issueRepository.GetByIds(issueIds.ToList());
                 return await ToIssueViewModels(issues);
             }
+            return new List<IssueViewModel>();
         }
-        return new List<IssueViewModel>();
+        else
+        {
+            filterConfiguration = new FilterConfiguration();
+            string query = filterConfiguration.QueryAfterBuild();
+            _logger.LogInformation(query);
+            var issueIds = await _connectionFactory.QueryAsync<Guid>(query);
+            if (issueIds.Any())
+            {
+                var issues = await _issueRepository.GetByIds(issueIds.ToList());
+                return await ToIssueViewModels(issues);
+            }
+            return new List<IssueViewModel>();
+        }
     }
 
     public async Task<IReadOnlyCollection<IssueViewModel>> GetIssuesByConfiguration(GetIssueByConfigurationDto getIssueByConfigurationDto)

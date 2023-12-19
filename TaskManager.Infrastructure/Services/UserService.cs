@@ -105,7 +105,7 @@ public class UserService : IUserService
         {
             Name = CoreConstants.AllIssuesFilterName,
             Type = CoreConstants.DefaultFiltersType,
-            Configuration = null!,
+            Configuration = new FilterConfiguration().ToJson(),
             CreatorUserId = userId,
         };
         #endregion

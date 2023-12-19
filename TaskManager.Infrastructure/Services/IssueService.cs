@@ -203,6 +203,9 @@ public class IssueService : IIssueService
                 await _issueRepository.LoadStatus(childIssue);
             }
 
+            var epicStartDate = childIssues.MinBy(i => i.CreationTime)?.CreationTime;
+            var epicEndDate = childIssues.MaxBy(i => i.CreationTime)?.CompleteDate ?? DateTime.Now;
+
             var doneChildIssuesNum = childIssues.Where(ci => ci.Status!.StatusCategoryId == doneStatusCategory.Id).Count();
             var childIssuesNum = childIssues.Count;
 
@@ -210,8 +213,8 @@ public class IssueService : IIssueService
             {
                 Id = issue.Id,
                 Name = issue.Name,
-                Start = issue.ProjectId is null ? issue.CreationTime : issue.StartDate,
-                End = issue.ProjectId is null ? issue.CompleteDate : issue.DueDate,
+                Start = issue.ProjectId is null ? issue.CreationTime : issue.StartDate ?? epicStartDate,
+                End = issue.ProjectId is null ? issue.CompleteDate : issue.DueDate ?? epicEndDate,
                 Type = issue.ProjectId is null ? "task" : "project",
                 Project = issue.ProjectId is null ? issue.ParentId : null,
                 Progress = (doneChildIssuesNum / childIssuesNum) * 100,
