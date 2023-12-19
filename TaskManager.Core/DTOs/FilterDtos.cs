@@ -27,6 +27,7 @@ public class CreateFilterDto
     public UpdatedCriteria? Updated { get; set; }
     [Required]
     public Guid CreatorUserId { get; set; }
+    public string? Descrption { get; set; }
 }
 
 public class FilterConfiguration
@@ -550,4 +551,5 @@ public class UpdateFilterDto
 {
     public string? Name { get; set; }
     public bool? Stared { get; set; }
+    public string? Descrption { get; set; }
 }

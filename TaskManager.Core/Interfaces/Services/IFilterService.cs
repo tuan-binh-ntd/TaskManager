@@ -16,4 +16,5 @@ public interface IFilterService
     Task<IReadOnlyCollection<IssueViewModel>> GetIssueByFilterConfiguration(Guid id);
     Task<IReadOnlyCollection<IssueViewModel>> GetIssuesByConfiguration(GetIssueByConfigurationDto getIssueByConfigurationDto);
     Task<IReadOnlyCollection<FilterViewModel>> GetFilterViewModelsByUserId(Guid userId);
+    Task<FilterViewModel> GetFilterViewModelById(Guid id);
 }

@@ -9,4 +9,5 @@ public class FilterViewModel
     public bool Stared { get; set; } = true;
     public string Type { get; set; } = string.Empty;
     public FilterConfiguration Configuration { get; set; } = new FilterConfiguration();
+    public string? Description { get; set; }
 }

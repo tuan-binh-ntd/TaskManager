@@ -185,7 +185,8 @@ public class FilterService : IFilterService
             Stared = createFilterDto.Stared,
             Type = createFilterDto.Stared ? CoreConstants.StaredFiltersType : CoreConstants.CreatedUserFiltersType,
             Configuration = filterConfiguration.ToJson(),
-            CreatorUserId = createFilterDto.CreatorUserId
+            CreatorUserId = createFilterDto.CreatorUserId,
+            Descrption = createFilterDto.Descrption,
         };
 
         _filterRepository.Add(filter);
@@ -277,9 +278,23 @@ public class FilterService : IFilterService
             filter.Stared = stared;
         }
         filter.Type = filter.Stared ? CoreConstants.StaredFiltersType : CoreConstants.CreatedUserFiltersType;
+        filter.Descrption = string.IsNullOrWhiteSpace(updateFilterDto.Descrption) ? filter.Descrption : updateFilterDto.Descrption;
 
         _filterRepository.Update(filter);
         await _filterRepository.UnitOfWork.SaveChangesAsync();
         return filter.Adapt<FilterViewModel>();
+    }
+
+    public async Task<FilterViewModel> GetFilterViewModelById(Guid id)
+    {
+        var filter = await _filterRepository.GetById(id) ?? throw new FilterNullException();
+        return new FilterViewModel()
+        {
+            Id = filter.Id,
+            Name = filter.Name,
+            Stared = filter.Stared,
+            Type = filter.Type,
+            Configuration = filter.Configuration!.FromJson<FilterConfiguration>()
+        };
     }
 }
