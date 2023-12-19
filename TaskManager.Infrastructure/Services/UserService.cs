@@ -65,6 +65,11 @@ public class UserService : IUserService
             {
                 CurrentUserId = userId,
             },
+            Resolution = new ResolutionCriteria()
+            {
+                Unresolved = true,
+                Done = false
+            }
         };
 
         #region Create My open issues filter
