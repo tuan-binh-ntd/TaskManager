@@ -1420,7 +1420,7 @@ public class IssueService : IIssueService
     {
         var backlog = await _backlogRepository.GetByProjectId(projectId) ?? throw new BacklogNullException();
         var issuesOfBacklog = await _backlogRepository.GetIssues(backlog.Id);
-        var sprints = await _sprintRepository.GetSprintByProjectId(projectId);
+        var sprints = await _sprintRepository.GetSprintViewModelByProjectId(projectId);
         var issues = new List<Issue>();
         issues.AddRange(issuesOfBacklog);
 
