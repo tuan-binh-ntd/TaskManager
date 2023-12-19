@@ -547,6 +547,14 @@ public class ProjectService : IProjectService
 
     private async Task<Guid> CreateRolesForProject(Project project)
     {
+        var plPermissions = new Permissions()
+        {
+            Timeline = new PermissionGroupDto { ViewPermission = true, EditPermission = true },
+            Backlog = new PermissionGroupDto { ViewPermission = true, EditPermission = true },
+            Board = new PermissionGroupDto { ViewPermission = true, EditPermission = true },
+            Project = new PermissionGroupDto { ViewPermission = true, EditPermission = true },
+        };
+
         var poPermissions = new Permissions()
         {
             Timeline = new PermissionGroupDto { ViewPermission = true, EditPermission = true },
@@ -569,6 +577,14 @@ public class ProjectService : IProjectService
             Backlog = new PermissionGroupDto { ViewPermission = true, EditPermission = true },
             Board = new PermissionGroupDto { ViewPermission = false, EditPermission = false },
             Project = new PermissionGroupDto { ViewPermission = false, EditPermission = false },
+        };
+
+        var projectLeadRole = new PermissionGroup()
+        {
+            Name = CoreConstants.ProjectLeadName,
+            ProjectId = project.Id,
+            Permissions = plPermissions.ToJson(),
+            IsMain = true,
         };
 
         var productOwnerRole = new PermissionGroup()
@@ -596,7 +612,7 @@ public class ProjectService : IProjectService
 
         var permissionGroups = new List<PermissionGroup>()
         {
-            productOwnerRole, scrumMasterRole, developerRole
+            projectLeadRole, productOwnerRole, scrumMasterRole, developerRole
         };
 
         _permissionGroupRepository.AddRange(permissionGroups);
