@@ -224,8 +224,8 @@ public class IssueService : IIssueService
             {
                 Id = issue.Id,
                 Name = issue.Name,
-                Start = issue.StartDate,
-                End = issue.DueDate,
+                Start = issue.CreationTime,
+                End = issue.CompleteDate,
                 Type = issue.ProjectId is null ? "task" : "project",
                 Project = issue.ProjectId is null ? issue.ParentId : null,
                 Progress = 0,
@@ -298,6 +298,12 @@ public class IssueService : IIssueService
         }
         else if (updateIssueDto.StatusId is Guid newStatusId)
         {
+            var isComplete = await _statusRepository.CheckStatusBelongDone(newStatusId);
+            if (isComplete)
+            {
+                issue.CompleteDate = DateTime.Now;
+            }
+
             await ChangeStatusIssue(issue, updateIssueDto, issueHistories, newStatusId, senderName, projectName, issueMovedEvent);
             userIds = await GetUserIdsByNotificationConfig(issue.Id, issueMovedEvent);
 

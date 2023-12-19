@@ -86,4 +86,13 @@ public class StatusRepository : IStatusRepository
         string? name = await _context.Statuses.AsNoTracking().Where(s => s.Id == statusId).Select(s => s.Name).FirstOrDefaultAsync();
         return name;
     }
+
+    public async Task<bool> CheckStatusBelongDone(Guid statusId)
+    {
+        var query = from sc in _context.StatusCategories.Where(sc => sc.Code == CoreConstants.DoneCode)
+                     join s in _context.Statuses.Where(s => s.Id == statusId) on sc.Id equals s.StatusCategoryId
+                     select s;
+
+        return await query.AnyAsync();
+    }
 }

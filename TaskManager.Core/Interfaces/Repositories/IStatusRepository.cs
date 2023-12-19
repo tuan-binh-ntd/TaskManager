@@ -14,4 +14,5 @@ public interface IStatusRepository : IRepository<Status>
     Task<Status> GetUnreleasedStatus(Guid projectId);
     Task<PaginationResult<Status>> GetByProjectIdPaging(Guid projectId, PaginationInput paginationInput);
     Task<string?> GetNameOfStatus(Guid statusId);
+    Task<bool> CheckStatusBelongDone(Guid statusId);
 }
