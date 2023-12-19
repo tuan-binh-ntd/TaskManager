@@ -181,7 +181,6 @@ public class SprintService : ISprintService
     {
         var sprintIds = await _sprintRepository.GetSprintIdsByProjectId(projectId, getSprintByFilterDto);
         var issues = await _issueRepository.GetBySprintIds(sprintIds, getSprintByFilterDto, projectId);
-
         var issueOnBoard = new Dictionary<string, IReadOnlyCollection<IssueViewModel>>();
         var statuses = await _statusRepository.GetByProjectId(projectId);
 
@@ -189,6 +188,13 @@ public class SprintService : ISprintService
         {
             var issueByStatusIds = issues.Where(i => i.StatusId == status.Id).ToList();
             var issueViewModels = issueByStatusIds.Adapt<IReadOnlyCollection<IssueViewModel>>();
+            foreach (var issueViewModel in issueViewModels)
+            {
+                if (issueViewModel.ParentId is Guid parentId)
+                {
+                    issueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
+                }
+            }
             issueOnBoard.Add(status.Name, issueViewModels);
         }
 
