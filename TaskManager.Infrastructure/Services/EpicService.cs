@@ -301,6 +301,11 @@ public class EpicService : IEpicService
         }
         else if (updateIssueDto.StatusId is Guid newStatusId)
         {
+            var isComplete = await _statusRepository.CheckStatusBelongDone(newStatusId);
+            if (isComplete)
+            {
+                issue.CompleteDate = DateTime.Now;
+            }
             await ChangeStatusIssue(issue, updateIssueDto, issueHistories, newStatusId, senderName, projectName, issueMovedEvent);
             userIds = await GetUserIdsByNotificationConfig(issue.Id, issueMovedEvent);
         }
