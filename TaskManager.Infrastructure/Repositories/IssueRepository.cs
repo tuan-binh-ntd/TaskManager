@@ -191,11 +191,19 @@ public class IssueRepository : IIssueRepository
 
     public async Task<IReadOnlyCollection<Issue>> GetBySprintIds(IReadOnlyCollection<Guid> sprintIds, GetSprintByFilterDto getSprintByFilterDto, Guid projectId)
     {
-        var subtaskTypeId = await _context.IssueTypes.AsNoTracking().Where(it => it.ProjectId == projectId && it.Name == CoreConstants.SubTaskName).Select(it => it.Id).FirstOrDefaultAsync();
+        var subtaskTypeId = await _context.IssueTypes
+            .AsNoTracking()
+            .Where(it => it.ProjectId == projectId && it.Name == CoreConstants.SubTaskName)
+            .Select(it => it.Id)
+            .FirstOrDefaultAsync();
 
-        var issueIds = await _context.LabelIssues.WhereIf(getSprintByFilterDto.LabelIds is not null && getSprintByFilterDto.LabelIds.Any(), l => getSprintByFilterDto.LabelIds!.Contains(l.LabelId)).Select(it => it.IssueId).ToListAsync();
-        if (issueIds.Any())
+        if (getSprintByFilterDto.LabelIds is not null && getSprintByFilterDto.LabelIds.Any())
         {
+            var issueIds = await _context.LabelIssues
+                .Where(l => getSprintByFilterDto.LabelIds!.Contains(l.LabelId))
+                .Select(it => it.IssueId)
+                .ToListAsync();
+
             var issues = await _context.Issues
                 .Include(i => i.IssueType)
                 .WhereIf(issueIds.Any(), i => issueIds.Contains(i.Id))
