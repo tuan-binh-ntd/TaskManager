@@ -127,4 +127,17 @@ public class NotificationRepository : INotificationRepository
 
         return notificationEventViewModels.AsReadOnly();
     }
+
+    public async Task<IReadOnlyCollection<IssueEventViewModel>> GetIssueEventViewModels()
+    {
+        var issueEventViewModels = await _context.IssueEvents
+            .AsNoTracking()
+            .Select(ie => new IssueEventViewModel
+            {
+                Id = ie.Id,
+                Name = ie.Name,
+            }).ToListAsync();
+
+        return issueEventViewModels.AsReadOnly();
+    }
 }

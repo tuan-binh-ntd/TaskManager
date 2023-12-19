@@ -82,4 +82,10 @@ public class NotificationEventService : INotificationEventService
         var notification = await _notificationRepository.GetByProjectId(projectId);
         return notification;
     }
+
+    public async Task<IReadOnlyCollection<IssueEventViewModel>> GetIssueEventViewModels()
+    {
+        var issueEventViewModels = await _notificationRepository.GetIssueEventViewModels();
+        return issueEventViewModels;
+    }
 }

@@ -135,3 +135,9 @@ public class CurrentAssigneeAndReporterViewModel
     public Guid Reporter { get; set; }
     public Guid? Project { get; set; }
 }
+
+public class IssueEventViewModel
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+}

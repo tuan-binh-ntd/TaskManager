@@ -17,4 +17,5 @@ public interface INotificationRepository : IRepository<Notification>
     Task<string?> GetIssueEventName(Guid issueEventId);
     Task<NotificationViewModel> GetByProjectId(Guid projectId);
     Task<IReadOnlyCollection<NotificationEventViewModel>> GetNotificationIssueEventByProjectId(Guid projectId);
+    Task<IReadOnlyCollection<IssueEventViewModel>> GetIssueEventViewModels();
 }

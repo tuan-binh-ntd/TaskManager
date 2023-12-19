@@ -73,7 +73,9 @@ public class FilterRepository : IFilterRepository
                                  Type = f.Type,
                                  Stared = f.Stared,
                                  Configuration = string.IsNullOrWhiteSpace(f.Configuration) ? new FilterConfiguration() : f.Configuration.FromJson<FilterConfiguration>()
-                             }).ToListAsync();
+                             })
+                             .OrderBy(f => f.Type)
+                             .ToListAsync();
 
         return filters.AsReadOnly();
     }
