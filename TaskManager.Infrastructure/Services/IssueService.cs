@@ -210,8 +210,8 @@ public class IssueService : IIssueService
             {
                 Id = issue.Id,
                 Name = issue.Name,
-                Start = issue.StartDate,
-                End = issue.DueDate,
+                Start = issue.ProjectId is null ? issue.CreationTime : issue.StartDate,
+                End = issue.ProjectId is null ? issue.CompleteDate : issue.DueDate,
                 Type = issue.ProjectId is null ? "task" : "project",
                 Project = issue.ProjectId is null ? issue.ParentId : null,
                 Progress = (doneChildIssuesNum / childIssuesNum) * 100,
@@ -224,8 +224,8 @@ public class IssueService : IIssueService
             {
                 Id = issue.Id,
                 Name = issue.Name,
-                Start = issue.CreationTime,
-                End = issue.CompleteDate,
+                Start = issue.ProjectId is null ? issue.CreationTime : issue.StartDate,
+                End = issue.ProjectId is null ? issue.CompleteDate : issue.DueDate,
                 Type = issue.ProjectId is null ? "task" : "project",
                 Project = issue.ProjectId is null ? issue.ParentId : null,
                 Progress = 0,
