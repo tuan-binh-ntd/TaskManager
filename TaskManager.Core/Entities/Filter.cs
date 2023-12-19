@@ -9,6 +9,7 @@ public class Filter : BaseEntity
     public string Type { get; set; } = string.Empty;
     public string? Configuration { get; set; }
     public Guid CreatorUserId { get; set; }
+    public string? Descrption { get; set; }
 
     //Relationship
     public ICollection<FilterCriteria>? FilterCriterias { get; set; }

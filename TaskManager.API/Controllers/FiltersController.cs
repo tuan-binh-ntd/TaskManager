@@ -64,4 +64,12 @@ public class FiltersController : BaseController
         var res = await _filterService.UpdateFilter(id, updateFilterDto);
         return CustomResult(res, HttpStatusCode.OK);
     }
+
+    [HttpGet("api/[controller]/{id}")]
+    [ProducesResponseType(typeof(FilterViewModel), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var res = await _filterService.GetFilterViewModelById(id);
+        return CustomResult(res, HttpStatusCode.OK);
+    }
 }
