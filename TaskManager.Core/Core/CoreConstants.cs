@@ -57,9 +57,9 @@ public static class CoreConstants
     public const string HighColor = "#ff8d71";
     public const string HighestColor = "#fe6d4b";
     // Issue Event
-    public const string IssueCreatedName = "An issue ís created";
-    public const string IssueEditedName = "An issue ís edited";
-    public const string SomeoneAssignedToAIssueName = "Someone assigned to an issue";
+    public const string IssueCreatedName = "An issue is created";
+    public const string IssueEditedName = "An issue is edited";
+    public const string SomeoneAssignedToAIssueName = "You're assigned to an issue";
     public const string IssueDeletedName = "An issue is deleted";
     public const string IssueMovedName = "An issue is moved";
     public const string SomeoneMadeACommentName = "Someone made a comment";
