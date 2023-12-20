@@ -618,10 +618,10 @@ public class ProjectService : IProjectService
         _permissionGroupRepository.AddRange(permissionGroups);
         await _permissionGroupRepository.UnitOfWork.SaveChangesAsync();
 
-        return productOwnerRole.Id;
+        return projectLeadRole.Id;
     }
 
-    private async Task<bool> CreateNotificationScheme(Project project, Guid userId)
+    private async Task<bool> CreateNotificationScheme(Project project)
     {
         var issueEvents = await _issueEventRepository.Gets();
         var notification = new Notification()
