@@ -718,7 +718,7 @@ public class ProjectService : IProjectService
         _userProjectRepository.Add(userProject);
         await _projectRepository.UnitOfWork.SaveChangesAsync();
 
-        await CreateNotificationScheme(project, userId);
+        await CreateNotificationScheme(project);
 
         return await ToProjectViewModel(project);
     }
