@@ -74,7 +74,7 @@ public class IssuesController : BaseController
         var res = await _issueService.UpdateIssue(id, updateIssueDto);
 
         var connectionIds = _presenceTracker.GetConnectionsForUserIds(res.UserIds);
-        await _hubContext.Clients.Users(res.UserIds.Select(u => u.ToString()).ToList()).SendAsync("NewNotification", res.Notification);
+        await _hubContext.Clients.Clients(connectionIds).SendAsync("NewNotification", res.Notification);
 
         return CustomResult(res.Issue, HttpStatusCode.OK);
     }
