@@ -628,7 +628,8 @@ public class ProjectService : IProjectService
         {
             Name = "Default Notification Scheme",
             NotificationIssueEvents = new List<NotificationIssueEvent>(),
-            ProjectId = project.Id
+            ProjectId = project.Id,
+            Description = "Notification emails for this project can be sent directly from Jira Software, or you can use a custom email with your own domain instead."
         };
         foreach (var item in issueEvents)
         {
