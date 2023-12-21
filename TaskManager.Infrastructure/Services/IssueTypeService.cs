@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using MapsterMapper;
+using TaskManager.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Helper;
@@ -41,7 +42,7 @@ public class IssueTypeService : IIssueTypeService
         int count = await _issueRepository.CountIssueByIssueTypeId(issueTypeId);
         if (count > 0)
         {
-            await _issueRepository.UpdateOneColumnForIssue(issueTypeId, newIssueTypeId);
+            await _issueRepository.UpdateOneColumnForIssue(issueTypeId, newIssueTypeId, NameColumn.IssueTypeId);
         }
         _issueTypeRepository.Delete(issueTypeId);
         await _issueTypeRepository.UnitOfWork.SaveChangesAsync();

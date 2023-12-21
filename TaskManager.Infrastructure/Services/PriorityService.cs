@@ -1,4 +1,5 @@
 ﻿using MapsterMapper;
+using TaskManager.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Exceptions;
@@ -38,7 +39,7 @@ public class PriorityService : IPriorityService
         int count = await _issueRepository.CountIssueByPriorityId(id);
         if (count > 0)
         {
-            await _issueRepository.UpdateOneColumnForIssue(id, newId);
+            await _issueRepository.UpdateOneColumnForIssue(id, newId, NameColumn.PriorityId);
         }
         _priorityRepository.Delete(id);
         await _priorityRepository.UnitOfWork.SaveChangesAsync();

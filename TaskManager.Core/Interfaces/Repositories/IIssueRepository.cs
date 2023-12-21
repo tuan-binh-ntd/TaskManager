@@ -160,7 +160,7 @@ public interface IIssueRepository : IRepository<Issue>
     Task DeleteByProjectId(Guid projectId);
     Task<IReadOnlyCollection<Guid>?> GetAllWatcherOfIssue(Guid issueId);
     Task<string> GetProjectNameOfIssue(Guid issueId);
-    Task UpdateOneColumnForIssue(Guid oldValue, Guid? newValue);
+    Task UpdateOneColumnForIssue(Guid oldValue, Guid? newValue, NameColumn nameColumn);
     Task<int> CountIssueByPriorityId(Guid priorityId);
     Task<int> CountIssueByStatusId(Guid statusId);
     Task<int> CountIssueByIssueTypeId(Guid issueTypeId);

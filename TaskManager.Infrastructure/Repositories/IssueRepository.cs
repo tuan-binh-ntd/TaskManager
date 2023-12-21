@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TaskManager.Core;
 using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
@@ -304,11 +305,31 @@ public class IssueRepository : IIssueRepository
         }
     }
 
-    public async Task UpdateOneColumnForIssue(Guid oldValue, Guid? newValue)
+    public async Task UpdateOneColumnForIssue(Guid oldValue, Guid? newValue, NameColumn nameColumn)
     {
-        await _context.Issues
-            .Where(i => i.PriorityId == oldValue)
-            .ExecuteUpdateAsync(setters => setters.SetProperty(i => i.PriorityId, newValue));
+        switch (nameColumn)
+        {
+            case NameColumn.PriorityId:
+                await _context.Issues
+                    .Where(i => i.PriorityId == oldValue)
+                    .ExecuteUpdateAsync(setters => setters.SetProperty(i => i.PriorityId, newValue));
+                break;
+            case NameColumn.ParentId:
+                await _context.Issues
+                    .Where(i => i.ParentId == oldValue)
+                    .ExecuteUpdateAsync(setters => setters.SetProperty(i => i.ParentId, newValue));
+                break;
+            case NameColumn.StatusId:
+                await _context.Issues
+                    .Where(i => i.StatusId == oldValue)
+                    .ExecuteUpdateAsync(setters => setters.SetProperty(i => i.StatusId, newValue));
+                break;
+            case NameColumn.IssueTypeId:
+                await _context.Issues
+                    .Where(i => i.IssueTypeId == oldValue)
+                    .ExecuteUpdateAsync(setters => setters.SetProperty(i => i.IssueTypeId, newValue));
+                break;
+        }
     }
 
     public async Task<int> CountIssueByPriorityId(Guid priorityId)

@@ -98,4 +98,10 @@ public class UserProjectRepository : IUserProjectRepository
     {
         _context.UserProjects.Remove(userProject);
     }
+
+    public async Task<UserProject?> GetById(Guid id)
+    {
+        var userProject = await _context.UserProjects.Where(up => up.Id == id).FirstOrDefaultAsync();
+        return userProject;
+    }
 }

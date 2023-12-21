@@ -1,6 +1,7 @@
 ﻿using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using TaskManager.Core;
 using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
@@ -1146,7 +1147,7 @@ public class EpicService : IEpicService
 
     public async Task<Guid> DeleteEpic(Guid id)
     {
-        await _issueRepository.UpdateOneColumnForIssue(id, null);
+        await _issueRepository.UpdateOneColumnForIssue(id, null, NameColumn.ParentId);
         _issueRepository.Delete(id);
         await _issueRepository.UnitOfWork.SaveChangesAsync();
         return id;
