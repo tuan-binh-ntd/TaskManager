@@ -859,4 +859,28 @@ public class ProjectService : IProjectService
         await _userProjectRepository.UnitOfWork.SaveChangesAsync();
         return id;
     }
+
+    public async Task<IReadOnlyCollection<SprintFilterViewModel>> GetSprintFiltersViewModel(Guid projectId)
+    {
+        var sprintFilterViewModels = await _projectRepository.GetSprintFiltersByProjectId(projectId);
+        return sprintFilterViewModels;
+    }
+
+    public async Task<IReadOnlyCollection<TypeFilterViewModel>> GetTypeFiltersViewModel(Guid projectId)
+    {
+        var typeFilterViewModels = await _projectRepository.GetIssueTypeFiltersByProjectId(projectId);
+        return typeFilterViewModels;
+    }
+
+    public async Task<IReadOnlyCollection<EpicFilterViewModel>> GetEpicFiltersViewModel(Guid projectId)
+    {
+        var epicFilterViewModels = await _projectRepository.GetEpicFiltersByProjectId(projectId);
+        return epicFilterViewModels;
+    }
+
+    public async Task<IReadOnlyCollection<LabelFilterViewModel>> GetLabelFiltersViewModel(Guid projectId)
+    {
+        var labelFilterViewModels = await _projectRepository.GetLabelFiltersByProjectId(projectId);
+        return labelFilterViewModels;
+    }
 }

@@ -28,4 +28,8 @@ public interface IProjectRepository : IRepository<Project>
     Task LoadSprints(Project project);
     Task LoadVersions(Project project);
     Task<string> GetProjectName(Guid projectId);
+    Task<IReadOnlyCollection<SprintFilterViewModel>> GetSprintFiltersByProjectId(Guid projectId);
+    Task<IReadOnlyCollection<TypeFilterViewModel>> GetIssueTypeFiltersByProjectId(Guid projectId);
+    Task<IReadOnlyCollection<LabelFilterViewModel>> GetLabelFiltersByProjectId(Guid projectId);
+    Task<IReadOnlyCollection<EpicFilterViewModel>> GetEpicFiltersByProjectId(Guid projectId);
 }

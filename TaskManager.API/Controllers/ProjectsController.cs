@@ -9,7 +9,6 @@ using TaskManager.Core.ViewModel;
 
 namespace TaskManager.API.Controllers;
 
-[Route("api/users/{id}/[controller]")]
 [ApiController]
 public class ProjectsController : BaseController
 {
@@ -22,14 +21,14 @@ public class ProjectsController : BaseController
         _projectService = projectService;
     }
 
-    [HttpGet, AllowAnonymous]
+    [HttpGet("api/users/{id}/[controller]"), AllowAnonymous]
     public async Task<IActionResult> GetProjectByFilter(Guid id, [FromQuery] GetProjectByFilterDto filter, [FromQuery] PaginationInput paginationInput)
     {
         var result = await _projectService.GetProjectsByFilter(id, filter, paginationInput);
         return CustomResult(result, HttpStatusCode.OK);
     }
 
-    [HttpPost, AllowAnonymous]
+    [HttpPost("api/users/{id}/[controller]"), AllowAnonymous]
     [ProducesResponseType(typeof(ProjectViewModel), (int)HttpStatusCode.Created)]
     public async Task<IActionResult> CreateProject(Guid id, CreateProjectDto createProjectDto)
     {
@@ -37,7 +36,7 @@ public class ProjectsController : BaseController
         return CustomResult(res, HttpStatusCode.Created);
     }
 
-    [HttpPut("{projectId}")]
+    [HttpPut("api/users/{id}/[controller]/{projectId}")]
     [ProducesResponseType(typeof(ProjectViewModel), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> UpdateProject(Guid id, Guid projectId, UpdateProjectDto updateProjectDto)
     {
@@ -45,7 +44,7 @@ public class ProjectsController : BaseController
         return CustomResult(res, HttpStatusCode.OK);
     }
 
-    [HttpDelete("{projectId}")]
+    [HttpDelete("api/users/{id}/[controller]/{projectId}")]
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> DeleteProject(Guid projectId)
     {
@@ -53,14 +52,7 @@ public class ProjectsController : BaseController
         return CustomResult(result, HttpStatusCode.OK);
     }
 
-    /* [HttpGet("{projectId}"), AllowAnonymous]
-     public async Task<IActionResult> Get(Guid projectId)
-     {
-         var result = await _projectService.Get(projectId);
-         return CustomResult(result, HttpStatusCode.OK);
-     }*/
-
-    [HttpGet("{code}"), AllowAnonymous]
+    [HttpGet("api/users/{id}/[controller]/{code}"), AllowAnonymous]
     [ProducesResponseType(typeof(ProjectViewModel), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Get(string code, Guid id)
     {
@@ -72,7 +64,7 @@ public class ProjectsController : BaseController
         return CustomResult(result, HttpStatusCode.OK);
     }
 
-    [HttpPost("members:add")]
+    [HttpPost("api/users/{id}/[controller]/members:add")]
     [ProducesResponseType(typeof(ProjectViewModel), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> AddMember([FromBody] AddMemberToProjectDto addMemberToProjectDto)
     {
@@ -80,11 +72,43 @@ public class ProjectsController : BaseController
         return CustomResult(res, HttpStatusCode.OK);
     }
 
-    [HttpPatch("{projectId}")]
+    [HttpPatch("api/users/{id}/[controller]/{projectId}")]
     [ProducesResponseType(typeof(ProjectViewModel), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Update(Guid projectId, UpdateProjectDto updateProjectDto)
     {
         var res = await _projectService.Update(userId: Guid.Empty, projectId, updateProjectDto);
+        return CustomResult(res, HttpStatusCode.OK);
+    }
+
+    [HttpGet("api/[controller]/{projectId}/sprint-filter")]
+    [ProducesResponseType(typeof(IReadOnlyCollection<SprintFilterViewModel>), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> GetSprintFilter(Guid projectId)
+    {
+        var res = await _projectService.GetSprintFiltersViewModel(projectId);
+        return CustomResult(res, HttpStatusCode.OK);
+    }
+
+    [HttpGet("api/[controller]/{projectId}/epic-filter")]
+    [ProducesResponseType(typeof(IReadOnlyCollection<EpicFilterViewModel>), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> GetEpicFilter(Guid projectId)
+    {
+        var res = await _projectService.GetEpicFiltersViewModel(projectId);
+        return CustomResult(res, HttpStatusCode.OK);
+    }
+
+    [HttpGet("api/[controller]/{projectId}/type-filter")]
+    [ProducesResponseType(typeof(IReadOnlyCollection<TypeFilterViewModel>), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> GetTypeFilter(Guid projectId)
+    {
+        var res = await _projectService.GetTypeFiltersViewModel(projectId);
+        return CustomResult(res, HttpStatusCode.OK);
+    }
+
+    [HttpGet("api/[controller]/{projectId}/label-filter")]
+    [ProducesResponseType(typeof(IReadOnlyCollection<LabelFilterViewModel>), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> GetLabelFilter(Guid projectId)
+    {
+        var res = await _projectService.GetLabelFiltersViewModel(projectId);
         return CustomResult(res, HttpStatusCode.OK);
     }
 }

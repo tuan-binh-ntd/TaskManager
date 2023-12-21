@@ -160,9 +160,70 @@ public class ProjectRepository : IProjectRepository
     {
         await _context.Entry(project).Collection(p => p.Versions!).LoadAsync();
     }
+
     public async Task<string> GetProjectName(Guid projectId)
     {
         var name = await _context.Projects.Where(p => p.Id == projectId).Select(p => p.Name).FirstOrDefaultAsync();
         return name!;
+    }
+
+    public async Task<IReadOnlyCollection<SprintFilterViewModel>> GetSprintFiltersByProjectId(Guid projectId)
+    {
+        var sprintFilterViewModels = await _context.Sprints
+            .AsNoTracking()
+            .Where(s => s.ProjectId == projectId && s.IsStart == true)
+            .Select(s => new SprintFilterViewModel
+            {
+                Id = s.Id,
+                Name = s.Name
+            }).ToListAsync();
+
+        return sprintFilterViewModels.AsReadOnly();
+    }
+
+    public async Task<IReadOnlyCollection<EpicFilterViewModel>> GetEpicFiltersByProjectId(Guid projectId)
+    {
+        var epicFilterViewModels = await (from s in _context.Sprints.Where(s => s.ProjectId == projectId && s.IsStart == true)
+                                          join i in _context.Issues on s.Id equals i.SprintId
+                                          join e in _context.Issues on i.ParentId equals e.Id
+                                          group e by new { e.Id, e.Name } into g
+                                          select new EpicFilterViewModel
+                                          {
+                                              Id = g.Key.Id,
+                                              Name = g.Key.Name,
+                                          }).ToArrayAsync();
+
+        return epicFilterViewModels.AsReadOnly();
+    }
+
+    public async Task<IReadOnlyCollection<LabelFilterViewModel>> GetLabelFiltersByProjectId(Guid projectId)
+    {
+        var epicFilterViewModels = await (from s in _context.Sprints.Where(s => s.ProjectId == projectId && s.IsStart == true)
+                                          join i in _context.Issues on s.Id equals i.SprintId
+                                          join li in _context.LabelIssues on i.Id equals li.IssueId
+                                          join l in _context.Labels on li.LabelId equals l.Id
+                                          group l by new { l.Id, l.Name } into g
+                                          select new LabelFilterViewModel
+                                          {
+                                              Id = g.Key.Id,
+                                              Name = g.Key.Name,
+                                          }).ToArrayAsync();
+
+        return epicFilterViewModels.AsReadOnly();
+    }
+
+    public async Task<IReadOnlyCollection<TypeFilterViewModel>> GetIssueTypeFiltersByProjectId(Guid projectId)
+    {
+        var epicFilterViewModels = await (from s in _context.Sprints.Where(s => s.ProjectId == projectId && s.IsStart == true)
+                                          join i in _context.Issues on s.Id equals i.SprintId
+                                          join it in _context.IssueTypes on i.IssueTypeId equals it.Id
+                                          group it by new { it.Id, it.Name } into g
+                                          select new TypeFilterViewModel
+                                          {
+                                              Id = g.Key.Id,
+                                              Name = g.Key.Name,
+                                          }).ToArrayAsync();
+
+        return epicFilterViewModels.AsReadOnly();
     }
 }

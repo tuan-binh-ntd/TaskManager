@@ -9,16 +9,21 @@ namespace TaskManager.API.Hubs;
 public class NotificationHub : Hub
 {
     private readonly IUserNotificationService _userNotificationService;
+    private readonly PresenceTracker _tracker;
 
     public NotificationHub(
-        IUserNotificationService userNotificationService
+        IUserNotificationService userNotificationService,
+        PresenceTracker tracker
         )
     {
         _userNotificationService = userNotificationService;
+        _tracker = tracker;
     }
 
     public override async Task OnConnectedAsync()
     {
+        await _tracker.UserConnected(Context!.User!.GetUserId(), Context.ConnectionId);
+
         var userId = Context.User!.GetUserId();
         // Return notification list
         var notifications = await _userNotificationService.GetUserNotificationViewModelsByUserId(userId);
@@ -27,6 +32,8 @@ public class NotificationHub : Hub
         // Return unread notification number
         int unreadNotificationNum = await _userNotificationService.GetUnreadUserNotificationNumOfUser(userId);
         await Clients.Caller.SendAsync("UnreadNotificationNum", unreadNotificationNum);
+
+        await base.OnConnectedAsync();
     }
 
     public async Task ReadNotification(Guid id)
@@ -40,6 +47,8 @@ public class NotificationHub : Hub
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
+        await _tracker.UserDisconnected(Context!.User!.GetUserId(), Context.ConnectionId);
+
         await base.OnDisconnectedAsync(exception);
     }
 }
