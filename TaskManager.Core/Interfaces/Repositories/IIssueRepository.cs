@@ -1,5 +1,4 @@
-﻿using TaskManager.Core.DTOs;
-using TaskManager.Core.Entities;
+﻿using TaskManager.Core.Entities;
 
 namespace TaskManager.Core.Interfaces.Repositories;
 
@@ -148,12 +147,6 @@ public interface IIssueRepository : IRepository<Issue>
     /// <param name="sprintId">Id of sprint</param>
     /// <returns>List of issue</returns>
     Task<IReadOnlyCollection<Issue>> GetNotDoneIssuesBySprintId(Guid sprintId, Guid projectId);
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="sprintIds"></param>
-    /// <returns></returns>
-    Task<IReadOnlyCollection<Issue>> GetBySprintIds(IReadOnlyCollection<Guid> sprintIds, GetSprintByFilterDto getSprintByFilterDto, Guid projectId);
     Task<string?> GetNameOfIssue(Guid issueId);
     Task DeleteByBacklogId(Guid backlogId);
     Task DeleteBySprintId(Guid sprintId);

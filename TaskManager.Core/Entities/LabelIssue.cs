@@ -8,5 +8,5 @@ public class LabelIssue : BaseEntity
     public Guid IssueId { get; set; }
     // Relationship
     public Label? Label { get; set; }
-    public Version? Version { get; set; }
+    public Issue? Issue { get; set; }
 }

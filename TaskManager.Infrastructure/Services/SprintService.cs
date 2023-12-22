@@ -17,6 +17,7 @@ public class SprintService : ISprintService
     private readonly IIssueRepository _issueRepository;
     private readonly IBacklogRepository _backlogRepository;
     private readonly IStatusRepository _statusRepository;
+    private readonly IConnectionFactory _connectionFactory;
     private readonly IMapper _mapper;
 
     public SprintService(
@@ -25,6 +26,7 @@ public class SprintService : ISprintService
         IIssueRepository issueRepository,
         IBacklogRepository backlogRepository,
         IStatusRepository statusRepository,
+        IConnectionFactory connectionFactory,
         IMapper mapper
         )
     {
@@ -33,6 +35,7 @@ public class SprintService : ISprintService
         _issueRepository = issueRepository;
         _backlogRepository = backlogRepository;
         _statusRepository = statusRepository;
+        _connectionFactory = connectionFactory;
         _mapper = mapper;
     }
 
@@ -50,6 +53,32 @@ public class SprintService : ISprintService
             sprintViewModel.IssueOnBoard.Add(status.Name, issueViewModels);
         }
         return sprintViewModel;
+    }
+
+    private async Task<IReadOnlyCollection<IssueViewModel>> ToIssueViewModels(IReadOnlyCollection<Issue> issues)
+    {
+        var issueViewModels = new List<IssueViewModel>();
+        if (issues.Any())
+        {
+            foreach (var issue in issues)
+            {
+                var issueViewModel = await ToIssueViewModel(issue);
+                issueViewModels.Add(issueViewModel);
+            }
+        }
+        return issueViewModels.AsReadOnly();
+    }
+
+    private async Task<IssueViewModel> ToIssueViewModel(Issue issue)
+    {
+        await _issueRepository.LoadIssueType(issue);
+        var issueViewModel = _mapper.Map<IssueViewModel>(issue);
+
+        if (issue.ParentId is Guid parentId)
+        {
+            issueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
+        }
+        return issueViewModel;
     }
     #endregion
 
@@ -179,23 +208,24 @@ public class SprintService : ISprintService
 
     public async Task<Dictionary<string, IReadOnlyCollection<IssueViewModel>>> GetAll(Guid projectId, GetSprintByFilterDto getSprintByFilterDto)
     {
-        var sprintIds = await _sprintRepository.GetSprintIdsByProjectId(projectId, getSprintByFilterDto);
-        var issues = await _issueRepository.GetBySprintIds(sprintIds, getSprintByFilterDto, projectId);
+        if (getSprintByFilterDto.SprintIds.Count > 0)
+        {
+            getSprintByFilterDto.SprintIds = await _sprintRepository.GetSprintIdsByProjectId(projectId);
+        }
+
+        string query = getSprintByFilterDto.FullQuery();
+        var issueIds = await _connectionFactory.QueryAsync<Guid>(query);
+        var issues = await _issueRepository.GetByIds(issueIds);
+
+        var issueViewModels = await ToIssueViewModels(issues);
+
         var issueOnBoard = new Dictionary<string, IReadOnlyCollection<IssueViewModel>>();
         var statuses = await _statusRepository.GetByProjectId(projectId);
 
         foreach (var status in statuses)
         {
-            var issueByStatusIds = issues.Where(i => i.StatusId == status.Id).ToList();
-            var issueViewModels = issueByStatusIds.Adapt<IReadOnlyCollection<IssueViewModel>>();
-            foreach (var issueViewModel in issueViewModels)
-            {
-                if (issueViewModel.ParentId is Guid parentId)
-                {
-                    issueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
-                }
-            }
-            issueOnBoard.Add(status.Name, issueViewModels);
+            var issueByStatusIds = issueViewModels.Where(i => i.StatusId == status.Id).ToList();
+            issueOnBoard.Add(status.Name, issueByStatusIds);
         }
 
         return issueOnBoard;

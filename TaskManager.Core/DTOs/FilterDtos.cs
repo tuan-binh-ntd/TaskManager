@@ -52,6 +52,7 @@ public class FilterConfiguration
     {
         return @"
             SELECT 
+            DISTINCT
               i.Id
             FROM (SELECT Id, Code FROM StatusCategories WHERE Code IN (N'To-do', N'In-Progress', N'Done')) sc
             INNER JOIN Statuses s ON sc.Id = s.StatusCategoryId
