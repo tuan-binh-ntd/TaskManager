@@ -276,7 +276,7 @@ public class ProjectService : IProjectService
             ProjectId = project.Id,
         };
 
-        // Create transition
+        // Working transition
         var workingTransition = new Transition()
         {
             Name = CoreConstants.WorkingTransitionName,
@@ -285,7 +285,7 @@ public class ProjectService : IProjectService
             ProjectId = project.Id,
         };
 
-        // Create transition
+        // Done transition
         var doneTransition = new Transition()
         {
             Name = CoreConstants.FinishedTransitionName,
@@ -328,16 +328,14 @@ public class ProjectService : IProjectService
         await _transitionRepository.UnitOfWork.SaveChangesAsync();
     }
 
-    private async Task CreateWorkflowForProject(Project project)
+    private async Task CreateWorkflowForProject(Project project, IReadOnlyCollection<IssueType> issueTypes)
     {
-        var workflow = new Workflow()
+        var workflow = new Workflow
         {
             Name = $"Workflow of {project.Name}",
             ProjectId = project.Id,
+            WorkflowIssueTypes = new List<WorkflowIssueType>()
         };
-
-        var issueTypes = await _issueTypeRepository.GetsByProjectId(project.Id);
-        workflow.WorkflowIssueTypes = new List<WorkflowIssueType>();
         foreach (var item in issueTypes)
         {
             var WorkflowIssueType = new WorkflowIssueType()
@@ -434,7 +432,7 @@ public class ProjectService : IProjectService
         return epicViewModel;
     }
 
-    private async Task CreateIssueTypesForProject(Project project)
+    private async Task<IReadOnlyCollection<IssueType>> CreateIssueTypesForProject(Project project)
     {
         var issueTypes = new List<IssueType>()
         {
@@ -487,6 +485,8 @@ public class ProjectService : IProjectService
 
         _issueTypeRepository.AddRange(issueTypes);
         await _issueTypeRepository.UnitOfWork.SaveChangesAsync();
+
+        return issueTypes.AsReadOnly();
     }
 
     private async Task CreatePrioritiesForProject(Project project)
@@ -702,9 +702,9 @@ public class ProjectService : IProjectService
 
         await CreateStatusForProject(project);
 
-        await CreateWorkflowForProject(project);
+        var issueTypes = await CreateIssueTypesForProject(project);
 
-        await CreateIssueTypesForProject(project);
+        await CreateWorkflowForProject(project, issueTypes);
 
         var productOwnerId = await CreateRolesForProject(project);
 
