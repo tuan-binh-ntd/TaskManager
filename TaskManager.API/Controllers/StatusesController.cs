@@ -50,4 +50,12 @@ public class StatusesController : BaseController
         var res = await _statusService.Gets(projectId, paginationInput);
         return CustomResult(res, HttpStatusCode.OK);
     }
+
+    [HttpGet("versions")]
+    [ProducesResponseType(typeof(IReadOnlyCollection<StatusViewModel>), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> Gets(Guid projectId)
+    {
+        var res = await _statusService.GetStatusViewModelsForViewAsync(projectId);
+        return CustomResult(res, HttpStatusCode.OK);
+    }
 }

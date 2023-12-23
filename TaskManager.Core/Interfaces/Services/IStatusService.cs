@@ -11,4 +11,5 @@ public interface IStatusService
     Task<Guid> Delete(Guid id, Guid newId);
     Task<object> Gets(Guid projectId, PaginationInput paginationInput);
     Task<IReadOnlyCollection<StatusCategoryViewModel>> GetStatusCategoryViewModels();
+    Task<IReadOnlyCollection<StatusViewModel>> GetStatusViewModelsForViewAsync(Guid projectId);
 }

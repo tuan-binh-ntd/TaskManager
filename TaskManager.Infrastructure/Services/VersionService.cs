@@ -251,7 +251,12 @@ public class VersionService : IVersionService
 #pragma warning restore CA2208 // Instantiate argument exceptions correctly
         }
 
-        version = _mapper.Map<Version>(updateVersionDto);
+        version.Name = string.IsNullOrWhiteSpace(updateVersionDto.Name) ? version.Name : updateVersionDto.Name;
+        version.StartDate = updateVersionDto.StartDate is DateTime startDate ? startDate : version.StartDate;
+        version.ReleaseDate = updateVersionDto.ReleaseDate is DateTime releaseDate ? releaseDate : version.ReleaseDate;
+        version.Description = string.IsNullOrWhiteSpace(updateVersionDto.Description) ? version.Description : updateVersionDto.Description;
+        version.DriverId = updateVersionDto.DriverId is Guid driverId ? driverId : version.DriverId;
+
         _versionRepository.Update(version);
         await _versionRepository.UnitOfWork.SaveChangesAsync();
         return _mapper.Map<VersionViewModel>(version);

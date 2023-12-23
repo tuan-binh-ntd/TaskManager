@@ -78,4 +78,10 @@ public class StatusService : IStatusService
         await _statusRepository.UnitOfWork.SaveChangesAsync();
         return status.Adapt<StatusViewModel>();
     }
+
+    public async Task<IReadOnlyCollection<StatusViewModel>> GetStatusViewModelsForViewAsync(Guid projectId)
+    {
+        var statusViewModels = await _statusRepository.GetStatusViewModelsAsync(projectId);
+        return statusViewModels;
+    }
 }
