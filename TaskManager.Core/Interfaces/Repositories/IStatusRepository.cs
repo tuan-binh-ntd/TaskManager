@@ -1,5 +1,6 @@
 ﻿using TaskManager.Core.Entities;
 using TaskManager.Core.Helper;
+using TaskManager.Core.ViewModel;
 
 namespace TaskManager.Core.Interfaces.Repositories;
 
@@ -15,4 +16,5 @@ public interface IStatusRepository : IRepository<Status>
     Task<PaginationResult<Status>> GetByProjectIdPaging(Guid projectId, PaginationInput paginationInput);
     Task<string?> GetNameOfStatus(Guid statusId);
     Task<bool> CheckStatusBelongDone(Guid statusId);
+    Task<IReadOnlyCollection<StatusViewModel>> GetStatusViewModelsAsync(Guid projectId);
 }

@@ -23,6 +23,7 @@ public class UpdateVersionDto
     /// someone in your team with project administrator permissions who’s responsible for coordinating the release from start to finish (by default, it’s the person who creates the version).
     /// </summary>
     public Guid? DriverId { get; set; }
+    public Guid StatusId { get; set; }
 }
 
 public class AddIssuesToVersionDto

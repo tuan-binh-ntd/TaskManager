@@ -39,6 +39,7 @@ public class StatusViewModel
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public bool IsMain { get; set; }
+    public Guid StatusCategoryId { get; set; }
 }
 
 public class StatusCategoryViewModel

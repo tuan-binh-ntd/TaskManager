@@ -4,6 +4,7 @@ using TaskManager.Core.Entities;
 using TaskManager.Core.Extensions;
 using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Repositories;
+using TaskManager.Core.ViewModel;
 using TaskManager.Infrastructure.Data;
 
 namespace TaskManager.Infrastructure.Repositories;
@@ -90,9 +91,23 @@ public class StatusRepository : IStatusRepository
     public async Task<bool> CheckStatusBelongDone(Guid statusId)
     {
         var query = from sc in _context.StatusCategories.Where(sc => sc.Code == CoreConstants.DoneCode)
-                     join s in _context.Statuses.Where(s => s.Id == statusId) on sc.Id equals s.StatusCategoryId
-                     select s;
+                    join s in _context.Statuses.Where(s => s.Id == statusId) on sc.Id equals s.StatusCategoryId
+                    select s;
 
         return await query.AnyAsync();
+    }
+
+    public async Task<IReadOnlyCollection<StatusViewModel>> GetStatusViewModelsAsync(Guid projectId)
+    {
+        var statusViewModels = await (from sc in _context.StatusCategories.Where(sc => sc.Code == CoreConstants.VersionCode)
+                                      join s in _context.Statuses.Where(S => S.ProjectId == projectId) on sc.Id equals s.StatusCategoryId
+                                      select new StatusViewModel
+                                      {
+                                          Id = s.Id,
+                                          Name = s.Name,
+                                          Description = s.Description,
+                                      }).ToListAsync();
+
+        return statusViewModels.AsReadOnly();
     }
 }
