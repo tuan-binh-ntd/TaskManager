@@ -1,4 +1,5 @@
 ﻿using TaskManager.Core.Entities;
+using TaskManager.Core.ViewModel;
 using Version = TaskManager.Core.Entities.Version;
 
 namespace TaskManager.Core.Interfaces.Repositories;
@@ -15,4 +16,5 @@ public interface IVersionRepository : IRepository<Version>
     void AddVersionIssue(VersionIssue versionIssue);
     void RemoveRange(IReadOnlyCollection<VersionIssue> versionIssues);
     Task<IReadOnlyCollection<VersionIssue>> GetVersionIssuesByIssueId(Guid issueId);
+    Task<IReadOnlyCollection<VersionViewModel>> GetStatusViewModelsByIssueId(Guid issueId);
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
+using TaskManager.Core.ViewModel;
 using TaskManager.Infrastructure.Data;
 using Version = TaskManager.Core.Entities.Version;
 
@@ -69,5 +70,18 @@ public class VersionRepository : IVersionRepository
     {
         var versionIssues = await _context.VersionIssues.Where(vi => vi.IssueId == issueId).ToListAsync();
         return versionIssues.AsReadOnly();
+    }
+
+    public async Task<IReadOnlyCollection<VersionViewModel>> GetStatusViewModelsByIssueId(Guid issueId)
+    {
+        var versionViewModels = await (from vi in _context.VersionIssues.Where(vi => vi.IssueId == issueId)
+                                       join v in _context.Versions on vi.VersionId equals v.Id
+                                       select new VersionViewModel
+                                       {
+                                           Id = v.Id,
+                                           Name = v.Name,
+                                       }).ToListAsync();
+
+        return versionViewModels.AsReadOnly();
     }
 }

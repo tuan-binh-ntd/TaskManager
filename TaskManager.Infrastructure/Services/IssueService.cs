@@ -99,6 +99,7 @@ public class IssueService : IIssueService
         var issueViewModel = _mapper.Map<IssueViewModel>(issue);
         var childIssues = await _issueRepository.GetChildIssueOfIssue(issue.Id);
         var labelsOfIssue = await _labelRepository.GetByIssueId(issue.Id);
+        var versionsOfIssue = await _versionRepository.GetStatusViewModelsByIssueId(issue.Id);
 
         if (issue.IssueDetail is not null)
         {
@@ -139,6 +140,7 @@ public class IssueService : IIssueService
             issueViewModel.ChildIssues = await ToChildIssueViewModels(childIssues);
         }
         issueViewModel.IssueDetail!.Labels = labelsOfIssue;
+        issueViewModel.IssueDetail!.Versions = versionsOfIssue;
         return issueViewModel;
     }
 

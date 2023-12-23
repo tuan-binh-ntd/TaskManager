@@ -6,6 +6,7 @@ public class GetSprintByFilterDto
     public IReadOnlyCollection<Guid> LabelIds { get; set; } = new List<Guid>();
     public IReadOnlyCollection<Guid> IssueTypeIds { get; set; } = new List<Guid>();
     public IReadOnlyCollection<Guid> SprintIds { get; set; } = new List<Guid>();
+    public IReadOnlyCollection<Guid> VerionIds { get; set; } = new List<Guid>();
     public string? SearchKey { get; set; } = string.Empty;
 
     private static string BaseQuery()
@@ -17,6 +18,7 @@ public class GetSprintByFilterDto
             FROM IssueTypes it
             JOIN Issues i ON it.Id = i.IssueTypeId AND it.[Level] = 2 AND it.ProjectId IS NOT NULL
             LEFT JOIN LabelIssues li ON i.Id = li.IssueId
+            LEFT JOIN VersionIssues vi ON i.Id = vi.IssueId
             WHERE 1 = 1
         ";
     }
@@ -54,10 +56,17 @@ public class GetSprintByFilterDto
             ";
             querys.Add(sprintQuery);
         }
+        if (VerionIds.Any())
+        {
+            string versionQuery = $@"
+                vi.VersionId IN ({string.Join(",", VerionIds.Select(x => $"'{x}'"))})
+            ";
+            querys.Add(versionQuery);
+        }
         if (!string.IsNullOrWhiteSpace(SearchKey))
         {
             string searchKeyQuery = $@"
-                i.[Name] = '{SearchKey}'
+                i.[Name] LIKE '%{SearchKey}%'
             ";
             querys.Add(searchKeyQuery);
         }

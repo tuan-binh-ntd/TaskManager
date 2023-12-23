@@ -65,6 +65,7 @@ public class IssueDetailViewModel
     public Guid ReporterId { get; set; }
     public int StoryPointEstimate { get; set; }
     public IReadOnlyCollection<LabelViewModel> Labels { get; set; } = new List<LabelViewModel>();
+    public IReadOnlyCollection<VersionViewModel> Versions { get; set; } = new List<VersionViewModel>();
 }
 
 public class ChildIssueViewModel
