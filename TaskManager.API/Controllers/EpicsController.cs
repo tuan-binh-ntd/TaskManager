@@ -49,7 +49,7 @@ public class EpicsController : BaseController
         var connectionIds = _presenceTracker.GetConnectionsForUserIds(res.UserIds);
         await _hubContext.Clients.Clients(connectionIds).SendAsync("NewNotification", res.Notification);
 
-        return CustomResult(res, HttpStatusCode.OK);
+        return CustomResult(res.Epic, HttpStatusCode.OK);
     }
 
     [HttpPut("{id}/issues:add")]
