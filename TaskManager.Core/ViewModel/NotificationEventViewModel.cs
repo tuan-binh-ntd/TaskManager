@@ -32,6 +32,7 @@ public class UserNotificationViewModel
     public IssueTypeViewModel IssueType { get; set; } = new();
     public string StatusName { get; set; } = string.Empty;
     public bool IsRead { get; set; }
+    public DateTime CreationTime { get; set; }
 }
 
 public class RealtimeNotificationViewModel

@@ -101,6 +101,7 @@ public class UserNotificationRepository : IUserNotificationRepository
                                                    },
                                                    StatusName = s.Name,
                                                    IsRead = un.IsRead,
+                                                   CreationTime = un.CreationTime,
                                                }).FirstOrDefaultAsync();
         return userNotificationViewModel;
     }
