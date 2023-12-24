@@ -33,6 +33,7 @@ public class UserNotificationViewModel
     public string StatusName { get; set; } = string.Empty;
     public bool IsRead { get; set; }
     public DateTime CreationTime { get; set; }
+    public string ProjectCode { get; set; } = string.Empty;
 }
 
 public class RealtimeNotificationViewModel
