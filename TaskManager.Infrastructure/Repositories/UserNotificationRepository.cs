@@ -59,7 +59,7 @@ public class UserNotificationRepository : IUserNotificationRepository
                                                     Name = un.Name,
                                                     CreatorUsername = u.Name,
                                                     CreatorUserId = u.Id,
-                                                    IssueId = u.Id,
+                                                    IssueId = i.Id,
                                                     IssueName = i.Name,
                                                     IssueCode = i.Code,
                                                     IssueType = new IssueTypeViewModel
@@ -115,7 +115,7 @@ public class UserNotificationRepository : IUserNotificationRepository
                                                    Name = u.Name,
                                                    CreatorUsername = u.Name,
                                                    CreatorUserId = u.Id,
-                                                   IssueId = u.Id,
+                                                   IssueId = i.Id,
                                                    IssueName = i.Name,
                                                    IssueCode = i.Code,
                                                    IssueType = new IssueTypeViewModel
