@@ -44,6 +44,20 @@ public class VersionService : IVersionService
         return versionViewModel;
     }
 
+    private async Task<IReadOnlyCollection<VersionViewModel>> ToVersionViewModels(IReadOnlyCollection<Version> versions)
+    {
+        var versionViewModels = new List<VersionViewModel>();
+        if (versions.Count > 0)
+        {
+            foreach (var version in versions)
+            {
+                var versionViewModel = await ToVersionViewModel(version);
+                versionViewModels.Add(versionViewModel);
+            }
+        }
+        return versionViewModels.AsReadOnly();
+    }
+
     private async Task<IReadOnlyCollection<IssueViewModel>> ToIssueViewModels(IReadOnlyCollection<Issue> issues)
     {
         var issueViewModels = new List<IssueViewModel>();
@@ -238,7 +252,7 @@ public class VersionService : IVersionService
     public async Task<IReadOnlyCollection<VersionViewModel>> GetByProjectId(Guid projectId)
     {
         var versions = await _versionRepository.GetByProjectId(projectId);
-        return _mapper.Map<IReadOnlyCollection<VersionViewModel>>(versions);
+        return await ToVersionViewModels(versions);
     }
 
     public async Task<VersionViewModel> Update(Guid id, UpdateVersionDto updateVersionDto)
