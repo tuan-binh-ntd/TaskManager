@@ -159,4 +159,5 @@ public interface IIssueRepository : IRepository<Issue>
     Task<int> CountIssueByIssueTypeId(Guid issueTypeId);
     Task<Guid> GetProjectIdOfIssue(Guid issueId);
     Task<Guid> GetProjectLeadIdOfIssue(Guid issueId);
+    Task<string> GetProjectCodeOfIssue(Guid issueId);
 }

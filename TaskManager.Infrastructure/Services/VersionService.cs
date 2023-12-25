@@ -1,5 +1,4 @@
-﻿using Mapster;
-using MapsterMapper;
+﻿using MapsterMapper;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
@@ -40,7 +39,7 @@ public class VersionService : IVersionService
         var versionViewModel = _mapper.Map<VersionViewModel>(version);
         var issueIds = await _versionRepository.GetIssueIdsByVersionId(version.Id);
         var issues = await _issueRepository.GetByIds(issueIds);
-        versionViewModel.Issues = issues.Adapt<IReadOnlyCollection<IssueViewModel>>();
+        versionViewModel.Issues = await ToIssueViewModels(issues);
         return versionViewModel;
     }
 
@@ -74,32 +73,14 @@ public class VersionService : IVersionService
 
     private async Task<IssueViewModel> ToIssueViewModel(Issue issue)
     {
-        await _issueRepository.LoadEntitiesRelationship(issue);
+        await _issueRepository.LoadIssueDetail(issue);
+        await _issueRepository.LoadStatus(issue);
+        await _issueRepository.LoadIssueType(issue);
         var issueViewModel = _mapper.Map<IssueViewModel>(issue);
         if (issue.IssueDetail is not null)
         {
             var issueDetail = _mapper.Map<IssueDetailViewModel>(issue.IssueDetail);
             issueViewModel.IssueDetail = issueDetail;
-        }
-        if (issue.IssueHistories is not null && issue.IssueHistories.Any())
-        {
-            var issueHistories = _mapper.Map<ICollection<IssueHistoryViewModel>>(issue.IssueHistories);
-            issueViewModel.IssueHistories = issueHistories;
-        }
-        if (issue.Comments is not null && issue.Comments.Any())
-        {
-            var comments = _mapper.Map<ICollection<CommentViewModel>>(issue.Comments);
-            issueViewModel.Comments = comments;
-        }
-        if (issue.Attachments is not null && issue.Attachments.Any())
-        {
-            var attachments = _mapper.Map<ICollection<AttachmentViewModel>>(issue.Attachments);
-            issueViewModel.Attachments = attachments;
-        }
-        if (issue.IssueType is not null)
-        {
-            var issueType = _mapper.Map<IssueTypeViewModel>(issue.IssueType);
-            issueViewModel.IssueType = issueType;
         }
         if (issue.Status is not null)
         {
@@ -110,10 +91,10 @@ public class VersionService : IVersionService
         {
             issueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
         }
-        var childIssues = await _issueRepository.GetChildIssueOfIssue(issue.Id);
-        if (childIssues.Any())
+        if (issue.IssueType is not null)
         {
-            issueViewModel.ChildIssues = await ToChildIssueViewModels(childIssues);
+            var issueType = _mapper.Map<IssueTypeViewModel>(issue.IssueType);
+            issueViewModel.IssueType = issueType;
         }
         return issueViewModel;
     }
@@ -158,55 +139,6 @@ public class VersionService : IVersionService
             };
         }
 
-    }
-    private async Task<IReadOnlyCollection<ChildIssueViewModel>> ToChildIssueViewModels(IReadOnlyCollection<Issue> issues)
-    {
-        var childIssueViewModels = new List<ChildIssueViewModel>();
-        if (issues.Any())
-        {
-            foreach (var issue in issues)
-            {
-                var childIssueViewModel = await ToChildIssueViewModel(issue);
-                childIssueViewModels.Add(childIssueViewModel);
-            }
-        }
-        return childIssueViewModels.AsReadOnly();
-    }
-
-    private async Task<ChildIssueViewModel> ToChildIssueViewModel(Issue childIssue)
-    {
-        await _issueRepository.LoadAttachments(childIssue);
-        await _issueRepository.LoadIssueDetail(childIssue);
-        await _issueRepository.LoadIssueType(childIssue);
-        await _issueRepository.LoadStatus(childIssue);
-
-        var childIssueViewModel = _mapper.Map<ChildIssueViewModel>(childIssue);
-
-        if (childIssue.IssueDetail is not null)
-        {
-            var issueDetail = _mapper.Map<IssueDetailViewModel>(childIssue.IssueDetail);
-            childIssueViewModel.IssueDetail = issueDetail;
-        }
-        if (childIssue.Attachments is not null && childIssue.Attachments.Any())
-        {
-            var attachments = _mapper.Map<ICollection<AttachmentViewModel>>(childIssue.Attachments);
-            childIssueViewModel.Attachments = attachments;
-        }
-        if (childIssue.IssueType is not null)
-        {
-            var issueType = _mapper.Map<IssueTypeViewModel>(childIssue.IssueType);
-            childIssueViewModel.IssueType = issueType;
-        }
-        if (childIssue.Status is not null)
-        {
-            var status = _mapper.Map<StatusViewModel>(childIssue.Status);
-            childIssueViewModel.Status = status;
-        }
-        if (childIssue.ParentId is Guid parentId)
-        {
-            childIssueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
-        }
-        return childIssueViewModel;
     }
     #endregion
 

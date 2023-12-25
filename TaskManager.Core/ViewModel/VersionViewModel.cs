@@ -13,6 +13,7 @@ public class VersionViewModel
     public Guid DriverId { get; set; }
     public Guid ProjectId { get; set; }
     public Guid StatusId { get; set; }
+    public Guid StatusCategoryId { get; set; }
     public IReadOnlyCollection<IssueViewModel>? Issues { get; set; }
 }
 

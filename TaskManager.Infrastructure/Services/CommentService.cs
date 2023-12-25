@@ -52,20 +52,14 @@ public class CommentService : ICommentService
 
         var senderName = await _userManager.Users.Where(u => u.Id == createCommentDto.CreatorUserId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
         var projectName = await _issueRepository.GetProjectNameOfIssue(issueId);
+        var projectCode = await _issueRepository.GetProjectCodeOfIssue(issueId);
 
         var addNewCommentIssueEmailContentDto = new AddNewCommentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, createCommentDto.Content);
 
         string emailContent = EmailContentConstants.AddNewCommentIssueContent(addNewCommentIssueEmailContentDto);
 
-        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-        {
-            SenderName = senderName,
-            ActionName = EmailConstants.MadeOneUpdate,
-            ProjectName = projectName,
-            IssueCode = issue.Code,
-            IssueName = issue.Name,
-            EmailContent = emailContent,
-        };
+        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.MadeOneUpdate, projectName, issue.Code, issue.Name, emailContent, projectCode, issueId);
+
         if (someoneMadeCommentEvent is not null)
         {
             await _emailSender.SendEmailWhenUpdateIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: createCommentDto.CreatorUserId, buidEmailTemplateBaseDto, someoneMadeCommentEvent);
@@ -85,21 +79,16 @@ public class CommentService : ICommentService
         var commentDeletedEvent = notificationConfig.Where(n => n.EventName == CoreConstants.CommentDeletedName).FirstOrDefault();
 
         var senderName = await _userManager.Users.Where(u => u.Id == userId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
+        var projectCode = await _issueRepository.GetProjectCodeOfIssue(issueId);
+
         var projectName = await _issueRepository.GetProjectNameOfIssue(issueId);
 
         var deleteCommentIssueEmailContentDto = new DeleteCommentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, comment.Content);
 
         string emailContent = EmailContentConstants.DeleteCommentIssueContent(deleteCommentIssueEmailContentDto);
 
-        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-        {
-            SenderName = senderName,
-            ActionName = EmailConstants.DeleteOneComment,
-            ProjectName = projectName,
-            IssueCode = issue.Code,
-            IssueName = issue.Name,
-            EmailContent = emailContent,
-        };
+        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.DeleteOneComment, projectName, issue.Code, issue.Name, emailContent, projectCode, issueId);
+
         if (commentDeletedEvent is not null)
         {
             await _emailSender.SendEmailWhenUpdateIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: userId, buidEmailTemplateBaseDto, commentDeletedEvent);

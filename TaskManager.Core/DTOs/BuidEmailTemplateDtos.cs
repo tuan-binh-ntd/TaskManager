@@ -1,13 +1,31 @@
-﻿namespace TaskManager.Core.DTOs;
+﻿using TaskManager.Core.Core;
+
+namespace TaskManager.Core.DTOs;
 
 public class BuidEmailTemplateBaseDto
 {
+    public BuidEmailTemplateBaseDto(string senderName, string actionName, string projectName, string issueCode, string issueName, string emailContent, string projectCode, Guid issueId)
+    {
+        SenderName = senderName;
+        ActionName = actionName;
+        ProjectName = projectName;
+        IssueCode = issueCode;
+        IssueName = issueName;
+        EmailContent = emailContent;
+        ProjectCode = projectCode;
+        IssueId = issueId;
+        IssueLink = $"{EmailConstants.FrontEndUrl}project/{projectCode}/backlog/{issueId}";
+    }
+
     public string SenderName { get; set; } = string.Empty;
     public string ActionName { get; set; } = string.Empty;
     public string ProjectName { get; set; } = string.Empty;
     public string IssueCode { get; set; } = string.Empty;
     public string IssueName { get; set; } = string.Empty;
     public string EmailContent { get; set; } = string.Empty;
+    public string ProjectCode { get; set; } = string.Empty;
+    public Guid IssueId { get; set; }
+    public string IssueLink { get; set; } = string.Empty;
 }
 
 public abstract class IssueEmailContentBase

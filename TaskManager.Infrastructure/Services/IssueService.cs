@@ -30,7 +30,6 @@ public class IssueService : IIssueService
     private readonly IPriorityRepository _priorityRepository;
     private readonly IVersionRepository _versionRepository;
     private readonly ILabelRepository _labelRepository;
-    private readonly IProjectRepository _projectRepository;
     private readonly INotificationRepository _notificationRepository;
     private readonly IUserNotificationRepository _userNotificationRepository;
     private readonly IMapper _mapper;
@@ -51,7 +50,6 @@ public class IssueService : IIssueService
         IPriorityRepository priorityRepository,
         IVersionRepository versionRepository,
         ILabelRepository labelRepository,
-        IProjectRepository projectRepository,
         INotificationRepository notificationRepository,
         IUserNotificationRepository userNotificationRepository,
         IMapper mapper
@@ -72,7 +70,6 @@ public class IssueService : IIssueService
         _priorityRepository = priorityRepository;
         _versionRepository = versionRepository;
         _labelRepository = labelRepository;
-        _projectRepository = projectRepository;
         _notificationRepository = notificationRepository;
         _userNotificationRepository = userNotificationRepository;
         _mapper = mapper;
@@ -259,6 +256,7 @@ public class IssueService : IIssueService
         var projectName = await _issueRepository.GetProjectNameOfIssue(issue.Id);
         var projectId = await _issueRepository.GetProjectIdOfIssue(issue.Id);
         var notificationConfig = await _notificationRepository.GetNotificationIssueEventByProjectId(projectId);
+        var projectCode = await _issueRepository.GetProjectCodeOfIssue(issue.Id);
 
         var issueEditedEvent = notificationConfig.Where(n => n.EventName == CoreConstants.IssueEditedName).FirstOrDefault();
         var someoneAssignedEvent = notificationConfig.Where(n => n.EventName == CoreConstants.SomeoneAssignedToAIssueName).FirstOrDefault();
@@ -270,7 +268,7 @@ public class IssueService : IIssueService
 
         if (!string.IsNullOrWhiteSpace(updateIssueDto.Name))
         {
-            await ChangeNameIssue(issue, updateIssueDto, issueHistories, senderName, projectName, issueEditedEvent);
+            await ChangeNameIssue(issue, updateIssueDto, issueHistories, senderName, projectName, issueEditedEvent, projectCode);
             userIds = await GetUserIdsByNotificationConfig(issue.Id, issueEditedEvent);
         }
         else if (!string.IsNullOrWhiteSpace(updateIssueDto.Description))
@@ -279,25 +277,25 @@ public class IssueService : IIssueService
         }
         else if (updateIssueDto.ParentId is Guid parentId)
         {
-            await ChangeParentIssue(issue, updateIssueDto, issueHistories, parentId, senderName, projectName, issueEditedEvent);
+            await ChangeParentIssue(issue, updateIssueDto, issueHistories, parentId, senderName, projectName, issueEditedEvent, projectCode);
             userIds = await GetUserIdsByNotificationConfig(issue.Id, issueEditedEvent);
 
         }
         else if (updateIssueDto.SprintId is Guid newSprintId)
         {
-            await ChangeSprintIssue(issue, updateIssueDto, issueHistories, newSprintId, senderName, projectName, issueMovedEvent);
+            await ChangeSprintIssue(issue, updateIssueDto, issueHistories, newSprintId, senderName, projectName, issueMovedEvent, projectCode);
             userIds = await GetUserIdsByNotificationConfig(issue.Id, issueMovedEvent);
 
         }
         else if (updateIssueDto.IssueTypeId is Guid newIssueTypeId)
         {
-            await ChangeIssueTypeIssue(issue, updateIssueDto, issueHistories, newIssueTypeId, senderName, projectName, issueEditedEvent);
+            await ChangeIssueTypeIssue(issue, updateIssueDto, issueHistories, newIssueTypeId, senderName, projectName, issueEditedEvent, projectCode);
             userIds = await GetUserIdsByNotificationConfig(issue.Id, issueEditedEvent);
 
         }
         else if (updateIssueDto.BacklogId is Guid backlogId)
         {
-            await ChangeBacklogIssue(issue, updateIssueDto, issueHistories, backlogId, senderName, projectName, issueMovedEvent);
+            await ChangeBacklogIssue(issue, updateIssueDto, issueHistories, backlogId, senderName, projectName, issueMovedEvent, projectCode);
             userIds = await GetUserIdsByNotificationConfig(issue.Id, issueMovedEvent);
 
         }
@@ -309,13 +307,13 @@ public class IssueService : IIssueService
                 issue.CompleteDate = DateTime.Now;
             }
 
-            await ChangeStatusIssue(issue, updateIssueDto, issueHistories, newStatusId, senderName, projectName, issueMovedEvent);
+            await ChangeStatusIssue(issue, updateIssueDto, issueHistories, newStatusId, senderName, projectName, issueMovedEvent, projectCode);
             userIds = await GetUserIdsByNotificationConfig(issue.Id, issueMovedEvent);
 
         }
         else if (updateIssueDto.PriorityId is Guid newPriorityId)
         {
-            await ChangePriorityIssue(issue, updateIssueDto, issueHistories, newPriorityId, senderName, projectName, issueEditedEvent);
+            await ChangePriorityIssue(issue, updateIssueDto, issueHistories, newPriorityId, senderName, projectName, issueEditedEvent, projectCode);
             userIds = await GetUserIdsByNotificationConfig(issue.Id, issueEditedEvent);
 
         }
@@ -325,19 +323,19 @@ public class IssueService : IIssueService
             || updateIssueDto.StoryPointEstimate is 0 && issueDetail.StoryPointEstimate is not 0
             )
         {
-            await ChangeSPEIssue(issue, issueDetail, updateIssueDto, issueHistories, senderName, projectName, issueEditedEvent);
+            await ChangeSPEIssue(issue, issueDetail, updateIssueDto, issueHistories, senderName, projectName, issueEditedEvent, projectCode);
             userIds = await GetUserIdsByNotificationConfig(issue.Id, issueEditedEvent);
 
         }
         else if (updateIssueDto.ReporterId is Guid reporterId)
         {
-            await ChangeReporterIssue(issue, issueDetail, updateIssueDto, issueHistories, reporterId, senderName, projectName, issueEditedEvent);
+            await ChangeReporterIssue(issue, issueDetail, updateIssueDto, issueHistories, reporterId, senderName, projectName, issueEditedEvent, projectCode);
             userIds = await GetUserIdsByNotificationConfig(issue.Id, issueEditedEvent);
 
         }
         else if (updateIssueDto.AssigneeId != Guid.Empty)
         {
-            await ChangeAssigneeIssue(issue, issueDetail, updateIssueDto, issueHistories, senderName, projectName, someoneAssignedEvent);
+            await ChangeAssigneeIssue(issue, issueDetail, updateIssueDto, issueHistories, senderName, projectName, someoneAssignedEvent, projectCode);
             userIds = await GetUserIdsByNotificationConfig(issue.Id, someoneAssignedEvent);
         }
 
@@ -489,7 +487,7 @@ public class IssueService : IIssueService
         }
     }
 
-    private async Task ChangeNameIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel)
+    private async Task ChangeNameIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel, string projectCode)
     {
         var updatedTheSumaryHis = new IssueHistory()
         {
@@ -509,15 +507,8 @@ public class IssueService : IIssueService
 
         string emailContent = EmailContentConstants.ChangeNameIssueContent(changeNameIssueEmailContentDto);
 
-        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-        {
-            SenderName = senderName,
-            ActionName = EmailConstants.MadeOneUpdate,
-            ProjectName = projectName,
-            IssueCode = issue.Code,
-            IssueName = issue.Name,
-            EmailContent = emailContent,
-        };
+        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.MadeOneUpdate, projectName, issue.Code, issue.Name, emailContent, projectCode, issue.Id);
+
         if (notificationEventViewModel is not null)
         {
             await _emailSender.SendEmailWhenUpdateIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: updateIssueDto.ModificationUserId, buidEmailTemplateBaseDto, notificationEventViewModel);
@@ -540,7 +531,7 @@ public class IssueService : IIssueService
         issue.Description = updateIssueDto.Description;
     }
 
-    private async Task ChangeParentIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid parentId, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel)
+    private async Task ChangeParentIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid parentId, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel, string projectCode)
     {
         string? oldParentName = issue.ParentId is not null ? await _issueRepository.GetNameOfIssue((Guid)issue.ParentId) : IssueConstants.None_IssueHistoryContent;
         string? newParentName = await _issueRepository.GetNameOfIssue(parentId);
@@ -561,15 +552,7 @@ public class IssueService : IIssueService
 
         string emailContent = EmailContentConstants.ChangeParentIssueContent(changeParentIssueEmailContentDto);
 
-        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-        {
-            SenderName = senderName,
-            ActionName = EmailConstants.MadeOneUpdate,
-            ProjectName = projectName,
-            IssueCode = issue.Code,
-            IssueName = issue.Name,
-            EmailContent = emailContent,
-        };
+        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.MadeOneUpdate, projectName, issue.Code, issue.Name, emailContent, projectCode, issue.Id);
 
         if (notificationEventViewModel is not null)
         {
@@ -579,7 +562,7 @@ public class IssueService : IIssueService
         issue.ParentId = parentId;
     }
 
-    private async Task ChangeSprintIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid newSprintId, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel)
+    private async Task ChangeSprintIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid newSprintId, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel, string projectCode)
     {
         if (issue.SprintId is Guid oldSprintId)
         {
@@ -602,15 +585,7 @@ public class IssueService : IIssueService
 
             string emailContent = EmailContentConstants.ChangeSprintIssueContent(changeSprintIssueEmailContentDto);
 
-            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-            {
-                SenderName = senderName,
-                ActionName = EmailConstants.MadeOneUpdate,
-                ProjectName = projectName,
-                IssueCode = issue.Code,
-                IssueName = issue.Name,
-                EmailContent = emailContent,
-            };
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.MadeOneUpdate, projectName, issue.Code, issue.Name, emailContent, projectCode, issue.Id);
 
             if (notificationEventViewModel is not null)
             {
@@ -637,15 +612,7 @@ public class IssueService : IIssueService
 
             string emailContent = EmailContentConstants.ChangeSprintIssueContent(changeSprintIssueEmailContentDto);
 
-            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-            {
-                SenderName = senderName,
-                ActionName = EmailConstants.MadeOneUpdate,
-                ProjectName = projectName,
-                IssueCode = issue.Code,
-                IssueName = issue.Name,
-                EmailContent = emailContent,
-            };
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.MadeOneUpdate, projectName, issue.Code, issue.Name, emailContent, projectCode, issue.Id);
 
             if (notificationEventViewModel is not null)
             {
@@ -656,7 +623,7 @@ public class IssueService : IIssueService
         issue.SprintId = newSprintId;
     }
 
-    private async Task ChangeIssueTypeIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid newIssueTypeId, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel)
+    private async Task ChangeIssueTypeIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid newIssueTypeId, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel, string projectCode)
     {
         string? newIssueTypeName = await _issueTypeRepository.GetNameOfIssueType(newIssueTypeId);
         string? oldIssueTypeName = await _issueTypeRepository.GetNameOfIssueType(issue.IssueTypeId);
@@ -677,15 +644,7 @@ public class IssueService : IIssueService
 
         string emailContent = EmailContentConstants.ChangeIssueTypeIssueContent(changeIssueTypeIssueEmailContentDto);
 
-        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-        {
-            SenderName = senderName,
-            ActionName = EmailConstants.MadeOneUpdate,
-            ProjectName = projectName,
-            IssueCode = issue.Code,
-            IssueName = issue.Name,
-            EmailContent = emailContent,
-        };
+        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.MadeOneUpdate, projectName, issue.Code, issue.Name, emailContent, projectCode, issue.Id);
 
         if (notificationEventViewModel is not null)
         {
@@ -695,7 +654,7 @@ public class IssueService : IIssueService
         issue.IssueTypeId = newIssueTypeId;
     }
 
-    private async Task ChangeBacklogIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid backlogId, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel)
+    private async Task ChangeBacklogIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid backlogId, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel, string projectCode)
     {
         if (issue.SprintId is Guid oldSprintId)
         {
@@ -717,15 +676,7 @@ public class IssueService : IIssueService
 
             string emailContent = EmailContentConstants.ChangeSprintIssueContent(changeSprintIssueEmailContentDto);
 
-            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-            {
-                SenderName = senderName,
-                ActionName = EmailConstants.MadeOneUpdate,
-                ProjectName = projectName,
-                IssueCode = issue.Code,
-                IssueName = issue.Name,
-                EmailContent = emailContent,
-            };
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.MadeOneUpdate, projectName, issue.Code, issue.Name, emailContent, projectCode, issue.Id);
 
             if (notificationEventViewModel is not null)
             {
@@ -735,7 +686,7 @@ public class IssueService : IIssueService
         issue.BacklogId = backlogId;
     }
 
-    private async Task ChangeAssigneeIssue(Issue issue, IssueDetail issueDetail, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel)
+    private async Task ChangeAssigneeIssue(Issue issue, IssueDetail issueDetail, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel, string projectCode)
     {
         var changedTheAssigneeHis = new IssueHistory()
         {
@@ -745,14 +696,7 @@ public class IssueService : IIssueService
             IssueId = issue.Id,
         };
 
-        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-        {
-            SenderName = senderName,
-            ActionName = EmailConstants.MadeOneUpdate,
-            ProjectName = projectName,
-            IssueCode = issue.Code,
-            IssueName = issue.Name,
-        };
+        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.MadeOneUpdate, projectName, issue.Code, issue.Name, string.Empty, projectCode, issue.Id);
 
         var changeAssigneeIssueEmailContentDto = new ChangeAssigneeIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue);
 
@@ -839,7 +783,7 @@ public class IssueService : IIssueService
         }
     }
 
-    private async Task ChangeStatusIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid newStatusId, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel)
+    private async Task ChangeStatusIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid newStatusId, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel, string projectCode)
     {
         if (issue.StatusId is Guid oldStatusId)
         {
@@ -862,15 +806,7 @@ public class IssueService : IIssueService
 
             string emailContent = EmailContentConstants.ChangeStatusIssueContent(changeStatusIssueEmailContentDto);
 
-            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-            {
-                SenderName = senderName,
-                ActionName = EmailConstants.MadeOneUpdate,
-                ProjectName = projectName,
-                IssueCode = issue.Code,
-                IssueName = issue.Name,
-                EmailContent = emailContent,
-            };
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.MadeOneUpdate, projectName, issue.Code, issue.Name, emailContent, projectCode, issue.Id);
 
             if (notificationEventViewModel is not null)
             {
@@ -881,7 +817,7 @@ public class IssueService : IIssueService
         issue.StatusId = newStatusId;
     }
 
-    private async Task ChangePriorityIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid newPriorityId, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel)
+    private async Task ChangePriorityIssue(Issue issue, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid newPriorityId, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel, string projectCode)
     {
         if (issue.PriorityId is Guid oldPriorityId)
         {
@@ -905,15 +841,7 @@ public class IssueService : IIssueService
 
             string emailContent = EmailContentConstants.ChangePriorityIssueContent(changePriorityIssueEmailContentDto);
 
-            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-            {
-                SenderName = senderName,
-                ActionName = EmailConstants.MadeOneUpdate,
-                ProjectName = projectName,
-                IssueCode = issue.Code,
-                IssueName = issue.Name,
-                EmailContent = emailContent,
-            };
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.MadeOneUpdate, projectName, issue.Code, issue.Name, emailContent, projectCode, issue.Id);
 
             if (notificationEventViewModel is not null)
             {
@@ -941,15 +869,7 @@ public class IssueService : IIssueService
 
             string emailContent = EmailContentConstants.ChangePriorityIssueContent(changePriorityIssueEmailContentDto);
 
-            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-            {
-                SenderName = senderName,
-                ActionName = EmailConstants.MadeOneUpdate,
-                ProjectName = projectName,
-                IssueCode = issue.Code,
-                IssueName = issue.Name,
-                EmailContent = emailContent,
-            };
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.MadeOneUpdate, projectName, issue.Code, issue.Name, emailContent, projectCode, issue.Id);
 
             if (notificationEventViewModel is not null)
             {
@@ -960,7 +880,7 @@ public class IssueService : IIssueService
         issue.PriorityId = newPriorityId;
     }
 
-    private async Task ChangeSPEIssue(Issue issue, IssueDetail issueDetail, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel)
+    private async Task ChangeSPEIssue(Issue issue, IssueDetail issueDetail, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel, string projectCode)
     {
         var updatedTheSPEHis = new IssueHistory()
         {
@@ -979,15 +899,7 @@ public class IssueService : IIssueService
 
         string emailContent = EmailContentConstants.ChangeSPEIssueContent(changeSPEIssueEmailContentDto);
 
-        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-        {
-            SenderName = senderName,
-            ActionName = EmailConstants.MadeOneUpdate,
-            ProjectName = projectName,
-            IssueCode = issue.Code,
-            IssueName = issue.Name,
-            EmailContent = emailContent,
-        };
+        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.MadeOneUpdate, projectName, issue.Code, issue.Name, emailContent, projectCode, issue.Id);
 
         if (notificationEventViewModel is not null)
         {
@@ -997,7 +909,7 @@ public class IssueService : IIssueService
         issueDetail.StoryPointEstimate = updateIssueDto.StoryPointEstimate ?? 0;
     }
 
-    private async Task ChangeReporterIssue(Issue issue, IssueDetail issueDetail, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid reporterId, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel)
+    private async Task ChangeReporterIssue(Issue issue, IssueDetail issueDetail, UpdateIssueDto updateIssueDto, List<IssueHistory> issueHistories, Guid reporterId, string senderName, string projectName, NotificationEventViewModel? notificationEventViewModel, string projectCode)
     {
         var updatedTheReporterHis = new IssueHistory()
         {
@@ -1025,15 +937,7 @@ public class IssueService : IIssueService
 
         string emailContent = EmailContentConstants.ChangeReporterIssueContent(changeReporterIssueEmailContentDto);
 
-        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-        {
-            SenderName = senderName,
-            ActionName = EmailConstants.MadeOneUpdate,
-            ProjectName = projectName,
-            IssueCode = issue.Code,
-            IssueName = issue.Name,
-            EmailContent = emailContent,
-        };
+        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.MadeOneUpdate, projectName, issue.Code, issue.Name, emailContent, projectCode, issue.Id);
 
         if (notificationEventViewModel is not null)
         {
@@ -1283,16 +1187,12 @@ public class IssueService : IIssueService
             };
 
             string emailContent = EmailContentConstants.CreatedIssueContent(createdIssueEmailContentDto);
+            var senderName = await _userManager.Users.Where(u => u.Id == createIssueByNameDto.CreatorUserId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
+            var projectName = await _issueRepository.GetProjectNameOfIssue(issue.Id);
+            var projectCode = await _issueRepository.GetProjectCodeOfIssue(issue.Id);
 
-            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-            {
-                SenderName = await _userManager.Users.Where(u => u.Id == createIssueByNameDto.CreatorUserId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent,
-                ActionName = EmailConstants.CreatedAnIssue,
-                ProjectName = await _projectRepository.GetProjectName(createIssueByNameDto.ProjectId),
-                IssueCode = issue.Code,
-                IssueName = issue.Name,
-                EmailContent = emailContent,
-            };
+
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.CreatedAnIssue, projectName, issue.Code, issue.Name, emailContent, projectCode, issue.Id);
 
             await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: createIssueByNameDto.CreatorUserId, buidEmailTemplateBaseDto, issueCreatedEvent);
         }

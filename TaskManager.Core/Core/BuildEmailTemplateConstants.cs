@@ -110,10 +110,10 @@ public static class BuildEmailTemplateConstants
                                                                     <tr>
                                                                         <td style=""padding:0;padding:0""> <a
                                                                                 class=""m_-5525498053404099447ak-button__appearance-primary""
-                                                                                href=""https://techshopmanagement.atlassian.net/browse/TC-234?atlOrigin=eyJpIjoiMWE5OWQwZTNiNjQ4NDFjYTk3ZDVhM2M1NTFhZjU0MGEiLCJwIjoiaiJ9""
+                                                                                href=""{buidEmailTemplateDto.IssueLink}""
                                                                                 style=""color:#0052cc;text-decoration:none;box-sizing:border-box;border-radius:3px;border-width:0;display:inline-flex;font-style:normal;font-size:inherit;height:2.2857144em;line-height:2.2857144em;margin:0;outline:none;padding:0 12px;text-align:center;vertical-align:middle;white-space:nowrap;background:#0052cc;color:#ffffff;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto','Oxygen','Ubuntu','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;font-size:14px;padding:0 38px""
                                                                                 target=""_blank""
-                                                                                data-saferedirecturl=""https://www.google.com/url?q=https://techshopmanagement.atlassian.net/browse/TC-234?atlOrigin%3DeyJpIjoiMWE5OWQwZTNiNjQ4NDFjYTk3ZDVhM2M1NTFhZjU0MGEiLCJwIjoiaiJ9&amp;source=gmail&amp;ust=1701759535684000&amp;usg=AOvVaw290j2jPHB-VO2eX48-g1Y7"">View issue</a> </td>
+                                                                                data-saferedirecturl=""https://www.google.com/url?q={buidEmailTemplateDto.IssueLink};source=gmail&amp;ust=1701759535684000&amp;usg=AOvVaw290j2jPHB-VO2eX48-g1Y7"">View issue</a> </td>
                                                                     </tr>
                                                                 </tbody>
                                                             </table>
