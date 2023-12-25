@@ -38,10 +38,12 @@ public class NotificationHub : Hub
 
     public async Task ReadNotification(Guid id)
     {
+        var userId = Context.User!.GetUserId();
+
         var res = await _userNotificationService.ReadNotification(id);
         await Clients.Caller.SendAsync("ReadNotification", res);
 
-        int unreadNotificationNum = await _userNotificationService.GetUnreadUserNotificationNumOfUser(id);
+        int unreadNotificationNum = await _userNotificationService.GetUnreadUserNotificationNumOfUser(userId);
         await Clients.Caller.SendAsync("UnreadNotificationNum", unreadNotificationNum);
     }
 
