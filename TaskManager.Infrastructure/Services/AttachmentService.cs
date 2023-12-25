@@ -176,6 +176,7 @@ public class AttachmentService : IAttachmentService
         {
             var senderName = await _userManager.Users.Where(u => u.Id == userId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
             var projectName = await _issueRepository.GetProjectNameOfIssue(issueId);
+            var projectCode = await _issueRepository.GetProjectCodeOfIssue(issueId);
 
             var addNewAttachmentIssueEmailContentDto = new AddNewAttachmentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
             {
@@ -184,15 +185,8 @@ public class AttachmentService : IAttachmentService
 
             string emailContent = EmailContentConstants.AddNewAttachmentIssueContent(addNewAttachmentIssueEmailContentDto);
 
-            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-            {
-                SenderName = senderName,
-                ActionName = EmailConstants.AddOneNewAttachment,
-                ProjectName = projectName,
-                IssueCode = issue.Code,
-                IssueName = issue.Name,
-                EmailContent = emailContent,
-            };
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.AddOneNewAttachment, projectName, issue.Code, issue.Name, emailContent, projectCode, issueId);
+
             if (someoneAddedAttachmentEvent is not null)
             {
                 await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: userId, buidEmailTemplateBaseDto, someoneAddedAttachmentEvent);
@@ -224,6 +218,7 @@ public class AttachmentService : IAttachmentService
 
         var senderName = await _userManager.Users.Where(u => u.Id == userId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
         var projectName = await _issueRepository.GetProjectNameOfIssue(issueId);
+        var projectCode = await _issueRepository.GetProjectCodeOfIssue(issueId);
 
         var deleteNewAttachmentIssueEmailContentDto = new DeleteNewAttachmentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
         {
@@ -232,15 +227,7 @@ public class AttachmentService : IAttachmentService
 
         string emailContent = EmailContentConstants.DeleteNewAttachmentIssueContent(deleteNewAttachmentIssueEmailContentDto);
 
-        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto()
-        {
-            SenderName = senderName,
-            ActionName = EmailConstants.DeleteOneNewAttachment,
-            ProjectName = projectName,
-            IssueCode = issue.Code,
-            IssueName = issue.Name,
-            EmailContent = emailContent,
-        };
+        var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.AddOneNewAttachment, projectName, issue.Code, issue.Name, emailContent, projectCode, issueId);
 
         if (attachmentDeletedEvent is not null)
         {

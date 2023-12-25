@@ -10,5 +10,5 @@ public class EmailConstants
     public const string DeleteOneNewAttachment = "deleted 1 attachment";
     public const string DeleteOneComment = "deleted 1 comment";
 
-    public const string FrontEndUrl = "/project/${notification.projectCode}/backlog/${notification.issueId}";
+    public const string FrontEndUrl = "http://localhost:3000/";
 }
