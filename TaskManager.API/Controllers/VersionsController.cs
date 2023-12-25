@@ -44,9 +44,9 @@ public class VersionsController : BaseController
 
     [HttpDelete("{id}")]
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id, [FromQuery] Guid? newVersionId)
     {
-        var res = await _versionService.Delete(id);
+        var res = await _versionService.Delete(id, newVersionId);
         return CustomResult(res, HttpStatusCode.OK);
     }
 

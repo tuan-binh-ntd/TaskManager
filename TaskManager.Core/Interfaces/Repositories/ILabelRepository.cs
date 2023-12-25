@@ -19,4 +19,6 @@ public interface ILabelRepository : IRepository<Label>
     void AddRange(IReadOnlyCollection<LabelIssue> labelIssues);
     Task<IReadOnlyCollection<LabelIssue>> GetLabelIssuesByIssueId(Guid issueId);
     void RemoveRange(IReadOnlyCollection<LabelIssue> labelIssues);
+    Task<IReadOnlyCollection<LabelIssue>> GetLabelIssuesByLabelId(Guid labelId);
+
 }

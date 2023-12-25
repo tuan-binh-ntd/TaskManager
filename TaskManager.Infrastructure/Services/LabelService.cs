@@ -36,6 +36,8 @@ public class LabelService : ILabelService
     public async Task<Guid> Delete(Guid id)
     {
         var label = await _labelRepository.GetById(id) ?? throw new LabelNullException();
+        var labelIssues = await _labelRepository.GetLabelIssuesByLabelId(label.Id);
+        _labelRepository.RemoveRange(labelIssues);
         _labelRepository.Delete(label);
         await _labelRepository.UnitOfWork.SaveChangesAsync();
         return id;

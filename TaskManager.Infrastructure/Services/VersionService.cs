@@ -174,8 +174,24 @@ public class VersionService : IVersionService
         return _mapper.Map<VersionViewModel>(version);
     }
 
-    public async Task<Guid> Delete(Guid id)
+    public async Task<Guid> Delete(Guid id, Guid? newVersionId)
     {
+        var versionIssues = await _versionRepository.GetVersionIssuesByVersionId(id);
+        _versionRepository.RemoveRange(versionIssues);
+        if (newVersionId is Guid versionId)
+        {
+            var newVersionIssues = new List<VersionIssue>();
+            foreach (var versionIssue in versionIssues)
+            {
+                var newVersionIssue = new VersionIssue()
+                {
+                    VersionId = versionId,
+                    IssueId = versionIssue.IssueId
+                };
+                newVersionIssues.Add(newVersionIssue);
+            }
+            _versionRepository.AddRange(newVersionIssues);
+        }
         _versionRepository.Delete(id);
         await _versionRepository.UnitOfWork.SaveChangesAsync();
         return id;

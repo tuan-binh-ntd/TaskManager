@@ -17,4 +17,5 @@ public interface IVersionRepository : IRepository<Version>
     void RemoveRange(IReadOnlyCollection<VersionIssue> versionIssues);
     Task<IReadOnlyCollection<VersionIssue>> GetVersionIssuesByIssueId(Guid issueId);
     Task<IReadOnlyCollection<VersionViewModel>> GetStatusViewModelsByIssueId(Guid issueId);
+    Task<IReadOnlyCollection<VersionIssue>> GetVersionIssuesByVersionId(Guid versionId);
 }

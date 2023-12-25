@@ -84,4 +84,10 @@ public class VersionRepository : IVersionRepository
 
         return versionViewModels.AsReadOnly();
     }
+
+    public async Task<IReadOnlyCollection<VersionIssue>> GetVersionIssuesByVersionId(Guid versionId)
+    {
+        var versionIssues = await _context.VersionIssues.Where(vi => vi.VersionId == versionId).ToListAsync();
+        return versionIssues.AsReadOnly();
+    }
 }
