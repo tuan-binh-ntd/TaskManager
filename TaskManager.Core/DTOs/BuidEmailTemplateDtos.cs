@@ -15,6 +15,7 @@ public class BuidEmailTemplateBaseDto
         ProjectCode = projectCode;
         IssueId = issueId;
         IssueLink = $"{EmailConstants.FrontEndUrl}project/{projectCode}/backlog/{issueId}";
+        ProjectLink = $"{EmailConstants.FrontEndUrl}project/{projectCode}/backlog";
     }
 
     public string SenderName { get; set; } = string.Empty;
@@ -26,6 +27,7 @@ public class BuidEmailTemplateBaseDto
     public string ProjectCode { get; set; } = string.Empty;
     public Guid IssueId { get; set; }
     public string IssueLink { get; set; } = string.Empty;
+    public string ProjectLink { get; set; } = string.Empty;
 }
 
 public abstract class IssueEmailContentBase
