@@ -71,3 +71,9 @@ public class BlobContainerSettings
 {
     public string ConnectionStrings { get; set; } = string.Empty;
 }
+
+public class TextToImageAISettings
+{
+    public string APIUrl { get; set; } = string.Empty;
+    public string APIKey { get; set; } = string.Empty;
+}

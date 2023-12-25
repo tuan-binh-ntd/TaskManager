@@ -54,6 +54,7 @@ builder.Services.Configure<ElasticConfigurationSettings>(builder.Configuration.G
 builder.Services.Configure<EmailConfigurationSettings>(builder.Configuration.GetSection("EmailConfigurationSettings"));
 builder.Services.Configure<FileShareSettings>(builder.Configuration.GetSection("FileShareSettings"));
 builder.Services.Configure<BlobContainerSettings>(builder.Configuration.GetSection("BlobContainerSettings"));
+builder.Services.Configure<TextToImageAISettings>(builder.Configuration.GetSection("TextToImageAISettings"));
 
 // Set Mapster
 builder.Services.AddMapster(); // From the configuration file
