@@ -39,9 +39,9 @@ public class MembersController : BaseController
 
     [HttpDelete("{id}")]
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid projectId, Guid id)
     {
-        var res = await _projectService.DeleteMember(id);
+        var res = await _projectService.DeleteMember(projectId, id);
         return CustomResult(res, HttpStatusCode.OK);
     }
 }

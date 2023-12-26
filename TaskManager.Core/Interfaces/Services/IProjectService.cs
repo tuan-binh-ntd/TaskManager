@@ -19,7 +19,7 @@ public interface IProjectService
     Task<ProjectViewModel> AddMember(AddMemberToProjectDto addMemberToProjectDto);
     Task<object> GetMembersOfProject(Guid projectId, PaginationInput paginationInput);
     Task<MemberProjectViewModel> UpdateMembder(Guid id, UpdateMemberProjectDto updateMemberProjectDto);
-    Task<Guid> DeleteMember(Guid id);
+    Task<Guid> DeleteMember(Guid projectId, Guid id);
     Task<IReadOnlyCollection<LabelFilterViewModel>> GetLabelFiltersViewModel(Guid projectId);
     Task<IReadOnlyCollection<EpicFilterViewModel>> GetEpicFiltersViewModel(Guid projectId);
     Task<IReadOnlyCollection<TypeFilterViewModel>> GetTypeFiltersViewModel(Guid projectId);

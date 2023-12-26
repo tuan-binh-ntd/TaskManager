@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using MapsterMapper;
+using TaskManager.Core;
 using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
@@ -9,6 +10,7 @@ using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
+using TaskManager.Infrastructure.Repositories;
 
 namespace TaskManager.Infrastructure.Services;
 
@@ -32,6 +34,7 @@ public class ProjectService : IProjectService
     private readonly IIssueEventRepository _issueEventRepository;
     private readonly ILabelRepository _labelRepository;
     private readonly IConnectionFactory _connectionFactory;
+    private readonly IssueDetailRepository _issueDetailRepository;
     private readonly IMapper _mapper;
 
     public ProjectService(
@@ -53,6 +56,7 @@ public class ProjectService : IProjectService
         IIssueEventRepository issueEventRepository,
         ILabelRepository labelRepository,
         IConnectionFactory connectionFactory,
+        IssueDetailRepository issueDetailRepository,
         IMapper mapper
         )
     {
@@ -74,6 +78,7 @@ public class ProjectService : IProjectService
         _issueEventRepository = issueEventRepository;
         _labelRepository = labelRepository;
         _connectionFactory = connectionFactory;
+        _issueDetailRepository = issueDetailRepository;
         _mapper = mapper;
     }
 
@@ -855,8 +860,15 @@ public class ProjectService : IProjectService
         return await _userProjectRepository.GetMemberProject(id) ?? throw new MemberProjectViewModelNullException();
     }
 
-    public async Task<Guid> DeleteMember(Guid id)
+    public async Task<Guid> DeleteMember(Guid projectId, Guid id)
     {
+        var defaultAssigneeId = await _projectConfigurationRepository.GetDefaultAssigneeIdByProjectId(projectId);
+        var leaderId = await _userProjectRepository.GetLeaderIdByProjectId(projectId);
+
+        await _issueDetailRepository.UpdateOneColumnForIssueDetail(id, defaultAssigneeId, NameColumn.AssigneeId);
+
+        await _issueDetailRepository.UpdateOneColumnForIssueDetail(id, leaderId, NameColumn.ReporterId);
+
         var userProject = await _userProjectRepository.GetMember(id) ?? throw new MemberProjectNullException();
         _userProjectRepository.Delete(userProject);
         await _userProjectRepository.UnitOfWork.SaveChangesAsync();

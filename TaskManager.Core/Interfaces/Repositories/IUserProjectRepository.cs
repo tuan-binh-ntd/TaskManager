@@ -15,4 +15,5 @@ public interface IUserProjectRepository : IRepository<UserProject>
     Task<IReadOnlyCollection<Guid>> GetByUserId(Guid userId);
     void Delete(UserProject userProject);
     Task<UserProject?> GetById(Guid id);
+    Task<Guid> GetLeaderIdByProjectId(Guid projectId);
 }

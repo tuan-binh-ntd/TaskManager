@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
+using TaskManager.Core;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.ViewModel;
@@ -72,5 +73,22 @@ public class IssueDetailRepository : IIssueDetailRepository
             .Where(id => id.IssueId == issueId)
             .Select(id => id.ReporterId).FirstOrDefaultAsync();
         return reporterId;
+    }
+
+    public async Task UpdateOneColumnForIssueDetail(Guid oldValue, Guid? newValue, NameColumn nameColumn)
+    {
+        switch (nameColumn)
+        {
+            case NameColumn.AssigneeId:
+                await _context.IssueDetails
+                    .Where(i => i.AssigneeId == oldValue)
+                    .ExecuteUpdateAsync(setters => setters.SetProperty(i => i.AssigneeId, newValue));
+                break;
+            case NameColumn.ReporterId:
+                await _context.IssueDetails
+                    .Where(i => i.ReporterId == oldValue)
+                    .ExecuteUpdateAsync(setters => setters.SetProperty(i => i.ReporterId, newValue));
+                break;
+        }
     }
 }

@@ -104,4 +104,10 @@ public class UserProjectRepository : IUserProjectRepository
         var userProject = await _context.UserProjects.Where(up => up.Id == id).FirstOrDefaultAsync();
         return userProject;
     }
+
+    public async Task<Guid> GetLeaderIdByProjectId(Guid projectId)
+    {
+        var leaderId = await _context.UserProjects.Where(up => up.ProjectId == projectId).Select(up => up.UserId).FirstOrDefaultAsync();
+        return leaderId;
+    }
 }

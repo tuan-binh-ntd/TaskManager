@@ -13,4 +13,5 @@ public interface IIssueDetailRepository : IRepository<IssueDetail>
     Task<CurrentAssigneeAndReporterViewModel?> GetCurrentAssigneeAndReporter(Guid issueId);
     Task<Guid?> GetCurrentAssignee(Guid issueId);
     Task<Guid> GetReporter(Guid issueId);
+    Task UpdateOneColumnForIssueDetail(Guid oldValue, Guid? newValue, NameColumn nameColumn);
 }

@@ -30,4 +30,10 @@ public class ProjectConfigurationRepository : IProjectConfigurationRepository
     {
         _context.Entry(projectConfiguration).State = EntityState.Modified;
     }
+
+    public async Task<Guid?> GetDefaultAssigneeIdByProjectId(Guid projectId)
+    {
+        var assigneeId = await _context.ProjectConfigurations.Where(pc => pc.ProjectId == projectId).Select(pc => pc.DefaultAssigneeId).FirstOrDefaultAsync();
+        return assigneeId;
+    }
 }
