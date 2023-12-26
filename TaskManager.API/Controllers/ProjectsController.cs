@@ -111,4 +111,12 @@ public class ProjectsController : BaseController
         var res = await _projectService.GetLabelFiltersViewModel(projectId);
         return CustomResult(res, HttpStatusCode.OK);
     }
+
+    [HttpPost("api/[controller]/{projectId}/backlog")]
+    [ProducesResponseType(typeof(GetIssueForProjectViewModel), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> Get(Guid projectId, GetIssueForProjectFilterInputModel getIssueForProjectFilterInputModel)
+    {
+        var res = await _projectService.GetIssueForProjectViewModelAsync(projectId, getIssueForProjectFilterInputModel);
+        return CustomResult(res, HttpStatusCode.OK);
+    }
 }

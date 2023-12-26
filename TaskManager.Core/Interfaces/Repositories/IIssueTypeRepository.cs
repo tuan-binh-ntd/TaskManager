@@ -17,4 +17,6 @@ public interface IIssueTypeRepository : IRepository<IssueType>
     Task<PaginationResult<IssueTypeViewModel>> GetsByProjectIdPaging(Guid projectId, PaginationInput paginationInput);
     void AddRange(IReadOnlyCollection<IssueType> issueTypes);
     Task<string?> GetNameOfIssueType(Guid issueTypeId);
+    Task<IReadOnlyCollection<IssueTypeViewModel>> GetIssueTypeViewModelsByProjectId(Guid projectId);
+
 }

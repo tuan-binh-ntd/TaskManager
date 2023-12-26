@@ -40,7 +40,7 @@ public class StatusRepository : IStatusRepository
         _context.Statuses.AddRange(statuses);
     }
 
-    public async Task<IReadOnlyCollection<Status>> GetByProjectId(Guid projectId)
+    public async Task<IReadOnlyCollection<StatusViewModel>> GetStatusViewModelByProjectId(Guid projectId)
     {
         var statusCodes = new List<string>()
         {
@@ -51,7 +51,18 @@ public class StatusRepository : IStatusRepository
 
         var statuses = await (from sc in _context.StatusCategories.AsNoTracking().Where(sc => statusCodes.Contains(sc.Code))
                               join s in _context.Statuses.AsNoTracking().Where(s => s.ProjectId == projectId) on sc.Id equals s.StatusCategoryId
-                              select s).ToListAsync();
+                              join i in _context.Issues.AsNoTracking().Where(i => i.ProjectId == null) on s.Id equals i.StatusId into ij
+                              from ilj in ij.DefaultIfEmpty()
+                              group new { s, ilj } by new { s.Id, s.Name, s.IsMain, s.Description, s.StatusCategoryId, IssueId = ilj.Id } into g
+                              select new StatusViewModel
+                              {
+                                  Id = g.Key.Id,
+                                  Name = g.Key.Name,
+                                  Description = g.Key.Description,
+                                  IsMain = g.Key.IsMain,
+                                  StatusCategoryId = g.Key.StatusCategoryId,
+                                  IssueCount = g.Count(g => g.ilj.Id != null)
+                              }).ToListAsync();
         return statuses.AsReadOnly();
     }
 
@@ -67,7 +78,7 @@ public class StatusRepository : IStatusRepository
         return status!;
     }
 
-    public async Task<PaginationResult<Status>> GetByProjectIdPaging(Guid projectId, PaginationInput paginationInput)
+    public async Task<PaginationResult<StatusViewModel>> GetByProjectIdPaging(Guid projectId, PaginationInput paginationInput)
     {
         var statusCodes = new List<string>()
         {
@@ -78,7 +89,19 @@ public class StatusRepository : IStatusRepository
 
         var query = from sc in _context.StatusCategories.AsNoTracking().Where(sc => statusCodes.Contains(sc.Code))
                     join s in _context.Statuses.AsNoTracking().Where(s => s.ProjectId == projectId) on sc.Id equals s.StatusCategoryId
-                    select s;
+                    join i in _context.Issues.AsNoTracking().Where(i => i.ProjectId == null) on s.Id equals i.StatusId into ij
+                    from ilj in ij.DefaultIfEmpty()
+                    group new { s, ilj } by new { s.Id, s.Name, s.IsMain, s.Description, s.StatusCategoryId, IssueId = ilj.Id } into g
+                    select new StatusViewModel
+                    {
+                        Id = g.Key.Id,
+                        Name = g.Key.Name,
+                        Description = g.Key.Description,
+                        IsMain = g.Key.IsMain,
+                        StatusCategoryId = g.Key.StatusCategoryId,
+                        IssueCount = g.Count(g => g.ilj.Id != null)
+                    };
+
         return await query.Pagination(paginationInput);
     }
 
@@ -106,8 +129,25 @@ public class StatusRepository : IStatusRepository
                                           Id = s.Id,
                                           Name = s.Name,
                                           Description = s.Description,
+                                          IsMain = s.IsMain,
+                                          StatusCategoryId = s.StatusCategoryId,
                                       }).ToListAsync();
 
         return statusViewModels.AsReadOnly();
+    }
+
+    public async Task<IReadOnlyCollection<Status>> GetByProjectId(Guid projectId)
+    {
+        var statusCodes = new List<string>()
+        {
+            CoreConstants.ToDoCode,
+            CoreConstants.InProgressCode,
+            CoreConstants.DoneCode
+        };
+
+        var statuses = await (from sc in _context.StatusCategories.AsNoTracking().Where(sc => statusCodes.Contains(sc.Code))
+                              join s in _context.Statuses.AsNoTracking().Where(s => s.ProjectId == projectId) on sc.Id equals s.StatusCategoryId
+                              select s).ToListAsync();
+        return statuses.AsReadOnly();
     }
 }

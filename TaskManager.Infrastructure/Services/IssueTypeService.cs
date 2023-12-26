@@ -58,7 +58,7 @@ public class IssueTypeService : IIssueTypeService
         }
         else
         {
-            var issuesTypes = await _issueTypeRepository.GetsByProjectId(projectId);
+            var issuesTypes = await _issueTypeRepository.GetIssueTypeViewModelsByProjectId(projectId);
             return issuesTypes;
         }
     }

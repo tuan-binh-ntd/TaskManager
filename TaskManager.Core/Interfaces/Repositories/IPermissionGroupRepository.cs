@@ -16,4 +16,6 @@ public interface IPermissionGroupRepository : IRepository<PermissionGroup>
     void AddRange(IReadOnlyCollection<UserProject> userProjects);
     Task<IReadOnlyCollection<UserProject>> GetUserProjectsByPermissionGroupId(Guid permissionGroupId);
     Task<PermissionGroupViewModel> GetPermissionGroupViewModelById(Guid projectId, Guid userId);
+    Task<IReadOnlyCollection<PermissionGroupViewModel>> GetPermissionGroupViewModelsByProjectId(Guid projectId);
+    Task UpdatePermissionGroupId(Guid oldValue, Guid newValue);
 }

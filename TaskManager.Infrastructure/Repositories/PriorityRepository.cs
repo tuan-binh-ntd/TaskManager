@@ -4,6 +4,7 @@ using TaskManager.Core.Entities;
 using TaskManager.Core.Extensions;
 using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Repositories;
+using TaskManager.Core.ViewModel;
 using TaskManager.Infrastructure.Data;
 
 namespace TaskManager.Infrastructure.Repositories;
@@ -57,9 +58,24 @@ public class PriorityRepository : IPriorityRepository
         return priority!;
     }
 
-    public async Task<PaginationResult<Priority>> GetByProjectId(Guid projectId, PaginationInput paginationInput)
+    public async Task<PaginationResult<PriorityViewModel>> GetByProjectId(Guid projectId, PaginationInput paginationInput)
     {
-        var query = _context.Priorities.AsNoTracking().Where(p => p.ProjectId == projectId);
+        var query = from p in _context.Priorities.Where(p => p.ProjectId == projectId)
+                    join i in _context.Issues on p.Id equals i.PriorityId into ij
+                    from ilj in ij.DefaultIfEmpty()
+                    group new { p, ilj } by new { p.Id, p.Name, p.Description, p.IsMain, p.Color, p.Icon, p.ProjectId, IssueId = ilj.Id } into g
+                    select new PriorityViewModel
+                    {
+                        Id = g.Key.Id,
+                        Name = g.Key.Name,
+                        Description = g.Key.Description,
+                        IsMain = g.Key.IsMain,
+                        Color = g.Key.Color,
+                        Icon = g.Key.Icon,
+                        ProjectId = projectId,
+                        IssueCount = g.Count(g => g.ilj.Id != null),
+                    };
+
         return await query.Pagination(paginationInput);
     }
 
@@ -67,5 +83,27 @@ public class PriorityRepository : IPriorityRepository
     {
         string? name = await _context.Priorities.AsNoTracking().Where(p => p.Id == priorityId).Select(p => p.Name).FirstOrDefaultAsync();
         return name;
+    }
+
+    public async Task<IReadOnlyCollection<PriorityViewModel>> GetPriorityViewModelsByProjectId(Guid projectId)
+    {
+        var query = from p in _context.Priorities.Where(p => p.ProjectId == projectId)
+                    join i in _context.Issues on p.Id equals i.PriorityId into ij
+                    from ilj in ij.DefaultIfEmpty()
+                    group new { p, ilj } by new { p.Id, p.Name, p.Description, p.IsMain, p.Color, p.Icon, p.ProjectId, IssueId = ilj.Id } into g
+                    select new PriorityViewModel
+                    {
+                        Id = g.Key.Id,
+                        Name = g.Key.Name,
+                        Description = g.Key.Description,
+                        IsMain = g.Key.IsMain,
+                        Color = g.Key.Color,
+                        Icon = g.Key.Icon,
+                        ProjectId = projectId,
+                        IssueCount = g.Count(g => g.ilj.Id != null),
+                    };
+
+        var priorityViewModels = await query.ToListAsync();
+        return priorityViewModels.AsReadOnly();
     }
 }

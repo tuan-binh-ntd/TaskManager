@@ -24,4 +24,5 @@ public interface IProjectService
     Task<IReadOnlyCollection<EpicFilterViewModel>> GetEpicFiltersViewModel(Guid projectId);
     Task<IReadOnlyCollection<TypeFilterViewModel>> GetTypeFiltersViewModel(Guid projectId);
     Task<IReadOnlyCollection<SprintFilterViewModel>> GetSprintFiltersViewModel(Guid projectId);
+    Task<GetIssueForProjectViewModel> GetIssueForProjectViewModelAsync(Guid projectId, GetIssueForProjectFilterInputModel getIssueForProjectFilterInputModel);
 }

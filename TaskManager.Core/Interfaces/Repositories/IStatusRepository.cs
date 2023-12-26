@@ -13,8 +13,9 @@ public interface IStatusRepository : IRepository<Status>
     Task<IReadOnlyCollection<Status>> GetByProjectId(Guid projectId);
     Task<Status> GetById(Guid id);
     Task<Status> GetUnreleasedStatus(Guid projectId);
-    Task<PaginationResult<Status>> GetByProjectIdPaging(Guid projectId, PaginationInput paginationInput);
+    Task<PaginationResult<StatusViewModel>> GetByProjectIdPaging(Guid projectId, PaginationInput paginationInput);
     Task<string?> GetNameOfStatus(Guid statusId);
     Task<bool> CheckStatusBelongDone(Guid statusId);
     Task<IReadOnlyCollection<StatusViewModel>> GetStatusViewModelsAsync(Guid projectId);
+    Task<IReadOnlyCollection<StatusViewModel>> GetStatusViewModelByProjectId(Guid projectId);
 }

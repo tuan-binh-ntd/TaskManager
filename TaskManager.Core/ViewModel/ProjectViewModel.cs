@@ -30,7 +30,7 @@ public class BacklogViewModel
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public ICollection<IssueViewModel>? Issues { get; set; }
+    public IReadOnlyCollection<IssueViewModel>? Issues { get; set; }
 }
 
 public class StatusViewModel
@@ -40,6 +40,7 @@ public class StatusViewModel
     public string Description { get; set; } = string.Empty;
     public bool IsMain { get; set; }
     public Guid StatusCategoryId { get; set; }
+    public int IssueCount { get; set; }
 }
 
 public class StatusCategoryViewModel
@@ -53,4 +54,10 @@ public class ProjectConfigurationViewModel
 {
     public Guid? DefaultAssigneeId { get; set; }
     public Guid? DefaultPriorityId { get; set; }
+}
+
+public class GetIssueForProjectViewModel
+{
+    public BacklogViewModel Backlog { get; set; } = new();
+    public IReadOnlyCollection<SprintViewModel> Sprints { get; set; } = new List<SprintViewModel>();
 }
