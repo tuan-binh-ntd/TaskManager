@@ -34,12 +34,12 @@ public class PriorityService : IPriorityService
         return _mapper.Map<PriorityViewModel>(priority);
     }
 
-    public async Task<Guid> Delete(Guid id, Guid newId)
+    public async Task<Guid> Delete(Guid id, Guid? newId)
     {
         int count = await _issueRepository.CountIssueByPriorityId(id);
-        if (count > 0)
+        if (count > 0 && newId is Guid newPriorityId)
         {
-            await _issueRepository.UpdateOneColumnForIssue(id, newId, NameColumn.PriorityId);
+            await _issueRepository.UpdateOneColumnForIssue(id, newPriorityId, NameColumn.PriorityId);
         }
         _priorityRepository.Delete(id);
         await _priorityRepository.UnitOfWork.SaveChangesAsync();

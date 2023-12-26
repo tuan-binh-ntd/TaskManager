@@ -37,12 +37,12 @@ public class IssueTypeService : IIssueTypeService
         return issueTypeViewModel;
     }
 
-    public async Task<Guid> Delete(Guid issueTypeId, Guid newIssueTypeId)
+    public async Task<Guid> Delete(Guid issueTypeId, Guid? newIssueTypeId)
     {
         int count = await _issueRepository.CountIssueByIssueTypeId(issueTypeId);
-        if (count > 0)
+        if (count > 0 && newIssueTypeId is Guid newId)
         {
-            await _issueRepository.UpdateOneColumnForIssue(issueTypeId, newIssueTypeId, NameColumn.IssueTypeId);
+            await _issueRepository.UpdateOneColumnForIssue(issueTypeId, newId, NameColumn.IssueTypeId);
         }
         _issueTypeRepository.Delete(issueTypeId);
         await _issueTypeRepository.UnitOfWork.SaveChangesAsync();

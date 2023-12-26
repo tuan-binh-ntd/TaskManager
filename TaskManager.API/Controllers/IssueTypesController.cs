@@ -1,6 +1,5 @@
 ﻿using CoreApiResponse;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 using System.Net;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Helper;
@@ -46,7 +45,7 @@ public class IssueTypesController : BaseController
 
     [HttpDelete("{issueTypeId}")]
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> Delete(Guid issueTypeId, [FromQuery, Required] Guid newIssueTypeId)
+    public async Task<IActionResult> Delete(Guid issueTypeId, [FromQuery] Guid? newIssueTypeId)
     {
         var res = await _issueTypeService.Delete(issueTypeId, newIssueTypeId);
         return CustomResult(res, HttpStatusCode.OK);

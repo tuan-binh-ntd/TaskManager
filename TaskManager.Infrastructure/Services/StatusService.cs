@@ -38,12 +38,12 @@ public class StatusService : IStatusService
         return status.Adapt<StatusViewModel>();
     }
 
-    public async Task<Guid> Delete(Guid id, Guid newId)
+    public async Task<Guid> Delete(Guid id, Guid? newId)
     {
         int count = await _issueRepository.CountIssueByStatusId(id);
-        if (count > 0)
+        if (count > 0 && newId is Guid newStatusId)
         {
-            await _issueRepository.UpdateOneColumnForIssue(id, newId, NameColumn.StatusId);
+            await _issueRepository.UpdateOneColumnForIssue(id, newStatusId, NameColumn.StatusId);
         }
         _statusRepository.Delete(id);
         await _statusRepository.UnitOfWork.SaveChangesAsync();
