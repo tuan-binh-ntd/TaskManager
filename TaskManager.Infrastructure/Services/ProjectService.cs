@@ -10,7 +10,6 @@ using TaskManager.Core.Helper;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
-using TaskManager.Infrastructure.Repositories;
 
 namespace TaskManager.Infrastructure.Services;
 
@@ -34,7 +33,7 @@ public class ProjectService : IProjectService
     private readonly IIssueEventRepository _issueEventRepository;
     private readonly ILabelRepository _labelRepository;
     private readonly IConnectionFactory _connectionFactory;
-    private readonly IssueDetailRepository _issueDetailRepository;
+    private readonly IIssueDetailRepository _issueDetailRepository;
     private readonly IMapper _mapper;
 
     public ProjectService(
@@ -56,7 +55,7 @@ public class ProjectService : IProjectService
         IIssueEventRepository issueEventRepository,
         ILabelRepository labelRepository,
         IConnectionFactory connectionFactory,
-        IssueDetailRepository issueDetailRepository,
+        IIssueDetailRepository issueDetailRepository,
         IMapper mapper
         )
     {
