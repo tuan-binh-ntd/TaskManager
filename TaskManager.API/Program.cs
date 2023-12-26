@@ -89,6 +89,7 @@ builder.Services.AddScoped<ICriteriaRepository, CriteriaRepository>();
 builder.Services.AddScoped<IPermissionGroupRepository, PermissionGroupRepository>();
 builder.Services.AddScoped<ILabelRepository, LabelRepository>();
 builder.Services.AddScoped<IUserNotificationRepository, UserNotificationRepository>();
+builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 
 // Services
 builder.Services.AddScoped<IJWTTokenService, JWTTokenService>();
@@ -115,6 +116,7 @@ builder.Services.AddScoped<INotificationEventService, NotificationEventService>(
 builder.Services.AddScoped<IConnectionFactory, SqlConnectionFactory>();
 builder.Services.AddScoped<IUserNotificationService, UserNotificationService>();
 builder.Services.AddScoped<ITextToImageService, TextToImageService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 // Add EmailService
 // End  Declaration DI
 builder.Services.AddSingleton<PresenceTracker>();

@@ -130,4 +130,8 @@ public static class CoreConstants
     public const string BacklogOption = "Backlog";
     // Text to image service
     public const int BlockSize = 4194304;
+    // Dashboard
+    public const string AssigneeType = "Assignee";
+    public const string ReporterType = "Reporter";
+    public const string AllType = "All";
 }
