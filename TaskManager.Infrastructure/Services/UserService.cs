@@ -259,6 +259,11 @@ public class UserService : IUserService
             Token = await _jwtTokenService.CreateToken(user),
             Id = user.Id,
             Email = user.Email,
+            AvatarUrl = user.AvatarUrl,
+            Department = user.Department,
+            Organization = user.Organization,
+            JobTitle = user.JobTitle,
+            Location = user.Location,
         };
 
         return res;
