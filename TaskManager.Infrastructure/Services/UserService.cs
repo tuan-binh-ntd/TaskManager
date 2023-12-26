@@ -22,6 +22,7 @@ public class UserService : IUserService
     private readonly ICriteriaRepository _criteriaRepository;
     private readonly IFilterRepository _filterRepository;
     private readonly IStatusCategoryRepository _statusCategoryRepository;
+    private readonly ITextToImageService _textToImageService;
     private readonly IMapper _mapper;
 
     public UserService(
@@ -32,6 +33,7 @@ public class UserService : IUserService
         ICriteriaRepository criteriaRepository,
         IFilterRepository filterRepository,
         IStatusCategoryRepository statusCategoryRepository,
+        ITextToImageService textToImageService,
         IMapper mapper
         )
     {
@@ -42,6 +44,7 @@ public class UserService : IUserService
         _criteriaRepository = criteriaRepository;
         _filterRepository = filterRepository;
         _statusCategoryRepository = statusCategoryRepository;
+        _textToImageService = textToImageService;
         _mapper = mapper;
     }
 
@@ -238,9 +241,12 @@ public class UserService : IUserService
     {
         if (await CheckEmailExists(signUpDto.Email)) return "Email is taken";
 
+        var avatarUrl = await _textToImageService.GenerateImageAsync(signUpDto.Name);
+
         var user = _mapper.Map<AppUser>(signUpDto);
         user.UserName = signUpDto.Email;
         user.Name = signUpDto.Name;
+        user.AvatarUrl = avatarUrl;
 
         var result = await _userManager.CreateAsync(user, signUpDto.Password);
 

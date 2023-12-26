@@ -128,4 +128,6 @@ public static class CoreConstants
     // Complete Sprint
     public const string NewSprintOption = "New sprint";
     public const string BacklogOption = "Backlog";
+    // Text to image service
+    public const int BlockSize = 4194304;
 }

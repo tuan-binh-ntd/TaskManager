@@ -114,6 +114,7 @@ builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<INotificationEventService, NotificationEventService>();
 builder.Services.AddScoped<IConnectionFactory, SqlConnectionFactory>();
 builder.Services.AddScoped<IUserNotificationService, UserNotificationService>();
+builder.Services.AddScoped<ITextToImageService, TextToImageService>();
 // Add EmailService
 // End  Declaration DI
 builder.Services.AddSingleton<PresenceTracker>();
