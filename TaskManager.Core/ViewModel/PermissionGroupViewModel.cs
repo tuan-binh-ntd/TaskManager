@@ -7,6 +7,7 @@ namespace TaskManager.Core.ViewModel
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public Permissions? Permissions { get; set; }
+        public int MemberCount { get; set; }
     }
 
     public class PermissionViewModel

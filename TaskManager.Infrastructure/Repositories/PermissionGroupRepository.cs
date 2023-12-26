@@ -62,11 +62,15 @@ public class PermissionGroupRepository : IPermissionGroupRepository
     public async Task<PaginationResult<PermissionGroupViewModel>> GetByProjectId(Guid projectId, PaginationInput paginationInput)
     {
         var query = from pg in _context.PermissionGroups.Where(pg => pg.ProjectId == projectId)
+                    join up in _context.UserProjects on pg.Id equals up.PermissionGroupId into upj
+                    from uplj in upj.DefaultIfEmpty()
+                    group new { pg, uplj } by new { pg.Id, pg.Name, pg.Permissions, IssueId = uplj.PermissionGroupId } into g
                     select new PermissionGroupViewModel
                     {
-                        Id = pg.Id,
-                        Name = pg.Name,
-                        Permissions = pg.Permissions.FromJson<Permissions>()
+                        Id = g.Key.Id,
+                        Name = g.Key.Name,
+                        Permissions = g.Key.Permissions.FromJson<Permissions>(),
+                        MemberCount = g.Count(g => g.uplj.PermissionGroupId != null)
                     };
         return await query.Pagination(paginationInput);
     }
@@ -96,5 +100,28 @@ public class PermissionGroupRepository : IPermissionGroupRepository
             })
             .FirstOrDefaultAsync(pg => pg.Id == permissionGroupId);
         return permissionGroup!;
+    }
+
+    public async Task<IReadOnlyCollection<PermissionGroupViewModel>> GetPermissionGroupViewModelsByProjectId(Guid projectId)
+    {
+        var query = from pg in _context.PermissionGroups.Where(pg => pg.ProjectId == projectId)
+                    join up in _context.UserProjects on pg.Id equals up.PermissionGroupId into upj
+                    from uplj in upj.DefaultIfEmpty()
+                    group new { pg, uplj } by new { pg.Id, pg.Name, pg.Permissions, IssueId = uplj.PermissionGroupId } into g
+                    select new PermissionGroupViewModel
+                    {
+                        Id = g.Key.Id,
+                        Name = g.Key.Name,
+                        Permissions = g.Key.Permissions.FromJson<Permissions>(),
+                        MemberCount = g.Count(g => g.uplj.PermissionGroupId != null)
+                    };
+        return await query.ToListAsync();
+    }
+
+    public async Task UpdatePermissionGroupId(Guid oldValue, Guid newValue)
+    {
+        await _context.UserProjects
+                   .Where(i => i.PermissionGroupId == oldValue)
+                   .ExecuteUpdateAsync(setters => setters.SetProperty(i => i.PermissionGroupId, newValue));
     }
 }

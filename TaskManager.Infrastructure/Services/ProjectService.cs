@@ -31,6 +31,7 @@ public class ProjectService : IProjectService
     private readonly INotificationRepository _notificationRepository;
     private readonly IIssueEventRepository _issueEventRepository;
     private readonly ILabelRepository _labelRepository;
+    private readonly IConnectionFactory _connectionFactory;
     private readonly IMapper _mapper;
 
     public ProjectService(
@@ -51,6 +52,7 @@ public class ProjectService : IProjectService
         INotificationRepository notificationRepository,
         IIssueEventRepository issueEventRepository,
         ILabelRepository labelRepository,
+        IConnectionFactory connectionFactory,
         IMapper mapper
         )
     {
@@ -71,6 +73,7 @@ public class ProjectService : IProjectService
         _notificationRepository = notificationRepository;
         _issueEventRepository = issueEventRepository;
         _labelRepository = labelRepository;
+        _connectionFactory = connectionFactory;
         _mapper = mapper;
     }
 
@@ -882,5 +885,45 @@ public class ProjectService : IProjectService
     {
         var labelFilterViewModels = await _projectRepository.GetLabelFiltersByProjectId(projectId);
         return labelFilterViewModels;
+    }
+
+    public async Task<GetIssueForProjectViewModel> GetIssueForProjectViewModelAsync(Guid projectId, GetIssueForProjectFilterInputModel getIssueForProjectFilterInputModel)
+    {
+        var backlog = await _backlogRepository.GetBacklog(projectId);
+
+        var getIssueForProjectFilterDto = new GetIssueForProjectFilterDto
+        {
+            VerionIds = getIssueForProjectFilterInputModel.VerionIds,
+            EpicIds = getIssueForProjectFilterInputModel.EpicIds,
+            LabelIds = getIssueForProjectFilterInputModel.LabelIds,
+            IssueTypeIds = getIssueForProjectFilterInputModel.IssueTypeIds,
+            SearchKey = getIssueForProjectFilterInputModel.SearchKey,
+            BacklogId = backlog.Id
+        };
+
+        string query = getIssueForProjectFilterDto.FullQuery();
+        var issueIds = await _connectionFactory.QueryAsync<Guid>(query);
+        var issues = await _issueRepository.GetByIds(issueIds);
+
+        var issueOfbacklog = issues.Where(i => i.BacklogId == backlog.Id).ToList();
+        var issueViewModels = await ToIssueViewModels(issueOfbacklog);
+        backlog.Issues = issueViewModels;
+
+        var sprints = await _sprintRepository.GetSprintByProjectId(projectId);
+        if (sprints.Any())
+        {
+            foreach (var sprint in sprints)
+            {
+                var issuesOfSprint = issues.Where(i => i.SprintId == sprint.Id).ToList();
+                issueViewModels = await ToIssueViewModels(issuesOfSprint);
+                sprint.Issues = issueViewModels.ToList();
+            }
+        }
+
+        return new GetIssueForProjectViewModel
+        {
+            Sprints = sprints,
+            Backlog = backlog,
+        };
     }
 }

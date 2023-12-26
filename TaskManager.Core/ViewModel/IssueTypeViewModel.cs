@@ -8,4 +8,5 @@ public class IssueTypeViewModel
     public string Icon { get; set; } = string.Empty;
     public byte Level { get; set; }
     public bool IsMain { get; set; }
+    public int IssueCount { get; set; }
 }

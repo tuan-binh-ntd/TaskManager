@@ -85,16 +85,20 @@ public class IssueTypeRepository : IIssueTypeRepository
 
     public async Task<PaginationResult<IssueTypeViewModel>> GetsByProjectIdPaging(Guid projectId, PaginationInput paginationInput)
     {
-        var query = _context.IssueTypes.AsNoTracking()
-            .Where(e => e.ProjectId == projectId).Select(e => new IssueTypeViewModel()
-            {
-                Id = e.Id,
-                Name = e.Name,
-                Description = e.Description,
-                Icon = e.Icon,
-                Level = e.Level,
-                IsMain = e.IsMain,
-            });
+        var query = from it in _context.IssueTypes.AsNoTracking().Where(it => it.ProjectId == projectId)
+                    join i in _context.Issues.AsNoTracking() on it.Id equals i.IssueTypeId into ij
+                    from ilj in ij.DefaultIfEmpty()
+                    group new { it, ilj } by new { it.Id, it.Name, it.Description, it.Icon, it.Level, it.IsMain, IssueId = ilj.Id } into g
+                    select new IssueTypeViewModel
+                    {
+                        Id = g.Key.Id,
+                        Name = g.Key.Name,
+                        Description = g.Key.Description,
+                        Icon = g.Key.Icon,
+                        Level = g.Key.Level,
+                        IsMain = g.Key.IsMain,
+                        IssueCount = g.Count(g => g.ilj.Id != null)
+                    };
 
         return await query.Pagination(paginationInput);
     }
@@ -108,5 +112,25 @@ public class IssueTypeRepository : IIssueTypeRepository
     {
         string? name = await _context.IssueTypes.AsNoTracking().Where(it => it.Id == issueTypeId).Select(it => it.Name).FirstOrDefaultAsync();
         return name;
+    }
+
+    public async Task<IReadOnlyCollection<IssueTypeViewModel>> GetIssueTypeViewModelsByProjectId(Guid projectId)
+    {
+        var issueTypes = await (from it in _context.IssueTypes.AsNoTracking().Where(it => it.ProjectId == projectId)
+                                join i in _context.Issues.AsNoTracking() on it.Id equals i.IssueTypeId into ij
+                                from ilj in ij.DefaultIfEmpty()
+                                group new { it, ilj } by new { it.Id, it.Name, it.Description, it.Icon, it.Level, it.IsMain, IssueId = ilj.Id } into g
+                                select new IssueTypeViewModel
+                                {
+                                    Id = g.Key.Id,
+                                    Name = g.Key.Name,
+                                    Description = g.Key.Description,
+                                    Icon = g.Key.Icon,
+                                    Level = g.Key.Level,
+                                    IsMain = g.Key.IsMain,
+                                    IssueCount = g.Count(g => g.ilj.Id != null)
+                                }).ToListAsync();
+
+        return issueTypes.AsReadOnly();
     }
 }

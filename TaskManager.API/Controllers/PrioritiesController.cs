@@ -1,5 +1,6 @@
 ﻿using CoreApiResponse;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Helper;
@@ -44,7 +45,7 @@ public class PrioritiesController : BaseController
 
     [HttpDelete("{id}")]
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> Delete(Guid id, [FromQuery] Guid newId)
+    public async Task<IActionResult> Delete(Guid id, [FromQuery, Required] Guid newId)
     {
         var res = await _priorityService.Delete(id, newId);
         return CustomResult(res, HttpStatusCode.OK);

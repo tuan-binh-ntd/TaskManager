@@ -1,5 +1,6 @@
 ﻿using TaskManager.Core.Entities;
 using TaskManager.Core.Helper;
+using TaskManager.Core.ViewModel;
 
 namespace TaskManager.Core.Interfaces.Repositories;
 
@@ -12,6 +13,7 @@ public interface IPriorityRepository : IRepository<Priority>
     void Update(Priority priority);
     void Delete(Guid id);
     Task<Priority> GetMediumByProjectId(Guid projectId);
-    Task<PaginationResult<Priority>> GetByProjectId(Guid projectId, PaginationInput paginationInput);
+    Task<PaginationResult<PriorityViewModel>> GetByProjectId(Guid projectId, PaginationInput paginationInput);
     Task<string?> GetNameOfPriority(Guid priorityId);
+    Task<IReadOnlyCollection<PriorityViewModel>> GetPriorityViewModelsByProjectId(Guid projectId);
 }

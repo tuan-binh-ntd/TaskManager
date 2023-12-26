@@ -61,7 +61,7 @@ public class PriorityService : IPriorityService
         }
         else
         {
-            var priorities = await _priorityRepository.GetByProjectId(projectId);
+            var priorities = await _priorityRepository.GetPriorityViewModelsByProjectId(projectId);
             return _mapper.Map<IReadOnlyCollection<PriorityViewModel>>(priorities);
         }
     }

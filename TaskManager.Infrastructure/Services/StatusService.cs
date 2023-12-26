@@ -59,7 +59,7 @@ public class StatusService : IStatusService
         }
         else
         {
-            var statuses = await _statusRepository.GetByProjectId(projectId);
+            var statuses = await _statusRepository.GetStatusViewModelByProjectId(projectId);
             return _mapper.Map<IReadOnlyCollection<StatusViewModel>>(statuses);
         }
     }

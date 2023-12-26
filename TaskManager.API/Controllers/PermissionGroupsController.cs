@@ -1,5 +1,6 @@
 ﻿using CoreApiResponse;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Helper;
@@ -46,9 +47,9 @@ public class PermissionGroupsController : BaseController
 
     [HttpDelete("{id}")]
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id, [FromQuery, Required] Guid newPermissionGroupId)
     {
-        var res = await _permissionGroupService.Delete(id);
+        var res = await _permissionGroupService.Delete(id, newPermissionGroupId);
         return CustomResult(res, HttpStatusCode.OK);
     }
 }
