@@ -63,7 +63,7 @@ public class PriorityRepository : IPriorityRepository
         var query = from p in _context.Priorities.Where(p => p.ProjectId == projectId)
                     join i in _context.Issues on p.Id equals i.PriorityId into ij
                     from ilj in ij.DefaultIfEmpty()
-                    group new { p, ilj } by new { p.Id, p.Name, p.Description, p.IsMain, p.Color, p.Icon, p.ProjectId, IssueId = ilj.Id } into g
+                    group new { p, ilj } by new { p.Id, p.Name, p.Description, p.IsMain, p.Color, p.Icon, p.ProjectId } into g
                     select new PriorityViewModel
                     {
                         Id = g.Key.Id,
@@ -72,7 +72,7 @@ public class PriorityRepository : IPriorityRepository
                         IsMain = g.Key.IsMain,
                         Color = g.Key.Color,
                         Icon = g.Key.Icon,
-                        ProjectId = projectId,
+                        ProjectId = (Guid)g.Key.ProjectId!,
                         IssueCount = g.Count(g => g.ilj.Id != null),
                     };
 
@@ -90,7 +90,7 @@ public class PriorityRepository : IPriorityRepository
         var query = from p in _context.Priorities.Where(p => p.ProjectId == projectId)
                     join i in _context.Issues on p.Id equals i.PriorityId into ij
                     from ilj in ij.DefaultIfEmpty()
-                    group new { p, ilj } by new { p.Id, p.Name, p.Description, p.IsMain, p.Color, p.Icon, p.ProjectId, IssueId = ilj.Id } into g
+                    group new { p, ilj } by new { p.Id, p.Name, p.Description, p.IsMain, p.Color, p.Icon, p.ProjectId } into g
                     select new PriorityViewModel
                     {
                         Id = g.Key.Id,
@@ -99,7 +99,7 @@ public class PriorityRepository : IPriorityRepository
                         IsMain = g.Key.IsMain,
                         Color = g.Key.Color,
                         Icon = g.Key.Icon,
-                        ProjectId = projectId,
+                        ProjectId = (Guid)g.Key.ProjectId!,
                         IssueCount = g.Count(g => g.ilj.Id != null),
                     };
 

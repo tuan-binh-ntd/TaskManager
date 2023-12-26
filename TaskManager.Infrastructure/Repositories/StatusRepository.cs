@@ -51,9 +51,9 @@ public class StatusRepository : IStatusRepository
 
         var statuses = await (from sc in _context.StatusCategories.AsNoTracking().Where(sc => statusCodes.Contains(sc.Code))
                               join s in _context.Statuses.AsNoTracking().Where(s => s.ProjectId == projectId) on sc.Id equals s.StatusCategoryId
-                              join i in _context.Issues.AsNoTracking().Where(i => i.ProjectId == null) on s.Id equals i.StatusId into ij
+                              join i in _context.Issues.AsNoTracking() on s.Id equals i.StatusId into ij
                               from ilj in ij.DefaultIfEmpty()
-                              group new { s, ilj } by new { s.Id, s.Name, s.IsMain, s.Description, s.StatusCategoryId, IssueId = ilj.Id } into g
+                              group new { s, ilj } by new { s.Id, s.Name, s.IsMain, s.Description, s.StatusCategoryId } into g
                               select new StatusViewModel
                               {
                                   Id = g.Key.Id,
@@ -89,9 +89,9 @@ public class StatusRepository : IStatusRepository
 
         var query = from sc in _context.StatusCategories.AsNoTracking().Where(sc => statusCodes.Contains(sc.Code))
                     join s in _context.Statuses.AsNoTracking().Where(s => s.ProjectId == projectId) on sc.Id equals s.StatusCategoryId
-                    join i in _context.Issues.AsNoTracking().Where(i => i.ProjectId == null) on s.Id equals i.StatusId into ij
+                    join i in _context.Issues.AsNoTracking() on s.Id equals i.StatusId into ij
                     from ilj in ij.DefaultIfEmpty()
-                    group new { s, ilj } by new { s.Id, s.Name, s.IsMain, s.Description, s.StatusCategoryId, IssueId = ilj.Id } into g
+                    group new { s, ilj } by new { s.Id, s.Name, s.IsMain, s.Description, s.StatusCategoryId } into g
                     select new StatusViewModel
                     {
                         Id = g.Key.Id,

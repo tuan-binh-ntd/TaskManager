@@ -88,7 +88,7 @@ public class IssueTypeRepository : IIssueTypeRepository
         var query = from it in _context.IssueTypes.AsNoTracking().Where(it => it.ProjectId == projectId)
                     join i in _context.Issues.AsNoTracking() on it.Id equals i.IssueTypeId into ij
                     from ilj in ij.DefaultIfEmpty()
-                    group new { it, ilj } by new { it.Id, it.Name, it.Description, it.Icon, it.Level, it.IsMain, IssueId = ilj.Id } into g
+                    group new { it, ilj } by new { it.Id, it.Name, it.Description, it.Icon, it.Level, it.IsMain } into g
                     select new IssueTypeViewModel
                     {
                         Id = g.Key.Id,
@@ -119,7 +119,7 @@ public class IssueTypeRepository : IIssueTypeRepository
         var issueTypes = await (from it in _context.IssueTypes.AsNoTracking().Where(it => it.ProjectId == projectId)
                                 join i in _context.Issues.AsNoTracking() on it.Id equals i.IssueTypeId into ij
                                 from ilj in ij.DefaultIfEmpty()
-                                group new { it, ilj } by new { it.Id, it.Name, it.Description, it.Icon, it.Level, it.IsMain, IssueId = ilj.Id } into g
+                                group new { it, ilj } by new { it.Id, it.Name, it.Description, it.Icon, it.Level, it.IsMain } into g
                                 select new IssueTypeViewModel
                                 {
                                     Id = g.Key.Id,

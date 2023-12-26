@@ -71,7 +71,7 @@ public class PermissionGroupService : IPermissionGroupService
         }
         else
         {
-            var permissionGroups = await _permissionGroupRepository.GetByProjectId(projectId);
+            var permissionGroups = await _permissionGroupRepository.GetPermissionGroupViewModelsByProjectId(projectId);
             return permissionGroups;
         }
     }
