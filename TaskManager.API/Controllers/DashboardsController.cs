@@ -18,7 +18,7 @@ public class DashboardsController : BaseController
         _dashboardService = dashboardService;
     }
 
-    [HttpGet]
+    [HttpGet("circle-chart")]
     [ProducesResponseType(typeof(IReadOnlyCollection<IssueOfAssigneeDashboardViewModel>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Get(Guid projectId)
     {
@@ -26,7 +26,7 @@ public class DashboardsController : BaseController
         return CustomResult(res, HttpStatusCode.OK);
     }
 
-    [HttpGet("issues-in-project")]
+    [HttpGet("column-chart")]
     [ProducesResponseType(typeof(IReadOnlyCollection<IssuesInProjectDashboardViewModel>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Gets(Guid projectId)
     {
@@ -34,7 +34,7 @@ public class DashboardsController : BaseController
         return CustomResult(res, HttpStatusCode.OK);
     }
 
-    [HttpPost]
+    [HttpPost("table-chart")]
     [ProducesResponseType(typeof(IReadOnlyCollection<IssueViewModel>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> GetIssueViewModels(Guid projectId, [FromBody] GetIssuesForAssigneeOrReporterDto getIssuesForAssigneeOrReporterDto)
     {
