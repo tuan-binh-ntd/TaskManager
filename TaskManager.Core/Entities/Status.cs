@@ -8,6 +8,10 @@ public class Status : BaseEntity
     public string Description { get; set; } = string.Empty;
     public int Ordering { get; set; }
     public bool IsMain { get; set; }
+    /// <summary>
+    /// Allow issues in any status to move to this one
+    /// </summary>
+    public bool AllowAnyStatus { get; set; }
     //Relationship
     public Guid? ProjectId { get; set; }
     public Project? Project { get; set; }

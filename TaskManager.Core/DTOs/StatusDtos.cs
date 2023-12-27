@@ -11,6 +11,7 @@ public class CreateStatusDto
     //Relationship
     public Guid? ProjectId { get; set; }
     public Guid StatusCategoryId { get; set; }
+    public bool AllowAnyStatus { get; set; }
 }
 
 public class UpdateStatusDto : BaseDto<UpdateStatusDto, Status>
@@ -19,6 +20,7 @@ public class UpdateStatusDto : BaseDto<UpdateStatusDto, Status>
     public string? Description { get; set; } = string.Empty;
     //Relationship
     public Guid? StatusCategoryId { get; set; }
+    public bool AllowAnyStatus { get; set; }
 
     public override void Register(TypeAdapterConfig config)
     {

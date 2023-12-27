@@ -202,7 +202,8 @@ public class ProjectService : IProjectService
             Name = CoreConstants.StartStatusName,
             ProjectId = project.Id,
             StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.HideCode).Select(e => e.Id).FirstOrDefault(),
-            IsMain = true
+            IsMain = true,
+            AllowAnyStatus = true,
         };
 
         var anyStatus = new Status()
@@ -210,7 +211,8 @@ public class ProjectService : IProjectService
             Name = CoreConstants.AnyStatusName,
             ProjectId = project.Id,
             StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.HideCode).Select(e => e.Id).FirstOrDefault(),
-            IsMain = true
+            IsMain = true,
+            AllowAnyStatus = true,
         };
 
         var todoStatus = new Status()
@@ -219,7 +221,8 @@ public class ProjectService : IProjectService
             ProjectId = project.Id,
             StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.ToDoCode).Select(e => e.Id).FirstOrDefault(),
             Ordering = 1,
-            IsMain = true
+            IsMain = true,
+            AllowAnyStatus = true,
         };
 
         var inProgressStatus = new Status()
@@ -228,7 +231,8 @@ public class ProjectService : IProjectService
             ProjectId = project.Id,
             StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.InProgressCode).Select(e => e.Id).FirstOrDefault(),
             Ordering = 2,
-            IsMain = true
+            IsMain = true,
+            AllowAnyStatus = true,
         };
 
         var doneStatus = new Status()
@@ -237,7 +241,8 @@ public class ProjectService : IProjectService
             ProjectId = project.Id,
             StatusCategoryId = statusCategories.Where(e => e.Code == CoreConstants.DoneCode).Select(e => e.Id).FirstOrDefault(),
             Ordering = 3,
-            IsMain = true
+            IsMain = true,
+            AllowAnyStatus = true,
         };
 
         var unreleasedStatus = new Status()
@@ -283,52 +288,34 @@ public class ProjectService : IProjectService
             ProjectId = project.Id,
         };
 
-        // Working transition
-        var workingTransition = new Transition()
-        {
-            Name = CoreConstants.WorkingTransitionName,
-            FromStatusId = todoStatus.Id,
-            ToStatusId = inProgressStatus.Id,
-            ProjectId = project.Id,
-        };
-
-        // Done transition
-        var doneTransition = new Transition()
-        {
-            Name = CoreConstants.FinishedTransitionName,
-            FromStatusId = inProgressStatus.Id,
-            ToStatusId = doneStatus.Id,
-            ProjectId = project.Id,
-        };
-
         // Any Transition
-        var anyToTodoTransition = new Transition()
-        {
-            Name = "Any status moving to \"To Do\"",
-            FromStatusId = anyStatus.Id,
-            ToStatusId = todoStatus.Id,
-            ProjectId = project.Id,
-        };
+        //var anyToTodoTransition = new Transition()
+        //{
+        //    Name = "Any status moving to \"To Do\"",
+        //    FromStatusId = anyStatus.Id,
+        //    ToStatusId = todoStatus.Id,
+        //    ProjectId = project.Id,
+        //};
 
-        var anyToInProgressTransition = new Transition()
-        {
-            Name = "Any status moving to \"In Progress\"",
-            FromStatusId = anyStatus.Id,
-            ToStatusId = inProgressStatus.Id,
-            ProjectId = project.Id,
-        };
+        //var anyToInProgressTransition = new Transition()
+        //{
+        //    Name = "Any status moving to \"In Progress\"",
+        //    FromStatusId = anyStatus.Id,
+        //    ToStatusId = inProgressStatus.Id,
+        //    ProjectId = project.Id,
+        //};
 
-        var anyToDoneTransition = new Transition()
-        {
-            Name = "Any status moving to \"Done\"",
-            FromStatusId = anyStatus.Id,
-            ToStatusId = doneStatus.Id,
-            ProjectId = project.Id,
-        };
+        //var anyToDoneTransition = new Transition()
+        //{
+        //    Name = "Any status moving to \"Done\"",
+        //    FromStatusId = anyStatus.Id,
+        //    ToStatusId = doneStatus.Id,
+        //    ProjectId = project.Id,
+        //};
 
         var transitions = new List<Transition>()
         {
-            createTransition, workingTransition, doneTransition, anyToTodoTransition, anyToInProgressTransition, anyToDoneTransition
+            createTransition
         };
 
         _transitionRepository.AddRange(transitions);
