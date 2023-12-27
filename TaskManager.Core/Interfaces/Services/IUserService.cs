@@ -1,4 +1,5 @@
-﻿using TaskManager.Core.DTOs;
+﻿using Microsoft.AspNetCore.Http;
+using TaskManager.Core.DTOs;
 using TaskManager.Core.ViewModel;
 
 namespace TaskManager.Core.Interfaces.Services;
@@ -13,4 +14,5 @@ public interface IUserService
     Task<IReadOnlyCollection<UserViewModel>> Gets(GetUserByFilterDto filter);
     Task<UserViewModel?> GetById(Guid id);
     Task<UserViewModel> Update(Guid id, UpdateUserDto updateUserDto);
+    Task<UserViewModel> UploadPhoto(Guid id, IFormFile file);
 }

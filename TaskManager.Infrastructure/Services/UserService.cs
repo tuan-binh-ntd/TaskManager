@@ -1,7 +1,11 @@
-﻿using Mapster;
+﻿using Azure;
+using Azure.Storage.Files.Shares;
+using Mapster;
 using MapsterMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
@@ -23,6 +27,7 @@ public class UserService : IUserService
     private readonly IFilterRepository _filterRepository;
     private readonly IStatusCategoryRepository _statusCategoryRepository;
     private readonly ITextToImageService _textToImageService;
+    private readonly FileShareSettings _fileShareSettings;
     private readonly IMapper _mapper;
 
     public UserService(
@@ -34,6 +39,7 @@ public class UserService : IUserService
         IFilterRepository filterRepository,
         IStatusCategoryRepository statusCategoryRepository,
         ITextToImageService textToImageService,
+        IOptionsMonitor<FileShareSettings> optionsMonitor,
         IMapper mapper
         )
     {
@@ -45,6 +51,7 @@ public class UserService : IUserService
         _filterRepository = filterRepository;
         _statusCategoryRepository = statusCategoryRepository;
         _textToImageService = textToImageService;
+        _fileShareSettings = optionsMonitor.CurrentValue;
         _mapper = mapper;
     }
 
@@ -214,6 +221,71 @@ public class UserService : IUserService
         _filterRepository.AddRange(filters);
         await _filterRepository.UnitOfWork.SaveChangesAsync();
     }
+
+    private async Task<string> FileUploadAsync(IFormFile file)
+    {
+        // Get the configurations and create share object
+        ShareClient share = new(_fileShareSettings.ConnectionStrings, _fileShareSettings.FileShareName);
+
+        // Create the share if it doesn't already exist
+        await share.CreateIfNotExistsAsync();
+
+        // Get a reference to the sample directory
+        ShareDirectoryClient directory = share.GetDirectoryClient("AttachmentOfIssue");
+
+        // Create the directory if it doesn't already exist
+        await directory.CreateIfNotExistsAsync();
+
+        // Get a reference to a file and upload it
+        ShareFileClient shareFile = directory.GetFileClient(file.FileName);
+
+        using Stream stream = file.OpenReadStream();
+        shareFile.Create(stream.Length);
+
+        int blockSize = 4194304;
+        long offset = 0;//Define http range offset
+        BinaryReader reader = new(stream);
+        while (true)
+        {
+            byte[] buffer = reader.ReadBytes(blockSize);
+            if (offset == stream.Length)
+            {
+                break;
+            }
+            else
+            {
+                MemoryStream uploadChunk = new();
+                uploadChunk.Write(buffer, 0, buffer.Length);
+                uploadChunk.Position = 0;
+
+                HttpRange httpRange = new(offset, buffer.Length);
+                var response = shareFile.UploadRange(httpRange, uploadChunk);
+                offset += buffer.Length;//Shift the offset by number of bytes already written
+            }
+        }
+        reader.Close();
+
+        return shareFile.Uri.AbsoluteUri;
+    }
+
+    private async Task<Response> DeleteFileAsync(string fileName)
+    {
+        ShareClient share = new(_fileShareSettings.ConnectionStrings, _fileShareSettings.FileShareName);
+
+        // Create the share if it doesn't already exist
+        await share.CreateIfNotExistsAsync();
+
+        // Get a reference to the sample directory
+        ShareDirectoryClient directory = share.GetDirectoryClient("AttachmentOfIssue");
+
+        // Create the directory if it doesn't already exist
+        await directory.CreateIfNotExistsAsync();
+
+        // Get a reference to a file and upload it
+        ShareFileClient shareFile = directory.GetFileClient(fileName);
+        var reponse = shareFile.Delete();
+        return reponse;
+    }
     #endregion
 
     public async Task<object> SignIn(LoginDto loginDto)
@@ -264,6 +336,7 @@ public class UserService : IUserService
             Organization = user.Organization,
             JobTitle = user.JobTitle,
             Location = user.Location,
+            Name = user.Name,
         };
 
         return res;
@@ -322,5 +395,28 @@ public class UserService : IUserService
         user.Location = !string.IsNullOrWhiteSpace(updateUserDto.Location) ? updateUserDto.Location : user.Location;
         await _userManager.UpdateAsync(user);
         return user.Adapt<UserViewModel>();
+    }
+
+    public async Task<UserViewModel> UploadPhoto(Guid id, IFormFile file)
+    {
+        var user = await _userManager.FindByIdAsync(id.ToString()) ?? throw new UserNullException();
+        string newAvatarUrl = await FileUploadAsync(file);
+        var symbolIndex = user.AvatarUrl.LastIndexOf("/");
+        var fileName = user.AvatarUrl[(symbolIndex + 1)..];
+        user.AvatarUrl = newAvatarUrl;
+        await DeleteFileAsync(fileName);
+        await _userManager.UpdateAsync(user);
+
+        return new UserViewModel()
+        {
+            Id = user.Id,
+            Email = user.Email,
+            AvatarUrl = user.AvatarUrl,
+            Department = user.Department,
+            Organization = user.Organization,
+            JobTitle = user.JobTitle,
+            Location = user.Location,
+            Name = user.Name,
+        };
     }
 }

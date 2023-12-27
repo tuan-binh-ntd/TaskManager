@@ -117,11 +117,19 @@ public class UsersController : BaseController
         return CustomResult(res, HttpStatusCode.OK);
     }
 
-    [HttpGet, AllowAnonymous]
+    [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyCollection<UserViewModel>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Gets([FromQuery] GetUserByFilterDto filter)
     {
         var res = await _userService.Gets(filter);
+        return CustomResult(res, HttpStatusCode.OK);
+    }
+
+    [HttpPost("{id}/photos")]
+    [ProducesResponseType(typeof(UserViewModel), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> UploadPhoto(Guid id, IFormFile formFile)
+    {
+        var res = await _userService.UploadPhoto(id, formFile);
         return CustomResult(res, HttpStatusCode.OK);
     }
 }
