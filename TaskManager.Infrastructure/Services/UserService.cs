@@ -231,7 +231,7 @@ public class UserService : IUserService
         await share.CreateIfNotExistsAsync();
 
         // Get a reference to the sample directory
-        ShareDirectoryClient directory = share.GetDirectoryClient("AttachmentOfIssue");
+        ShareDirectoryClient directory = share.GetDirectoryClient("AvatarOfUser");
 
         // Create the directory if it doesn't already exist
         await directory.CreateIfNotExistsAsync();
@@ -276,7 +276,7 @@ public class UserService : IUserService
         await share.CreateIfNotExistsAsync();
 
         // Get a reference to the sample directory
-        ShareDirectoryClient directory = share.GetDirectoryClient("AttachmentOfIssue");
+        ShareDirectoryClient directory = share.GetDirectoryClient("AvatarOfUser");
 
         // Create the directory if it doesn't already exist
         await directory.CreateIfNotExistsAsync();

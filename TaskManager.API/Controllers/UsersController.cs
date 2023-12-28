@@ -125,7 +125,7 @@ public class UsersController : BaseController
         return CustomResult(res, HttpStatusCode.OK);
     }
 
-    [HttpPost("{id}/photos")]
+    [HttpPost("{id}/photos"), AllowAnonymous]
     [ProducesResponseType(typeof(UserViewModel), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> UploadPhoto(Guid id, IFormFile formFile)
     {
