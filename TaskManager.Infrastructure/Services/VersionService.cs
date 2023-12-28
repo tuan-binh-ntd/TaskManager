@@ -235,7 +235,7 @@ public class VersionService : IVersionService
 
         _versionRepository.Update(version);
         await _versionRepository.UnitOfWork.SaveChangesAsync();
-        return _mapper.Map<VersionViewModel>(version);
+        return await ToVersionViewModel(version);
     }
 
     public async Task<GetIssuesByVersionIdViewModel> GetIssuesByVersionId(Guid versionId)
