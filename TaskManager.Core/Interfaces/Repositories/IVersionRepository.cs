@@ -18,4 +18,7 @@ public interface IVersionRepository : IRepository<Version>
     Task<IReadOnlyCollection<VersionIssue>> GetVersionIssuesByIssueId(Guid issueId);
     Task<IReadOnlyCollection<VersionViewModel>> GetStatusViewModelsByIssueId(Guid issueId);
     Task<IReadOnlyCollection<VersionIssue>> GetVersionIssuesByVersionId(Guid versionId);
+    Task<int> IssuesNotDoneNumInVersion(Guid versionId);
+    Task<IReadOnlyCollection<Guid>> IssuesNotDoneInVersion(Guid versionId);
+    Task UpdateVersionIssuesByIssueIds(IReadOnlyCollection<Guid> issueIds, Guid newVersionId);
 }

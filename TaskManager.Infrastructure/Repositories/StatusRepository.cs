@@ -150,4 +150,9 @@ public class StatusRepository : IStatusRepository
                               select s).ToListAsync();
         return statuses.AsReadOnly();
     }
+
+    public async Task<bool> IsReleaseStatus(Guid statusId)
+    {
+        return await _context.Statuses.Where(s => s.Id == statusId && s.Name == CoreConstants.ReleasedStatusName).AnyAsync(); ;
+    }
 }

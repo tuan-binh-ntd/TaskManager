@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TaskManager.Core.Core;
 using TaskManager.Core.Entities;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.ViewModel;
@@ -89,5 +90,36 @@ public class VersionRepository : IVersionRepository
     {
         var versionIssues = await _context.VersionIssues.Where(vi => vi.VersionId == versionId).ToListAsync();
         return versionIssues.AsReadOnly();
+    }
+
+    public async Task<int> IssuesNotDoneNumInVersion(Guid versionId)
+    {
+        var query = from vi in _context.VersionIssues.Where(vi => vi.VersionId == versionId)
+                    join i in _context.Issues on vi.IssueId equals i.Id
+                    join s in _context.Statuses on i.StatusId equals s.Id
+                    join sc in _context.StatusCategories on s.StatusCategoryId equals sc.Id
+                    where sc.Code == CoreConstants.ToDoCode || sc.Code == CoreConstants.InProgressCode
+                    select i.Id;
+
+        return await query.CountAsync();
+    }
+
+    public async Task<IReadOnlyCollection<Guid>> IssuesNotDoneInVersion(Guid versionId)
+    {
+        var issueIds = await (from vi in _context.VersionIssues.Where(vi => vi.VersionId == versionId)
+                              join i in _context.Issues on vi.IssueId equals i.Id
+                              join s in _context.Statuses on i.StatusId equals s.Id
+                              join sc in _context.StatusCategories on s.StatusCategoryId equals sc.Id
+                              where sc.Code == CoreConstants.ToDoCode || sc.Code == CoreConstants.InProgressCode
+                              select i.Id).ToListAsync();
+
+        return issueIds.AsReadOnly();
+    }
+
+    public async Task UpdateVersionIssuesByIssueIds(IReadOnlyCollection<Guid> issueIds, Guid newVersionId)
+    {
+        await _context.VersionIssues
+            .Where(vi => issueIds.Contains(vi.IssueId))
+            .ExecuteUpdateAsync(setters => setters.SetProperty(i => i.VersionId, newVersionId));
     }
 }

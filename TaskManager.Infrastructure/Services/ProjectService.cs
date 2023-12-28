@@ -344,9 +344,8 @@ public class ProjectService : IProjectService
         await _workflowRepository.UnitOfWork.SaveChangesAsync();
     }
 
-    private async Task CreateBacklogAndProjectConfigurationForProject(Project project)
+    private async Task CreateBacklogAndProjectConfigurationForProject(Project project, Guid mediumPriorityId)
     {
-        var mediumPriority = await _priorityRepository.GetMediumByProjectId(project.Id);
         Backlog backlog = new()
         {
             Name = project.Name,
@@ -362,7 +361,7 @@ public class ProjectService : IProjectService
             IssueCode = 0,
             SprintCode = 0,
             Code = project.Code,
-            DefaultPriorityId = mediumPriority.Id,
+            DefaultPriorityId = mediumPriorityId
         };
 
         _projectConfigurationRepository.Add(projectConfiguration);
@@ -483,7 +482,7 @@ public class ProjectService : IProjectService
         return issueTypes.AsReadOnly();
     }
 
-    private async Task CreatePrioritiesForProject(Project project)
+    private async Task<Guid> CreatePrioritiesForProject(Project project)
     {
         var priorities = new List<Priority>()
         {
@@ -537,6 +536,8 @@ public class ProjectService : IProjectService
 
         _priorityRepository.AddRange(priorities);
         await _priorityRepository.UnitOfWork.SaveChangesAsync();
+
+        return priorities.Where(p => p.Name == CoreConstants.MediumName).Select(p => p.Id).FirstOrDefault();
     }
 
     private async Task<Guid> CreateRolesForProject(Project project)
@@ -690,9 +691,9 @@ public class ProjectService : IProjectService
         _projectRepository.Add(project);
         await _projectRepository.UnitOfWork.SaveChangesAsync();
 
-        await CreatePrioritiesForProject(project);
+        var mediumPriorityId = await CreatePrioritiesForProject(project);
 
-        await CreateBacklogAndProjectConfigurationForProject(project);
+        await CreateBacklogAndProjectConfigurationForProject(project, mediumPriorityId);
 
         await CreateStatusForProject(project);
 
