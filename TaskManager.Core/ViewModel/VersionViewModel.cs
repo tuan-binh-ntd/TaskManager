@@ -15,6 +15,7 @@ public class VersionViewModel
     public Guid StatusId { get; set; }
     public Guid StatusCategoryId { get; set; }
     public IReadOnlyCollection<IssueViewModel>? Issues { get; set; }
+    public int IssueCount { get; set; }
 }
 
 public class GetIssuesByVersionIdViewModel

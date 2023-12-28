@@ -37,6 +37,7 @@ public class VersionService : IVersionService
     private async Task<VersionViewModel> ToVersionViewModel(Version version)
     {
         var versionViewModel = _mapper.Map<VersionViewModel>(version);
+        versionViewModel.IssueCount = await _versionRepository.IssuesNotDoneNumInVersion(version.Id);
         var issueIds = await _versionRepository.GetIssueIdsByVersionId(version.Id);
         var issues = await _issueRepository.GetByIds(issueIds);
         versionViewModel.Issues = await ToIssueViewModels(issues);
@@ -218,7 +219,19 @@ public class VersionService : IVersionService
         version.ReleaseDate = updateVersionDto.ReleaseDate is DateTime releaseDate ? releaseDate : version.ReleaseDate;
         version.Description = string.IsNullOrWhiteSpace(updateVersionDto.Description) ? version.Description : updateVersionDto.Description;
         version.DriverId = updateVersionDto.DriverId is Guid driverId ? driverId : version.DriverId;
-        version.StatusId = updateVersionDto.StatusId is Guid statusId ? statusId : version.StatusId;
+
+        if (updateVersionDto.StatusId is Guid statusId)
+        {
+            version.StatusId = statusId;
+            if (await _statusRepository.IsReleaseStatus(statusId))
+            {
+                var issueIds = await _versionRepository.IssuesNotDoneInVersion(version.Id);
+                if (issueIds.Any())
+                {
+                    await _versionRepository.UpdateVersionIssuesByIssueIds(issueIds, statusId);
+                }
+            }
+        }
 
         _versionRepository.Update(version);
         await _versionRepository.UnitOfWork.SaveChangesAsync();

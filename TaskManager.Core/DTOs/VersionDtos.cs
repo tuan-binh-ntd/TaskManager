@@ -24,6 +24,7 @@ public class UpdateVersionDto
     /// </summary>
     public Guid? DriverId { get; set; }
     public Guid StatusId { get; set; }
+    public Guid? NewVersionId { get; set; }
 }
 
 public class AddIssuesToVersionDto

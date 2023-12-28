@@ -18,4 +18,5 @@ public interface IStatusRepository : IRepository<Status>
     Task<bool> CheckStatusBelongDone(Guid statusId);
     Task<IReadOnlyCollection<StatusViewModel>> GetStatusViewModelsAsync(Guid projectId);
     Task<IReadOnlyCollection<StatusViewModel>> GetStatusViewModelByProjectId(Guid projectId);
+    Task<bool> IsReleaseStatus(Guid statusId);
 }
