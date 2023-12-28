@@ -226,9 +226,9 @@ public class VersionService : IVersionService
             if (await _statusRepository.IsReleaseStatus(statusId))
             {
                 var issueIds = await _versionRepository.IssuesNotDoneInVersion(version.Id);
-                if (issueIds.Any())
+                if (issueIds.Any() && updateVersionDto.NewVersionId is Guid newId)
                 {
-                    await _versionRepository.UpdateVersionIssuesByIssueIds(issueIds, statusId);
+                    await _versionRepository.UpdateVersionIssuesByIssueIds(issueIds, newId);
                 }
             }
         }
