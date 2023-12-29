@@ -9,5 +9,5 @@ public interface IEpicService
     Task<RealtimeNotificationViewModel> CreateEpic(CreateEpicDto createEpicDto);
     Task<GetIssuesByEpicIdViewModel> GetIssuesByEpicId(Guid epicId);
     Task<RealtimeNotificationViewModel> UpdateEpic(Guid id, UpdateEpicDto updateEpicDto);
-    Task<Guid> DeleteEpic(Guid id);
+    Task<RealtimeNotificationViewModel> DeleteEpic(Guid id, Guid userId);
 }

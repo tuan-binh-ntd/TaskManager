@@ -226,4 +226,10 @@ public class ProjectRepository : IProjectRepository
 
         return epicFilterViewModels.AsReadOnly();
     }
+
+    public async Task<Guid> GetUserIdByMemberId(Guid memberId)
+    {
+        var userId = await _context.UserProjects.Where(up => up.Id == memberId).Select(up => up.UserId).FirstOrDefaultAsync();
+        return userId;
+    }
 }

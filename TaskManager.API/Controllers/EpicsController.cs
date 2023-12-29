@@ -1,7 +1,9 @@
 ﻿using CoreApiResponse;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using System.Net;
+using TaskManager.API.Extensions;
 using TaskManager.API.Hubs;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Interfaces.Services;
@@ -60,11 +62,13 @@ public class EpicsController : BaseController
         return CustomResult(res, HttpStatusCode.OK);
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var res = await _epicService.DeleteEpic(id);
-        return CustomResult(res, HttpStatusCode.OK);
+        var userId = User.GetUserId();
+        var res = await _epicService.DeleteEpic(id, userId);
+        return CustomResult(res.IssueId, HttpStatusCode.OK);
     }
 }

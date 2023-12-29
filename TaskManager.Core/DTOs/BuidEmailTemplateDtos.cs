@@ -32,30 +32,33 @@ public class BuidEmailTemplateBaseDto
 
 public abstract class IssueEmailContentBase
 {
-    protected IssueEmailContentBase(string reporterName, DateTime issueCreationTime)
+    protected IssueEmailContentBase(string reporterName, DateTime issueCreationTime, string avatarUrl)
     {
         ReporterName = reporterName;
         IssueCreationTime = issueCreationTime;
+        AvatarUrl = avatarUrl + CoreConstants.AccessTokenAvatar;
     }
 
     public string ReporterName { get; set; } = string.Empty;
     public DateTime IssueCreationTime { get; set; }
+    public string AvatarUrl { get; set; } = string.Empty;
 }
 
 public class CreatedIssueEmailContentDto : IssueEmailContentBase
 {
-    public CreatedIssueEmailContentDto(string reporterName, DateTime issueCreationTime) : base(reporterName, issueCreationTime)
+    public CreatedIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
     {
     }
 
     public string IssueTypeName { get; set; } = string.Empty;
     public string AssigneeName { get; set; } = string.Empty;
     public string PriorityName { get; set; } = string.Empty;
+    public string AssigneeAvatarUrl { get; set; } = string.Empty;
 }
 
 public class ChangeStatusIssueEmailContentDto : IssueEmailContentBase
 {
-    public ChangeStatusIssueEmailContentDto(string reporterName, DateTime issueCreationTime) : base(reporterName, issueCreationTime)
+    public ChangeStatusIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
     {
     }
 
@@ -65,7 +68,7 @@ public class ChangeStatusIssueEmailContentDto : IssueEmailContentBase
 
 public class AddNewCommentIssueEmailContentDto : IssueEmailContentBase
 {
-    public AddNewCommentIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string content) : base(reporterName, issueCreationTime)
+    public AddNewCommentIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string content, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
     {
         CommentContent = content;
     }
@@ -75,7 +78,7 @@ public class AddNewCommentIssueEmailContentDto : IssueEmailContentBase
 
 public class ChangeSprintIssueEmailContentDto : IssueEmailContentBase
 {
-    public ChangeSprintIssueEmailContentDto(string reporterName, DateTime issueCreationTime) : base(reporterName, issueCreationTime)
+    public ChangeSprintIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
     {
     }
 
@@ -84,7 +87,7 @@ public class ChangeSprintIssueEmailContentDto : IssueEmailContentBase
 }
 public class ChangeNameIssueEmailContentDto : IssueEmailContentBase
 {
-    public ChangeNameIssueEmailContentDto(string reporterName, DateTime issueCreationTime) : base(reporterName, issueCreationTime)
+    public ChangeNameIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
     {
     }
 
@@ -94,13 +97,13 @@ public class ChangeNameIssueEmailContentDto : IssueEmailContentBase
 
 public class ChangeDueDateIssueEmailContentDto : IssueEmailContentBase
 {
-    public ChangeDueDateIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string fromDueDate, string toDueDate) : base(reporterName, issueCreationTime)
+    public ChangeDueDateIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string fromDueDate, string toDueDate, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
     {
         FromDueDate = fromDueDate;
         ToDueDate = toDueDate;
     }
 
-    public ChangeDueDateIssueEmailContentDto(string reporterName, DateTime issueCreationTime) : base(reporterName, issueCreationTime)
+    public ChangeDueDateIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
     {
         FromDueDate = string.Empty;
         ToDueDate = string.Empty;
@@ -112,13 +115,13 @@ public class ChangeDueDateIssueEmailContentDto : IssueEmailContentBase
 
 public class ChangeStartDateIssueEmailContentDto : IssueEmailContentBase
 {
-    public ChangeStartDateIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string fromStartDate, string toStartDate) : base(reporterName, issueCreationTime)
+    public ChangeStartDateIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string fromStartDate, string toStartDate, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
     {
         FromStartDate = fromStartDate;
         ToStartDate = toStartDate;
     }
 
-    public ChangeStartDateIssueEmailContentDto(string reporterName, DateTime issueCreationTime) : base(reporterName, issueCreationTime)
+    public ChangeStartDateIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
     {
         FromStartDate = string.Empty;
         ToStartDate = string.Empty;
@@ -130,7 +133,7 @@ public class ChangeStartDateIssueEmailContentDto : IssueEmailContentBase
 
 public class ChangeAssigneeIssueEmailContentDto : IssueEmailContentBase
 {
-    public ChangeAssigneeIssueEmailContentDto(string reporterName, DateTime issueCreationTime) : base(reporterName, issueCreationTime)
+    public ChangeAssigneeIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
     {
     }
 
@@ -140,7 +143,7 @@ public class ChangeAssigneeIssueEmailContentDto : IssueEmailContentBase
 
 public class ChangeReporterIssueEmailContentDto : IssueEmailContentBase
 {
-    public ChangeReporterIssueEmailContentDto(string reporterName, DateTime issueCreationTime) : base(reporterName, issueCreationTime)
+    public ChangeReporterIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
     {
     }
 
@@ -150,7 +153,7 @@ public class ChangeReporterIssueEmailContentDto : IssueEmailContentBase
 
 public class ChangeParentIssueEmailContentDto : IssueEmailContentBase
 {
-    public ChangeParentIssueEmailContentDto(string reporterName, DateTime issueCreationTime) : base(reporterName, issueCreationTime)
+    public ChangeParentIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
     {
     }
 
@@ -160,7 +163,7 @@ public class ChangeParentIssueEmailContentDto : IssueEmailContentBase
 
 public class ChangeIssueTypeIssueEmailContentDto : IssueEmailContentBase
 {
-    public ChangeIssueTypeIssueEmailContentDto(string reporterName, DateTime issueCreationTime) : base(reporterName, issueCreationTime)
+    public ChangeIssueTypeIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
     {
     }
 
@@ -170,7 +173,7 @@ public class ChangeIssueTypeIssueEmailContentDto : IssueEmailContentBase
 
 public class ChangePriorityIssueEmailContentDto : IssueEmailContentBase
 {
-    public ChangePriorityIssueEmailContentDto(string reporterName, DateTime issueCreationTime) : base(reporterName, issueCreationTime)
+    public ChangePriorityIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
     {
     }
 
@@ -180,7 +183,7 @@ public class ChangePriorityIssueEmailContentDto : IssueEmailContentBase
 
 public class ChangeSPEIssueEmailContentDto : IssueEmailContentBase
 {
-    public ChangeSPEIssueEmailContentDto(string reporterName, DateTime issueCreationTime) : base(reporterName, issueCreationTime)
+    public ChangeSPEIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
     {
     }
 
@@ -190,7 +193,7 @@ public class ChangeSPEIssueEmailContentDto : IssueEmailContentBase
 
 public class AddNewAttachmentIssueEmailContentDto : IssueEmailContentBase
 {
-    public AddNewAttachmentIssueEmailContentDto(string reporterName, DateTime issueCreationTime) : base(reporterName, issueCreationTime)
+    public AddNewAttachmentIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
     {
     }
 
@@ -199,7 +202,7 @@ public class AddNewAttachmentIssueEmailContentDto : IssueEmailContentBase
 
 public class DeleteNewAttachmentIssueEmailContentDto : IssueEmailContentBase
 {
-    public DeleteNewAttachmentIssueEmailContentDto(string reporterName, DateTime issueCreationTime) : base(reporterName, issueCreationTime)
+    public DeleteNewAttachmentIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
     {
     }
 
@@ -208,10 +211,19 @@ public class DeleteNewAttachmentIssueEmailContentDto : IssueEmailContentBase
 
 public class DeleteCommentIssueEmailContentDto : IssueEmailContentBase
 {
-    public DeleteCommentIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string content) : base(reporterName, issueCreationTime)
+    public DeleteCommentIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string content, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
     {
         CommentContent = content;
     }
 
     public string CommentContent { get; set; } = string.Empty;
+}
+
+public class DeletedIssueEmailContentDto : IssueEmailContentBase
+{
+    public DeletedIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
+    {
+    }
+
+    public string IssueName { get; set; } = string.Empty;
 }

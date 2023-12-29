@@ -9,6 +9,7 @@ public class EmailConstants
     public const string AddOneNewAttachment = "added 1 new attachment";
     public const string DeleteOneNewAttachment = "deleted 1 attachment";
     public const string DeleteOneComment = "deleted 1 comment";
+    public const string DeletedIssue = "deleted an issue";
 
     public const string FrontEndUrl = "http://localhost:3000/";
 }

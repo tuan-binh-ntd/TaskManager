@@ -178,7 +178,10 @@ public class AttachmentService : IAttachmentService
             var projectName = await _issueRepository.GetProjectNameOfIssue(issueId);
             var projectCode = await _issueRepository.GetProjectCodeOfIssue(issueId);
 
-            var addNewAttachmentIssueEmailContentDto = new AddNewAttachmentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
+            var avatarUrl = await _userManager.Users.Where(u => u.Id == userId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
+
+
+            var addNewAttachmentIssueEmailContentDto = new AddNewAttachmentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl)
             {
                 AttachmentName = attachment.Name,
             };
@@ -219,8 +222,9 @@ public class AttachmentService : IAttachmentService
         var senderName = await _userManager.Users.Where(u => u.Id == userId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
         var projectName = await _issueRepository.GetProjectNameOfIssue(issueId);
         var projectCode = await _issueRepository.GetProjectCodeOfIssue(issueId);
+        var avatarUrl = await _userManager.Users.Where(u => u.Id == userId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-        var deleteNewAttachmentIssueEmailContentDto = new DeleteNewAttachmentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
+        var deleteNewAttachmentIssueEmailContentDto = new DeleteNewAttachmentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl)
         {
             AttachmentName = attachment.Name,
         };

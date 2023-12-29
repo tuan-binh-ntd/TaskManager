@@ -160,4 +160,5 @@ public interface IIssueRepository : IRepository<Issue>
     Task<Guid> GetProjectIdOfIssue(Guid issueId);
     Task<Guid> GetProjectLeadIdOfIssue(Guid issueId);
     Task<string> GetProjectCodeOfIssue(Guid issueId);
+    Task<Issue?> GetById(Guid id);
 }

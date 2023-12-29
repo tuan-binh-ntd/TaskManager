@@ -853,11 +853,12 @@ public class ProjectService : IProjectService
         var defaultAssigneeId = await _projectConfigurationRepository.GetDefaultAssigneeIdByProjectId(projectId);
         var leaderId = await _userProjectRepository.GetLeaderIdByProjectId(projectId);
 
-        await _issueDetailRepository.UpdateOneColumnForIssueDetail(id, defaultAssigneeId, NameColumn.AssigneeId);
-
-        await _issueDetailRepository.UpdateOneColumnForIssueDetail(id, leaderId, NameColumn.ReporterId);
-
         var userProject = await _userProjectRepository.GetMember(id) ?? throw new MemberProjectNullException();
+
+        await _issueDetailRepository.UpdateOneColumnForIssueDetail(userProject.UserId, defaultAssigneeId, NameColumn.AssigneeId);
+
+        await _issueDetailRepository.UpdateOneColumnForIssueDetail(userProject.UserId, leaderId, NameColumn.ReporterId);
+
         _userProjectRepository.Delete(userProject);
         await _userProjectRepository.UnitOfWork.SaveChangesAsync();
         return id;
