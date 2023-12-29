@@ -432,7 +432,7 @@ public class IssueService : IIssueService
         {
             issueDetail.ReporterId = reporterId;
         }
-        if (updateIssueDto.AssigneeId is not null)
+        if (updateIssueDto.AssigneeId != Guid.Empty)
         {
             issueDetail.AssigneeId = updateIssueDto.AssigneeId;
         }
@@ -1082,7 +1082,6 @@ public class IssueService : IIssueService
 
         await AddVersionOrLabel(issue, updateIssueDto);
 
-        issue = updateIssueDto.Adapt(issue);
         _issueRepository.Update(issue);
         await _issueRepository.UnitOfWork.SaveChangesAsync();
 

@@ -311,7 +311,13 @@ app.UseDefaultFiles();
 
 app.UseStaticFiles();
 
-app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins("http://localhost:3000"));
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins(
+    new string[]
+    {
+    "http://localhost:3000",
+    "https://ziblitz.azurewebsites.net"
+    }
+    ));
 
 app.UseAuthentication();
 
