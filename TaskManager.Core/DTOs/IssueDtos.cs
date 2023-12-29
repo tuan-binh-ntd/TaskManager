@@ -98,7 +98,7 @@ public class UpdateEpicDto : BaseDto<UpdateEpicDto, Issue>
     public string? Voted { get; set; }
     public DateTime? StartDate { get; set; } = DateTime.MinValue;
     public DateTime? DueDate { get; set; } = DateTime.MinValue;
-    public Guid? ParentId { get; set; } = Guid.Empty;
+    public Guid? ParentId { get; set; }
     public Guid? AssigneeId { get; set; } = Guid.Empty;
     public Guid? StatusId { get; set; }
     public Guid? PriorityId { get; set; }
