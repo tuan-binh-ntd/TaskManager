@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using MapsterMapper;
+using Microsoft.Extensions.Logging;
 using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
@@ -18,6 +19,7 @@ public class SprintService : ISprintService
     private readonly IBacklogRepository _backlogRepository;
     private readonly IStatusRepository _statusRepository;
     private readonly IConnectionFactory _connectionFactory;
+    private readonly ILogger<SprintService> _logger;
     private readonly IMapper _mapper;
 
     public SprintService(
@@ -27,6 +29,7 @@ public class SprintService : ISprintService
         IBacklogRepository backlogRepository,
         IStatusRepository statusRepository,
         IConnectionFactory connectionFactory,
+        ILogger<SprintService> logger,
         IMapper mapper
         )
     {
@@ -36,6 +39,7 @@ public class SprintService : ISprintService
         _backlogRepository = backlogRepository;
         _statusRepository = statusRepository;
         _connectionFactory = connectionFactory;
+        _logger = logger;
         _mapper = mapper;
     }
 
@@ -208,12 +212,18 @@ public class SprintService : ISprintService
 
     public async Task<Dictionary<string, IReadOnlyCollection<IssueViewModel>>> GetAll(Guid projectId, GetSprintByFilterDto getSprintByFilterDto)
     {
-        if (getSprintByFilterDto.SprintIds.Count > 0)
+        if (getSprintByFilterDto.SprintIds.Count == 0)
         {
             getSprintByFilterDto.SprintIds = await _sprintRepository.GetSprintIdsByProjectId(projectId);
         }
 
         string query = getSprintByFilterDto.FullQuery();
+        if (query.Equals(string.Empty))
+        {
+            return new Dictionary<string, IReadOnlyCollection<IssueViewModel>>();
+        }
+
+        _logger.LogInformation(query);
         var issueIds = await _connectionFactory.QueryAsync<Guid>(query);
         var issues = await _issueRepository.GetByIds(issueIds);
 

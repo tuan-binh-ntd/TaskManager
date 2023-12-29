@@ -77,6 +77,14 @@ public class GetSprintByFilterDto
         return query.Equals("AND") ? string.Empty : query;
     }
 
-    public string FullQuery() => BaseQuery()
-        + BuildSubWhereQuery();
+    public string FullQuery()
+    {
+        string subWhere = BuildSubWhereQuery();
+        if (subWhere.Equals(string.Empty))
+        {
+            return string.Empty;
+        }
+        return BaseQuery() + BuildSubWhereQuery();
+    }
+
 }
