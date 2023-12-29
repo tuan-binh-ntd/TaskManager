@@ -367,4 +367,10 @@ public class IssueRepository : IIssueRepository
             return string.Empty;
         }
     }
+
+    public async Task<Issue?> GetById(Guid id)
+    {
+        var issue = await _context.Issues.AsNoTracking().Where(i => i.Id == id).FirstOrDefaultAsync();
+        return issue;
+    }
 }

@@ -504,8 +504,9 @@ public class IssueService : IIssueService
         };
 
         issueHistories.Add(updatedTheSumaryHis);
+        var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-        var changeNameIssueEmailContentDto = new ChangeNameIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
+        var changeNameIssueEmailContentDto = new ChangeNameIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl)
         {
             FromName = issue.Name,
             ToName = updateIssueDto.Name ?? string.Empty,
@@ -549,8 +550,9 @@ public class IssueService : IIssueService
             IssueId = issue.Id,
         };
         issueHistories.Add(changedTheParentHis);
+        var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-        var changeParentIssueEmailContentDto = new ChangeParentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
+        var changeParentIssueEmailContentDto = new ChangeParentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl)
         {
             FromParentName = oldParentName ?? string.Empty,
             ToParentName = newParentName ?? string.Empty,
@@ -582,8 +584,9 @@ public class IssueService : IIssueService
                 IssueId = issue.Id,
             };
             issueHistories.Add(changedTheParentHis);
+            var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-            var changeSprintIssueEmailContentDto = new ChangeSprintIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
+            var changeSprintIssueEmailContentDto = new ChangeSprintIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl)
             {
                 FromSprintName = oldSprintName ?? string.Empty,
                 ToSprintName = newSprintName ?? string.Empty,
@@ -609,8 +612,9 @@ public class IssueService : IIssueService
                 IssueId = issue.Id,
             };
             issueHistories.Add(changedTheParentHis);
+            var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-            var changeSprintIssueEmailContentDto = new ChangeSprintIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
+            var changeSprintIssueEmailContentDto = new ChangeSprintIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl)
             {
                 FromSprintName = string.Empty,
                 ToSprintName = newSprintName ?? string.Empty,
@@ -641,8 +645,9 @@ public class IssueService : IIssueService
             IssueId = issue.Id,
         };
         issueHistories.Add(updatedTheIssueTypeHis);
+        var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-        var changeIssueTypeIssueEmailContentDto = new ChangeIssueTypeIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
+        var changeIssueTypeIssueEmailContentDto = new ChangeIssueTypeIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl)
         {
             FromIssueTypeName = oldIssueTypeName ?? string.Empty,
             ToIssueTypeName = newIssueTypeName ?? string.Empty,
@@ -673,8 +678,9 @@ public class IssueService : IIssueService
                 IssueId = issue.Id,
             };
             issueHistories.Add(changedTheBacklogHis);
+            var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-            var changeSprintIssueEmailContentDto = new ChangeSprintIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
+            var changeSprintIssueEmailContentDto = new ChangeSprintIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl)
             {
                 FromSprintName = oldSprintName ?? string.Empty,
                 ToSprintName = string.Empty,
@@ -703,8 +709,9 @@ public class IssueService : IIssueService
         };
 
         var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.MadeOneUpdate, projectName, issue.Code, issue.Name, string.Empty, projectCode, issue.Id);
+        var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-        var changeAssigneeIssueEmailContentDto = new ChangeAssigneeIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue);
+        var changeAssigneeIssueEmailContentDto = new ChangeAssigneeIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl);
 
         if (updateIssueDto.AssigneeId is Guid newAssigneeId && issueDetail.AssigneeId is Guid oldAssigneeId)
         {
@@ -803,8 +810,9 @@ public class IssueService : IIssueService
                 IssueId = issue.Id,
             };
             issueHistories.Add(changedTheStatusHis);
+            var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-            var changeStatusIssueEmailContentDto = new ChangeStatusIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
+            var changeStatusIssueEmailContentDto = new ChangeStatusIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl)
             {
                 FromStatusName = oldStatusName ?? string.Empty,
                 ToStatusName = newStatusName ?? string.Empty,
@@ -838,8 +846,9 @@ public class IssueService : IIssueService
             };
 
             issueHistories.Add(changedThePriorityHis);
+            var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-            var changePriorityIssueEmailContentDto = new ChangePriorityIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
+            var changePriorityIssueEmailContentDto = new ChangePriorityIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl)
             {
                 FromPriorityName = oldPriorityName ?? string.Empty,
                 ToPriorityName = newPriorityName ?? string.Empty,
@@ -866,8 +875,9 @@ public class IssueService : IIssueService
             };
 
             issueHistories.Add(changedThePriorityHis);
+            var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-            var changePriorityIssueEmailContentDto = new ChangePriorityIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
+            var changePriorityIssueEmailContentDto = new ChangePriorityIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl)
             {
                 FromPriorityName = IssueConstants.None_IssueHistoryContent,
                 ToPriorityName = newPriorityName ?? string.Empty,
@@ -896,8 +906,9 @@ public class IssueService : IIssueService
             IssueId = issue.Id,
         };
         issueHistories.Add(updatedTheSPEHis);
+        var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-        var changeSPEIssueEmailContentDto = new ChangeSPEIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
+        var changeSPEIssueEmailContentDto = new ChangeSPEIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl)
         {
             FromSPEName = issueDetail.StoryPointEstimate.ToString(),
             ToSPEName = updateIssueDto.StoryPointEstimate?.ToString() ?? "0",
@@ -933,8 +944,9 @@ public class IssueService : IIssueService
         var fromReporterName = await _userManager.Users.Where(u => u.Id == issueDetail.ReporterId).Select(u => u.Name).FirstOrDefaultAsync();
 
         var toReporterName = await _userManager.Users.Where(u => u.Id == reporterId).Select(u => u.Name).FirstOrDefaultAsync();
+        var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-        var changeReporterIssueEmailContentDto = new ChangeReporterIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
+        var changeReporterIssueEmailContentDto = new ChangeReporterIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl)
         {
             ReporterName = senderName,
             FromReporterName = fromReporterName ?? string.Empty,
@@ -1184,12 +1196,14 @@ public class IssueService : IIssueService
         if (issueCreatedEvent is not null)
         {
             var reporterName = await _userManager.Users.Where(u => u.Id == createIssueByNameDto.CreatorUserId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
+            var avatarUrl = await _userManager.Users.Where(u => u.Id == createIssueByNameDto.CreatorUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-            var createdIssueEmailContentDto = new CreatedIssueEmailContentDto(reporterName, issue.CreationTime)
+            var createdIssueEmailContentDto = new CreatedIssueEmailContentDto(reporterName, issue.CreationTime, avatarUrl)
             {
                 IssueTypeName = await _issueTypeRepository.GetNameOfIssueType(createIssueByNameDto.IssueTypeId) ?? IssueConstants.None_IssueHistoryContent,
                 AssigneeName = await _userManager.Users.Where(u => u.Id == issueDetail.AssigneeId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.Unassigned_IssueHistoryContent,
                 PriorityName = issue.PriorityId is not null ? await _priorityRepository.GetNameOfPriority((Guid)issue.PriorityId) ?? IssueConstants.None_IssueHistoryContent : IssueConstants.None_IssueHistoryContent,
+                AssigneeAvatarUrl = await _userManager.Users.Where(u => u.Id == issueDetail.AssigneeId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar,
             };
 
             string emailContent = EmailContentConstants.CreatedIssueContent(createdIssueEmailContentDto);
@@ -1224,12 +1238,58 @@ public class IssueService : IIssueService
         };
     }
 
-    public async Task<Guid> DeleteIssue(Guid id)
+    public async Task<RealtimeNotificationViewModel> DeleteIssue(Guid id, Guid userId)
     {
+        var projectId = await _issueRepository.GetProjectIdOfIssue(id);
+        var notificationConfig = await _notificationRepository.GetNotificationIssueEventByProjectId(projectId);
+        var issue = await _issueRepository.GetById(id) ?? throw new IssueNullException();
+
+        var issueDeletedEvent = notificationConfig.Where(n => n.EventName == CoreConstants.IssueDeletedName).FirstOrDefault();
+
+        if (issueDeletedEvent is not null)
+        {
+            var reporterName = await _userManager.Users.Where(u => u.Id == userId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
+            var avatarUrl = await _userManager.Users.Where(u => u.Id == userId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
+
+            var deletedIssueEmailContentDto = new DeletedIssueEmailContentDto(reporterName, issue.CreationTime, avatarUrl)
+            {
+                IssueName = issue.Name,
+            };
+
+            string emailContent = EmailContentConstants.DeleteIssueContent(deletedIssueEmailContentDto);
+            var senderName = await _userManager.Users.Where(u => u.Id == userId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
+            var projectName = await _issueRepository.GetProjectNameOfIssue(issue.Id);
+            var projectCode = await _issueRepository.GetProjectCodeOfIssue(issue.Id);
+
+
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.DeletedIssue, projectName, issue.Code, issue.Name, emailContent, projectCode, issue.Id);
+
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: userId, buidEmailTemplateBaseDto, issueDeletedEvent);
+        }
+
+        var userIds = await GetUserIdsByNotificationConfig(issue.Id, issueDeletedEvent);
+        var userNotification = new UserNotification()
+        {
+            Name = EmailConstants.DeletedIssue,
+            CreatorUserId = userId,
+            IssueId = issue.Id,
+            IsRead = false,
+            UserId = userId,
+        };
+        _userNotificationRepository.Add(userNotification);
+        await _userNotificationRepository.UnitOfWork.SaveChangesAsync();
+
+        var userNotificationViewModel = await _userNotificationRepository.ToUserNotificationViewMode(userNotification.Id);
+
         await _issueRepository.UpdateOneColumnForIssue(id, null, NameColumn.ParentId);
         _issueRepository.Delete(id);
         await _issueRepository.UnitOfWork.SaveChangesAsync();
-        return id;
+
+        return new RealtimeNotificationViewModel()
+        {
+            Notification = userNotificationViewModel!,
+            IssueId = id
+        };
     }
 
     public async Task<ChildIssueViewModel> CreateChildIssue(CreateChildIssueDto createChildIssueDto)

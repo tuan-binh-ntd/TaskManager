@@ -32,4 +32,5 @@ public interface IProjectRepository : IRepository<Project>
     Task<IReadOnlyCollection<TypeFilterViewModel>> GetIssueTypeFiltersByProjectId(Guid projectId);
     Task<IReadOnlyCollection<LabelFilterViewModel>> GetLabelFiltersByProjectId(Guid projectId);
     Task<IReadOnlyCollection<EpicFilterViewModel>> GetEpicFiltersByProjectId(Guid projectId);
+    Task<Guid> GetUserIdByMemberId(Guid memberId);
 }

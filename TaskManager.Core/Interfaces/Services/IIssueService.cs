@@ -10,7 +10,7 @@ public interface IIssueService
     Task<IReadOnlyCollection<IssueViewModel>> GetBySprintId(Guid sprintId);
     Task<IReadOnlyCollection<IssueViewModel>> GetByBacklogId(Guid backlogId);
     Task<RealtimeNotificationViewModel> CreateIssueByName(CreateIssueByNameDto createIssueByNameDto, Guid? sprintId = default, Guid? backlogId = default);
-    Task<Guid> DeleteIssue(Guid id);
+    Task<RealtimeNotificationViewModel> DeleteIssue(Guid id, Guid userId);
     Task<ChildIssueViewModel> CreateChildIssue(CreateChildIssueDto createChildIssueDto);
     Task<IssueViewModel> GetById(Guid id);
     Task<IReadOnlyCollection<IssueHistoryViewModel>> GetHistoriesByIssueId(Guid issueId);

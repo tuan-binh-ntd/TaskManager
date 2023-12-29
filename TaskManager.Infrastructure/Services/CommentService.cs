@@ -53,8 +53,9 @@ public class CommentService : ICommentService
         var senderName = await _userManager.Users.Where(u => u.Id == createCommentDto.CreatorUserId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
         var projectName = await _issueRepository.GetProjectNameOfIssue(issueId);
         var projectCode = await _issueRepository.GetProjectCodeOfIssue(issueId);
+        var avatarUrl = await _userManager.Users.Where(u => u.Id == createCommentDto.CreatorUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-        var addNewCommentIssueEmailContentDto = new AddNewCommentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, createCommentDto.Content);
+        var addNewCommentIssueEmailContentDto = new AddNewCommentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, createCommentDto.Content, avatarUrl);
 
         string emailContent = EmailContentConstants.AddNewCommentIssueContent(addNewCommentIssueEmailContentDto);
 
@@ -82,8 +83,9 @@ public class CommentService : ICommentService
         var projectCode = await _issueRepository.GetProjectCodeOfIssue(issueId);
 
         var projectName = await _issueRepository.GetProjectNameOfIssue(issueId);
+        var avatarUrl = await _userManager.Users.Where(u => u.Id == userId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-        var deleteCommentIssueEmailContentDto = new DeleteCommentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, comment.Content);
+        var deleteCommentIssueEmailContentDto = new DeleteCommentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, comment.Content, avatarUrl);
 
         string emailContent = EmailContentConstants.DeleteCommentIssueContent(deleteCommentIssueEmailContentDto);
 

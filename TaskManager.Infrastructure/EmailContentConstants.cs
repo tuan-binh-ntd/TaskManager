@@ -11,7 +11,7 @@ public static class EmailContentConstants
                 <td rowspan=""6""
                     style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px""
                     width=""40""><img
-                        src=""https://ci3.googleusercontent.com/proxy/mpf1A_JzhEqCZH0kbRzOe9qU4MTbyxQBfvU25JNqSOnJn8fID_qjf3FrfACcM0moTdk0NBdn8M0H2Bw2OjESur73RpLeDlLCxHBenHWoN2I_yLtuTgbP7Pxk0NJXxs9GeUAgGq38SZin9TvA61ovE-HhkVWM6EKrWPEo0qIauZt5O-SO_t_VwDv14zAKf9GljA4vV0cKGMpaNjGWD5pkZbNhtdgqPH9oQLK7zp8RsBGWEgrpVAKyvg54wg=s0-d-e1-ft#https://secure.gravatar.com/avatar/346602f7edbee67d87c461aaed73cb72?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FBB-4.png""
+                        src=""{createdIssueEmailTemplateDto.AvatarUrl}""
                         style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px""
                         width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
                 <td colspan=""2""
@@ -35,7 +35,7 @@ public static class EmailContentConstants
                     Assignee:</td>
                 <td
                     style=""border:0;padding:0;padding:0;padding:0;line-height:24px;display:inline-block;padding:0 4px;display:inline"">
-                    <img src=""https://ci4.googleusercontent.com/proxy/WJOGgYFqK_BYC-tqRZCRkT4JHFPj758pN5neAMGHg04oTnGnkqi_xenjYRCbWEVKCZt3jVN9288wZjHGFMs1IkjE8i-9YuEHfpJwbVR9N0nTSkpKKQCUCZKgEkX-q4112IHH7cPBOq9cA215-9ho6MFeX_QJ2nLr0XpqHUN5Yn2ex36l3jfGaaDXDltgj0G5P41pP-cwPSQcFdpnjuQTsVx-CjjIkjRtA0pc5bSfNQJQm3CjzQ2iBF7PLg=s0-d-e1-ft#https://secure.gravatar.com/avatar/f7a09824cc5f012a5ffac9bb4467b94a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FTB-2.png""
+                    <img src=""{createdIssueEmailTemplateDto.AssigneeAvatarUrl}""
                         style=""border:0;height:24px;width:24px;max-width:24px;border:0;max-width:700px;height:auto;border-radius:50.0%;vertical-align:middle;display:inline""
                         height=""24"" width=""24"" class=""CToWUd"" data-bit=""iit"" ></td>
                 <td
@@ -64,7 +64,7 @@ public static class EmailContentConstants
                     Reporter:</td>
                 <td
                     style=""border:0;padding:0;padding:0;padding:0;line-height:24px;display:inline-block;padding:0 4px;display:inline"">
-                    <img src=""https://ci3.googleusercontent.com/proxy/mpf1A_JzhEqCZH0kbRzOe9qU4MTbyxQBfvU25JNqSOnJn8fID_qjf3FrfACcM0moTdk0NBdn8M0H2Bw2OjESur73RpLeDlLCxHBenHWoN2I_yLtuTgbP7Pxk0NJXxs9GeUAgGq38SZin9TvA61ovE-HhkVWM6EKrWPEo0qIauZt5O-SO_t_VwDv14zAKf9GljA4vV0cKGMpaNjGWD5pkZbNhtdgqPH9oQLK7zp8RsBGWEgrpVAKyvg54wg=s0-d-e1-ft#https://secure.gravatar.com/avatar/346602f7edbee67d87c461aaed73cb72?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FBB-4.png""
+                    <img src=""{createdIssueEmailTemplateDto.AvatarUrl}""
                         style=""border:0;height:24px;width:24px;max-width:24px;border:0;max-width:700px;height:auto;border-radius:50.0%;vertical-align:middle;display:inline""
                         height=""24"" width=""24"" class=""CToWUd"" data-bit=""iit""></td>
                 <td
@@ -96,7 +96,7 @@ public static class EmailContentConstants
     public static string AddNewCommentIssueContent(AddNewCommentIssueEmailContentDto newCommentIssueEmailContentDto) => $@"
         <tbody style=""border-bottom:0"">
              <tr>
-              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""https://ci3.googleusercontent.com/proxy/mpf1A_JzhEqCZH0kbRzOe9qU4MTbyxQBfvU25JNqSOnJn8fID_qjf3FrfACcM0moTdk0NBdn8M0H2Bw2OjESur73RpLeDlLCxHBenHWoN2I_yLtuTgbP7Pxk0NJXxs9GeUAgGq38SZin9TvA61ovE-HhkVWM6EKrWPEo0qIauZt5O-SO_t_VwDv14zAKf9GljA4vV0cKGMpaNjGWD5pkZbNhtdgqPH9oQLK7zp8RsBGWEgrpVAKyvg54wg=s0-d-e1-ft#https://secure.gravatar.com/avatar/346602f7edbee67d87c461aaed73cb72?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FBB-4.png"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
+              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""{newCommentIssueEmailContentDto.AvatarUrl}"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
               <td colspan=""2"" style=""padding:0;padding:0;padding-top:14px;padding-bottom:6px;line-height:20px;vertical-align:middle""><span style=""color:#42526e;font-weight:500;display:inline-block;vertical-align:middle"">{newCommentIssueEmailContentDto.ReporterName}</span> <span style=""color:#42526e;display:inline-block;vertical-align:middle""> {newCommentIssueEmailContentDto.IssueCreationTime}</span></td>
              </tr>
              <tr>
@@ -118,7 +118,7 @@ public static class EmailContentConstants
             return $@"
                 <tbody style=""border-bottom:0"">
                  <tr>
-                  <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""https://ci3.googleusercontent.com/proxy/mpf1A_JzhEqCZH0kbRzOe9qU4MTbyxQBfvU25JNqSOnJn8fID_qjf3FrfACcM0moTdk0NBdn8M0H2Bw2OjESur73RpLeDlLCxHBenHWoN2I_yLtuTgbP7Pxk0NJXxs9GeUAgGq38SZin9TvA61ovE-HhkVWM6EKrWPEo0qIauZt5O-SO_t_VwDv14zAKf9GljA4vV0cKGMpaNjGWD5pkZbNhtdgqPH9oQLK7zp8RsBGWEgrpVAKyvg54wg=s0-d-e1-ft#https://secure.gravatar.com/avatar/346602f7edbee67d87c461aaed73cb72?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FBB-4.png"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
+                  <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""{changeSprintIssueEmailContentDto.AvatarUrl}"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
                   <td colspan=""2"" style=""padding:0;padding:0;padding-top:14px;padding-bottom:6px;line-height:20px;vertical-align:middle""><span style=""color:#42526e;font-weight:500;display:inline-block;vertical-align:middle"">Bình - 64IT1 Hoàng Bảo</span> <span style=""color:#42526e;display:inline-block;vertical-align:middle""> 4:42&nbsp;PM&nbsp;ICT</span></td>
                  </tr>
                  <tr>
@@ -134,7 +134,7 @@ public static class EmailContentConstants
             return $@"
                 <tbody style=""border-bottom:0"">
                  <tr>
-                  <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""https://ci3.googleusercontent.com/proxy/mpf1A_JzhEqCZH0kbRzOe9qU4MTbyxQBfvU25JNqSOnJn8fID_qjf3FrfACcM0moTdk0NBdn8M0H2Bw2OjESur73RpLeDlLCxHBenHWoN2I_yLtuTgbP7Pxk0NJXxs9GeUAgGq38SZin9TvA61ovE-HhkVWM6EKrWPEo0qIauZt5O-SO_t_VwDv14zAKf9GljA4vV0cKGMpaNjGWD5pkZbNhtdgqPH9oQLK7zp8RsBGWEgrpVAKyvg54wg=s0-d-e1-ft#https://secure.gravatar.com/avatar/346602f7edbee67d87c461aaed73cb72?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FBB-4.png"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
+                  <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""{changeSprintIssueEmailContentDto.AvatarUrl}"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
                   <td colspan=""2"" style=""padding:0;padding:0;padding-top:14px;padding-bottom:6px;line-height:20px;vertical-align:middle""><span style=""color:#42526e;font-weight:500;display:inline-block;vertical-align:middle"">Bình - 64IT1 Hoàng Bảo</span> <span style=""color:#42526e;display:inline-block;vertical-align:middle""> 4:42&nbsp;PM&nbsp;ICT</span></td>
                  </tr>
                  <tr>
@@ -151,7 +151,7 @@ public static class EmailContentConstants
             return $@"
                 <tbody style=""border-bottom:0"">
                      <tr>
-                      <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""https://ci3.googleusercontent.com/proxy/mpf1A_JzhEqCZH0kbRzOe9qU4MTbyxQBfvU25JNqSOnJn8fID_qjf3FrfACcM0moTdk0NBdn8M0H2Bw2OjESur73RpLeDlLCxHBenHWoN2I_yLtuTgbP7Pxk0NJXxs9GeUAgGq38SZin9TvA61ovE-HhkVWM6EKrWPEo0qIauZt5O-SO_t_VwDv14zAKf9GljA4vV0cKGMpaNjGWD5pkZbNhtdgqPH9oQLK7zp8RsBGWEgrpVAKyvg54wg=s0-d-e1-ft#https://secure.gravatar.com/avatar/346602f7edbee67d87c461aaed73cb72?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FBB-4.png"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
+                      <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""{changeSprintIssueEmailContentDto.AvatarUrl}"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
                       <td colspan=""2"" style=""padding:0;padding:0;padding-top:14px;padding-bottom:6px;line-height:20px;vertical-align:middle""><span style=""color:#42526e;font-weight:500;display:inline-block;vertical-align:middle"">{changeSprintIssueEmailContentDto.ReporterName}</span> <span style=""color:#42526e;display:inline-block;vertical-align:middle""> {changeSprintIssueEmailContentDto.IssueCreationTime:hh:mm tt}</span></td>
                      </tr>
                      <tr>
@@ -166,7 +166,7 @@ public static class EmailContentConstants
     public static string ChangeNameIssueContent(ChangeNameIssueEmailContentDto changeNameIssueEmailContentDto) => $@"
         <tbody style=""border-bottom:0"">
              <tr>
-              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""https://ci3.googleusercontent.com/proxy/mpf1A_JzhEqCZH0kbRzOe9qU4MTbyxQBfvU25JNqSOnJn8fID_qjf3FrfACcM0moTdk0NBdn8M0H2Bw2OjESur73RpLeDlLCxHBenHWoN2I_yLtuTgbP7Pxk0NJXxs9GeUAgGq38SZin9TvA61ovE-HhkVWM6EKrWPEo0qIauZt5O-SO_t_VwDv14zAKf9GljA4vV0cKGMpaNjGWD5pkZbNhtdgqPH9oQLK7zp8RsBGWEgrpVAKyvg54wg=s0-d-e1-ft#https://secure.gravatar.com/avatar/346602f7edbee67d87c461aaed73cb72?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FBB-4.png"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
+              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""{changeNameIssueEmailContentDto.AvatarUrl}"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
               <td colspan=""2"" style=""padding:0;padding:0;padding-top:14px;padding-bottom:6px;line-height:20px;vertical-align:middle""><span style=""color:#42526e;font-weight:500;display:inline-block;vertical-align:middle"">{changeNameIssueEmailContentDto.ReporterName}</span> <span style=""color:#42526e;display:inline-block;vertical-align:middle""> {changeNameIssueEmailContentDto.IssueCreationTime:hh:mm tt}</span></td>
              </tr>
              <tr>
@@ -179,7 +179,7 @@ public static class EmailContentConstants
     public static string ChangeDueDateIssueContent(ChangeDueDateIssueEmailContentDto changeDueDateIssueEmailContentDto) => $@"
         <tbody style=""border-bottom:0"">
              <tr>
-              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""https://ci6.googleusercontent.com/proxy/E6XBKLyCIitch5qhKUwq0Axyl6u1MMA3CsblNCaTJIij-lsfCrBB5I4YPFRhOvTdLtc2uimGReT04f6Du3F09yrLWM4y-HeL6FlnA-oYF8XLGj2PF0012cL_mgt0CFi0eY0qqZtruhejbz5tYAeM-BsGbwGjFQdjl_bX0WdmSSYf0LSqH2XT1mV0kNJ6tgr5z7nGG-aUKgTq8bV8c3U488Tj4ADu_tABzzEfCcYLemB9nSXHevsq2K67hQ=s0-d-e1-ft#https://secure.gravatar.com/avatar/f80e164f797f868bd1faab3fcaaacce2?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FBB-4.png"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
+              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""{changeDueDateIssueEmailContentDto.AvatarUrl}"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
               <td colspan=""2"" style=""padding:0;padding:0;padding-top:14px;padding-bottom:6px;line-height:20px;vertical-align:middle""><span style=""color:#42526e;font-weight:500;display:inline-block;vertical-align:middle"">{changeDueDateIssueEmailContentDto.ReporterName}</span> <span style=""color:#42526e;display:inline-block;vertical-align:middle""> {changeDueDateIssueEmailContentDto.IssueCreationTime}</span></td>
              </tr>
              <tr>
@@ -192,7 +192,7 @@ public static class EmailContentConstants
     public static string ChangeStartDateIssueContent(ChangeStartDateIssueEmailContentDto changeStartDateIssueEmailContentDto) => $@"
         <tbody style=""border-bottom:0"">
              <tr>
-              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""https://ci6.googleusercontent.com/proxy/E6XBKLyCIitch5qhKUwq0Axyl6u1MMA3CsblNCaTJIij-lsfCrBB5I4YPFRhOvTdLtc2uimGReT04f6Du3F09yrLWM4y-HeL6FlnA-oYF8XLGj2PF0012cL_mgt0CFi0eY0qqZtruhejbz5tYAeM-BsGbwGjFQdjl_bX0WdmSSYf0LSqH2XT1mV0kNJ6tgr5z7nGG-aUKgTq8bV8c3U488Tj4ADu_tABzzEfCcYLemB9nSXHevsq2K67hQ=s0-d-e1-ft#https://secure.gravatar.com/avatar/f80e164f797f868bd1faab3fcaaacce2?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FBB-4.png"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
+              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""{changeStartDateIssueEmailContentDto.AvatarUrl}"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
               <td colspan=""2"" style=""padding:0;padding:0;padding-top:14px;padding-bottom:6px;line-height:20px;vertical-align:middle""><span style=""color:#42526e;font-weight:500;display:inline-block;vertical-align:middle"">{changeStartDateIssueEmailContentDto.ReporterName}</span> <span style=""color:#42526e;display:inline-block;vertical-align:middle""> {changeStartDateIssueEmailContentDto.IssueCreationTime}</span></td>
              </tr>
              <tr>
@@ -205,7 +205,7 @@ public static class EmailContentConstants
     public static string ChangeAssigneeIssueContent(ChangeAssigneeIssueEmailContentDto changeAssigneeIssueEmailContentDto) => $@"
         <tbody style=""border-bottom:0"">
              <tr>
-              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""https://ci3.googleusercontent.com/proxy/mpf1A_JzhEqCZH0kbRzOe9qU4MTbyxQBfvU25JNqSOnJn8fID_qjf3FrfACcM0moTdk0NBdn8M0H2Bw2OjESur73RpLeDlLCxHBenHWoN2I_yLtuTgbP7Pxk0NJXxs9GeUAgGq38SZin9TvA61ovE-HhkVWM6EKrWPEo0qIauZt5O-SO_t_VwDv14zAKf9GljA4vV0cKGMpaNjGWD5pkZbNhtdgqPH9oQLK7zp8RsBGWEgrpVAKyvg54wg=s0-d-e1-ft#https://secure.gravatar.com/avatar/346602f7edbee67d87c461aaed73cb72?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FBB-4.png"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
+              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""{changeAssigneeIssueEmailContentDto.AvatarUrl}"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
               <td colspan=""2"" style=""padding:0;padding:0;padding-top:14px;padding-bottom:6px;line-height:20px;vertical-align:middle""><span style=""color:#42526e;font-weight:500;display:inline-block;vertical-align:middle"">{changeAssigneeIssueEmailContentDto.ReporterName}</span> <span style=""color:#42526e;display:inline-block;vertical-align:middle""> {changeAssigneeIssueEmailContentDto.IssueCreationTime:hh:mm tt}</span></td>
              </tr>
              <tr>
@@ -218,7 +218,7 @@ public static class EmailContentConstants
     public static string ChangeReporterIssueContent(ChangeReporterIssueEmailContentDto changeReporterIssueEmailContentDto) => $@"
         <tbody style=""border-bottom:0"">
              <tr>
-              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""https://ci3.googleusercontent.com/proxy/mpf1A_JzhEqCZH0kbRzOe9qU4MTbyxQBfvU25JNqSOnJn8fID_qjf3FrfACcM0moTdk0NBdn8M0H2Bw2OjESur73RpLeDlLCxHBenHWoN2I_yLtuTgbP7Pxk0NJXxs9GeUAgGq38SZin9TvA61ovE-HhkVWM6EKrWPEo0qIauZt5O-SO_t_VwDv14zAKf9GljA4vV0cKGMpaNjGWD5pkZbNhtdgqPH9oQLK7zp8RsBGWEgrpVAKyvg54wg=s0-d-e1-ft#https://secure.gravatar.com/avatar/346602f7edbee67d87c461aaed73cb72?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FBB-4.png"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
+              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""{changeReporterIssueEmailContentDto.AvatarUrl}"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
               <td colspan=""2"" style=""padding:0;padding:0;padding-top:14px;padding-bottom:6px;line-height:20px;vertical-align:middle""><span style=""color:#42526e;font-weight:500;display:inline-block;vertical-align:middle"">{changeReporterIssueEmailContentDto.ReporterName}</span> <span style=""color:#42526e;display:inline-block;vertical-align:middle""> {changeReporterIssueEmailContentDto.IssueCreationTime:hh:mm tt}</span></td>
              </tr>
              <tr>
@@ -231,7 +231,7 @@ public static class EmailContentConstants
     public static string ChangeParentIssueContent(ChangeParentIssueEmailContentDto changeParentIssueEmailContentDto) => $@"
         <tbody style=""border-bottom:0"">
              <tr>
-              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""https://ci3.googleusercontent.com/proxy/mpf1A_JzhEqCZH0kbRzOe9qU4MTbyxQBfvU25JNqSOnJn8fID_qjf3FrfACcM0moTdk0NBdn8M0H2Bw2OjESur73RpLeDlLCxHBenHWoN2I_yLtuTgbP7Pxk0NJXxs9GeUAgGq38SZin9TvA61ovE-HhkVWM6EKrWPEo0qIauZt5O-SO_t_VwDv14zAKf9GljA4vV0cKGMpaNjGWD5pkZbNhtdgqPH9oQLK7zp8RsBGWEgrpVAKyvg54wg=s0-d-e1-ft#https://secure.gravatar.com/avatar/346602f7edbee67d87c461aaed73cb72?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FBB-4.png"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
+              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""{changeParentIssueEmailContentDto.AvatarUrl}"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
               <td colspan=""2"" style=""padding:0;padding:0;padding-top:14px;padding-bottom:6px;line-height:20px;vertical-align:middle""><span style=""color:#42526e;font-weight:500;display:inline-block;vertical-align:middle"">{changeParentIssueEmailContentDto.ReporterName}</span> <span style=""color:#42526e;display:inline-block;vertical-align:middle""> {changeParentIssueEmailContentDto.IssueCreationTime:hh:mm tt}</span></td>
              </tr>
              <tr>
@@ -244,7 +244,7 @@ public static class EmailContentConstants
     public static string ChangeIssueTypeIssueContent(ChangeIssueTypeIssueEmailContentDto changeIssueTypeIssueEmailContentDto) => $@"
         <tbody style=""border-bottom:0"">
              <tr>
-              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""https://ci3.googleusercontent.com/proxy/mpf1A_JzhEqCZH0kbRzOe9qU4MTbyxQBfvU25JNqSOnJn8fID_qjf3FrfACcM0moTdk0NBdn8M0H2Bw2OjESur73RpLeDlLCxHBenHWoN2I_yLtuTgbP7Pxk0NJXxs9GeUAgGq38SZin9TvA61ovE-HhkVWM6EKrWPEo0qIauZt5O-SO_t_VwDv14zAKf9GljA4vV0cKGMpaNjGWD5pkZbNhtdgqPH9oQLK7zp8RsBGWEgrpVAKyvg54wg=s0-d-e1-ft#https://secure.gravatar.com/avatar/346602f7edbee67d87c461aaed73cb72?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FBB-4.png"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
+              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""{changeIssueTypeIssueEmailContentDto.AvatarUrl}"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
               <td colspan=""2"" style=""padding:0;padding:0;padding-top:14px;padding-bottom:6px;line-height:20px;vertical-align:middle""><span style=""color:#42526e;font-weight:500;display:inline-block;vertical-align:middle"">{changeIssueTypeIssueEmailContentDto.ReporterName}</span> <span style=""color:#42526e;display:inline-block;vertical-align:middle""> {changeIssueTypeIssueEmailContentDto.IssueCreationTime:hh:mm tt}</span></td>
              </tr>
              <tr>
@@ -257,7 +257,7 @@ public static class EmailContentConstants
     public static string ChangePriorityIssueContent(ChangePriorityIssueEmailContentDto changePriorityIssueEmailContentDto) => $@"
         <tbody style=""border-bottom:0"">
              <tr>
-              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""https://ci3.googleusercontent.com/proxy/mpf1A_JzhEqCZH0kbRzOe9qU4MTbyxQBfvU25JNqSOnJn8fID_qjf3FrfACcM0moTdk0NBdn8M0H2Bw2OjESur73RpLeDlLCxHBenHWoN2I_yLtuTgbP7Pxk0NJXxs9GeUAgGq38SZin9TvA61ovE-HhkVWM6EKrWPEo0qIauZt5O-SO_t_VwDv14zAKf9GljA4vV0cKGMpaNjGWD5pkZbNhtdgqPH9oQLK7zp8RsBGWEgrpVAKyvg54wg=s0-d-e1-ft#https://secure.gravatar.com/avatar/346602f7edbee67d87c461aaed73cb72?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FBB-4.png"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
+              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""{changePriorityIssueEmailContentDto.AvatarUrl}"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
               <td colspan=""2"" style=""padding:0;padding:0;padding-top:14px;padding-bottom:6px;line-height:20px;vertical-align:middle""><span style=""color:#42526e;font-weight:500;display:inline-block;vertical-align:middle"">{changePriorityIssueEmailContentDto.ReporterName}</span> <span style=""color:#42526e;display:inline-block;vertical-align:middle""> {changePriorityIssueEmailContentDto.IssueCreationTime:hh:mm tt}</span></td>
              </tr>
              <tr>
@@ -270,7 +270,7 @@ public static class EmailContentConstants
     public static string ChangeSPEIssueContent(ChangeSPEIssueEmailContentDto changeSPEIssueEmailContentDto) => $@"
         <tbody style=""border-bottom:0"">
              <tr>
-              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""https://ci3.googleusercontent.com/proxy/mpf1A_JzhEqCZH0kbRzOe9qU4MTbyxQBfvU25JNqSOnJn8fID_qjf3FrfACcM0moTdk0NBdn8M0H2Bw2OjESur73RpLeDlLCxHBenHWoN2I_yLtuTgbP7Pxk0NJXxs9GeUAgGq38SZin9TvA61ovE-HhkVWM6EKrWPEo0qIauZt5O-SO_t_VwDv14zAKf9GljA4vV0cKGMpaNjGWD5pkZbNhtdgqPH9oQLK7zp8RsBGWEgrpVAKyvg54wg=s0-d-e1-ft#https://secure.gravatar.com/avatar/346602f7edbee67d87c461aaed73cb72?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FBB-4.png"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
+              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""{changeSPEIssueEmailContentDto.AvatarUrl}"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
               <td colspan=""2"" style=""padding:0;padding:0;padding-top:14px;padding-bottom:6px;line-height:20px;vertical-align:middle""><span style=""color:#42526e;font-weight:500;display:inline-block;vertical-align:middle"">{changeSPEIssueEmailContentDto.ReporterName}</span> <span style=""color:#42526e;display:inline-block;vertical-align:middle""> {changeSPEIssueEmailContentDto.IssueCreationTime:hh:mm tt}</span></td>
              </tr>
              <tr>
@@ -283,7 +283,7 @@ public static class EmailContentConstants
     public static string AddNewAttachmentIssueContent(AddNewAttachmentIssueEmailContentDto addNewAttachmentIssueEmailContentDto) => $@"
         <tbody style=""border-bottom:0"">
              <tr>
-              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""https://ci3.googleusercontent.com/proxy/mpf1A_JzhEqCZH0kbRzOe9qU4MTbyxQBfvU25JNqSOnJn8fID_qjf3FrfACcM0moTdk0NBdn8M0H2Bw2OjESur73RpLeDlLCxHBenHWoN2I_yLtuTgbP7Pxk0NJXxs9GeUAgGq38SZin9TvA61ovE-HhkVWM6EKrWPEo0qIauZt5O-SO_t_VwDv14zAKf9GljA4vV0cKGMpaNjGWD5pkZbNhtdgqPH9oQLK7zp8RsBGWEgrpVAKyvg54wg=s0-d-e1-ft#https://secure.gravatar.com/avatar/346602f7edbee67d87c461aaed73cb72?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FBB-4.png"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
+              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""{addNewAttachmentIssueEmailContentDto.AvatarUrl}"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
               <td colspan=""2"" style=""padding:0;padding:0;padding-top:14px;padding-bottom:6px;line-height:20px;vertical-align:middle""><span style=""color:#42526e;font-weight:500;display:inline-block;vertical-align:middle"">{addNewAttachmentIssueEmailContentDto.ReporterName}</span> <span style=""color:#42526e;display:inline-block;vertical-align:middle""> {addNewAttachmentIssueEmailContentDto.IssueCreationTime}</span></td>
              </tr>
              <tr>
@@ -300,7 +300,7 @@ public static class EmailContentConstants
     public static string DeleteNewAttachmentIssueContent(DeleteNewAttachmentIssueEmailContentDto deleteNewAttachmentIssueEmailContentDto) => $@"
         <tbody style=""border-bottom:0"">
              <tr>
-              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""https://ci3.googleusercontent.com/proxy/mpf1A_JzhEqCZH0kbRzOe9qU4MTbyxQBfvU25JNqSOnJn8fID_qjf3FrfACcM0moTdk0NBdn8M0H2Bw2OjESur73RpLeDlLCxHBenHWoN2I_yLtuTgbP7Pxk0NJXxs9GeUAgGq38SZin9TvA61ovE-HhkVWM6EKrWPEo0qIauZt5O-SO_t_VwDv14zAKf9GljA4vV0cKGMpaNjGWD5pkZbNhtdgqPH9oQLK7zp8RsBGWEgrpVAKyvg54wg=s0-d-e1-ft#https://secure.gravatar.com/avatar/346602f7edbee67d87c461aaed73cb72?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FBB-4.png"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
+              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""{deleteNewAttachmentIssueEmailContentDto.AvatarUrl}"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
               <td colspan=""2"" style=""padding:0;padding:0;padding-top:14px;padding-bottom:6px;line-height:20px;vertical-align:middle""><span style=""color:#42526e;font-weight:500;display:inline-block;vertical-align:middle"">{deleteNewAttachmentIssueEmailContentDto.ReporterName}</span> <span style=""color:#42526e;display:inline-block;vertical-align:middle""> {deleteNewAttachmentIssueEmailContentDto.IssueCreationTime}</span></td>
              </tr>
              <tr>
@@ -317,7 +317,7 @@ public static class EmailContentConstants
     public static string DeleteCommentIssueContent(DeleteCommentIssueEmailContentDto deleteCommentIssueEmailContentDto) => $@"
         <tbody style=""border-bottom:0"">
              <tr>
-              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""https://ci3.googleusercontent.com/proxy/mpf1A_JzhEqCZH0kbRzOe9qU4MTbyxQBfvU25JNqSOnJn8fID_qjf3FrfACcM0moTdk0NBdn8M0H2Bw2OjESur73RpLeDlLCxHBenHWoN2I_yLtuTgbP7Pxk0NJXxs9GeUAgGq38SZin9TvA61ovE-HhkVWM6EKrWPEo0qIauZt5O-SO_t_VwDv14zAKf9GljA4vV0cKGMpaNjGWD5pkZbNhtdgqPH9oQLK7zp8RsBGWEgrpVAKyvg54wg=s0-d-e1-ft#https://secure.gravatar.com/avatar/346602f7edbee67d87c461aaed73cb72?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FBB-4.png"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
+              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""{deleteCommentIssueEmailContentDto.AvatarUrl}"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
               <td colspan=""2"" style=""padding:0;padding:0;padding-top:14px;padding-bottom:6px;line-height:20px;vertical-align:middle""><span style=""color:#42526e;font-weight:500;display:inline-block;vertical-align:middle"">{deleteCommentIssueEmailContentDto.ReporterName}</span> <span style=""color:#42526e;display:inline-block;vertical-align:middle""> {deleteCommentIssueEmailContentDto.IssueCreationTime}</span></td>
              </tr>
              <tr>
@@ -327,6 +327,18 @@ public static class EmailContentConstants
                  <span style=""max-width:700px;height:auto;display:inline-block;padding:0 4px;background-color:#ffebe6;text-decoration:line-through"" bgcolor=""#ffebe6"">{deleteCommentIssueEmailContentDto.CommentContent}</span>
                 </div>
                </div></td>
+             </tr>
+        </tbody>
+    ";
+
+    public static string DeleteIssueContent(DeletedIssueEmailContentDto deletedIssueEmailContent) => $@"
+        <tbody style=""border-bottom:0"">
+             <tr>
+              <td rowspan=""2"" style=""padding:0;padding:0;padding-top:14px;vertical-align:top;width:40px"" width=""40""><img src=""{deletedIssueEmailContent.AvatarUrl}"" style=""border:0;border:0;border-radius:50.0%;width:32px;height:32px"" width=""32"" height=""32"" class=""CToWUd"" data-bit=""iit""></td>
+              <td colspan=""2"" style=""padding:0;padding:0;padding-top:14px;padding-bottom:6px;line-height:20px;vertical-align:middle""><span style=""color:#42526e;font-weight:500;display:inline-block;vertical-align:middle"">{deletedIssueEmailContent.ReporterName}</span> <span style=""color:#42526e;display:inline-block;vertical-align:middle""> {deletedIssueEmailContent.IssueCreationTime:hh:mm tt}</span></td>
+             </tr>
+             <tr>
+              <td style=""padding:0;padding:0;line-height:24px""><span style=""max-width:700px;height:auto;display:inline-block;padding:0 4px;background-color:#ffebe6;text-decoration:line-through"" bgcolor=""#ffebe6"">{deletedIssueEmailContent.IssueName}</span> </td>
              </tr>
         </tbody>
     ";

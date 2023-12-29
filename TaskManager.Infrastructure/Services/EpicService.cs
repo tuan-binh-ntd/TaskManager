@@ -379,9 +379,11 @@ public class EpicService : IEpicService
             IssueId = issue.Id,
         };
 
+        var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
+
         issueHistories.Add(updatedTheSumaryHis);
 
-        var changeNameIssueEmailContentDto = new ChangeNameIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
+        var changeNameIssueEmailContentDto = new ChangeNameIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl)
         {
             FromName = issue.Name,
             ToName = updateIssueDto.Name ?? string.Empty,
@@ -426,7 +428,9 @@ public class EpicService : IEpicService
         };
         issueHistories.Add(changedTheParentHis);
 
-        var changeParentIssueEmailContentDto = new ChangeParentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
+        var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
+
+        var changeParentIssueEmailContentDto = new ChangeParentIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl)
         {
             FromParentName = oldParentName ?? string.Empty,
             ToParentName = newParentName ?? string.Empty,
@@ -455,8 +459,9 @@ public class EpicService : IEpicService
         };
 
         var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.MadeOneUpdate, projectName, issue.Code, issue.Name, string.Empty, projectCode, issue.Id);
+        var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-        var changeAssigneeIssueEmailContentDto = new ChangeAssigneeIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue);
+        var changeAssigneeIssueEmailContentDto = new ChangeAssigneeIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl);
 
         if (updateIssueDto.AssigneeId is Guid newAssigneeId && issueDetail.AssigneeId is Guid oldAssigneeId)
         {
@@ -555,8 +560,9 @@ public class EpicService : IEpicService
                 IssueId = issue.Id,
             };
             issueHistories.Add(changedTheStatusHis);
+            var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-            var changeStatusIssueEmailContentDto = new ChangeStatusIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
+            var changeStatusIssueEmailContentDto = new ChangeStatusIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl)
             {
                 FromStatusName = oldStatusName ?? string.Empty,
                 ToStatusName = newStatusName ?? string.Empty,
@@ -590,8 +596,9 @@ public class EpicService : IEpicService
             };
 
             issueHistories.Add(changedThePriorityHis);
+            var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-            var changePriorityIssueEmailContentDto = new ChangePriorityIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
+            var changePriorityIssueEmailContentDto = new ChangePriorityIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl)
             {
                 FromPriorityName = oldPriorityName ?? string.Empty,
                 ToPriorityName = newPriorityName ?? string.Empty,
@@ -618,8 +625,9 @@ public class EpicService : IEpicService
             };
 
             issueHistories.Add(changedThePriorityHis);
+            var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-            var changePriorityIssueEmailContentDto = new ChangePriorityIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
+            var changePriorityIssueEmailContentDto = new ChangePriorityIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl)
             {
                 FromPriorityName = IssueConstants.None_IssueHistoryContent,
                 ToPriorityName = newPriorityName ?? string.Empty,
@@ -648,8 +656,9 @@ public class EpicService : IEpicService
             IssueId = issue.Id,
         };
         issueHistories.Add(updatedTheSPEHis);
+        var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-        var changeSPEIssueEmailContentDto = new ChangeSPEIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
+        var changeSPEIssueEmailContentDto = new ChangeSPEIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl)
         {
             FromSPEName = issueDetail.StoryPointEstimate.ToString(),
             ToSPEName = updateIssueDto.StoryPointEstimate?.ToString() ?? "0",
@@ -681,12 +690,13 @@ public class EpicService : IEpicService
             IssueId = issue.Id,
         };
         issueHistories.Add(updatedTheReporterHis);
+        var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
         var fromReporterName = await _userManager.Users.Where(u => u.Id == issueDetail.ReporterId).Select(u => u.Name).FirstOrDefaultAsync();
 
         var toReporterName = await _userManager.Users.Where(u => u.Id == reporterId).Select(u => u.Name).FirstOrDefaultAsync();
 
-        var changeReporterIssueEmailContentDto = new ChangeReporterIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue)
+        var changeReporterIssueEmailContentDto = new ChangeReporterIssueEmailContentDto(senderName, IssueConstants.UpdateTime_Issue, avatarUrl)
         {
             FromReporterName = fromReporterName ?? string.Empty,
             ToReporterName = toReporterName ?? string.Empty,
@@ -712,8 +722,9 @@ public class EpicService : IEpicService
             CreatorUserId = updateIssueDto.ModificationUserId,
             IssueId = issue.Id,
         };
+        var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-        var changeStartDateIssueEmailContentDto = new ChangeStartDateIssueEmailContentDto(senderName, issue.CreationTime);
+        var changeStartDateIssueEmailContentDto = new ChangeStartDateIssueEmailContentDto(senderName, issue.CreationTime, avatarUrl);
 
         if (updateIssueDto.StartDate is DateTime newStartDate && issue.StartDate is null)
         {
@@ -764,8 +775,9 @@ public class EpicService : IEpicService
             CreatorUserId = updateIssueDto.ModificationUserId,
             IssueId = issue.Id,
         };
+        var avatarUrl = await _userManager.Users.Where(u => u.Id == updateIssueDto.ModificationUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-        var changeDueDateIssueEmailContentDto = new ChangeDueDateIssueEmailContentDto(senderName, issue.CreationTime);
+        var changeDueDateIssueEmailContentDto = new ChangeDueDateIssueEmailContentDto(senderName, issue.CreationTime, avatarUrl);
 
         if (updateIssueDto.DueDate is DateTime newDueDate && issue.DueDate is null)
         {
@@ -1012,12 +1024,14 @@ public class EpicService : IEpicService
             var senderName = await _userManager.Users.Where(u => u.Id == createEpicDto.CreatorUserId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
             var projectName = await _projectRepository.GetProjectName(createEpicDto.ProjectId);
             var projectCode = await _issueRepository.GetProjectCodeOfIssue(issue.Id);
+            var avatarUrl = await _userManager.Users.Where(u => u.Id == createEpicDto.CreatorUserId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
 
-            var createdIssueEmailContentDto = new CreatedIssueEmailContentDto(reporterName, issue.CreationTime)
+            var createdIssueEmailContentDto = new CreatedIssueEmailContentDto(reporterName, issue.CreationTime, avatarUrl)
             {
                 IssueTypeName = await _issueTypeRepository.GetNameOfIssueType(epicViewModel.IssueTypeId) ?? IssueConstants.None_IssueHistoryContent,
                 AssigneeName = await _userManager.Users.Where(u => u.Id == issueDetail.AssigneeId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.Unassigned_IssueHistoryContent,
                 PriorityName = issue.PriorityId is not null ? await _priorityRepository.GetNameOfPriority((Guid)issue.PriorityId) ?? IssueConstants.None_IssueHistoryContent : IssueConstants.None_IssueHistoryContent,
+                AssigneeAvatarUrl = await _userManager.Users.Where(u => u.Id == issueDetail.AssigneeId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar,
             };
             string emailContent = EmailContentConstants.CreatedIssueContent(createdIssueEmailContentDto);
 
@@ -1072,11 +1086,55 @@ public class EpicService : IEpicService
         };
     }
 
-    public async Task<Guid> DeleteEpic(Guid id)
+    public async Task<RealtimeNotificationViewModel> DeleteEpic(Guid id, Guid userId)
     {
+        var projectId = await _issueRepository.GetProjectIdOfIssue(id);
+        var notificationConfig = await _notificationRepository.GetNotificationIssueEventByProjectId(projectId);
+        var issue = await _issueRepository.GetById(id) ?? throw new IssueNullException();
+
+        var issueDeletedEvent = notificationConfig.Where(n => n.EventName == CoreConstants.IssueDeletedName).FirstOrDefault();
+
+        if (issueDeletedEvent is not null)
+        {
+            var reporterName = await _userManager.Users.Where(u => u.Id == userId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
+            var avatarUrl = await _userManager.Users.Where(u => u.Id == userId).Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? CoreConstants.AnonymousAvatar;
+
+            var deletedIssueEmailContentDto = new DeletedIssueEmailContentDto(reporterName, issue.CreationTime, avatarUrl)
+            {
+                IssueName = issue.Name,
+            };
+
+            string emailContent = EmailContentConstants.DeleteIssueContent(deletedIssueEmailContentDto);
+            var senderName = await _userManager.Users.Where(u => u.Id == userId).Select(u => u.Name).FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
+            var projectName = await _issueRepository.GetProjectNameOfIssue(issue.Id);
+            var projectCode = await _issueRepository.GetProjectCodeOfIssue(issue.Id);
+
+            var buidEmailTemplateBaseDto = new BuidEmailTemplateBaseDto(senderName, EmailConstants.DeletedIssue, projectName, issue.Code, issue.Name, emailContent, projectCode, issue.Id);
+
+            await _emailSender.SendEmailWhenCreatedIssue(issue.Id, subjectOfEmail: $"({issue.Code}) {issue.Name}", from: userId, buidEmailTemplateBaseDto, issueDeletedEvent);
+        }
+
+        var userIds = await GetUserIdsByNotificationConfig(issue.Id, issueDeletedEvent);
+        var userNotification = new UserNotification()
+        {
+            Name = EmailConstants.DeletedIssue,
+            CreatorUserId = userId,
+            IssueId = issue.Id,
+            IsRead = false,
+            UserId = userId,
+        };
+        _userNotificationRepository.Add(userNotification);
+        await _userNotificationRepository.UnitOfWork.SaveChangesAsync();
+
+        var userNotificationViewModel = await _userNotificationRepository.ToUserNotificationViewMode(userNotification.Id);
+
         await _issueRepository.UpdateOneColumnForIssue(id, null, NameColumn.ParentId);
         _issueRepository.Delete(id);
         await _issueRepository.UnitOfWork.SaveChangesAsync();
-        return id;
+        return new RealtimeNotificationViewModel()
+        {
+            Notification = userNotificationViewModel!,
+            IssueId = id
+        };
     }
 }

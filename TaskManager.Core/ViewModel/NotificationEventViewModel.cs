@@ -42,4 +42,5 @@ public class RealtimeNotificationViewModel
     public IssueViewModel? Issue { get; set; }
     public EpicViewModel? Epic { get; set; }
     public UserNotificationViewModel Notification { get; set; } = new();
+    public Guid IssueId { get; set; }
 }
