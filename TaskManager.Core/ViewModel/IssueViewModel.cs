@@ -28,6 +28,7 @@ public class IssueViewModel
     public IssueDetailViewModel? IssueDetail { get; set; }
     public IReadOnlyCollection<ChildIssueViewModel>? ChildIssues { get; set; }
     public StatusViewModel? Status { get; set; }
+    public virtual DateTime? ModificationTime { get; set; }
 }
 
 public class IssueHistoryViewModel
@@ -116,6 +117,7 @@ public class EpicViewModel
     public IssueDetailViewModel? IssueDetail { get; set; }
     public StatusViewModel? Status { get; set; }
     public IReadOnlyCollection<IssueViewModel>? ChildIssues { get; set; }
+    public virtual DateTime? ModificationTime { get; set; }
 }
 
 public class IssueForProjectViewModel

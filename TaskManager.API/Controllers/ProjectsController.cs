@@ -119,4 +119,36 @@ public class ProjectsController : BaseController
         var res = await _projectService.GetIssueForProjectViewModelAsync(projectId, getIssueForProjectFilterInputModel);
         return CustomResult(res, HttpStatusCode.OK);
     }
+
+    [HttpGet("api/[controller]/{projectId}/version-filter-backlog")]
+    [ProducesResponseType(typeof(IReadOnlyCollection<SprintFilterViewModel>), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> GetVersionFilterForBacklog(Guid projectId)
+    {
+        var res = await _projectService.GetVerionFiltersViewModelForBacklog(projectId);
+        return CustomResult(res, HttpStatusCode.OK);
+    }
+
+    [HttpGet("api/[controller]/{projectId}/epic-filter-backlog")]
+    [ProducesResponseType(typeof(IReadOnlyCollection<EpicFilterViewModel>), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> GetEpicFilterForBacklog(Guid projectId)
+    {
+        var res = await _projectService.GetEpicFiltersViewModelForBacklog(projectId);
+        return CustomResult(res, HttpStatusCode.OK);
+    }
+
+    [HttpGet("api/[controller]/{projectId}/type-filter-backlog")]
+    [ProducesResponseType(typeof(IReadOnlyCollection<TypeFilterViewModel>), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> GetTypeFilterForBacklog(Guid projectId)
+    {
+        var res = await _projectService.GetTypeFiltersViewModelForBacklog(projectId);
+        return CustomResult(res, HttpStatusCode.OK);
+    }
+
+    [HttpGet("api/[controller]/{projectId}/label-filter-backlog")]
+    [ProducesResponseType(typeof(IReadOnlyCollection<LabelFilterViewModel>), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> GetLabelFilterForBacklog(Guid projectId)
+    {
+        var res = await _projectService.GetLabelFiltersViewModelForBacklog(projectId);
+        return CustomResult(res, HttpStatusCode.OK);
+    }
 }

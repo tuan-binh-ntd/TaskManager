@@ -99,7 +99,7 @@ public class UpdateEpicDto : BaseDto<UpdateEpicDto, Issue>
     public DateTime? StartDate { get; set; } = DateTime.MinValue;
     public DateTime? DueDate { get; set; } = DateTime.MinValue;
     public Guid? ParentId { get; set; } = Guid.Empty;
-    public Guid? AssigneeId { get; set; }
+    public Guid? AssigneeId { get; set; } = Guid.Empty;
     public Guid? StatusId { get; set; }
     public Guid? PriorityId { get; set; }
     public int? StoryPointEstimate { get; set; } = 0;
