@@ -94,6 +94,9 @@ public class EpicService : IEpicService
     {
         await _issueRepository.LoadEntitiesRelationship(issue);
         var issueViewModel = _mapper.Map<IssueViewModel>(issue);
+        var labelsOfIssue = await _labelRepository.GetByIssueId(issue.Id);
+        var versionsOfIssue = await _versionRepository.GetStatusViewModelsByIssueId(issue.Id);
+
         if (issue.IssueDetail is not null)
         {
             var issueDetail = _mapper.Map<IssueDetailViewModel>(issue.IssueDetail);
@@ -133,6 +136,8 @@ public class EpicService : IEpicService
         {
             issueViewModel.ChildIssues = await ToChildIssueViewModels(childIssues);
         }
+        issueViewModel.IssueDetail!.Labels = labelsOfIssue;
+        issueViewModel.IssueDetail!.Versions = versionsOfIssue;
         return issueViewModel;
     }
 
@@ -140,7 +145,8 @@ public class EpicService : IEpicService
     {
         await _issueRepository.LoadEntitiesRelationship(epic);
         var epicViewModel = _mapper.Map<EpicViewModel>(epic);
-
+        var labelsOfEpic = await _labelRepository.GetByIssueId(epic.Id);
+        var versionsOfEpic = await _versionRepository.GetStatusViewModelsByIssueId(epic.Id);
 
         if (epic.IssueDetail is not null)
         {
@@ -177,6 +183,8 @@ public class EpicService : IEpicService
         {
             epicViewModel.ChildIssues = await ToIssueViewModels(childIssues);
         }
+        epicViewModel.IssueDetail!.Labels = labelsOfEpic;
+        epicViewModel.IssueDetail!.Versions = versionsOfEpic;
         return epicViewModel;
     }
 
@@ -241,6 +249,8 @@ public class EpicService : IEpicService
         await _issueRepository.LoadIssueDetail(childIssue);
         await _issueRepository.LoadIssueType(childIssue);
         await _issueRepository.LoadStatus(childIssue);
+        var labelsOfChildIssue = await _labelRepository.GetByIssueId(childIssue.Id);
+        var versionsOfChildIssue = await _versionRepository.GetStatusViewModelsByIssueId(childIssue.Id);
 
         var childIssueViewModel = _mapper.Map<ChildIssueViewModel>(childIssue);
 
@@ -268,6 +278,8 @@ public class EpicService : IEpicService
         {
             childIssueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
         }
+        childIssueViewModel.IssueDetail!.Labels = labelsOfChildIssue;
+        childIssueViewModel.IssueDetail!.Versions = versionsOfChildIssue;
         return childIssueViewModel;
     }
 
@@ -824,7 +836,6 @@ public class EpicService : IEpicService
             _versionRepository.RemoveRange(removedVersionIssues);
             await _labelRepository.UnitOfWork.SaveChangesAsync();
         }
-
         if (updateIssueDto.LabelIds is not null && updateIssueDto.LabelIds.Any())
         {
             var removedLabelIssues = await _labelRepository.GetLabelIssuesByIssueId(issue.Id);

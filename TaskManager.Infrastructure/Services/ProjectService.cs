@@ -1,4 +1,5 @@
-﻿using Mapster;
+﻿using Dapper;
+using Mapster;
 using MapsterMapper;
 using TaskManager.Core;
 using TaskManager.Core.Core;
@@ -924,5 +925,125 @@ public class ProjectService : IProjectService
             Sprints = sprints,
             Backlog = backlog,
         };
+    }
+
+    public async Task<IReadOnlyCollection<VersionFilterViewModel>> GetVerionFiltersViewModelForBacklog(Guid projectId)
+    {
+        string query = @"
+            SELECT
+              v.Id,
+              v.Name
+            FROM Sprints s 
+            JOIN Issues i ON s.Id = i.SprintId
+            JOIN VersionIssues vi ON i.Id = vi.IssueId
+            JOIN Versions v ON vi.VersionId = v.Id
+            WHERE s.ProjectId = @ProjectId AND s.IsComplete <> 1
+            GROUP BY v.Id, v.Name
+            UNION
+            SELECT
+              v.Id,
+              v.Name
+            FROM Backlogs b
+            JOIN Issues i ON b.Id = i.BacklogId
+            JOIN VersionIssues vi ON i.Id = vi.IssueId
+            JOIN Versions v ON vi.VersionId = v.Id
+            WHERE b.ProjectId = @ProjectId
+            GROUP BY v.Id, v.Name
+        ";
+
+        var param = new DynamicParameters();
+        param.Add("ProjectId", projectId, System.Data.DbType.Guid);
+        var versionFilters = await _connectionFactory.QueryAsync<VersionFilterViewModel>(query, param);
+
+        return versionFilters.ToList().AsReadOnly();
+    }
+
+    public async Task<IReadOnlyCollection<TypeFilterViewModel>> GetTypeFiltersViewModelForBacklog(Guid projectId)
+    {
+        string query = @"
+            SELECT
+              it.Id,
+              it.Name
+            FROM Sprints s 
+            JOIN Issues i ON s.Id = i.SprintId
+            JOIN IssueTypes it ON i.IssueTypeId = it.Id
+            WHERE s.ProjectId = @ProjectId AND s.IsComplete <> 1
+            GROUP BY it.Id, it.Name
+            UNION
+            SELECT
+              it.Id,
+              it.Name
+            FROM Backlogs b
+            JOIN Issues i ON b.Id = i.BacklogId
+            JOIN IssueTypes it ON i.IssueTypeId = it.Id
+            WHERE b.ProjectId = @ProjectId
+            GROUP BY it.Id, it.Name
+        ";
+
+        var param = new DynamicParameters();
+        param.Add("ProjectId", projectId, System.Data.DbType.Guid);
+        var typeFilters = await _connectionFactory.QueryAsync<TypeFilterViewModel>(query, param);
+
+        return typeFilters.ToList().AsReadOnly();
+    }
+
+    public async Task<IReadOnlyCollection<EpicFilterViewModel>> GetEpicFiltersViewModelForBacklog(Guid projectId)
+    {
+        string query = @"
+            SELECT
+              e.Id,
+              e.Name
+            FROM Sprints s 
+            JOIN Issues i ON s.Id = i.SprintId
+            JOIN Issues e ON i.ParentId = e.Id
+            WHERE s.ProjectId = @ProjectId AND s.IsComplete <> 1
+            GROUP BY e.Id, e.Name
+            UNION
+            SELECT
+              e.Id,
+              e.Name
+            FROM Backlogs b
+            JOIN Issues i ON b.Id = i.BacklogId
+            JOIN Issues e ON i.ParentId = e.Id
+            WHERE b.ProjectId = @ProjectId
+            GROUP BY e.Id, e.Name
+        ";
+
+        var param = new DynamicParameters();
+        param.Add("ProjectId", projectId, System.Data.DbType.Guid);
+        var epicFilters = await _connectionFactory.QueryAsync<EpicFilterViewModel>(query, param);
+
+        return epicFilters.ToList().AsReadOnly();
+    }
+
+    public async Task<IReadOnlyCollection<LabelFilterViewModel>> GetLabelFiltersViewModelForBacklog(Guid projectId)
+    {
+        string query = @"
+            SELECT
+              l.Id,
+              l.Name
+            FROM Sprints s 
+            JOIN Issues i ON s.Id = i.SprintId
+            JOIN LabelIssues li ON i.Id = li.IssueId
+            JOIN Labels l ON li.LabelId = l.Id
+            WHERE s.ProjectId = @ProjectId AND s.IsComplete <> 1
+            GROUP BY l.Id, l.Name
+            UNION
+            SELECT
+              l.Id,
+              l.Name
+            FROM Backlogs b
+            JOIN Issues i ON b.Id = i.BacklogId
+            JOIN LabelIssues li ON i.Id = li.IssueId
+            JOIN Labels l ON li.LabelId = l.Id
+            WHERE b.ProjectId = @ProjectId
+            GROUP BY l.Id, l.Name
+        ";
+
+        var param = new DynamicParameters();
+        param.Add("ProjectId", projectId, System.Data.DbType.Guid);
+        var labelFilters = await _connectionFactory.QueryAsync<LabelFilterViewModel>(query, param);
+
+        return labelFilters.ToList().AsReadOnly();
     }
 }

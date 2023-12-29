@@ -2,6 +2,7 @@
 using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using TaskManager.Core;
 using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
@@ -162,6 +163,9 @@ public class IssueService : IIssueService
         await _issueRepository.LoadIssueType(childIssue);
         await _issueRepository.LoadStatus(childIssue);
 
+        var labelsOfChildIssue = await _labelRepository.GetByIssueId(childIssue.Id);
+        var versionsOfChildIssue = await _versionRepository.GetStatusViewModelsByIssueId(childIssue.Id);
+
         var childIssueViewModel = _mapper.Map<ChildIssueViewModel>(childIssue);
 
         if (childIssue.IssueDetail is not null)
@@ -188,6 +192,8 @@ public class IssueService : IIssueService
         {
             childIssueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
         }
+        childIssueViewModel.IssueDetail!.Labels = labelsOfChildIssue;
+        childIssueViewModel.IssueDetail!.Versions = versionsOfChildIssue;
         return childIssueViewModel;
     }
 
@@ -1220,6 +1226,7 @@ public class IssueService : IIssueService
 
     public async Task<Guid> DeleteIssue(Guid id)
     {
+        await _issueRepository.UpdateOneColumnForIssue(id, null, NameColumn.ParentId);
         _issueRepository.Delete(id);
         await _issueRepository.UnitOfWork.SaveChangesAsync();
         return id;

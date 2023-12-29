@@ -23,3 +23,9 @@ public class LabelFilterViewModel
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
 }
+
+public class VersionFilterViewModel
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+}
