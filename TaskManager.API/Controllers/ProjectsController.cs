@@ -74,9 +74,9 @@ public class ProjectsController : BaseController
 
     [HttpPatch("api/users/{id}/[controller]/{projectId}")]
     [ProducesResponseType(typeof(ProjectViewModel), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> Update(Guid projectId, UpdateProjectDto updateProjectDto)
+    public async Task<IActionResult> Update(Guid id, Guid projectId, UpdateProjectDto updateProjectDto)
     {
-        var res = await _projectService.Update(userId: Guid.Empty, projectId, updateProjectDto);
+        var res = await _projectService.Update(userId: id, projectId, updateProjectDto);
         return CustomResult(res, HttpStatusCode.OK);
     }
 

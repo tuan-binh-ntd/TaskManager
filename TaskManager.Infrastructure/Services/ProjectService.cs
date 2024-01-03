@@ -169,6 +169,7 @@ public class ProjectService : IProjectService
         if (userId is Guid newUserId)
         {
             projectViewModel.UserPermissionGroup = await _permissionGroupRepository.GetPermissionGroupViewModelById(project.Id, newUserId);
+            projectViewModel.IsFavourite = await _userProjectRepository.GetIsFavouriteCol(project.Id, newUserId);
         }
         projectViewModel.PermissionGroups = await _permissionGroupRepository.GetByProjectId(project.Id);
         var projectConfiguration = _projectConfigurationRepository.GetByProjectId(project.Id);
@@ -178,14 +179,14 @@ public class ProjectService : IProjectService
         return projectViewModel;
     }
 
-    private async Task<IReadOnlyCollection<ProjectViewModel>> ToProjectViewModels(IReadOnlyCollection<Project> projects)
+    private async Task<IReadOnlyCollection<ProjectViewModel>> ToProjectViewModels(IReadOnlyCollection<Project> projects, Guid userId)
     {
         var projectViewModels = new List<ProjectViewModel>();
         if (projects.Any())
         {
             foreach (var item in projects)
             {
-                var projectViewModel = await ToProjectViewModel(item);
+                var projectViewModel = await ToProjectViewModel(item, userId);
                 projectViewModels.Add(projectViewModel);
             }
             return projectViewModels.AsReadOnly();
@@ -678,12 +679,6 @@ public class ProjectService : IProjectService
         return id;
     }
 
-    public async Task<IReadOnlyCollection<ProjectViewModel>> GetProjects()
-    {
-        var projects = await _projectRepository.GetAll();
-        return await ToProjectViewModels(projects);
-    }
-
     public async Task<ProjectViewModel> Create(Guid userId, CreateProjectDto projectDto)
     {
         var project = projectDto.Adapt<Project>();
@@ -755,6 +750,11 @@ public class ProjectService : IProjectService
             }
         }
 
+        if(updateProjectDto.IsFavourite is bool isFavourite)
+        {
+            await _userProjectRepository.UpdateIsFavouriteCol(projectId, userId, isFavourite);
+        }
+
         var projectConfiguration = _projectConfigurationRepository.GetByProjectId(projectId);
         projectConfiguration.DefaultAssigneeId = updateProjectDto.DefaultAssigneeId;
         projectConfiguration.DefaultPriorityId = updateProjectDto.DefaultPriorityId;
@@ -775,14 +775,14 @@ public class ProjectService : IProjectService
             {
                 TotalCount = pagedProjects.TotalCount,
                 TotalPage = pagedProjects.TotalPage,
-                Content = await ToProjectViewModels(pagedProjects.Content!)
+                Content = await ToProjectViewModels(pagedProjects.Content!, userId)
             };
             return res;
         }
         else
         {
             var res = await _projectRepository.GetByUserId(userId, filter);
-            return await ToProjectViewModels(res);
+            return await ToProjectViewModels(res, userId);
         }
     }
 

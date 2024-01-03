@@ -6,6 +6,7 @@ public class UserProject : BaseEntity
 {
     public string Role { get; set; } = string.Empty;
     public Guid PermissionGroupId { get; set; }
+    public bool IsFavourite { get; set; }
     // Relationship
     public Guid ProjectId { get; set; }
     public Guid UserId { get; set; }

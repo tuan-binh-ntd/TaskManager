@@ -9,7 +9,6 @@ namespace TaskManager.Core.Interfaces.Services;
 /// </summary>
 public interface IProjectService
 {
-    Task<IReadOnlyCollection<ProjectViewModel>> GetProjects();
     Task<ProjectViewModel> Create(Guid userId, CreateProjectDto projectDto);
     Task<ProjectViewModel> Update(Guid userId, Guid projectId, UpdateProjectDto updateProjectDto);
     Task<Guid> Delete(Guid id);

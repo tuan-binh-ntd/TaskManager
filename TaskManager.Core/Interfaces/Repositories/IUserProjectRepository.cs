@@ -16,4 +16,6 @@ public interface IUserProjectRepository : IRepository<UserProject>
     void Delete(UserProject userProject);
     Task<UserProject?> GetById(Guid id);
     Task<Guid> GetLeaderIdByProjectId(Guid projectId);
+    Task UpdateIsFavouriteCol(Guid projectId, Guid userId, bool isFavourite);
+    Task<bool> GetIsFavouriteCol(Guid projectId, Guid userId);
 }

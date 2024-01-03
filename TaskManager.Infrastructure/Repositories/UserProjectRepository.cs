@@ -110,4 +110,18 @@ public class UserProjectRepository : IUserProjectRepository
         var leaderId = await _context.UserProjects.Where(up => up.ProjectId == projectId).Select(up => up.UserId).FirstOrDefaultAsync();
         return leaderId;
     }
+
+    public async Task UpdateIsFavouriteCol(Guid projectId, Guid userId, bool isFavourite)
+    {
+        await _context.UserProjects
+            .Where(up => up.ProjectId == projectId && up.UserId == userId)
+            .ExecuteUpdateAsync(up => up.SetProperty(up => up.IsFavourite, isFavourite));
+    }
+
+    public async Task<bool> GetIsFavouriteCol(Guid projectId, Guid userId)
+    {
+        return await _context.UserProjects
+            .Where(up => up.ProjectId == projectId && up.UserId == userId)
+            .Select(up => up.IsFavourite).FirstOrDefaultAsync();
+    }
 }
