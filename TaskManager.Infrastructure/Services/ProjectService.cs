@@ -853,13 +853,14 @@ public class ProjectService : IProjectService
         var defaultAssigneeId = await _projectConfigurationRepository.GetDefaultAssigneeIdByProjectId(projectId);
         var leaderId = await _userProjectRepository.GetLeaderIdByProjectId(projectId);
 
-        if (defaultAssigneeId == id)
+
+        var userProject = await _userProjectRepository.GetMember(id) ?? throw new MemberProjectNullException();
+
+        if (userProject.UserId == defaultAssigneeId)
         {
             await _projectConfigurationRepository.UpdateDefaultAssignee(projectId, null);
             defaultAssigneeId = null;
         }
-
-        var userProject = await _userProjectRepository.GetMember(id) ?? throw new MemberProjectNullException();
 
         await _issueDetailRepository.UpdateOneColumnForIssueDetail(userProject.UserId, defaultAssigneeId, NameColumn.AssigneeId);
 
