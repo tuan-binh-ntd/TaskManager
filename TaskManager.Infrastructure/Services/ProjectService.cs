@@ -712,7 +712,7 @@ public class ProjectService : IProjectService
 
         await CreateNotificationScheme(project);
 
-        return await ToProjectViewModel(project);
+        return await ToProjectViewModel(project, userId);
     }
 
     public async Task<ProjectViewModel> Update(Guid userId, Guid projectId, UpdateProjectDto updateProjectDto)

@@ -76,11 +76,16 @@ public class SprintService : ISprintService
     private async Task<IssueViewModel> ToIssueViewModel(Issue issue)
     {
         await _issueRepository.LoadIssueType(issue);
+        await _issueRepository.LoadIssueDetail(issue);
         var issueViewModel = _mapper.Map<IssueViewModel>(issue);
 
         if (issue.ParentId is Guid parentId)
         {
             issueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
+        }
+        if(issue.IssueDetail is not null)
+        {
+            issueViewModel.IssueDetail = _mapper.Map<IssueDetailViewModel>(issue.IssueDetail);
         }
         return issueViewModel;
     }
