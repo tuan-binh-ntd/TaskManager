@@ -36,4 +36,11 @@ public class ProjectConfigurationRepository : IProjectConfigurationRepository
         var assigneeId = await _context.ProjectConfigurations.Where(pc => pc.ProjectId == projectId).Select(pc => pc.DefaultAssigneeId).FirstOrDefaultAsync();
         return assigneeId;
     }
+
+    public async Task UpdateDefaultAssignee(Guid projectId, Guid? defaultAssigneeId)
+    {
+        await _context.ProjectConfigurations
+            .Where(pc => pc.ProjectId == projectId)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(i => i.DefaultAssigneeId, defaultAssigneeId));
+    }
 }

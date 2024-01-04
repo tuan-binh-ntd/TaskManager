@@ -8,4 +8,5 @@ public interface IProjectConfigurationRepository : IRepository<ProjectConfigurat
     void Update(ProjectConfiguration projectConfiguration);
     ProjectConfiguration GetByProjectId(Guid projectId);
     Task<Guid?> GetDefaultAssigneeIdByProjectId(Guid projectId);
+    Task UpdateDefaultAssignee(Guid projectId, Guid? defaultAssigneeId);
 }
