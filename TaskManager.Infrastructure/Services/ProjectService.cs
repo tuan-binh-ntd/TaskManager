@@ -858,8 +858,8 @@ public class ProjectService : IProjectService
 
         if (userProject.UserId == defaultAssigneeId)
         {
-            await _projectConfigurationRepository.UpdateDefaultAssignee(projectId, null);
-            defaultAssigneeId = null;
+            await _projectConfigurationRepository.UpdateDefaultAssignee(projectId, leaderId);
+            defaultAssigneeId = leaderId;
         }
 
         await _issueDetailRepository.UpdateOneColumnForIssueDetail(userProject.UserId, defaultAssigneeId, NameColumn.AssigneeId);
