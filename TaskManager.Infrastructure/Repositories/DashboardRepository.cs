@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 using TaskManager.Core.Core;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Entities;
@@ -72,12 +73,18 @@ public class DashboardRepository : IDashboardRepository
 
     public async Task<IReadOnlyCollection<Issue>> GetIssueViewModelsDashboardViewModelAsync(Guid projectId, GetIssuesForAssigneeOrReporterDto getIssuesForAssigneeOrReporterDto)
     {
+        var sprintIds = await _context.Sprints.AsNoTracking().Where(s => s.ProjectId == projectId).Select(s => s.Id).ToListAsync();
+        var backlogId = await _context.Backlogs.AsNoTracking().Where(s => s.ProjectId == projectId).Select(b => b.Id).FirstOrDefaultAsync();
+
         var issues = await (from i in _context.Issues
+                            .WhereIf(sprintIds.Count > 0, i => sprintIds.Contains((Guid)i.SprintId!) || i.ProjectId == projectId || i.BacklogId == backlogId)
+                            //.WhereIf(backlogId != Guid.Empty, i => i.BacklogId == backlogId)
+                            //.Where(i => i.ProjectId == projectId)
                             join id in _context.IssueDetails
                             .Where(i => i.CreationTime >= getIssuesForAssigneeOrReporterDto.StartDate && i.CreationTime <= getIssuesForAssigneeOrReporterDto.EndDate)
                             .WhereIf(getIssuesForAssigneeOrReporterDto.Type == CoreConstants.AssigneeType, id => id.AssigneeId == getIssuesForAssigneeOrReporterDto.UserId)
                             .WhereIf(getIssuesForAssigneeOrReporterDto.Type == CoreConstants.ReporterType, id => id.ReporterId == getIssuesForAssigneeOrReporterDto.UserId)
-                            .WhereIf(getIssuesForAssigneeOrReporterDto.Type == CoreConstants.AllType, id => id.AssigneeId == getIssuesForAssigneeOrReporterDto.UserId || id.ReporterId == getIssuesForAssigneeOrReporterDto.UserId)
+                            .WhereIf(getIssuesForAssigneeOrReporterDto.Type == CoreConstants.AllType || getIssuesForAssigneeOrReporterDto.Type == "all", id => id.AssigneeId == getIssuesForAssigneeOrReporterDto.UserId || id.ReporterId == getIssuesForAssigneeOrReporterDto.UserId)
                             on i.Id equals id.IssueId
                             select i).ToListAsync();
 
