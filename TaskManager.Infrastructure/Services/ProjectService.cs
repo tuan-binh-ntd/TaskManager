@@ -763,7 +763,7 @@ public class ProjectService : IProjectService
         _projectConfigurationRepository.Update(projectConfiguration);
         _projectRepository.Update(project);
         await _projectRepository.UnitOfWork.SaveChangesAsync();
-        return await ToProjectViewModel(project);
+        return await ToProjectViewModel(project, userId);
     }
 
     public async Task<object> GetProjectsByFilter(Guid userId, GetProjectByFilterDto filter, PaginationInput paginationInput)
