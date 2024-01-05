@@ -13,7 +13,7 @@ public interface IFilterService
     /// </summary>
     /// <param name="id">Id of filter</param>
     /// <returns>List of issues</returns>
-    Task<IReadOnlyCollection<IssueViewModel>> GetIssueByFilterConfiguration(Guid id);
+    Task<IReadOnlyCollection<IssueViewModel>> GetIssueByFilterConfiguration(Guid id, Guid userId);
     Task<IReadOnlyCollection<IssueViewModel>> GetIssuesByConfiguration(GetIssueByConfigurationDto getIssueByConfigurationDto);
     Task<IReadOnlyCollection<FilterViewModel>> GetFilterViewModelsByUserId(Guid userId);
     Task<FilterViewModel> GetFilterViewModelById(Guid id);

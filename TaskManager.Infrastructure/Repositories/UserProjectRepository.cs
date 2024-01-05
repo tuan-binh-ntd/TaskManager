@@ -124,4 +124,10 @@ public class UserProjectRepository : IUserProjectRepository
             .Where(up => up.ProjectId == projectId && up.UserId == userId)
             .Select(up => up.IsFavourite).FirstOrDefaultAsync();
     }
+
+    public async Task<IReadOnlyCollection<Guid>> GetProjectIdsByUserId(Guid userId)
+    {
+        var projectIds = await _context.UserProjects.AsNoTracking().Where(up => up.UserId == userId).Select(up => up.ProjectId).ToListAsync();
+        return projectIds.AsReadOnly();
+    }
 }

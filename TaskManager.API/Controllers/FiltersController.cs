@@ -1,6 +1,8 @@
 ﻿using CoreApiResponse;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using TaskManager.API.Extensions;
 using TaskManager.Core.DTOs;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
@@ -17,11 +19,13 @@ public class FiltersController : BaseController
         _filterService = filterService;
     }
 
+    [Authorize]
     [HttpGet("api/[controller]/{id}/issues")]
     [ProducesResponseType(typeof(IReadOnlyCollection<IssueViewModel>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Get(Guid id)
     {
-        var res = await _filterService.GetIssueByFilterConfiguration(id);
+        var userId = User.GetUserId();
+        var res = await _filterService.GetIssueByFilterConfiguration(id, userId);
         return CustomResult(res, HttpStatusCode.OK);
     }
 

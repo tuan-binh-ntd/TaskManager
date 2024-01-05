@@ -8,7 +8,6 @@ using TaskManager.Core.Extensions;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Interfaces.Services;
 using TaskManager.Core.ViewModel;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace TaskManager.Infrastructure.Services;
 
@@ -19,6 +18,7 @@ public class FilterService : IFilterService
     private readonly IFilterRepository _filterRepository;
     private readonly ISprintRepository _sprintRepository;
     private readonly IBacklogRepository _backlogRepository;
+    private readonly IUserProjectRepository _userProjectRepository;
     private readonly ILogger<FilterService> _logger;
     private readonly IMapper _mapper;
 
@@ -28,6 +28,7 @@ public class FilterService : IFilterService
         IFilterRepository filterRepository,
         ISprintRepository sprintRepository,
         IBacklogRepository backlogRepository,
+        IUserProjectRepository userProjectRepository,
         ILogger<FilterService> logger,
         IMapper mapper
         )
@@ -37,6 +38,7 @@ public class FilterService : IFilterService
         _filterRepository = filterRepository;
         _sprintRepository = sprintRepository;
         _backlogRepository = backlogRepository;
+        _userProjectRepository = userProjectRepository;
         _logger = logger;
         _mapper = mapper;
     }
@@ -211,13 +213,24 @@ public class FilterService : IFilterService
         return filter.Id;
     }
 
-    public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByFilterConfiguration(Guid id)
+    public async Task<IReadOnlyCollection<IssueViewModel>> GetIssueByFilterConfiguration(Guid id, Guid userId)
     {
         var filterConfiguration = await _filterRepository.GetConfigurationOfFilter(id);
+        var projectIds = await _userProjectRepository.GetProjectIdsByUserId(userId);
+        var sprintIds = await _sprintRepository.GetSprintIdsByProjectIds(projectIds);
+        var backlogIds = await _backlogRepository.GetBacklogIdsByProjectIds(projectIds);
+
         if (filterConfiguration is not null)
         {
+            filterConfiguration.Project = new()
+            {
+                BacklogIds = backlogIds,
+                SprintIds = sprintIds,
+                ProjectIds = projectIds
+            };
+
             string query = filterConfiguration.QueryAfterBuild();
-            _logger.LogInformation(query);
+            _logger.LogInformation(message: query);
             var issueIds = await _connectionFactory.QueryAsync<Guid>(query);
             if (issueIds.Any())
             {
@@ -229,8 +242,14 @@ public class FilterService : IFilterService
         else
         {
             filterConfiguration = new FilterConfiguration();
+            filterConfiguration.Project = new()
+            {
+                BacklogIds = backlogIds,
+                SprintIds = sprintIds,
+                ProjectIds = projectIds
+            };
             string query = filterConfiguration.QueryAfterBuild();
-            _logger.LogInformation(query);
+            _logger.LogInformation(message: query);
             var issueIds = await _connectionFactory.QueryAsync<Guid>(query);
             if (issueIds.Any())
             {

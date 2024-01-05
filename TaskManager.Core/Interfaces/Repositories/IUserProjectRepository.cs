@@ -18,4 +18,5 @@ public interface IUserProjectRepository : IRepository<UserProject>
     Task<Guid> GetLeaderIdByProjectId(Guid projectId);
     Task UpdateIsFavouriteCol(Guid projectId, Guid userId, bool isFavourite);
     Task<bool> GetIsFavouriteCol(Guid projectId, Guid userId);
+    Task<IReadOnlyCollection<Guid>> GetProjectIdsByUserId(Guid userId);
 }

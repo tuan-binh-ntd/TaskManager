@@ -27,19 +27,46 @@ public class DashboardRepository : IDashboardRepository
 
     public async Task<IReadOnlyCollection<IssueOfAssigneeDashboardViewModel>> GetIssueOfAssigneeDashboardViewModel(Guid projectId)
     {
-        var query = from up in _context.UserProjects.Where(up => up.ProjectId == projectId)
-                    join u in _context.Users on up.UserId equals u.Id
-                    join id in _context.IssueDetails on up.UserId equals id.AssigneeId into idj
-                    from idlj in idj.DefaultIfEmpty()
-                    group new { idlj, u } by new { idlj.AssigneeId, u.Id, u.Name } into g
-                    select new IssueOfAssigneeDashboardViewModel
-                    {
-                        Id = g.Key.Id,
-                        Name = g.Key.Name,
-                        IssueCount = g.Count()
-                    };
+        string query = @"
+            SELECT
+              id.AssigneeId Id,
+              IIF(id.AssigneeId IS NULL, 'Unassgined', u.[Name]) [Name],
+              COUNT(ISNULL(id.AssigneeId, '00000000-0000-0000-0000-000000000000')) IssueCount
+            FROM Sprints s 
+            JOIN Issues i ON s.Id = i.SprintId
+            JOIN IssueDetails id ON i.Id = id.IssueId
+            LEFT JOIN AppUser u ON id.AssigneeId = u.Id
+            WHERE s.ProjectId = @ProjectId
+            GROUP BY id.AssigneeId, u.[Name]
+            UNION
+            SELECT
+              id.AssigneeId Id,
+              IIF(id.AssigneeId IS NULL, 'Unassgined', u.[Name]) [Name],
+              COUNT(ISNULL(id.AssigneeId, '00000000-0000-0000-0000-000000000000')) IssueCount
+            FROM Backlogs b
+            JOIN Issues i ON b.Id = i.BacklogId
+            JOIN IssueDetails id ON i.Id = id.IssueId
+            LEFT JOIN AppUser u ON id.AssigneeId = u.Id
+            WHERE b.ProjectId = @ProjectId
+            GROUP BY id.AssigneeId, u.[Name]
+            UNION
+            SELECT 
+              id.AssigneeId Id,
+              IIF(id.AssigneeId IS NULL, 'Unassgined', u.[Name]) [Name],
+              COUNT(ISNULL(id.AssigneeId, '00000000-0000-0000-0000-000000000000')) IssueCount
+            FROM Issues i
+            JOIN IssueDetails id ON i.Id = id.IssueId
+            LEFT JOIN AppUser u ON id.AssigneeId = u.Id
+            WHERE ProjectId = @ProjectId
+            GROUP BY id.AssigneeId, u.[Name]
+        ";
 
-        return await query.ToListAsync();
+        var param = new DynamicParameters();
+        param.Add("ProjectId", projectId, System.Data.DbType.Guid);
+
+        var issueOfAssigneeDashboardViewModels = await _connectionFactory.QueryAsync<IssueOfAssigneeDashboardViewModel>(query, param);
+
+        return issueOfAssigneeDashboardViewModels.ToList().AsReadOnly();
     }
 
     public async Task<IReadOnlyCollection<IssuesInProjectDashboardViewModel>> GetIssuesInProjectDashboardViewModelAsync(Guid projectId)
@@ -78,8 +105,8 @@ public class DashboardRepository : IDashboardRepository
 
         var issues = await (from i in _context.Issues
                             .WhereIf(sprintIds.Count > 0, i => sprintIds.Contains((Guid)i.SprintId!) || i.ProjectId == projectId || i.BacklogId == backlogId)
-                            //.WhereIf(backlogId != Guid.Empty, i => i.BacklogId == backlogId)
-                            //.Where(i => i.ProjectId == projectId)
+                                //.WhereIf(backlogId != Guid.Empty, i => i.BacklogId == backlogId)
+                                //.Where(i => i.ProjectId == projectId)
                             join id in _context.IssueDetails
                             .Where(i => i.CreationTime >= getIssuesForAssigneeOrReporterDto.StartDate && i.CreationTime <= getIssuesForAssigneeOrReporterDto.EndDate)
                             .WhereIf(getIssuesForAssigneeOrReporterDto.Type == CoreConstants.AssigneeType, id => id.AssigneeId == getIssuesForAssigneeOrReporterDto.UserId)
