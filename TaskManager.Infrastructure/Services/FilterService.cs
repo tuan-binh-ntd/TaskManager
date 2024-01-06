@@ -222,12 +222,15 @@ public class FilterService : IFilterService
 
         if (filterConfiguration is not null)
         {
-            filterConfiguration.Project = new()
+            if (filterConfiguration.Project is null)
             {
-                BacklogIds = backlogIds,
-                SprintIds = sprintIds,
-                ProjectIds = projectIds
-            };
+                filterConfiguration.Project = new()
+                {
+                    BacklogIds = backlogIds,
+                    SprintIds = sprintIds,
+                    ProjectIds = projectIds
+                };
+            }
 
             string query = filterConfiguration.QueryAfterBuild();
             _logger.LogInformation(message: query);
@@ -241,12 +244,14 @@ public class FilterService : IFilterService
         }
         else
         {
-            filterConfiguration = new FilterConfiguration();
-            filterConfiguration.Project = new()
+            filterConfiguration = new FilterConfiguration
             {
-                BacklogIds = backlogIds,
-                SprintIds = sprintIds,
-                ProjectIds = projectIds
+                Project = new()
+                {
+                    BacklogIds = backlogIds,
+                    SprintIds = sprintIds,
+                    ProjectIds = projectIds
+                }
             };
             string query = filterConfiguration.QueryAfterBuild();
             _logger.LogInformation(message: query);
