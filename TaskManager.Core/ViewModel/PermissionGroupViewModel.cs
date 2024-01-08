@@ -8,6 +8,7 @@ namespace TaskManager.Core.ViewModel
         public string Name { get; set; } = string.Empty;
         public Permissions? Permissions { get; set; }
         public int MemberCount { get; set; }
+        public bool IsAdmin { get; set; }
     }
 
     public class PermissionViewModel

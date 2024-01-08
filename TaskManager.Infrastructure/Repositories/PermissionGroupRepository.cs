@@ -124,4 +124,15 @@ public class PermissionGroupRepository : IPermissionGroupRepository
                    .Where(i => i.PermissionGroupId == oldValue)
                    .ExecuteUpdateAsync(setters => setters.SetProperty(i => i.PermissionGroupId, newValue));
     }
+
+    public async Task<Guid> GetDeveloperId(Guid projectId)
+    {
+        var developerId = await _context.PermissionGroups
+            .AsNoTracking()
+            .Where(pg => pg.ProjectId == projectId && pg.Name == CoreConstants.DeveloperName)
+            .Select(pg => pg.Id)
+            .FirstOrDefaultAsync();
+
+        return developerId;
+    }
 }

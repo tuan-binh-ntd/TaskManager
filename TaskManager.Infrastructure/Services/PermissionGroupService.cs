@@ -54,8 +54,9 @@ public class PermissionGroupService : IPermissionGroupService
         return await ToPermissionGroupViewModel(permissionGroup);
     }
 
-    public async Task<Guid> Delete(Guid id, Guid? newPermissionGroupId)
+    public async Task<Guid> Delete(Guid id, Guid? newPermissionGroupId, Guid projectId)
     {
+        newPermissionGroupId = await _permissionGroupRepository.GetDeveloperId(projectId);
         if (newPermissionGroupId is Guid newId)
         {
             await _permissionGroupRepository.UpdatePermissionGroupId(id, newId);

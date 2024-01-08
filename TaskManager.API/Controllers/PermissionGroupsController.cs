@@ -46,7 +46,7 @@ public class PermissionGroupsController : BaseController
 
     [HttpDelete("{id}")]
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> Delete(Guid id, [FromQuery] Guid? newPermissionGroupId)
+    public async Task<IActionResult> Delete(Guid projectId, Guid id, [FromQuery] Guid? newPermissionGroupId)
     {
         var res = await _permissionGroupService.Delete(id, newPermissionGroupId);
         return CustomResult(res, HttpStatusCode.OK);

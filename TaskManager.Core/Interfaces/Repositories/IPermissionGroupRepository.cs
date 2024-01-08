@@ -18,4 +18,5 @@ public interface IPermissionGroupRepository : IRepository<PermissionGroup>
     Task<PermissionGroupViewModel> GetPermissionGroupViewModelById(Guid projectId, Guid userId);
     Task<IReadOnlyCollection<PermissionGroupViewModel>> GetPermissionGroupViewModelsByProjectId(Guid projectId);
     Task UpdatePermissionGroupId(Guid oldValue, Guid newValue);
+    Task<Guid> GetDeveloperId(Guid projectId);
 }
