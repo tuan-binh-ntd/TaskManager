@@ -28,37 +28,44 @@ public class DashboardRepository : IDashboardRepository
     public async Task<IReadOnlyCollection<IssueOfAssigneeDashboardViewModel>> GetIssueOfAssigneeDashboardViewModel(Guid projectId)
     {
         string query = @"
-            SELECT
-              id.AssigneeId Id,
-              IIF(id.AssigneeId IS NULL, 'Unassgined', u.[Name]) [Name],
-              COUNT(ISNULL(id.AssigneeId, '00000000-0000-0000-0000-000000000000')) IssueCount
-            FROM Sprints s 
-            JOIN Issues i ON s.Id = i.SprintId
-            JOIN IssueDetails id ON i.Id = id.IssueId
-            LEFT JOIN AppUser u ON id.AssigneeId = u.Id
-            WHERE s.ProjectId = @ProjectId
-            GROUP BY id.AssigneeId, u.[Name]
-            UNION
-            SELECT
-              id.AssigneeId Id,
-              IIF(id.AssigneeId IS NULL, 'Unassgined', u.[Name]) [Name],
-              COUNT(ISNULL(id.AssigneeId, '00000000-0000-0000-0000-000000000000')) IssueCount
-            FROM Backlogs b
-            JOIN Issues i ON b.Id = i.BacklogId
-            JOIN IssueDetails id ON i.Id = id.IssueId
-            LEFT JOIN AppUser u ON id.AssigneeId = u.Id
-            WHERE b.ProjectId = @ProjectId
-            GROUP BY id.AssigneeId, u.[Name]
-            UNION
             SELECT 
-              id.AssigneeId Id,
-              IIF(id.AssigneeId IS NULL, 'Unassgined', u.[Name]) [Name],
-              COUNT(ISNULL(id.AssigneeId, '00000000-0000-0000-0000-000000000000')) IssueCount
-            FROM Issues i
-            JOIN IssueDetails id ON i.Id = id.IssueId
-            LEFT JOIN AppUser u ON id.AssigneeId = u.Id
-            WHERE ProjectId = @ProjectId
-            GROUP BY id.AssigneeId, u.[Name]
+              id.Id,
+              IIF(id.Id IS NULL, 'Unassgined', id.[Name]) [Name],
+              SUM(id.IssueCount) IssueCount
+            FROM (
+              SELECT
+                id.AssigneeId Id,
+                IIF(id.AssigneeId IS NULL, 'Unassgined', u.[Name]) [Name],
+                COUNT(ISNULL(id.AssigneeId, '00000000-0000-0000-0000-000000000000')) IssueCount
+              FROM Sprints s 
+              JOIN Issues i ON s.Id = i.SprintId
+              JOIN IssueDetails id ON i.Id = id.IssueId
+              LEFT JOIN AppUser u ON id.AssigneeId = u.Id
+              WHERE s.ProjectId = @ProjectId
+              GROUP BY id.AssigneeId, u.[Name]
+              UNION
+              SELECT
+                id.AssigneeId Id,
+                IIF(id.AssigneeId IS NULL, 'Unassgined', u.[Name]) [Name],
+                COUNT(ISNULL(id.AssigneeId, '00000000-0000-0000-0000-000000000000')) IssueCount
+              FROM Backlogs b
+              JOIN Issues i ON b.Id = i.BacklogId
+              JOIN IssueDetails id ON i.Id = id.IssueId
+              LEFT JOIN AppUser u ON id.AssigneeId = u.Id
+              WHERE b.ProjectId = @ProjectId
+              GROUP BY id.AssigneeId, u.[Name]
+              UNION
+              SELECT 
+                id.AssigneeId Id,
+                IIF(id.AssigneeId IS NULL, 'Unassgined', u.[Name]) [Name],
+                COUNT(ISNULL(id.AssigneeId, '00000000-0000-0000-0000-000000000000')) IssueCount
+              FROM Issues i
+              JOIN IssueDetails id ON i.Id = id.IssueId
+              LEFT JOIN AppUser u ON id.AssigneeId = u.Id
+              WHERE ProjectId = @ProjectId
+              GROUP BY id.AssigneeId, u.[Name]
+            ) id
+            GROUP BY id.Id, id.[Name]
         ";
 
         var param = new DynamicParameters();
