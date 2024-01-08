@@ -44,7 +44,8 @@ public class PermissionGroupRepository : IPermissionGroupRepository
                     {
                         Id = pg.Id,
                         Name = pg.Name,
-                        Permissions = pg.Permissions.FromJson<Permissions>()
+                        Permissions = pg.Permissions.FromJson<Permissions>(),
+                        IsMain = pg.IsMain,
                     };
         return await query.ToListAsync();
     }
@@ -64,13 +65,14 @@ public class PermissionGroupRepository : IPermissionGroupRepository
         var query = from pg in _context.PermissionGroups.Where(pg => pg.ProjectId == projectId)
                     join up in _context.UserProjects on pg.Id equals up.PermissionGroupId into upj
                     from uplj in upj.DefaultIfEmpty()
-                    group new { pg, uplj } by new { pg.Id, pg.Name, pg.Permissions, IssueId = uplj.PermissionGroupId } into g
+                    group new { pg, uplj } by new { pg.Id, pg.Name, pg.Permissions, IssueId = uplj.PermissionGroupId, pg.IsMain } into g
                     select new PermissionGroupViewModel
                     {
                         Id = g.Key.Id,
                         Name = g.Key.Name,
                         Permissions = g.Key.Permissions.FromJson<Permissions>(),
-                        MemberCount = g.Count(g => g.uplj.PermissionGroupId != null)
+                        MemberCount = g.Count(g => g.uplj.PermissionGroupId != null),
+                        IsMain = g.Key.IsMain
                     };
         return await query.Pagination(paginationInput);
     }
@@ -107,13 +109,14 @@ public class PermissionGroupRepository : IPermissionGroupRepository
         var query = from pg in _context.PermissionGroups.Where(pg => pg.ProjectId == projectId)
                     join up in _context.UserProjects on pg.Id equals up.PermissionGroupId into upj
                     from uplj in upj.DefaultIfEmpty()
-                    group new { pg, uplj } by new { pg.Id, pg.Name, pg.Permissions, IssueId = uplj.PermissionGroupId } into g
+                    group new { pg, uplj } by new { pg.Id, pg.Name, pg.Permissions, IssueId = uplj.PermissionGroupId, pg.IsMain } into g
                     select new PermissionGroupViewModel
                     {
                         Id = g.Key.Id,
                         Name = g.Key.Name,
                         Permissions = g.Key.Permissions.FromJson<Permissions>(),
-                        MemberCount = g.Count(g => g.uplj.PermissionGroupId != null)
+                        MemberCount = g.Count(g => g.uplj.PermissionGroupId != null),
+                        IsMain = g.Key.IsMain
                     };
         return await query.ToListAsync();
     }
