@@ -11,5 +11,5 @@ public class EmailConstants
     public const string DeleteOneComment = "deleted 1 comment";
     public const string DeletedIssue = "deleted an issue";
 
-    public const string FrontEndUrl = "http://localhost:3000/";
+    public const string FrontEndUrl = "https://ziblitz.azurewebsites.net/";
 }
