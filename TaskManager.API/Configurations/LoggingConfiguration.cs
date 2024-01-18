@@ -1,9 +1,4 @@
-﻿using Serilog;
-using Serilog.Exceptions;
-using Serilog.Sinks.Elasticsearch;
-using System.Reflection;
-
-namespace TaskManager.API.Configurations;
+﻿namespace TaskManager.API.Configurations;
 
 public static class LoggingConfiguration
 {

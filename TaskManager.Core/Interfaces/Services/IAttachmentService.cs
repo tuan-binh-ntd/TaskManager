@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using TaskManager.Core.ViewModel;
-
-namespace TaskManager.Core.Interfaces.Services;
+﻿namespace TaskManager.Core.Interfaces.Services;
 
 public interface IAttachmentService
 {

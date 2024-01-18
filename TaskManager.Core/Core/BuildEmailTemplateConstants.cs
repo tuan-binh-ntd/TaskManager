@@ -1,6 +1,4 @@
-﻿using TaskManager.Core.DTOs;
-
-namespace TaskManager.Core.Core;
+﻿namespace TaskManager.Core.Core;
 
 public static class BuildEmailTemplateConstants
 {

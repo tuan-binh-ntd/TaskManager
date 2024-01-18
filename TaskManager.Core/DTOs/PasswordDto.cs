@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace TaskManager.Core.DTOs;
+﻿namespace TaskManager.Core.DTOs;
 
 public class PasswordDto
 {

@@ -1,9 +1,4 @@
-﻿using Mapster;
-using MapsterMapper;
-using System.Reflection;
-using static TaskManager.Core.Extensions.CoreExtensions;
-
-namespace TaskManager.API.Configurations;
+﻿namespace TaskManager.API.Configurations;
 
 public static class MapsterConfiguration
 {

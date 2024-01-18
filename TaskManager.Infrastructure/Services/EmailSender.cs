@@ -1,18 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using MimeKit;
-using MimeKit.Text;
-using TaskManager.Core.Core;
-using TaskManager.Core.DTOs;
-using TaskManager.Core.Entities;
-using TaskManager.Core.Interfaces.Repositories;
-using TaskManager.Core.Interfaces.Services;
-using TaskManager.Core.ViewModel;
-using SmtpClient = MailKit.Net.Smtp.SmtpClient;
-
-namespace TaskManager.Infrastructure.Services;
+﻿namespace TaskManager.Infrastructure.Services;
 
 public class EmailSender : IEmailSender
 {

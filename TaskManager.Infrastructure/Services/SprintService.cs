@@ -1,15 +1,4 @@
-﻿using Mapster;
-using MapsterMapper;
-using Microsoft.Extensions.Logging;
-using TaskManager.Core.Core;
-using TaskManager.Core.DTOs;
-using TaskManager.Core.Entities;
-using TaskManager.Core.Exceptions;
-using TaskManager.Core.Interfaces.Repositories;
-using TaskManager.Core.Interfaces.Services;
-using TaskManager.Core.ViewModel;
-
-namespace TaskManager.Infrastructure.Services;
+﻿namespace TaskManager.Infrastructure.Services;
 
 public class SprintService : ISprintService
 {
@@ -83,7 +72,7 @@ public class SprintService : ISprintService
         {
             issueViewModel.ParentName = await _issueRepository.GetParentName(parentId);
         }
-        if(issue.IssueDetail is not null)
+        if (issue.IssueDetail is not null)
         {
             issueViewModel.IssueDetail = _mapper.Map<IssueDetailViewModel>(issue.IssueDetail);
         }

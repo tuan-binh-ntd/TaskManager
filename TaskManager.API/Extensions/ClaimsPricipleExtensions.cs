@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-
-namespace TaskManager.API.Extensions;
+﻿namespace TaskManager.API.Extensions;
 
 public static class ClaimsPricipleExtensions
 {

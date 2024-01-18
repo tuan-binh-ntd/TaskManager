@@ -1,10 +1,4 @@
-﻿using CoreApiResponse;
-using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using TaskManager.Core.DTOs;
-using TaskManager.Core.Helper;
-using TaskManager.Core.Interfaces.Services;
-using TaskManager.Core.ViewModel;
+﻿using TaskManager.Core.Helper;
 
 namespace TaskManager.API.Controllers;
 

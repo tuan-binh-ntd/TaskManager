@@ -1,13 +1,4 @@
-﻿using CoreApiResponse;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using System.Net;
-using TaskManager.API.Hubs;
-using TaskManager.Core.DTOs;
-using TaskManager.Core.Interfaces.Services;
-using TaskManager.Core.ViewModel;
-
-namespace TaskManager.API.Controllers;
+﻿namespace TaskManager.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

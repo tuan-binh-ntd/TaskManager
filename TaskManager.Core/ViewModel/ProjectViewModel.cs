@@ -1,6 +1,4 @@
-﻿using Mapster;
-
-namespace TaskManager.Core.ViewModel;
+﻿namespace TaskManager.Core.ViewModel;
 
 public class ProjectViewModel
 {

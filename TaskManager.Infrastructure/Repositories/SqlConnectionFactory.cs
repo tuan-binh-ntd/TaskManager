@@ -1,9 +1,6 @@
-﻿using Dapper;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
-using System.Data;
 using System.Data.Common;
-using TaskManager.Core.Interfaces.Repositories;
 
 namespace TaskManager.Infrastructure.Repositories;
 

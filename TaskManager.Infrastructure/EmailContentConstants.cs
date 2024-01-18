@@ -1,7 +1,4 @@
-﻿using TaskManager.Core.Core;
-using TaskManager.Core.DTOs;
-
-namespace TaskManager.Infrastructure;
+﻿namespace TaskManager.Infrastructure;
 
 public static class EmailContentConstants
 {

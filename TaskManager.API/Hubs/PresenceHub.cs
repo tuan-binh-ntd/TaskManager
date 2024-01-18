@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.SignalR;
-using TaskManager.API.Extensions;
-
-namespace TaskManager.API.Hubs;
+﻿namespace TaskManager.API.Hubs;
 
 [Authorize]
 public class PresenceHub : Hub

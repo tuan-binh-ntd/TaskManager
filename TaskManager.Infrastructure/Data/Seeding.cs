@@ -1,8 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TaskManager.Core.Core;
-using TaskManager.Core.Entities;
-
-namespace TaskManager.Infrastructure.Data;
+﻿namespace TaskManager.Infrastructure.Data;
 
 public class Seeding
 {

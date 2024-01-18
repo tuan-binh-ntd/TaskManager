@@ -1,17 +1,4 @@
-﻿using MapsterMapper;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using TaskManager.Core;
-using TaskManager.Core.Core;
-using TaskManager.Core.DTOs;
-using TaskManager.Core.Entities;
-using TaskManager.Core.Exceptions;
-using TaskManager.Core.Extensions;
-using TaskManager.Core.Interfaces.Repositories;
-using TaskManager.Core.Interfaces.Services;
-using TaskManager.Core.ViewModel;
-
-namespace TaskManager.Infrastructure.Services;
+﻿namespace TaskManager.Infrastructure.Services;
 
 public class EpicService : IEpicService
 {

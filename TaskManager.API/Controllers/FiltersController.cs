@@ -1,13 +1,4 @@
-﻿using CoreApiResponse;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using TaskManager.API.Extensions;
-using TaskManager.Core.DTOs;
-using TaskManager.Core.Interfaces.Services;
-using TaskManager.Core.ViewModel;
-
-namespace TaskManager.API.Controllers;
+﻿namespace TaskManager.API.Controllers;
 
 [ApiController]
 public class FiltersController : BaseController

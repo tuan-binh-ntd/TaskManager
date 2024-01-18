@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace TaskManager.Core.DTOs;
+﻿namespace TaskManager.Core.DTOs;
 
 public class FileDetails
 {

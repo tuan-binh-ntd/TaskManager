@@ -1,13 +1,4 @@
-﻿using Dapper;
-using Microsoft.EntityFrameworkCore;
-using System.Linq.Dynamic.Core;
-using TaskManager.Core.Core;
-using TaskManager.Core.DTOs;
-using TaskManager.Core.Entities;
-using TaskManager.Core.Extensions;
-using TaskManager.Core.Interfaces.Repositories;
-using TaskManager.Core.ViewModel;
-using TaskManager.Infrastructure.Data;
+﻿
 
 namespace TaskManager.Infrastructure.Repositories;
 

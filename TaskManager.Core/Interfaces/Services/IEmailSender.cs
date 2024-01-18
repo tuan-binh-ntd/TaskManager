@@ -1,6 +1,4 @@
 ﻿using MimeKit.Text;
-using TaskManager.Core.DTOs;
-using TaskManager.Core.ViewModel;
 
 namespace TaskManager.Core.Interfaces.Services;
 

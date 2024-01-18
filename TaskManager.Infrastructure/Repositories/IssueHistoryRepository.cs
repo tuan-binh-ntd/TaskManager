@@ -1,11 +1,4 @@
-﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
-using TaskManager.Core.Entities;
-using TaskManager.Core.Interfaces.Repositories;
-using TaskManager.Core.ViewModel;
-using TaskManager.Infrastructure.Data;
-
-namespace TaskManager.Infrastructure.Repositories;
+﻿namespace TaskManager.Infrastructure.Repositories;
 
 public class IssueHistoryRepository : IIssueHistoryRepository
 {

@@ -1,24 +1,3 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using Serilog;
-using Swashbuckle.AspNetCore.Filters;
-using System.Net;
-using System.Text;
-using TaskManager.API.Configurations;
-using TaskManager.API.Hubs;
-using TaskManager.Core.Entities;
-using TaskManager.Core.Extensions;
-using TaskManager.Core.Interfaces.Repositories;
-using TaskManager.Core.Interfaces.Services;
-using TaskManager.Infrastructure;
-using TaskManager.Infrastructure.Data;
-using TaskManager.Infrastructure.Repositories;
-using TaskManager.Infrastructure.Services;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -224,6 +203,9 @@ builder.Host.UseSerilog();
 
 //Add SignalR
 builder.Services.AddSignalR();
+
+//Add mediator
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
 var app = builder.Build();
 

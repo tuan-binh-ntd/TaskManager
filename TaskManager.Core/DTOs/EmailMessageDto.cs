@@ -1,6 +1,4 @@
-﻿using MimeKit;
-
-namespace TaskManager.Core.DTOs;
+﻿namespace TaskManager.Core.DTOs;
 
 public class EmailMessageDto
 {

@@ -1,13 +1,4 @@
-﻿using TaskManager.Core.DTOs;
-using TaskManager.Core.Entities;
-using TaskManager.Core.Exceptions;
-using TaskManager.Core.Extensions;
-using TaskManager.Core.Helper;
-using TaskManager.Core.Interfaces.Repositories;
-using TaskManager.Core.Interfaces.Services;
-using TaskManager.Core.ViewModel;
-
-namespace TaskManager.Infrastructure.Services;
+﻿namespace TaskManager.Infrastructure.Services;
 
 public class PermissionGroupService : IPermissionGroupService
 {

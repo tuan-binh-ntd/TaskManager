@@ -1,5 +1,4 @@
 ﻿using CloudinaryDotNet.Actions;
-using Microsoft.AspNetCore.Http;
 
 namespace TaskManager.Core.Interfaces.Services;
 

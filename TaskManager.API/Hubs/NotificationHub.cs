@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.SignalR;
-using TaskManager.API.Extensions;
-using TaskManager.Core.Interfaces.Services;
-
-namespace TaskManager.API.Hubs;
+﻿namespace TaskManager.API.Hubs;
 
 [Authorize]
 public class NotificationHub : Hub

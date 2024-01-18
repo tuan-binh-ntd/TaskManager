@@ -1,12 +1,4 @@
-﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
-using TaskManager.Core.Core;
-using TaskManager.Core.Entities;
-using TaskManager.Core.Extensions;
-using TaskManager.Core.Helper;
-using TaskManager.Core.Interfaces.Repositories;
-using TaskManager.Core.ViewModel;
-using TaskManager.Infrastructure.Data;
+﻿using TaskManager.Core.Helper;
 
 namespace TaskManager.Infrastructure.Repositories;
 

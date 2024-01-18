@@ -1,8 +1,4 @@
-﻿using Mapster;
-using TaskManager.Core.Entities;
-using static TaskManager.Core.Extensions.CoreExtensions;
-
-namespace TaskManager.Core.DTOs;
+﻿namespace TaskManager.Core.DTOs;
 
 public class CreateSprintDto
 {

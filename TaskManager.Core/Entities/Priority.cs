@@ -1,6 +1,4 @@
-﻿using TaskManager.Core.Core;
-
-namespace TaskManager.Core.Entities;
+﻿namespace TaskManager.Core.Entities;
 
 public class Priority : BaseEntity
 {

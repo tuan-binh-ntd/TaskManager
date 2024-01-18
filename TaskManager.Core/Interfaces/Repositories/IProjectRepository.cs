@@ -1,9 +1,4 @@
-﻿using TaskManager.Core.DTOs;
-using TaskManager.Core.Entities;
-using TaskManager.Core.Helper;
-using TaskManager.Core.ViewModel;
-
-namespace TaskManager.Core.Interfaces.Repositories;
+﻿namespace TaskManager.Core.Interfaces.Repositories;
 
 public interface IProjectRepository : IRepository<Project>
 {

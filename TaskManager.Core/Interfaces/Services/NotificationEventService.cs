@@ -1,8 +1,5 @@
-﻿using TaskManager.Core.DTOs;
-using TaskManager.Core.Entities;
-using TaskManager.Core.Exceptions;
+﻿using TaskManager.Core.Exceptions;
 using TaskManager.Core.Interfaces.Repositories;
-using TaskManager.Core.ViewModel;
 
 namespace TaskManager.Core.Interfaces.Services;
 

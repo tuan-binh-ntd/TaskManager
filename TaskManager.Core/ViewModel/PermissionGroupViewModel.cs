@@ -1,6 +1,4 @@
-﻿using TaskManager.Core.Entities;
-
-namespace TaskManager.Core.ViewModel
+﻿namespace TaskManager.Core.ViewModel
 {
     public class PermissionGroupViewModel
     {

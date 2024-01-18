@@ -1,12 +1,4 @@
 ﻿using Ardalis.GuardClauses;
-using Mapster;
-using MapsterMapper;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using TaskManager.Core.DTOs;
-using TaskManager.Core.Entities;
-using TaskManager.Core.Interfaces.Services;
-using TaskManager.Core.ViewModel;
 
 namespace TaskManager.Infrastructure.Services;
 

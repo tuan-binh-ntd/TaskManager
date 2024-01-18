@@ -1,8 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Version = TaskManager.Core.Entities.Version;
-
-namespace TaskManager.Infrastructure.Data.Config;
+﻿namespace TaskManager.Infrastructure.Data.Config;
 
 public class VersionConfiguration : IEntityTypeConfiguration<Version>
 {

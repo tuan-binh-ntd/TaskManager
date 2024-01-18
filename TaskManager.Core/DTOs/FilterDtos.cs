@@ -1,8 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using TaskManager.Core.Core;
-using TaskManager.Core.Entities;
-
-namespace TaskManager.Core.DTOs;
+﻿namespace TaskManager.Core.DTOs;
 
 public class CreateFilterDto
 {

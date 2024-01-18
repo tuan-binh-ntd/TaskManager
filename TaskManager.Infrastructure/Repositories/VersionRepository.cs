@@ -1,12 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TaskManager.Core.Core;
-using TaskManager.Core.Entities;
-using TaskManager.Core.Interfaces.Repositories;
-using TaskManager.Core.ViewModel;
-using TaskManager.Infrastructure.Data;
-using Version = TaskManager.Core.Entities.Version;
-
-namespace TaskManager.Infrastructure.Repositories;
+﻿namespace TaskManager.Infrastructure.Repositories;
 
 public class VersionRepository : IVersionRepository
 {

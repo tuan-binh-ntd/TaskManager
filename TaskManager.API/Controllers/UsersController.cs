@@ -1,12 +1,3 @@
-using CoreApiResponse;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using TaskManager.Core.DTOs;
-using TaskManager.Core.Interfaces.Services;
-using TaskManager.Core.ViewModel;
-
 namespace TaskManager.API.Controllers;
 
 [ApiController]

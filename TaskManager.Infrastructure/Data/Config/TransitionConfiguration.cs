@@ -1,8 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TaskManager.Core.Entities;
-
-namespace TaskManager.Infrastructure.Data.Config;
+﻿namespace TaskManager.Infrastructure.Data.Config;
 
 public class TransitionConfiguration : IEntityTypeConfiguration<Transition>
 {

@@ -1,7 +1,4 @@
-﻿using TaskManager.Core.Entities;
-using TaskManager.Core.ViewModel;
-
-namespace TaskManager.Core.Interfaces.Repositories;
+﻿namespace TaskManager.Core.Interfaces.Repositories;
 
 public interface INotificationRepository : IRepository<Notification>
 {

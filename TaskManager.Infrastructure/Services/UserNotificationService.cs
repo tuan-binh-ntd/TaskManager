@@ -1,9 +1,4 @@
-﻿using TaskManager.Core.Exceptions;
-using TaskManager.Core.Interfaces.Repositories;
-using TaskManager.Core.Interfaces.Services;
-using TaskManager.Core.ViewModel;
-
-namespace TaskManager.Infrastructure.Services;
+﻿namespace TaskManager.Infrastructure.Services;
 
 public class UserNotificationService : IUserNotificationService
 {

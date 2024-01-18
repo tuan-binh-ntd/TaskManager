@@ -1,10 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq.Dynamic.Core;
-using System.Linq.Expressions;
-using TaskManager.Core.Helper;
-
-namespace TaskManager.Core.Extensions;
+﻿namespace TaskManager.Core.Extensions;
 
 public static class LinqExtensions
 {

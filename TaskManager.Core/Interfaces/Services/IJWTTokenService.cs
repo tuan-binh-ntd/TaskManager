@@ -1,6 +1,4 @@
-﻿using TaskManager.Core.Entities;
-
-namespace TaskManager.Core.Interfaces.Services;
+﻿namespace TaskManager.Core.Interfaces.Services;
 
 public interface IJWTTokenService
 {

@@ -1,7 +1,4 @@
-﻿using TaskManager.Core.Core;
-using TaskManager.Core.DTOs;
-
-namespace TaskManager.Core.Entities;
+﻿namespace TaskManager.Core.Entities;
 
 public class PermissionGroup : BaseEntity
 {

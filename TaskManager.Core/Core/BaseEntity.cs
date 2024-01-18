@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace TaskManager.Core.Core;
+﻿namespace TaskManager.Core.Core;
 
 public abstract class BaseEntity : IHasCreationTime, IHasModificationTime, IEntity
 {

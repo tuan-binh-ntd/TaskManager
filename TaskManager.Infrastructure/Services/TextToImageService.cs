@@ -1,12 +1,4 @@
-﻿using Azure;
-using Azure.Storage.Files.Shares;
-using Microsoft.Extensions.Options;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Png;
-using TaskManager.Core.Core;
-using TaskManager.Core.Interfaces.Services;
-
-namespace TaskManager.Infrastructure.Services;
+﻿namespace TaskManager.Infrastructure.Services;
 
 public class TextToImageService : ITextToImageService
 {

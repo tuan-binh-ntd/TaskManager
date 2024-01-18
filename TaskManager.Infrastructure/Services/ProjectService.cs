@@ -1,18 +1,4 @@
-﻿using Dapper;
-using Mapster;
-using MapsterMapper;
-using TaskManager.Core;
-using TaskManager.Core.Core;
-using TaskManager.Core.DTOs;
-using TaskManager.Core.Entities;
-using TaskManager.Core.Exceptions;
-using TaskManager.Core.Extensions;
-using TaskManager.Core.Helper;
-using TaskManager.Core.Interfaces.Repositories;
-using TaskManager.Core.Interfaces.Services;
-using TaskManager.Core.ViewModel;
-
-namespace TaskManager.Infrastructure.Services;
+﻿namespace TaskManager.Infrastructure.Services;
 
 public class ProjectService : IProjectService
 {
@@ -750,7 +736,7 @@ public class ProjectService : IProjectService
             }
         }
 
-        if(updateProjectDto.IsFavourite is bool isFavourite)
+        if (updateProjectDto.IsFavourite is bool isFavourite)
         {
             await _userProjectRepository.UpdateIsFavouriteCol(projectId, userId, isFavourite);
         }

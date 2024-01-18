@@ -1,15 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using System.Data;
-using System.Reflection;
-using TaskManager.Core.Core;
-using TaskManager.Core.Entities;
-using TaskManager.Core.Interfaces.Repositories;
-using Version = TaskManager.Core.Entities.Version;
-
-namespace TaskManager.Infrastructure.Data;
+﻿namespace TaskManager.Infrastructure.Data;
 
 public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid,
     IdentityUserClaim<Guid>, AppUserRole, IdentityUserLogin<Guid>,

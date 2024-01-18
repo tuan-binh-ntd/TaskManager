@@ -1,13 +1,4 @@
-﻿using Azure.Storage.Files.Shares;
-using Azure.Storage.Files.Shares.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
-using Renci.SshNet;
-using Renci.SshNet.Common;
-using System.Net.Sockets;
-using TaskManager.Core.Interfaces.Services;
-
-namespace TaskManager.Infrastructure.Services;
+﻿namespace TaskManager.Infrastructure.Services;
 
 public class UploadFileService : IUploadFileService
 {

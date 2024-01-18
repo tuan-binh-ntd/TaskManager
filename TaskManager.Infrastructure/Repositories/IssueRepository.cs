@@ -1,9 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TaskManager.Core;
-using TaskManager.Core.Core;
-using TaskManager.Core.Entities;
-using TaskManager.Core.Interfaces.Repositories;
-using TaskManager.Infrastructure.Data;
+﻿using TaskManager.Core;
 
 namespace TaskManager.Infrastructure.Repositories;
 

@@ -1,6 +1,4 @@
-﻿using TaskManager.Core.Core;
-
-namespace TaskManager.Core.DTOs;
+﻿namespace TaskManager.Core.DTOs;
 
 public class BuidEmailTemplateBaseDto
 {

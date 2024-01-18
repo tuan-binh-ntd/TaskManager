@@ -1,12 +1,4 @@
-﻿using Mapster;
-using System.Runtime.CompilerServices;
-using System.Text.Json;
-using System.Text.RegularExpressions;
-using TaskManager.Core.DTOs;
-using TaskManager.Core.Entities;
-using TaskManager.Core.ViewModel;
-
-namespace TaskManager.Core.Extensions;
+﻿namespace TaskManager.Core.Extensions;
 
 public static partial class CoreExtensions
 {

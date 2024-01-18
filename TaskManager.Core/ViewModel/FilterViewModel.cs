@@ -1,6 +1,4 @@
-﻿using TaskManager.Core.DTOs;
-
-namespace TaskManager.Core.ViewModel;
+﻿namespace TaskManager.Core.ViewModel;
 
 public class FilterViewModel
 {

@@ -1,7 +1,4 @@
-﻿using System.Data;
-using System.Data.Common;
-
-namespace TaskManager.Core.Interfaces.Repositories;
+﻿namespace TaskManager.Core.Interfaces.Repositories;
 
 public interface IConnectionFactory
 {
