@@ -1,32 +1,32 @@
 ﻿namespace TaskManager.Infrastructure.Services;
 
-public class UserNotificationService : IUserNotificationService
+public class UserNotificationService(
+    IUserNotificationRepository userNotificationRepository,
+    IUnitOfWork unitOfWork
+    )
+    : IUserNotificationService
 {
-    private readonly IUserNotificationRepository _userNotificationRepository;
-
-    public UserNotificationService(IUserNotificationRepository userNotificationRepository)
-    {
-        _userNotificationRepository = userNotificationRepository;
-    }
+    private readonly IUserNotificationRepository _userNotificationRepository = userNotificationRepository;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task<int> GetUnreadUserNotificationNumOfUser(Guid userId)
     {
-        var num = await _userNotificationRepository.GetUnreadUserNotificationNum(userId);
+        var num = await _userNotificationRepository.GetUnreadUserNotificationNumAsync(userId);
         return num;
     }
 
     public async Task<IReadOnlyCollection<UserNotificationViewModel>> GetUserNotificationViewModelsByUserId(Guid userId)
     {
-        var userNotificationViewModels = await _userNotificationRepository.GetByUserId(userId);
+        var userNotificationViewModels = await _userNotificationRepository.GetUserNotificationViewModelsByUserIdAsync(userId);
         return userNotificationViewModels;
     }
 
     public async Task<UserNotificationViewModel?> ReadNotification(Guid id)
     {
-        var userNotification = await _userNotificationRepository.GetById(id) ?? throw new UserNotificationNullException();
-        userNotification.IsRead = true;
+        var userNotification = await _userNotificationRepository.GetByIdAsync(id) ?? throw new UserNotificationNullException();
+        userNotification.Read();
         _userNotificationRepository.Update(userNotification);
-        await _userNotificationRepository.UnitOfWork.SaveChangesAsync();
-        return await _userNotificationRepository.ToUserNotificationViewMode(userNotification.Id);
+        await _unitOfWork.SaveChangesAsync();
+        return await _userNotificationRepository.ToUserNotificationViewModeAsync(userNotification.Id);
     }
 }

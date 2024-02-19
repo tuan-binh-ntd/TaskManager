@@ -1,13 +1,10 @@
 ﻿namespace TaskManager.Core.Interfaces.Repositories;
 
-public interface IUserNotificationRepository : IRepository<UserNotification>
+public interface IUserNotificationRepository
 {
-    Task<IReadOnlyCollection<UserNotificationViewModel>> GetByUserId(Guid userId);
-    Task<UserNotification?> GetById(Guid id);
-    void Add(UserNotification userNotification);
+    Task<IReadOnlyCollection<UserNotificationViewModel>> GetUserNotificationViewModelsByUserIdAsync(Guid userId);
+    Task<UserNotificationViewModel?> ToUserNotificationViewModeAsync(Guid id);
+    Task<int> GetUnreadUserNotificationNumAsync(Guid userId);
+    Task<UserNotification?> GetByIdAsync(Guid id);
     void Update(UserNotification userNotification);
-    void Delete(UserNotification userNotification);
-    void AddRange(IReadOnlyCollection<UserNotification> userNotifications);
-    Task<UserNotificationViewModel?> ToUserNotificationViewMode(Guid id);
-    Task<int> GetUnreadUserNotificationNum(Guid userId);
 }

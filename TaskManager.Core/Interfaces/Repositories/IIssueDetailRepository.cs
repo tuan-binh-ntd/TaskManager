@@ -1,14 +1,14 @@
 ﻿namespace TaskManager.Core.Interfaces.Repositories;
 
-public interface IIssueDetailRepository : IRepository<IssueDetail>
+public interface IIssueDetailRepository
 {
-    Task<IReadOnlyCollection<IssueDetailViewModel>> Gets();
-    IssueDetailViewModel Add(IssueDetail issueDetail);
+    Task<CurrentAssigneeAndReporterViewModel?> GetCurrentAssigneeAndReporterAsync(Guid issueId);
+    Task<Guid?> GetCurrentAssigneeIdAsync(Guid issueId);
+    Task<Guid> GetReporterIdAsync(Guid issueId);
+    Task UpdateOneColumnForIssueDetailAsync(Guid oldValue, Guid? newValue, NameColumn nameColumn);
+    Task<IssueDetail?> GetByIdAsync(Guid id);
+    void Insert(IssueDetail issueDetail);
     void Update(IssueDetail issueDetail);
-    void Delete(Guid id);
-    Task<IssueDetail> GetById(Guid id);
-    Task<CurrentAssigneeAndReporterViewModel?> GetCurrentAssigneeAndReporter(Guid issueId);
-    Task<Guid?> GetCurrentAssignee(Guid issueId);
-    Task<Guid> GetReporter(Guid issueId);
-    Task UpdateOneColumnForIssueDetail(Guid oldValue, Guid? newValue, NameColumn nameColumn);
+    void Remove(IssueDetail issueDetail);
+    Task<IssueDetail?> GetIssueDetailByIssueIdAsync(Guid issueId);
 }

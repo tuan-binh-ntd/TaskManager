@@ -1,12 +1,24 @@
-﻿namespace TaskManager.Core.Entities;
+﻿using TaskManager.Core.Events.Projects;
+
+namespace TaskManager.Core.Entities;
 
 public class Project : BaseEntity
 {
+    private Project(Guid id, string name, string? description, string code, string avatarUrl)
+    {
+        Id = id;
+        Name = name;
+        Description = description;
+        Code = code;
+        AvatarUrl = avatarUrl;
+    }
+
+    private Project() { }
+
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; } = string.Empty;
     public string Code { get; set; } = string.Empty;
     public string AvatarUrl { get; set; } = string.Empty;
-    public bool IsFavourite { get; set; } = false;
 
     //Relationship
     public Backlog? Backlog { get; set; }
@@ -22,4 +34,14 @@ public class Project : BaseEntity
     public ICollection<Version>? Versions { get; set; }
     public ICollection<Label>? Labels { get; set; }
     public Notification? Notification { get; set; }
+
+    public static Project Create(string name, string? description, string code, string avatarUrl)
+    {
+        return new Project(Guid.NewGuid(), name, description, code, avatarUrl);
+    }
+
+    public void ProjectCreated()
+    {
+        AddDomainEvent(new ProjectCreatedDomainEvent(this));
+    }
 }

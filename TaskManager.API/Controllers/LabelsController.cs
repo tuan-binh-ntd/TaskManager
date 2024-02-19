@@ -1,48 +1,36 @@
-﻿using TaskManager.Core.Helper;
+﻿namespace TaskManager.API.Controllers;
 
-namespace TaskManager.API.Controllers;
-
-[Route("api/projects/{projectId}/[controller]")]
+[Route("api/projects/{projectId:guid}/[controller]")]
 [ApiController]
-public class LabelsController : BaseController
+public class LabelsController(IMediator mediator)
+    : ApiController(mediator)
 {
-    private readonly ILabelService _labelService;
-
-    public LabelsController(ILabelService labelService)
-    {
-        _labelService = labelService;
-    }
-
     [HttpGet]
-    [ProducesResponseType(typeof(IReadOnlyCollection<LabelViewModel>), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(PaginationResult<LabelViewModel>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<LabelViewModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Get(Guid projectId, [FromQuery] PaginationInput paginationInput)
-    {
-        var res = await _labelService.GetLabelsByProjectId(projectId, paginationInput);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Maybe<GetLabelsByProjectIdQuery>
+        .From(new GetLabelsByProjectIdQuery(projectId, paginationInput))
+        .Binding(query => Mediator.Send(query))
+        .Match(Ok, NotFound);
 
     [HttpPost]
-    [ProducesResponseType(typeof(LabelViewModel), (int)HttpStatusCode.Created)]
+    [ProducesResponseType(typeof(LabelViewModel), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(Guid projectId, CreateLabelDto createLabelDto)
-    {
-        var res = await _labelService.Create(projectId, createLabelDto);
-        return CustomResult(res, HttpStatusCode.Created);
-    }
+        => await Result.Success(new CreateLabelCommand(projectId, createLabelDto))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
-    [HttpPut("{id}")]
-    [ProducesResponseType(typeof(LabelViewModel), (int)HttpStatusCode.OK)]
+    [HttpPut("{id:guid}")]
+    [ProducesResponseType(typeof(LabelViewModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> Update(Guid id, UpdateLabelDto updateLabelDto)
-    {
-        var res = await _labelService.Update(id, updateLabelDto);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Result.Success(new UpdateLabelCommand(id, updateLabelDto))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
-    [HttpDelete("{id}")]
-    [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     public async Task<IActionResult> Delete(Guid id)
-    {
-        var res = await _labelService.Delete(id);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Result.Success(new DeleteLabelCommand(id))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 }

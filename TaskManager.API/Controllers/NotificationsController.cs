@@ -1,52 +1,38 @@
-﻿namespace TaskManager.API.Controllers;
+﻿using TaskManager.Application.NotificationIssueEvents.Commands.Create;
+using TaskManager.Application.NotificationIssueEvents.Commands.Delete;
+using TaskManager.Application.NotificationIssueEvents.Commands.Update;
+
+namespace TaskManager.API.Controllers;
 
 [ApiController]
-public class NotificationsController : BaseController
+public class NotificationsController(IMediator mediator) : ApiController(mediator)
 {
-    private readonly INotificationEventService _notificationEventService;
-
-    public NotificationsController(INotificationEventService notificationEventService)
-    {
-        _notificationEventService = notificationEventService;
-    }
-
-    [HttpGet("api/[controller]/{id}/notificationevents")]
-    [ProducesResponseType(typeof(IReadOnlyCollection<NotificationEventViewModel>), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> Get(Guid id)
-    {
-        var res = await _notificationEventService.GetNotificationEventsByNotificationId(id);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
-
-    [HttpPost("api/[controller]/{id}/notificationevents")]
+    [HttpPost("api/[controller]/{id:guid}/notification-events")]
     [ProducesResponseType(typeof(NotificationEventViewModel), (int)HttpStatusCode.Created)]
     public async Task<IActionResult> Create(Guid id, CreateNotificationEventDto createNotificationEventDto)
-    {
-        var res = await _notificationEventService.Create(id, createNotificationEventDto);
-        return CustomResult(res, HttpStatusCode.Created);
-    }
+        => await Result.Success(new CreateNotificationIssueEventCommand(id, createNotificationEventDto))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
-    [HttpPut("api/[controller]/{id}/notificationevents/{notificationEventId}")]
+    [HttpPut("api/[controller]/{id:guid}/notification-events/{notificationEventId}")]
     [ProducesResponseType(typeof(NotificationEventViewModel), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Update(Guid notificationEventId, UpdateNotificationEventDto updateNotificationEventDto)
-    {
-        var res = await _notificationEventService.Update(notificationEventId, updateNotificationEventDto);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Result.Success(new UpdateNotificationIssueEventCommand(notificationEventId, updateNotificationEventDto))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
-    [HttpDelete("api/[controller]/{id}/notificationevents/{notificationEventId}")]
+    [HttpDelete("api/[controller]/{id:guid}/notification-events/{notificationEventId}")]
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Delete(Guid notificationEventId)
-    {
-        var res = await _notificationEventService.Delete(notificationEventId);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Result.Success(new DeleteNotificationIssueEventCommand(notificationEventId))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
-    [HttpGet("api/projects/{projectId}/[controller]")]
-    [ProducesResponseType(typeof(NotificationViewModel), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> GetNotification(Guid projectId)
-    {
-        var res = await _notificationEventService.GetNotificationViewModelByProjectId(projectId);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+    //[HttpGet("api/projects/{projectId}/[controller]")]
+    //[ProducesResponseType(typeof(NotificationViewModel), (int)HttpStatusCode.OK)]
+    //public async Task<IActionResult> GetNotification(Guid projectId)
+    //{
+    //    var res = await _notificationEventService.GetNotificationViewModelByProjectId(projectId);
+    //    return CustomResult(res, HttpStatusCode.OK);
+    //}
 }

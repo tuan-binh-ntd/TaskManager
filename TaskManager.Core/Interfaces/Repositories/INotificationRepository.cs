@@ -1,18 +1,11 @@
 ﻿namespace TaskManager.Core.Interfaces.Repositories;
 
-public interface INotificationRepository : IRepository<Notification>
+public interface INotificationRepository
 {
-    Task<Notification> GetById(Guid id);
-    Notification Add(Notification notification);
+    Task<IReadOnlyCollection<NotificationEventViewModel>> GetNotificationEventViewModelsByNotificationIdAsync(Guid id);
+    Task<NotificationEventViewModel?> GetNotificationConfigurationByProjectIdAndEventNameAsync(Guid projectId, string eventName);
+    Task<Notification?> GetByIdAsync(Guid id);
+    void Insert(Notification notification);
     void Update(Notification notification);
-    void Delete(Guid id);
-    Task<IReadOnlyCollection<NotificationEventViewModel>> GetByNotificationId(Guid id);
-    void Add(NotificationIssueEvent notificationIssueEvent);
-    void Update(NotificationIssueEvent notificationIssueEvent);
-    void DeleteNotificationIssueEvent(NotificationIssueEvent notificationIssueEvent);
-    Task<NotificationIssueEvent?> GetNotificationIssueEventById(Guid id);
-    Task<string?> GetIssueEventName(Guid issueEventId);
-    Task<NotificationViewModel> GetByProjectId(Guid projectId);
-    Task<IReadOnlyCollection<NotificationEventViewModel>> GetNotificationIssueEventByProjectId(Guid projectId);
-    Task<IReadOnlyCollection<IssueEventViewModel>> GetIssueEventViewModels();
+    void Remove(Notification notification);
 }

@@ -1,17 +1,16 @@
 ﻿namespace TaskManager.Core.Interfaces.Repositories;
 
-public interface ISprintRepository : IRepository<Sprint>
+public interface ISprintRepository
 {
-    Task<IReadOnlyCollection<SprintViewModel>> Gets();
-    SprintViewModel Add(Sprint sprint);
+    Task<IReadOnlyCollection<Issue>> GetIssuesBySprintIdAsync(Guid sprintId, Guid projectId);
+    Task<IReadOnlyCollection<SprintViewModel>> GetSprintsByProjectIdAsync(Guid projectId);
+    Task<IReadOnlyCollection<Guid>> GetSprintIdsByProjectIdAsync(Guid projectId);
+    Task<IReadOnlyCollection<Issue>> GetIssuesBySprintIdAsync(Guid sprintId);
+    Task<string?> GetNameOfSprintAsync(Guid sprintId);
+    Task<IReadOnlyCollection<Guid>> GetSprintIdsByProjectIdsAsync(IReadOnlyCollection<Guid> projectIds);
+    Task<IReadOnlyCollection<SprintViewModel>> GetSprintViewModelsByProjectIdAsync(Guid projectId);
+    Task<Sprint?> GetByIdAsync(Guid id);
+    void Insert(Sprint sprint);
     void Update(Sprint sprint);
-    void Delete(Guid id);
-    Sprint? Get(Guid id);
-    Task<IReadOnlyCollection<Issue>> GetIssues(Guid sprintId, Guid projectId);
-    Task<IReadOnlyCollection<SprintViewModel>> GetSprintByProjectId(Guid projectId);
-    Task<IReadOnlyCollection<Guid>> GetSprintIdsByProjectId(Guid projectId);
-    Task<IReadOnlyCollection<Issue>> GetIssues(Guid sprintId);
-    Task<string?> GetNameOfSprint(Guid sprintId);
-    Task<IReadOnlyCollection<Guid>> GetSprintIdsByProjectIds(IReadOnlyCollection<Guid> projectIds);
-    Task<IReadOnlyCollection<SprintViewModel>> GetSprintViewModelByProjectId(Guid projectId);
+    void Remove(Sprint sprint);
 }

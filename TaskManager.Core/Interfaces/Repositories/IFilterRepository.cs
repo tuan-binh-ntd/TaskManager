@@ -1,13 +1,12 @@
 ﻿namespace TaskManager.Core.Interfaces.Repositories;
 
-public interface IFilterRepository : IRepository<Filter>
+public interface IFilterRepository
 {
-    Task<Filter> GetById(Guid id);
-    Filter Add(Filter filter);
-    void Update(Filter filter);
-    void Delete(Filter filter);
-    void AddRange(IReadOnlyCollection<Filter> filters);
-    Task<Filter> GetByName(string name);
-    Task<FilterConfiguration?> GetConfigurationOfFilter(Guid id);
-    Task<IReadOnlyCollection<FilterViewModel>> GetFiltersByUserId(Guid userId);
+    Task<Filter> GetByNameAsync(string name);
+    Task<FilterConfiguration?> GetConfigurationOfFilterAsync(Guid id);
+    Task<IReadOnlyCollection<FilterViewModel>> GetFiltersByUserIdAsync(Guid userId);
+    void Insert(Filter filter);
+    Task<Filter?> GetByIdAsync(Guid id);
+    void Remove(Filter filter);
+    void InsertRange(IReadOnlyCollection<Filter> filters);
 }

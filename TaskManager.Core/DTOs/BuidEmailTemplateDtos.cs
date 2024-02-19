@@ -16,6 +16,13 @@ public class BuidEmailTemplateBaseDto
         ProjectLink = $"{EmailConstants.FrontEndUrl}project/{projectCode}/backlog";
     }
 
+    public BuidEmailTemplateBaseDto(string actionName, string emailContent, Guid issueId)
+    {
+        ActionName = actionName;
+        EmailContent = emailContent;
+        IssueId = issueId;
+    }
+
     public string SenderName { get; set; } = string.Empty;
     public string ActionName { get; set; } = string.Empty;
     public string ProjectName { get; set; } = string.Empty;
@@ -34,7 +41,7 @@ public abstract class IssueEmailContentBase
     {
         ReporterName = reporterName;
         IssueCreationTime = issueCreationTime;
-        AvatarUrl = avatarUrl + CoreConstants.AccessTokenAvatar;
+        AvatarUrl = avatarUrl + TextToImageConstants.AccessTokenAvatar;
     }
 
     public string ReporterName { get; set; } = string.Empty;
@@ -42,53 +49,32 @@ public abstract class IssueEmailContentBase
     public string AvatarUrl { get; set; } = string.Empty;
 }
 
-public class CreatedIssueEmailContentDto : IssueEmailContentBase
+public class CreatedIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : IssueEmailContentBase(reporterName, issueCreationTime, avatarUrl)
 {
-    public CreatedIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
-    {
-    }
-
     public string IssueTypeName { get; set; } = string.Empty;
     public string AssigneeName { get; set; } = string.Empty;
     public string PriorityName { get; set; } = string.Empty;
     public string AssigneeAvatarUrl { get; set; } = string.Empty;
 }
 
-public class ChangeStatusIssueEmailContentDto : IssueEmailContentBase
+public class ChangeStatusIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : IssueEmailContentBase(reporterName, issueCreationTime, avatarUrl)
 {
-    public ChangeStatusIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
-    {
-    }
-
     public string FromStatusName { get; set; } = string.Empty;
     public string ToStatusName { get; set; } = string.Empty;
 }
 
-public class AddNewCommentIssueEmailContentDto : IssueEmailContentBase
+public class AddNewCommentIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string content, string avatarUrl) : IssueEmailContentBase(reporterName, issueCreationTime, avatarUrl)
 {
-    public AddNewCommentIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string content, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
-    {
-        CommentContent = content;
-    }
-
-    public string CommentContent { get; set; } = string.Empty;
+    public string CommentContent { get; set; } = content;
 }
 
-public class ChangeSprintIssueEmailContentDto : IssueEmailContentBase
+public class ChangeSprintIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : IssueEmailContentBase(reporterName, issueCreationTime, avatarUrl)
 {
-    public ChangeSprintIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
-    {
-    }
-
     public string FromSprintName { get; set; } = string.Empty;
     public string ToSprintName { get; set; } = string.Empty;
 }
-public class ChangeNameIssueEmailContentDto : IssueEmailContentBase
+public class ChangeNameIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : IssueEmailContentBase(reporterName, issueCreationTime, avatarUrl)
 {
-    public ChangeNameIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
-    {
-    }
-
     public string FromName { get; set; } = string.Empty;
     public string ToName { get; set; } = string.Empty;
 }
@@ -129,99 +115,58 @@ public class ChangeStartDateIssueEmailContentDto : IssueEmailContentBase
     public string ToStartDate { get; set; }
 }
 
-public class ChangeAssigneeIssueEmailContentDto : IssueEmailContentBase
+public class ChangeAssigneeIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : IssueEmailContentBase(reporterName, issueCreationTime, avatarUrl)
 {
-    public ChangeAssigneeIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
-    {
-    }
-
     public string FromAssigneeName { get; set; } = string.Empty;
     public string ToAssigneeName { get; set; } = string.Empty;
 }
 
-public class ChangeReporterIssueEmailContentDto : IssueEmailContentBase
+public class ChangeReporterIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : IssueEmailContentBase(reporterName, issueCreationTime, avatarUrl)
 {
-    public ChangeReporterIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
-    {
-    }
-
     public string FromReporterName { get; set; } = string.Empty;
     public string ToReporterName { get; set; } = string.Empty;
 }
 
-public class ChangeParentIssueEmailContentDto : IssueEmailContentBase
+public class ChangeParentIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : IssueEmailContentBase(reporterName, issueCreationTime, avatarUrl)
 {
-    public ChangeParentIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
-    {
-    }
-
     public string FromParentName { get; set; } = string.Empty;
     public string ToParentName { get; set; } = string.Empty;
 }
 
-public class ChangeIssueTypeIssueEmailContentDto : IssueEmailContentBase
+public class ChangeIssueTypeIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : IssueEmailContentBase(reporterName, issueCreationTime, avatarUrl)
 {
-    public ChangeIssueTypeIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
-    {
-    }
-
     public string FromIssueTypeName { get; set; } = string.Empty;
     public string ToIssueTypeName { get; set; } = string.Empty;
 }
 
-public class ChangePriorityIssueEmailContentDto : IssueEmailContentBase
+public class ChangePriorityIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : IssueEmailContentBase(reporterName, issueCreationTime, avatarUrl)
 {
-    public ChangePriorityIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
-    {
-    }
-
     public string FromPriorityName { get; set; } = string.Empty;
     public string ToPriorityName { get; set; } = string.Empty;
 }
 
-public class ChangeSPEIssueEmailContentDto : IssueEmailContentBase
+public class ChangeSPEIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : IssueEmailContentBase(reporterName, issueCreationTime, avatarUrl)
 {
-    public ChangeSPEIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
-    {
-    }
-
     public string FromSPEName { get; set; } = string.Empty;
     public string ToSPEName { get; set; } = string.Empty;
 }
 
-public class AddNewAttachmentIssueEmailContentDto : IssueEmailContentBase
+public class AddNewAttachmentIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : IssueEmailContentBase(reporterName, issueCreationTime, avatarUrl)
 {
-    public AddNewAttachmentIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
-    {
-    }
-
     public string AttachmentName { get; set; } = string.Empty;
 }
 
-public class DeleteNewAttachmentIssueEmailContentDto : IssueEmailContentBase
+public class DeleteNewAttachmentIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : IssueEmailContentBase(reporterName, issueCreationTime, avatarUrl)
 {
-    public DeleteNewAttachmentIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
-    {
-    }
-
     public string AttachmentName { get; set; } = string.Empty;
 }
 
-public class DeleteCommentIssueEmailContentDto : IssueEmailContentBase
+public class DeleteCommentIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string content, string avatarUrl) : IssueEmailContentBase(reporterName, issueCreationTime, avatarUrl)
 {
-    public DeleteCommentIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string content, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
-    {
-        CommentContent = content;
-    }
-
-    public string CommentContent { get; set; } = string.Empty;
+    public string CommentContent { get; set; } = content;
 }
 
-public class DeletedIssueEmailContentDto : IssueEmailContentBase
+public class DeletedIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : IssueEmailContentBase(reporterName, issueCreationTime, avatarUrl)
 {
-    public DeletedIssueEmailContentDto(string reporterName, DateTime issueCreationTime, string avatarUrl) : base(reporterName, issueCreationTime, avatarUrl)
-    {
-    }
-
     public string IssueName { get; set; } = string.Empty;
 }

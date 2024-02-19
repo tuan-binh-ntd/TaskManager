@@ -1,47 +1,36 @@
 ﻿namespace TaskManager.API.Controllers;
 
-[Route("api/issues/{issueId}/[controller]")]
+[Route("api/issues/{issueId:guid}/[controller]")]
 [ApiController]
-public class CommentsController : BaseController
+public class CommentsController(IMediator mediator)
+    : ApiController(mediator)
 {
-    private readonly ICommentService _commentService;
-
-    public CommentsController(
-        ICommentService commentService
-        )
-    {
-        _commentService = commentService;
-    }
-
     [HttpGet]
-    [ProducesResponseType(typeof(IReadOnlyCollection<CommentViewModel>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<CommentViewModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Get(Guid issueId)
-    {
-        var res = await _commentService.GetCommentsByIssueId(issueId);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Maybe<GetCommentsByIssueIdQuery>
+        .From(new GetCommentsByIssueIdQuery(issueId))
+        .Binding(query => Mediator.Send(query))
+        .Match(Ok, NotFound);
 
     [HttpPost]
-    [ProducesResponseType(typeof(CommentViewModel), (int)HttpStatusCode.Created)]
+    [ProducesResponseType(typeof(CommentViewModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> Create(Guid issueId, CreateCommentDto createCommentDto)
-    {
-        var res = await _commentService.CreateComment(issueId, createCommentDto);
-        return CustomResult(res, HttpStatusCode.Created);
-    }
+        => await Result.Success(new CreateCommentCommand(issueId, createCommentDto.Content, createCommentDto.CreatorUserId))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:guid}")]
+    [ProducesResponseType(typeof(CommentViewModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> Update(Guid issueId, Guid id, UpdateCommentDto updateCommentDto)
-    {
-        var res = await _commentService.UpdateComment(id, updateCommentDto, issueId);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Result.Success(new UpdateCommentCommand(id, updateCommentDto))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
     [Authorize]
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid issueId, Guid id)
-    {
-        var userId = User.GetUserId();
-        var res = await _commentService.DeleteComment(issueId, id, userId);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Result.Success(new DeleteCommentCommand(id, issueId))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 }

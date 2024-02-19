@@ -3,15 +3,11 @@
 public class CreateProjectDto
 {
     [Required]
-    public string? Name { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
     public string? Description { get; set; } = string.Empty;
     [Required]
-    public string? Code { get; set; } = string.Empty;
-    public string? AvatarUrl { get; set; } = string.Empty;
-    public bool IsFavourite { get; set; } = false;
+    public string Code { get; set; } = string.Empty;
 }
-
-
 
 public class GetIssueForProjectFilterInputModel
 {

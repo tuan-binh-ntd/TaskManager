@@ -1,20 +1,12 @@
 ﻿namespace TaskManager.Core.Interfaces.Repositories;
 
-public interface ILabelRepository : IRepository<Label>
+public interface ILabelRepository
 {
-    Task<IReadOnlyCollection<Label>> GetByProjectId(Guid projectId);
-    Task<Label?> GetById(Guid id);
-    void Add(Label label);
+    Task<IReadOnlyCollection<Label>> GetLabelsByProjectIdAsync(Guid projectId);
+    Task<IReadOnlyCollection<LabelViewModel>> GetLabelViewModelsByIssueIdAsync(Guid issueId);
+    Task<PaginationResult<LabelViewModel>> GetLabelViewModelsByProjectIdPagingAsync(Guid projectId, PaginationInput paginationInput);
+    void Insert(Label label);
+    Task<Label?> GetByIdAsync(Guid id);
     void Update(Label label);
-    void Delete(Label label);
-    void AddLabelIssue(LabelIssue labelIssue);
-    void RemoveLabelIssue(LabelIssue labelIssue);
-    Task<LabelIssue?> GetById(Guid labelId, Guid issueId);
-    Task<IReadOnlyCollection<LabelViewModel>> GetByIssueId(Guid issueId);
-    Task<PaginationResult<LabelViewModel>> GetByProjectId(Guid projectId, PaginationInput paginationInput);
-    void AddRange(IReadOnlyCollection<LabelIssue> labelIssues);
-    Task<IReadOnlyCollection<LabelIssue>> GetLabelIssuesByIssueId(Guid issueId);
-    void RemoveRange(IReadOnlyCollection<LabelIssue> labelIssues);
-    Task<IReadOnlyCollection<LabelIssue>> GetLabelIssuesByLabelId(Guid labelId);
-
+    void Remove(Label label);
 }

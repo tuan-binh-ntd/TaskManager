@@ -1,18 +1,15 @@
 ﻿namespace TaskManager.Core.Interfaces.Repositories;
 
-public interface IIssueTypeRepository : IRepository<IssueType>
+public interface IIssueTypeRepository
 {
-    Task<IReadOnlyCollection<IssueTypeViewModel>> Gets();
-    IssueTypeViewModel Add(IssueType issueType);
+    Task<IReadOnlyCollection<IssueTypeViewModel>> GetIssueTypesByProjectIdAsync(Guid projectId);
+    Task<IssueType?> GetSubtaskAsync();
+    Task<IssueType?> GetEpicAsync(Guid projectId);
+    Task<PaginationResult<IssueTypeViewModel>> GetIssueTypeViewModelsByProjectIdPagingAsync(Guid projectId, PaginationInput paginationInput);
+    Task<string?> GetNameOfIssueTypeAsync(Guid issueTypeId);
+    Task<IReadOnlyCollection<IssueTypeViewModel>> GetIssueTypeViewModelsByProjectIdAsync(Guid projectId);
+    void Insert(IssueType issueType);
     void Update(IssueType issueType);
-    void Delete(Guid id);
-    Task<IReadOnlyCollection<IssueTypeViewModel>> GetsByProjectId(Guid projectId);
-    Task<IssueType> Get(Guid id);
-    Task<IssueType> GetSubtask();
-    Task<IssueType> GetEpic(Guid projectId);
-    Task<PaginationResult<IssueTypeViewModel>> GetsByProjectIdPaging(Guid projectId, PaginationInput paginationInput);
-    void AddRange(IReadOnlyCollection<IssueType> issueTypes);
-    Task<string?> GetNameOfIssueType(Guid issueTypeId);
-    Task<IReadOnlyCollection<IssueTypeViewModel>> GetIssueTypeViewModelsByProjectId(Guid projectId);
-
+    void Remove(IssueType issueType);
+    Task<IssueType?> GetByIdAsync(Guid id);
 }

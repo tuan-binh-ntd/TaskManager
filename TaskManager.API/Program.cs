@@ -42,60 +42,10 @@ builder.Services.AddMapster(); // From the configuration file
 builder.Services.AddCors();
 
 // Start Declaration DI
-// Repositories
-builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
-builder.Services.AddScoped<IBacklogRepository, BacklogRepository>();
-builder.Services.AddScoped<IUserProjectRepository, UserProjectRepository>();
-builder.Services.AddScoped<IIssueRepository, IssueRepository>();
-builder.Services.AddScoped<IIssueTypeRepository, IssueTypeRepository>();
-builder.Services.AddScoped<IIssueHistoryRepository, IssueHistoryRepository>();
-builder.Services.AddScoped<ICommentRepository, CommentRepository>();
-builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
-builder.Services.AddScoped<IIssueDetailRepository, IssueDetailRepository>();
-builder.Services.AddScoped<ISprintRepository, SprintRepository>();
-builder.Services.AddScoped<IProjectConfigurationRepository, ProjectConfigurationRepository>();
-builder.Services.AddScoped<IStatusRepository, StatusRepository>();
-builder.Services.AddScoped<IStatusCategoryRepository, StatusCategoryRepository>();
-builder.Services.AddScoped<ITransitionRepository, TransitionRepository>();
-builder.Services.AddScoped<IWorkflowRepository, WorkflowRepository>();
-builder.Services.AddScoped<ITeamRepository, TeamRepository>();
-builder.Services.AddScoped<IPriorityRepository, PriorityRepository>();
-builder.Services.AddScoped<IVersionRepository, VersionRepository>();
-builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
-builder.Services.AddScoped<IIssueEventRepository, IssueEventRepository>();
-builder.Services.AddScoped<IFilterRepository, FilterRepository>();
-builder.Services.AddScoped<ICriteriaRepository, CriteriaRepository>();
-builder.Services.AddScoped<IPermissionGroupRepository, PermissionGroupRepository>();
-builder.Services.AddScoped<ILabelRepository, LabelRepository>();
-builder.Services.AddScoped<IUserNotificationRepository, UserNotificationRepository>();
-builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+builder.Services.AddPersistence();
+builder.Services.AddInfrastructure();
 
-// Services
-builder.Services.AddScoped<IJWTTokenService, JWTTokenService>();
-builder.Services.AddScoped<IProjectService, ProjectService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IRoleService, RoleService>();
-builder.Services.AddScoped<IPhotoService, PhotoService>();
-builder.Services.AddScoped<ISprintService, SprintService>();
-builder.Services.AddScoped<IIssueService, IssueService>();
-builder.Services.AddScoped<IIssueTypeService, IssueTypeService>();
-builder.Services.AddScoped<IUploadFileService, UploadFileService>();
-builder.Services.AddScoped<IStatusService, StatusService>();
-builder.Services.AddScoped<ITeamService, TeamService>();
-builder.Services.AddScoped<IPriorityService, PriorityService>();
-builder.Services.AddScoped<IVersionService, VersionService>();
-builder.Services.AddScoped<IEmailSender, EmailSender>();
-builder.Services.AddScoped<IEpicService, EpicService>();
-builder.Services.AddScoped<IFilterService, FilterService>();
-builder.Services.AddScoped<IPermissionGroupService, PermissionGroupService>();
-builder.Services.AddScoped<IAttachmentService, AttachmentService>();
-builder.Services.AddScoped<ILabelService, LabelService>();
-builder.Services.AddScoped<ICommentService, CommentService>();
-builder.Services.AddScoped<INotificationEventService, NotificationEventService>();
-builder.Services.AddScoped<IConnectionFactory, SqlConnectionFactory>();
-builder.Services.AddScoped<IUserNotificationService, UserNotificationService>();
-builder.Services.AddScoped<ITextToImageService, TextToImageService>();
-builder.Services.AddScoped<IDashboardService, DashboardService>();
+
 // Add EmailService
 // End  Declaration DI
 builder.Services.AddSingleton<PresenceTracker>();
@@ -207,6 +157,8 @@ builder.Services.AddSignalR();
 //Add mediator
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
+
+
 var app = builder.Build();
 
 if (app.Environment.IsProduction())
@@ -294,12 +246,7 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins(
-    new string[]
-    {
-    "http://localhost:3000",
-    "https://ziblitz.azurewebsites.net"
-    }
-    ));
+    ["http://localhost:3000", "https://ziblitz.azurewebsites.net"]));
 
 app.UseAuthentication();
 

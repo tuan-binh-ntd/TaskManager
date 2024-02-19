@@ -1,18 +1,15 @@
 ﻿namespace TaskManager.Core.Interfaces.Repositories;
 
-public interface IPermissionGroupRepository : IRepository<PermissionGroup>
+public interface IPermissionGroupRepository
 {
-    Task<IReadOnlyCollection<PermissionGroupViewModel>> GetByProjectId(Guid projectId);
-    Task<PermissionGroup> GetById(Guid id);
-    PermissionGroup Add(PermissionGroup permissionGroup);
+    Task<PaginationResult<PermissionGroupViewModel>> GetPermissionGroupViewModelsByProjectIdPagingAsync(Guid projectId, PaginationInput paginationInput);
+    Task<PermissionGroupViewModel> GetPermissionGroupViewModelByProjectIdAndUserIdAsync(Guid projectId, Guid userId);
+    Task<IReadOnlyCollection<PermissionGroupViewModel>> GetPermissionGroupViewModelsByProjectIdAsync(Guid projectId);
+    Task<Guid> GetDeveloperPermissionGroupIdAsync(Guid projectId);
+    Task<IReadOnlyCollection<Guid>> GetPermissionGroupIdByUserId(Guid userId);
+    void Insert(PermissionGroup permissionGroup);
     void Update(PermissionGroup permissionGroup);
-    void Delete(Guid id);
-    void AddRange(IReadOnlyCollection<PermissionGroup> permissionGroups);
-    Task<PaginationResult<PermissionGroupViewModel>> GetByProjectId(Guid projectId, PaginationInput paginationInput);
-    void AddRange(IReadOnlyCollection<UserProject> userProjects);
-    Task<IReadOnlyCollection<UserProject>> GetUserProjectsByPermissionGroupId(Guid permissionGroupId);
-    Task<PermissionGroupViewModel> GetPermissionGroupViewModelById(Guid projectId, Guid userId);
-    Task<IReadOnlyCollection<PermissionGroupViewModel>> GetPermissionGroupViewModelsByProjectId(Guid projectId);
-    Task UpdatePermissionGroupId(Guid oldValue, Guid newValue);
-    Task<Guid> GetDeveloperId(Guid projectId);
+    void Remove(PermissionGroup permissionGroup);
+    Task<PermissionGroup?> GetByIdAsync(Guid id);
+    void InsertRange(IReadOnlyCollection<PermissionGroup> permissionGroups);
 }

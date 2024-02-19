@@ -1,13 +1,4 @@
 ﻿namespace TaskManager.Infrastructure;
-
-public class ConnectionStrings
-{
-    /// <summary>
-    /// Connection string for TaskManager DB
-    /// </summary>
-    public string DefaultConnection { get; set; } = string.Empty;
-}
-
 public class JwtSettings
 {
     /// <summary>

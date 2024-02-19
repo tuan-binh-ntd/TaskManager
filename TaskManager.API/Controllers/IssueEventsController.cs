@@ -1,21 +1,17 @@
-﻿namespace TaskManager.API.Controllers;
+﻿using TaskManager.Application.IssueEvents.Queries.GetAll;
+
+namespace TaskManager.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class IssueEventsController : BaseController
+public class IssueEventsController(IMediator mediator)
+    : ApiController(mediator)
 {
-    private readonly INotificationEventService _notificationEventService;
-
-    public IssueEventsController(INotificationEventService notificationEventService)
-    {
-        _notificationEventService = notificationEventService;
-    }
-
     [HttpGet]
-    [ProducesResponseType(typeof(IReadOnlyCollection<IssueEventViewModel>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<IssueEventViewModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Gets()
-    {
-        var res = await _notificationEventService.GetIssueEventViewModels();
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Maybe<GetAllIssueEventsQuery>
+        .From(new GetAllIssueEventsQuery())
+        .Binding(query => Mediator.Send(query))
+        .Match(Ok, NotFound);
 }

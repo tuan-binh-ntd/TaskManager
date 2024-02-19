@@ -14,7 +14,7 @@ public class CreateIssueDto
     public Guid CreatorUserId { get; set; }
 }
 
-public class UpdateIssueDto : BaseDto<UpdateIssueDto, Issue>
+public class UpdateIssueDto
 {
     public string? Name { get; set; }
     public string? Description { get; set; }
@@ -36,28 +36,6 @@ public class UpdateIssueDto : BaseDto<UpdateIssueDto, Issue>
     [Required]
     public Guid ModificationUserId { get; set; }
     public IReadOnlyCollection<Guid>? LabelIds { get; set; }
-
-    public override void Register(TypeAdapterConfig config)
-    {
-        base.Register(config);
-
-        config.NewConfig<UpdateIssueDto, Issue>()
-            .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Name), dest => dest.Name)
-            .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Description), dest => dest.Description!)
-            .IgnoreIf((src, dest) => src.CompleteDate == null, dest => dest.CompleteDate!)
-            .IgnoreIf((src, dest) => src.PriorityId == null, dest => dest.PriorityId!)
-            .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Voted), dest => dest.Voted!)
-            .IgnoreIf((src, dest) => src.StartDate == null, dest => dest.StartDate!)
-            .IgnoreIf((src, dest) => src.DueDate == null, dest => dest.DueDate!)
-            .IgnoreIf((src, dest) => src.ParentId == null, dest => dest.ParentId!)
-            .IgnoreIf((src, dest) => src.SprintId == null, dest => dest.SprintId!)
-            .IgnoreIf((src, dest) => src.IssueTypeId == null, dest => dest.IssueTypeId!)
-            .IgnoreIf((src, dest) => src.BacklogId == null, dest => dest.BacklogId!)
-            .Ignore(dest => dest.Id)
-            .Ignore(dest => dest.CreationTime)
-            .Ignore(dest => dest.ModificationTime!)
-            .IgnoreNullValues(true);
-    }
 }
 
 public class CreateIssueByNameDto
@@ -84,7 +62,7 @@ public class CreateEpicDto
     public Guid ProjectId { get; set; }
 }
 
-public class UpdateEpicDto : BaseDto<UpdateEpicDto, Issue>
+public class UpdateEpicDto
 {
     public string? Name { get; set; }
     public string? Description { get; set; }
@@ -103,25 +81,6 @@ public class UpdateEpicDto : BaseDto<UpdateEpicDto, Issue>
     [Required]
     public Guid ModificationUserId { get; set; }
     public IReadOnlyCollection<Guid>? LabelIds { get; set; }
-
-    public override void Register(TypeAdapterConfig config)
-    {
-        base.Register(config);
-
-        config.NewConfig<UpdateEpicDto, Issue>()
-            .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Name), dest => dest.Name)
-            .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Description), dest => dest.Description!)
-            .IgnoreIf((src, dest) => src.CompleteDate == null, dest => dest.CompleteDate!)
-            .IgnoreIf((src, dest) => src.PriorityId == null, dest => dest.PriorityId!)
-            .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Voted), dest => dest.Voted!)
-            .IgnoreIf((src, dest) => src.StartDate == null, dest => dest.StartDate!)
-            .IgnoreIf((src, dest) => src.DueDate == null, dest => dest.DueDate!)
-            .IgnoreIf((src, dest) => src.ParentId == null, dest => dest.ParentId!)
-            .Ignore(dest => dest.Id)
-            .Ignore(dest => dest.CreationTime)
-            .Ignore(dest => dest.ModificationTime!)
-            .IgnoreNullValues(true);
-    }
 }
 
 public class AddIssueToEpicDto

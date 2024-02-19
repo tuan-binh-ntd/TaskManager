@@ -1,12 +1,6 @@
 ﻿namespace TaskManager.Core.Interfaces.Repositories;
 
-public interface IWorkflowRepository : IRepository<Workflow>
+public interface IWorkflowRepository
 {
-    Workflow Add(Workflow workflow);
-    void Update(Workflow workflow);
-    void Delete(Guid id);
-    Task<WorkflowViewModel> GetByProjectId(Guid projectId);
-    Task<IReadOnlyCollection<WorkflowIssueType>> GetWorkflowIssueTypesByWorkflowId(Guid workflowId);
-    void AddWorkflowIssueTypeRange(IReadOnlyCollection<WorkflowIssueType> workflowIssueTypes);
-    void RemoveWorkflowIssueTypeRange(IReadOnlyCollection<WorkflowIssueType> workflowIssueTypes);
+    Task<WorkflowViewModel?> GetWorkflowViewModelByProjectIdAsync(Guid projectId);
 }

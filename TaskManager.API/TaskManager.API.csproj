@@ -19,5 +19,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TaskManager.Infrastructure\TaskManager.Infrastructure.csproj" />
+    <ProjectReference Include="..\TaskManager.Persistence\TaskManager.Persistence.csproj" />
   </ItemGroup>
 </Project>

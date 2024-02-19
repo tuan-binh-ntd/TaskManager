@@ -9,29 +9,12 @@ public class CreateSprintDto
     public Guid ProjectId { get; set; }
 }
 
-public class UpdateSprintDto : BaseDto<UpdateSprintDto, Sprint>
+public class UpdateSprintDto
 {
     public string? Name { get; set; }
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public string? Goal { get; set; }
-    public Guid? ProjectId { get; set; }
-
-    public override void Register(TypeAdapterConfig config)
-    {
-        base.Register(config);
-
-        config.NewConfig<UpdateSprintDto, Sprint>()
-            .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Name), dest => dest.Name)
-            .IgnoreIf((src, dest) => src.StartDate == null, dest => dest.StartDate!)
-            .IgnoreIf((src, dest) => src.EndDate == null, dest => dest.EndDate!)
-            .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Goal), dest => dest.Goal!)
-            .IgnoreIf((src, dest) => src.ProjectId == null, dest => dest.ProjectId!)
-            .Ignore(dest => dest.Id)
-            .Ignore(dest => dest.CreationTime)
-            .Ignore(dest => dest.ModificationTime!)
-            .IgnoreNullValues(true);
-    }
 }
 
 public class CompleteSprintDto

@@ -1,27 +1,18 @@
 ﻿namespace TaskManager.Infrastructure.Services;
 
-public class EmailSender : IEmailSender
+public class EmailSender(
+    IOptionsMonitor<EmailConfigurationSettings> optionsMonitor,
+    IIssueRepository issueRepository,
+    UserManager<AppUser> userManager,
+    IIssueDetailRepository issueDetailRepository,
+    ILogger<EmailSender> logger
+        ) : IEmailSender
 {
-    private readonly EmailConfigurationSettings _emailConfigurationSettings;
-    private readonly IIssueRepository _issueRepository;
-    private readonly UserManager<AppUser> _userManager;
-    private readonly IIssueDetailRepository _issueDetailRepository;
-    private readonly ILogger<EmailSender> _logger;
-
-    public EmailSender(
-        IOptionsMonitor<EmailConfigurationSettings> optionsMonitor,
-        IIssueRepository issueRepository,
-        UserManager<AppUser> userManager,
-        IIssueDetailRepository issueDetailRepository,
-        ILogger<EmailSender> logger
-        )
-    {
-        _emailConfigurationSettings = optionsMonitor.CurrentValue;
-        _issueRepository = issueRepository;
-        _userManager = userManager;
-        _issueDetailRepository = issueDetailRepository;
-        _logger = logger;
-    }
+    private readonly EmailConfigurationSettings _emailConfigurationSettings = optionsMonitor.CurrentValue;
+    private readonly IIssueRepository _issueRepository = issueRepository;
+    private readonly UserManager<AppUser> _userManager = userManager;
+    private readonly IIssueDetailRepository _issueDetailRepository = issueDetailRepository;
+    private readonly ILogger<EmailSender> _logger = logger;
 
     #region Private methods
     private async Task SendAsync(MimeMessage mailMessage)
@@ -73,12 +64,12 @@ public class EmailSender : IEmailSender
         var userIds = new List<Guid>();
         if (notificationEventViewModel.AllWatcher)
         {
-            var watcherIds = await _issueRepository.GetAllWatcherOfIssue(issueId);
+            var watcherIds = await _issueRepository.GetAllWatcherOfIssueAsync(issueId);
             userIds.AddRange(watcherIds!);
         }
         if (notificationEventViewModel.CurrentAssignee)
         {
-            var currentAssigneeId = await _issueDetailRepository.GetCurrentAssignee(issueId);
+            var currentAssigneeId = await _issueDetailRepository.GetCurrentAssigneeIdAsync(issueId);
             if (currentAssigneeId is Guid id)
             {
                 userIds.Add(id);
@@ -87,12 +78,12 @@ public class EmailSender : IEmailSender
         }
         if (notificationEventViewModel.Reporter)
         {
-            var reporterId = await _issueDetailRepository.GetReporter(issueId);
+            var reporterId = await _issueDetailRepository.GetReporterIdAsync(issueId);
             userIds.Add(reporterId);
         }
         if (notificationEventViewModel.ProjectLead)
         {
-            var projectLeadId = await _issueRepository.GetProjectLeadIdOfIssue(issueId);
+            var projectLeadId = await _issueRepository.GetProjectLeadIdOfIssueAsync(issueId);
             userIds.Add(projectLeadId);
         }
 
@@ -103,7 +94,7 @@ public class EmailSender : IEmailSender
     }
     #endregion
 
-    public async Task SendEmailAsync(EmailMessageDto message, TextFormat textFormat = TextFormat.Text)
+    private async Task SendEmailAsync(EmailMessageDto message, TextFormat textFormat = TextFormat.Text)
     {
         var mailMessage = CreateEmailMessage(message, textFormat);
 
@@ -114,7 +105,7 @@ public class EmailSender : IEmailSender
     {
         var emails = await GetEmailsByNotificationConfig(issueId, notificationEventViewModel);
 
-        if (emails.Any())
+        if (emails.Count != 0)
         {
             var senderName = await _userManager.Users.Where(u => u.Id == from).Select(u => u.Name).FirstOrDefaultAsync();
 
@@ -125,17 +116,35 @@ public class EmailSender : IEmailSender
         }
     }
 
-    public async Task SendEmailWhenCreatedIssue(Guid issueId, string subjectOfEmail, Guid from, BuidEmailTemplateBaseDto buidEmailTemplateBase, NotificationEventViewModel notificationEventViewModel)
+    public async Task SendEmailWhenCreatedIssue(SendEmailModel sendEmailModel)
     {
-        var emails = await GetEmailsByNotificationConfig(issueId, notificationEventViewModel);
+        var issue = await _issueRepository.GetByIdAsync(sendEmailModel.IssueId) ?? throw new IssueNullException();
+        var emails = await GetEmailsByNotificationConfig(sendEmailModel.IssueId, sendEmailModel.NotificationEventViewModel);
 
-        if (emails.Any())
+        var senderName = await _userManager.Users
+            .Where(u => u.Id == sendEmailModel.FromUserId)
+            .Select(u => u.Name)
+            .FirstOrDefaultAsync() ?? IssueConstants.None_IssueHistoryContent;
+
+
+        var projectName = await _issueRepository.GetProjectNameOfIssueAsync(sendEmailModel.IssueId);
+        var projectCode = await _issueRepository.GetProjectCodeOfIssueAsync(sendEmailModel.IssueId);
+
+        var avatarUrl = await _userManager.Users
+            .Where(u => u.Id == sendEmailModel.FromUserId)
+            .Select(u => u.AvatarUrl).FirstOrDefaultAsync() ?? TextToImageConstants.AnonymousAvatar;
+
+        sendEmailModel.BuidEmailTemplate.SenderName = senderName;
+        sendEmailModel.BuidEmailTemplate.ProjectName = projectName;
+        sendEmailModel.BuidEmailTemplate.ProjectCode = projectCode;
+        sendEmailModel.BuidEmailTemplate.IssueCode = issue.Code;
+        sendEmailModel.BuidEmailTemplate.IssueName = issue.Name;
+
+        if (emails.Count != 0)
         {
-            var senderName = await _userManager.Users.Where(u => u.Id == from).Select(u => u.Name).FirstOrDefaultAsync();
+            string content = BuildEmailTemplateConstants.BuildEmailTemplate(sendEmailModel.BuidEmailTemplate);
 
-            string content = BuildEmailTemplateConstants.BuildEmailTemplate(buidEmailTemplateBase);
-
-            var emailMessageDto = new EmailMessageDto(emails, subjectOfEmail, content, senderName!);
+            var emailMessageDto = new EmailMessageDto(emails, sendEmailModel.Subject, content, senderName);
             await SendEmailAsync(emailMessageDto, TextFormat.Html);
         }
     }

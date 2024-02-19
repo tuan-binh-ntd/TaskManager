@@ -1,47 +1,41 @@
-﻿using TaskManager.Core.Helper;
+﻿using TaskManager.Application.IssueTypes.Commands.Create;
+using TaskManager.Application.IssueTypes.Commands.Delete;
+using TaskManager.Application.IssueTypes.Commands.Update;
+using TaskManager.Application.IssueTypes.Queries.GetIssueTypesByProjectId;
 
 namespace TaskManager.API.Controllers;
 
-[Route("api/projects/{projectId}/[controller]")]
+[Route("api/projects/{projectId:guid}/[controller]")]
 [ApiController]
-public class IssueTypesController : BaseController
+public class IssueTypesController(IMediator mediator)
+    : ApiController(mediator)
 {
-    private readonly IIssueTypeService _issueTypeService;
-
-    public IssueTypesController(IIssueTypeService issueTypeService)
-    {
-        _issueTypeService = issueTypeService;
-    }
-
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyCollection<IssueTypeViewModel>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Gets(Guid projectId, [FromQuery] PaginationInput paginationInput)
-    {
-        var res = await _issueTypeService.GetIssueTypesByProjectId(projectId, paginationInput);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Maybe<GetIssueTypesByProjectIdQuery>
+        .From(new GetIssueTypesByProjectIdQuery(projectId, paginationInput))
+        .Binding(query => Mediator.Send(query))
+        .Match(Ok, NotFound);
 
     [HttpPost]
     [ProducesResponseType(typeof(IssueTypeViewModel), (int)HttpStatusCode.Created)]
     public async Task<IActionResult> Create(Guid projectId, [FromBody] CreateIssueTypeDto createIssueTypeDto)
-    {
-        var res = await _issueTypeService.CreateIssueType(projectId, createIssueTypeDto);
-        return CustomResult(res, HttpStatusCode.Created);
-    }
+        => await Result.Success(new CreateIssueTypeCommand(createIssueTypeDto, projectId))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
-    [HttpPut("{issueTypeId}")]
+    [HttpPut("{issueTypeId:guid}")]
     [ProducesResponseType(typeof(IssueTypeViewModel), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Update(Guid issueTypeId, [FromBody] UpdateIssueTypeDto updateIssueTypeDto)
-    {
-        var res = await _issueTypeService.UpdateIssueType(issueTypeId, updateIssueTypeDto);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Result.Success(new UpdateIssueTypeCommand(issueTypeId, updateIssueTypeDto))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
-    [HttpDelete("{issueTypeId}")]
+    [HttpDelete("{issueTypeId:guid}")]
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Delete(Guid issueTypeId, [FromQuery] Guid? newIssueTypeId)
-    {
-        var res = await _issueTypeService.Delete(issueTypeId, newIssueTypeId);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Result.Success(new DeleteIssueTypeCommand(issueTypeId, newIssueTypeId))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 }

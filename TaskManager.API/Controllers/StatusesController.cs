@@ -1,53 +1,42 @@
-﻿namespace TaskManager.API.Controllers;
+﻿using System.ComponentModel.DataAnnotations;
+using TaskManager.Application.Statuses.Commands.Create;
+using TaskManager.Application.Statuses.Commands.Delete;
+using TaskManager.Application.Statuses.Commands.Update;
+using TaskManager.Application.Statuses.Queries.GetStatusesByProjectId;
+
+namespace TaskManager.API.Controllers;
 
 [Route("api/projects/{projectId}/[controller]")]
 [ApiController]
-public class StatusesController : BaseController
+public class StatusesController(IMediator mediator)
+    : ApiController(mediator)
 {
-    private readonly IStatusService _statusService;
-
-    public StatusesController(IStatusService statusService)
-    {
-        _statusService = statusService;
-    }
-
     [HttpPost]
     [ProducesResponseType(typeof(StatusViewModel), (int)HttpStatusCode.Created)]
     public async Task<IActionResult> Create(CreateStatusDto createStatusDto)
-    {
-        var res = await _statusService.Create(createStatusDto);
-        return CustomResult(res, HttpStatusCode.Created);
-    }
+        => await Result.Success(new CreateStatusCommand(createStatusDto))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
     [HttpPut("{id}")]
     [ProducesResponseType(typeof(StatusViewModel), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Update(Guid id, UpdateStatusDto updateStatusDto)
-    {
-        var res = await _statusService.Update(id, updateStatusDto);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+    => await Result.Success(new UpdateStatusCommand(id, updateStatusDto))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
     [HttpDelete("{id}")]
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.Created)]
-    public async Task<IActionResult> Delete(Guid id, [FromQuery] Guid? newId)
-    {
-        var res = await _statusService.Delete(id, newId);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+    public async Task<IActionResult> Delete(Guid id, [FromQuery, Required] Guid newId)
+    => await Result.Success(new DeleteStatusCommand(id, newId))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyCollection<StatusViewModel>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Get(Guid projectId, [FromQuery] PaginationInput paginationInput)
-    {
-        var res = await _statusService.Gets(projectId, paginationInput);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
-
-    [HttpGet("versions")]
-    [ProducesResponseType(typeof(IReadOnlyCollection<StatusViewModel>), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> Gets(Guid projectId)
-    {
-        var res = await _statusService.GetStatusViewModelsForViewAsync(projectId);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Maybe<GetStatusesByProjectIdQuery>
+        .From(new GetStatusesByProjectIdQuery(projectId, paginationInput))
+        .Binding(query => Mediator.Send(query))
+        .Match(Ok, BadRequest);
 }

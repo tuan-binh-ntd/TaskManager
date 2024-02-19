@@ -1,44 +1,40 @@
-﻿namespace TaskManager.API.Controllers;
+﻿using TaskManager.Application.Priorities.Commands.Create;
+using TaskManager.Application.Priorities.Commands.Delete;
+using TaskManager.Application.Priorities.Commands.Update;
+using TaskManager.Application.Priorities.Queries.GetPrioritiesByProjectId;
 
-[Route("api/projects/{projectId}/[controller]")]
+namespace TaskManager.API.Controllers;
+
+[Route("api/projects/{projectId:guid}/[controller]")]
 [ApiController]
-public class PrioritiesController : BaseController
+public class PrioritiesController(IMediator mediator)
+    : ApiController(mediator)
 {
-    private readonly IPriorityService _priorityService;
-
-    public PrioritiesController(IPriorityService priorityService)
-    {
-        _priorityService = priorityService;
-    }
-
     [HttpGet]
     public async Task<IActionResult> Get(Guid projectId, [FromQuery] PaginationInput paginationInput)
-    {
-        var res = await _priorityService.GetByProjectId(projectId, paginationInput);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Maybe<GetPrioritiesByProjectIdQuery>
+        .From(new GetPrioritiesByProjectIdQuery(projectId, paginationInput))
+        .Binding(query => Mediator.Send(query))
+        .Match(Ok, BadRequest);
 
     [HttpPost]
     [ProducesResponseType(typeof(PriorityViewModel), (int)HttpStatusCode.Created)]
     public async Task<IActionResult> Create(CreatePriorityDto createPriorityDto)
-    {
-        var res = await _priorityService.Create(createPriorityDto);
-        return CustomResult(res, HttpStatusCode.Created);
-    }
+        => await Result.Success(new CreatePriorityCommand(createPriorityDto))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:guid}")]
     [ProducesResponseType(typeof(PriorityViewModel), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Update(Guid id, UpdatePriorityDto updatePriorityDto)
-    {
-        var res = await _priorityService.Update(id, updatePriorityDto);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Result.Success(new UpdatePriorityCommand(id, updatePriorityDto))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> Delete(Guid id, [FromQuery] Guid? newId)
-    {
-        var res = await _priorityService.Delete(id, newId);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+    public async Task<IActionResult> Delete(Guid id, [FromQuery] Guid newId)
+        => await Result.Success(new DeletePriorityCommand(id, newId))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 }
