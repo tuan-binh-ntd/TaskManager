@@ -1,18 +1,17 @@
 ﻿namespace TaskManager.Core.Interfaces.Repositories;
 
-public interface IStatusRepository : IRepository<Status>
+public interface IStatusRepository
 {
-    Status Add(Status status);
+    Task<Status> GetUnreleasedStatusByProjectIdAsync(Guid projectId);
+    Task<PaginationResult<StatusViewModel>> GetStatusViewModelsByProjectIdPagingAsync(Guid projectId, PaginationInput paginationInput);
+    Task<string?> GetNameOfStatusAsync(Guid statusId);
+    Task<bool> CheckStatusBelongDoneAsync(Guid statusId);
+    Task<IReadOnlyCollection<StatusViewModel>> GetStatusViewModelsByProjectIdAsync(Guid projectId);
+    Task<IReadOnlyCollection<StatusViewModel>> GetStatusViewModelsOfIssueByProjectIdAsync(Guid projectId);
+    Task<bool> IsReleaseStatusAsync(Guid statusId);
+    Task<Status?> GetByIdAsync(Guid id);
+    void Insert(Status status);
     void Update(Status status);
-    void Delete(Guid id);
-    void AddRange(ICollection<Status> statuses);
-    Task<IReadOnlyCollection<Status>> GetByProjectId(Guid projectId);
-    Task<Status> GetById(Guid id);
-    Task<Status> GetUnreleasedStatus(Guid projectId);
-    Task<PaginationResult<StatusViewModel>> GetByProjectIdPaging(Guid projectId, PaginationInput paginationInput);
-    Task<string?> GetNameOfStatus(Guid statusId);
-    Task<bool> CheckStatusBelongDone(Guid statusId);
-    Task<IReadOnlyCollection<StatusViewModel>> GetStatusViewModelsAsync(Guid projectId);
-    Task<IReadOnlyCollection<StatusViewModel>> GetStatusViewModelByProjectId(Guid projectId);
-    Task<bool> IsReleaseStatus(Guid statusId);
+    void Remove(Status status);
+    Task<IReadOnlyCollection<Status>> GetStatusesByProjectIdAsync(Guid projectId);
 }

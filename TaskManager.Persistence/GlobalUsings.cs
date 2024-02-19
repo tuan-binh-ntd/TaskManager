@@ -1,1 +1,27 @@
-﻿
+﻿global using Dapper;
+global using Mapster;
+global using Microsoft.AspNetCore.Identity;
+global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+global using Microsoft.Data.SqlClient;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.Metadata.Builders;
+global using Microsoft.EntityFrameworkCore.Migrations;
+global using Microsoft.EntityFrameworkCore.Storage;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Options;
+global using System.Data;
+global using System.Data.Common;
+global using System.Linq.Dynamic.Core;
+global using System.Reflection;
+global using TaskManager.Application.Core.Abstractions;
+global using TaskManager.Core;
+global using TaskManager.Core.Constants;
+global using TaskManager.Core.Core;
+global using TaskManager.Core.DTOs;
+global using TaskManager.Core.Entities;
+global using TaskManager.Core.Extensions;
+global using TaskManager.Core.Helper;
+global using TaskManager.Core.Interfaces.Repositories;
+global using TaskManager.Core.ViewModel;
+global using TaskManager.Persistence.Data;
+global using Version = TaskManager.Core.Entities.Version;

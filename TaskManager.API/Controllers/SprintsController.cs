@@ -1,79 +1,58 @@
 ﻿namespace TaskManager.API.Controllers;
 
-[Route("api/projects/{projectId}/[controller]")]
+[Route("api/projects/{projectId:guid}/[controller]")]
 [ApiController]
-public class SprintsController : BaseController
+public class SprintsController(IMediator mediator)
+    : ApiController(mediator)
 {
-    private readonly ISprintService _sprintService;
-
-    public SprintsController(
-        ISprintService sprintService
-        )
-    {
-        _sprintService = sprintService;
-    }
-
-    [HttpPost]
-    [ProducesResponseType(typeof(SprintViewModel), (int)HttpStatusCode.Created)]
-    public async Task<IActionResult> Create(CreateSprintDto createSprintDto)
-    {
-        var res = await _sprintService.CreateSprint(createSprintDto);
-        return CustomResult(res, HttpStatusCode.Created);
-    }
-
     [HttpPut("{id}")]
     [ProducesResponseType(typeof(SprintViewModel), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Update(Guid id, UpdateSprintDto updateSprintDto)
-    {
-        var res = await _sprintService.UpdateSprint(id, updateSprintDto);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Result.Success(new UpdateSprintCommand(id, updateSprintDto))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
-    [HttpPost(":no-field")]
+    [HttpPost]
     [ProducesResponseType(typeof(SprintViewModel), (int)HttpStatusCode.Created)]
     public async Task<IActionResult> Create(Guid projectId)
-    {
-        var res = await _sprintService.CreateNoFieldSprint(projectId);
-        return CustomResult(res, HttpStatusCode.Created);
-    }
+        => await Result.Success(new CreateSprintCommand(projectId))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Delete(Guid id)
-    {
-        var res = await _sprintService.DeleteSprint(id);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Result.Success(new DeleteSprintCommand(id))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
-    [HttpPut("{id}:start")]
+    [HttpPut("{id:guid}:start")]
     [ProducesResponseType(typeof(SprintViewModel), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> Start(Guid projectId, Guid id, UpdateSprintDto updateSprintDto)
-    {
-        var res = await _sprintService.StartSprint(projectId, sprintId: id, updateSprintDto);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+    public async Task<IActionResult> Start(Guid id, UpdateSprintDto updateSprintDto)
+        => await Result.Success(new StartSprintCommand(id, updateSprintDto))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
-    [HttpPut("{id}:complete")]
+    [HttpPut("{id:guid}:complete")]
     [ProducesResponseType(typeof(SprintViewModel), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Complete(Guid id, Guid projectId, CompleteSprintDto completeSprintDto)
-    {
-        var res = await _sprintService.CompleteSprint(id, projectId, completeSprintDto);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Result.Success(new CompleteSprintCommand(projectId, id, completeSprintDto))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(SprintViewModel), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> Get(Guid projectId, Guid id)
-    {
-        var res = await _sprintService.GetById(projectId, id);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+    public async Task<IActionResult> Get(Guid id)
+        => await Maybe<GetSprintByIdQuery>
+        .From(new GetSprintByIdQuery(id))
+        .Binding(query => Mediator.Send(query))
+        .Match(Ok, NotFound);
 
     [HttpPost("get-sprints")]
     [ProducesResponseType(typeof(IReadOnlyCollection<SprintViewModel>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Get(Guid projectId, [FromBody] GetSprintByFilterDto getSprintByFilterDto)
-    {
-        var res = await _sprintService.GetAll(projectId, getSprintByFilterDto);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Maybe<GetSprintsForBoardQuery>
+        .From(new GetSprintsForBoardQuery(projectId, getSprintByFilterDto))
+        .Binding(query => Mediator.Send(query))
+        .Match(Ok, NotFound);
 }

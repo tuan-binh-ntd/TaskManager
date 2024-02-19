@@ -1,37 +1,35 @@
-﻿namespace TaskManager.API.Controllers;
+﻿using TaskManager.Application.Dashboards.Queries.GetIssueNumOfAssigneeDashboard;
+using TaskManager.Application.Dashboards.Queries.GetIssuesInProjectDashboard;
+using TaskManager.Application.Dashboards.Queries.GetIssueViewModelDashboard;
 
-[Route("api/projects/{projectId}/[controller]")]
+namespace TaskManager.API.Controllers;
+
+[Route("api/projects/{projectId:guid}/[controller]")]
 [ApiController]
-public class DashboardsController : BaseController
+public class DashboardsController(IMediator mediator)
+    : ApiController(mediator)
 {
-    private readonly IDashboardService _dashboardService;
-
-    public DashboardsController(IDashboardService dashboardService)
-    {
-        _dashboardService = dashboardService;
-    }
-
     [HttpGet("circle-chart")]
     [ProducesResponseType(typeof(IReadOnlyCollection<IssueOfAssigneeDashboardViewModel>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Get(Guid projectId)
-    {
-        var res = await _dashboardService.GetIssueOfAssigneeDashboardViewModelAsync(projectId);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Maybe<GetIssueNumOfAssigneeDashboardQuery>
+        .From(new GetIssueNumOfAssigneeDashboardQuery(projectId))
+        .Binding(query => Mediator.Send(query))
+        .Match(Ok, NotFound);
 
     [HttpGet("column-chart")]
     [ProducesResponseType(typeof(IReadOnlyCollection<IssuesInProjectDashboardViewModel>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Gets(Guid projectId)
-    {
-        var res = await _dashboardService.GetIssuesInProjectDashboardViewModelAsync(projectId);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Maybe<GetIssuesInProjectDashboardQuery>
+        .From(new GetIssuesInProjectDashboardQuery(projectId))
+        .Binding(query => Mediator.Send(query))
+        .Match(Ok, NotFound);
 
     [HttpPost("table-chart")]
     [ProducesResponseType(typeof(IReadOnlyCollection<IssueViewModel>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> GetIssueViewModels(Guid projectId, [FromBody] GetIssuesForAssigneeOrReporterDto getIssuesForAssigneeOrReporterDto)
-    {
-        var res = await _dashboardService.GetIssueViewModelsDashboardViewModelAsync(projectId, getIssuesForAssigneeOrReporterDto);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Maybe<GetIssueViewModelDashboardQuery>
+        .From(new GetIssueViewModelDashboardQuery(projectId, getIssuesForAssigneeOrReporterDto))
+        .Binding(query => Mediator.Send(query))
+        .Match(Ok, NotFound);
 }

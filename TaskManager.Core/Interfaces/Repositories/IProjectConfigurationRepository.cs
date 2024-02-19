@@ -1,10 +1,12 @@
 ﻿namespace TaskManager.Core.Interfaces.Repositories;
 
-public interface IProjectConfigurationRepository : IRepository<ProjectConfiguration>
+public interface IProjectConfigurationRepository
 {
-    ProjectConfiguration Add(ProjectConfiguration projectConfiguration);
+    Task<ProjectConfiguration?> GetProjectConfigurationByProjectIdAsync(Guid projectId);
+    Task<Guid?> GetDefaultAssigneeIdByProjectIdAsync(Guid projectId);
+    Task UpdateDefaultAssigneeAsync(Guid projectId, Guid? defaultAssigneeId);
     void Update(ProjectConfiguration projectConfiguration);
-    ProjectConfiguration GetByProjectId(Guid projectId);
-    Task<Guid?> GetDefaultAssigneeIdByProjectId(Guid projectId);
-    Task UpdateDefaultAssignee(Guid projectId, Guid? defaultAssigneeId);
+    void Insert(ProjectConfiguration projectConfiguration);
+    void Remove(ProjectConfiguration projectConfiguration);
+    Task<ProjectConfiguration?> GetByIdAsync(Guid id);
 }

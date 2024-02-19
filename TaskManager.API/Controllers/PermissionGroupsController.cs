@@ -1,46 +1,35 @@
 ﻿namespace TaskManager.API.Controllers;
 
-[Route("api/projects/{projectId}/[controller]")]
+[Route("api/projects/{projectId:guid}/[controller]")]
 [ApiController]
-public class PermissionGroupsController : BaseController
+public class PermissionGroupsController(IMediator mediator) : ApiController(mediator)
 {
-    private readonly IPermissionGroupService _permissionGroupService;
-
-    public PermissionGroupsController(IPermissionGroupService permissionGroupService)
-    {
-        _permissionGroupService = permissionGroupService;
-    }
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyCollection<PermissionGroupViewModel>), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(PaginationResult<PermissionGroupViewModel>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Get(Guid projectId, [FromQuery] PaginationInput paginationInput)
-    {
-        var res = await _permissionGroupService.GetPermissionGroupsByProjectId(projectId, paginationInput);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Maybe<GetPermissionGroupsByProjectIdQuery>
+        .From(new GetPermissionGroupsByProjectIdQuery(projectId, paginationInput))
+        .Binding(query => Mediator.Send(query))
+        .Match(Ok, NotFound);
 
     [HttpPost]
     [ProducesResponseType(typeof(PermissionGroupViewModel), (int)HttpStatusCode.Created)]
     public async Task<IActionResult> Create([FromBody] CreatePermissionGroupDto createPermissionGroupDto)
-    {
-        var res = await _permissionGroupService.Create(createPermissionGroupDto);
+        => await Result.Success(new CreatePermissionGroupCommand(createPermissionGroupDto))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
-        return CustomResult(res, HttpStatusCode.Created);
-    }
-
-    [HttpPut("{id}")]
+    [HttpPut("{id:guid}")]
     [ProducesResponseType(typeof(PermissionGroupViewModel), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> Update(Guid projectId, Guid id, [FromBody] UpdatePermissionGroupDto updatePermissionGroupDto)
-    {
-        var res = await _permissionGroupService.Update(id, updatePermissionGroupDto, projectId);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdatePermissionGroupDto updatePermissionGroupDto)
+        => await Result.Success(new UpdatePermissionGroupCommand(id, updatePermissionGroupDto))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> Delete(Guid projectId, Guid id, [FromQuery] Guid? newPermissionGroupId)
-    {
-        var res = await _permissionGroupService.Delete(id, newPermissionGroupId, projectId);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+    public async Task<IActionResult> Delete(Guid id, [FromQuery] Guid? newPermissionGroupId)
+        => await Result.Success(new DeletePermissionGroupCommand(id, newPermissionGroupId))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 }

@@ -1,62 +1,53 @@
-﻿namespace TaskManager.API.Controllers;
+﻿using TaskManager.Application.Filters.Commands.Create;
+using TaskManager.Application.Filters.Commands.Delete;
+using TaskManager.Application.Filters.Queries.GetFilterViewModelsByUserId;
+using TaskManager.Application.Filters.Queries.GetIssuesByConfiguration;
+using TaskManager.Application.Filters.Queries.GetIssuesByFilterConfiguration;
+
+namespace TaskManager.API.Controllers;
 
 [ApiController]
-public class FiltersController : BaseController
+public class FiltersController(IMediator mediator)
+    : ApiController(mediator)
 {
-    private readonly IFilterService _filterService;
-
-    public FiltersController(IFilterService filterService)
-    {
-        _filterService = filterService;
-    }
-
     [Authorize]
-    [HttpGet("api/[controller]/{id}/issues")]
-    [ProducesResponseType(typeof(IReadOnlyCollection<IssueViewModel>), (int)HttpStatusCode.OK)]
+    [HttpGet("api/[controller]/{id:guid}/issues")]
+    [ProducesResponseType(typeof(IReadOnlyCollection<IssueViewModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Get(Guid id)
     {
         var userId = User.GetUserId();
-        var res = await _filterService.GetIssueByFilterConfiguration(id, userId);
-        return CustomResult(res, HttpStatusCode.OK);
+        var query = new GetIssuesByFilterConfigurationQuery(id, userId);
+        var response = await Mediator.Send(query);
+        return CustomResult(response, HttpStatusCode.OK);
     }
 
     [HttpPost("api/[controller]")]
-    [ProducesResponseType(typeof(FilterViewModel), (int)HttpStatusCode.Created)]
+    [ProducesResponseType(typeof(FilterViewModel), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(CreateFilterDto createFilterDto)
-    {
-        var res = await _filterService.CreateFilter(createFilterDto);
-        return CustomResult(res, HttpStatusCode.Created);
-    }
+        => await Result.Success(new CreateFilterCommand(createFilterDto))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
-    [HttpDelete("api/[controller]/{id}")]
-    [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
+    [HttpDelete("api/[controller]/{id:guid}")]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     public async Task<IActionResult> Delete(Guid id)
-    {
-        var res = await _filterService.DeleteFilter(id);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Result.Success(new DeleteFilterCommand(id))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
     [HttpPost("api/[controller]/get-issues")]
-    [ProducesResponseType(typeof(IReadOnlyCollection<IssueViewModel>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<IssueViewModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Get([FromBody] GetIssueByConfigurationDto getIssueByConfigurationDto)
-    {
-        var res = await _filterService.GetIssuesByConfiguration(getIssueByConfigurationDto);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Maybe<GetIssuesByConfigurationQuery>
+        .From(new GetIssuesByConfigurationQuery(getIssueByConfigurationDto))
+        .Binding(query => Mediator.Send(query))
+        .Match(Ok, NotFound);
 
-    [HttpGet("api/users/{userId}/[controller]")]
-    [ProducesResponseType(typeof(IReadOnlyCollection<FilterViewModel>), (int)HttpStatusCode.OK)]
+    [HttpGet("api/users/{userId:guid}/[controller]")]
+    [ProducesResponseType(typeof(IReadOnlyCollection<FilterViewModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Gets(Guid userId)
-    {
-        var res = await _filterService.GetFilterViewModelsByUserId(userId);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
-
-    [HttpPut("api/[controller]/{id}")]
-    [ProducesResponseType(typeof(FilterViewModel), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> Update(Guid id, UpdateFilterDto updateFilterDto)
-    {
-        var res = await _filterService.UpdateFilter(id, updateFilterDto);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Maybe<GetFilterViewModelsByUserIdQuery>
+        .From(new GetFilterViewModelsByUserIdQuery(userId))
+        .Binding(query => Mediator.Send(query))
+        .Match(Ok, NotFound);
 }

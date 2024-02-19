@@ -1,11 +1,10 @@
 ﻿namespace TaskManager.Core.Interfaces.Repositories;
 
-public interface ICommentRepository : IRepository<Comment>
+public interface ICommentRepository
 {
-    Task<IReadOnlyCollection<CommentViewModel>> Gets();
-    CommentViewModel Add(Comment comment);
+    Task<IReadOnlyCollection<CommentViewModel>> GetCommentsByIssueIdAsync(Guid issueId);
+    void Insert(Comment comment);
+    void Remove(Comment comment);
+    Task<Comment?> GetByIdAsync(Guid id);
     void Update(Comment comment);
-    void Delete(Comment comment);
-    Task<IReadOnlyCollection<Comment>> GetByIssueId(Guid issueId);
-    Task<Comment?> GetById(Guid id);
 }

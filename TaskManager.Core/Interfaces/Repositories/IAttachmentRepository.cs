@@ -1,11 +1,10 @@
 ﻿namespace TaskManager.Core.Interfaces.Repositories;
 
-public interface IAttachmentRepository : IRepository<Attachment>
+public interface IAttachmentRepository
 {
     Task<IReadOnlyCollection<AttachmentViewModel>> GetByIssueId(Guid issueId);
-    AttachmentViewModel Add(Attachment attachment);
-    void Update(Attachment attachment);
-    void Delete(Attachment attachment);
-    Task<Attachment?> GetById(Guid id);
-    void AddRange(IReadOnlyCollection<Attachment> attachments);
+    void InsertRange(IReadOnlyCollection<Attachment> attachments);
+    void Insert(Attachment attachment);
+    Task<Attachment?> GetByIdAsync(Guid id);
+    void Remove(Attachment attachment);
 }

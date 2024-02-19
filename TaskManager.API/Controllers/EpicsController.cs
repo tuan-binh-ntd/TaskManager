@@ -1,63 +1,38 @@
-﻿namespace TaskManager.API.Controllers;
+﻿using TaskManager.Application.Epics.Commands.Create;
+using TaskManager.Application.Epics.Commands.Delete;
+using TaskManager.Application.Epics.Commands.Update;
 
-[Route("api/projects/{projectId}/[controller]")]
+namespace TaskManager.API.Controllers;
+
+[Route("api/projects/{projectId:guid}/[controller]")]
 [ApiController]
-public class EpicsController : BaseController
+public class EpicsController(
+    IMediator mediator
+        ) : ApiController(mediator)
 {
-    private readonly IEpicService _epicService;
-    private readonly PresenceTracker _presenceTracker;
-    private readonly IHubContext<NotificationHub> _hubContext;
-
-    public EpicsController(
-        IEpicService epicService,
-        PresenceTracker presenceTracker,
-        IHubContext<NotificationHub> hubContext
-        )
-    {
-        _epicService = epicService;
-        _presenceTracker = presenceTracker;
-        _hubContext = hubContext;
-    }
 
     [HttpPost]
-    [ProducesResponseType(typeof(EpicViewModel), (int)HttpStatusCode.Created)]
+    [ProducesResponseType(typeof(EpicViewModel), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(CreateEpicDto createEpicDto)
-    {
-        var res = await _epicService.CreateEpic(createEpicDto);
+        => await Result.Success(new CreateEpicCommand(createEpicDto))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
-        var connectionIds = _presenceTracker.GetConnectionsForUserIds(res.UserIds);
-        await _hubContext.Clients.Clients(connectionIds).SendAsync("NewNotification", res.Notification);
-
-        return CustomResult(res.Epic, HttpStatusCode.Created);
-    }
-
-    [HttpPut("{id}")]
-    [ProducesResponseType(typeof(EpicViewModel), (int)HttpStatusCode.OK)]
+    [HttpPut("{id:guid}")]
+    [ProducesResponseType(typeof(EpicViewModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> Update(Guid id, UpdateEpicDto updateEpicDto)
-    {
-        var res = await _epicService.UpdateEpic(id, updateEpicDto);
-
-        var connectionIds = _presenceTracker.GetConnectionsForUserIds(res.UserIds);
-        await _hubContext.Clients.Clients(connectionIds).SendAsync("NewNotification", res.Notification);
-
-        return CustomResult(res.Epic, HttpStatusCode.OK);
-    }
-
-    [HttpPut("{id}/issues:add")]
-    [ProducesResponseType(typeof(EpicViewModel), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> AddIssue(Guid id, AddIssueToEpicDto addIssueToEpicDto)
-    {
-        var res = await _epicService.AddIssueToEpic(issueId: addIssueToEpicDto.IssueId, epicId: id);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Result.Success(new UpdateEpicCommand(id, updateEpicDto))
+        .Bind(command => Mediator.Send(command))
+        .Match(Ok, BadRequest);
 
     [Authorize]
-    [HttpDelete("{id}")]
-    [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     public async Task<IActionResult> Delete(Guid id)
     {
         var userId = User.GetUserId();
-        var res = await _epicService.DeleteEpic(id, userId);
-        return CustomResult(res.IssueId, HttpStatusCode.OK);
+        var command = new DeleteEpicCommand(id, userId);
+        var response = await Mediator.Send(command);
+        return CustomResult(response, HttpStatusCode.OK);
     }
 }

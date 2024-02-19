@@ -1,18 +1,12 @@
 ﻿namespace TaskManager.Infrastructure.Services;
 
-public class UploadFileService : IUploadFileService
+public class UploadFileService(
+    IOptionsMonitor<SftpServerSettings> sftpSettingsOption,
+    IOptionsMonitor<FileShareSettings> fileShareSettings
+        ) : IUploadFileService
 {
-    private readonly SftpServerSettings _sftpServerSettings;
-    private readonly FileShareSettings _fileShareSettings;
-
-    public UploadFileService(
-        IOptionsMonitor<SftpServerSettings> sftpSettingsOption,
-        IOptionsMonitor<FileShareSettings> fileShareSettings
-        )
-    {
-        _sftpServerSettings = sftpSettingsOption.CurrentValue;
-        _fileShareSettings = fileShareSettings.CurrentValue;
-    }
+    private readonly SftpServerSettings _sftpServerSettings = sftpSettingsOption.CurrentValue;
+    private readonly FileShareSettings _fileShareSettings = fileShareSettings.CurrentValue;
 
     public bool UploadFile(IFormFile file)
     {

@@ -1,41 +1,35 @@
 ﻿namespace TaskManager.API.Controllers;
 
-[Route("api/issues/{issueId}/[controller]")]
-[ApiController]
-public class AttachmentsController : BaseController
+[Route("api/issues/{issueId:guid}/[controller]")]
+public class AttachmentsController(IMediator mediator)
+    : ApiController(mediator)
 {
-    private readonly IAttachmentService _attachmentService;
-
-    public AttachmentsController(IAttachmentService attachmentService)
-    {
-        _attachmentService = attachmentService;
-    }
-
-    [Authorize]
     [HttpPost]
     [ProducesResponseType(typeof(IReadOnlyCollection<AttachmentViewModel>), (int)HttpStatusCode.Created)]
     public async Task<IActionResult> Create(Guid issueId, List<IFormFile> files)
     {
         var userId = User.GetUserId();
-        var res = await _attachmentService.CreateMultiple(issueId, files, userId);
-        return CustomResult(res, HttpStatusCode.Created);
+        return await Result.Success(new CreateAttachmentCommand(issueId, files, userId))
+            .Bind(command => Mediator.Send(command))
+            .Match(Ok, BadRequest);
     }
 
     [Authorize]
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Delete(Guid id, Guid issueId)
     {
         var userId = User.GetUserId();
-        var res = await _attachmentService.Delete(id, userId, issueId);
-        return CustomResult(res, HttpStatusCode.OK);
+        return await Result.Success(new DeleteAttachmentCommand(id, userId, issueId))
+            .Bind(command => Mediator.Send(command))
+            .Match(Ok, BadRequest);
     }
 
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyCollection<AttachmentViewModel>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Gets(Guid issueId)
-    {
-        var res = await _attachmentService.GetByIssueId(issueId);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Maybe<GetAttachmentsByIssueIdQuery>
+        .From(new GetAttachmentsByIssueIdQuery(issueId))
+        .Binding(query => Mediator.Send(query))
+        .Match(Ok, NotFound);
 }

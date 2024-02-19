@@ -1,18 +1,12 @@
 ﻿namespace TaskManager.Infrastructure.Services;
 
-public class TextToImageService : ITextToImageService
+public class TextToImageService(
+    IOptionsMonitor<TextToImageAISettings> optionsMonitor,
+    IOptionsMonitor<FileShareSettings> optionsMonitor1
+        ) : ITextToImageService
 {
-    private readonly TextToImageAISettings _textToImageAISettings;
-    private readonly FileShareSettings _fileShareSettings;
-
-    public TextToImageService(
-        IOptionsMonitor<TextToImageAISettings> optionsMonitor,
-        IOptionsMonitor<FileShareSettings> optionsMonitor1
-        )
-    {
-        _textToImageAISettings = optionsMonitor.CurrentValue;
-        _fileShareSettings = optionsMonitor1.CurrentValue;
-    }
+    private readonly TextToImageAISettings _textToImageAISettings = optionsMonitor.CurrentValue;
+    private readonly FileShareSettings _fileShareSettings = optionsMonitor1.CurrentValue;
 
     public async Task<string> GenerateImageAsync(string text)
     {
@@ -60,7 +54,7 @@ public class TextToImageService : ITextToImageService
 
             shareFile.Create(imageStream.Length);
 
-            int blockSize = CoreConstants.BlockSize;
+            int blockSize = TextToImageConstants.BlockSize;
             long offset = 0;//Define http range offset
             BinaryReader reader = new(imageStream);
             while (true)

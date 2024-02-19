@@ -1,23 +1,16 @@
-﻿namespace TaskManager.API.Controllers;
+﻿using TaskManager.Application.StatusCategories.Queries.GetAll;
+
+namespace TaskManager.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class StatusCategoriesController : BaseController
+public class StatusCategoriesController(IMediator mediator) : ApiController(mediator)
 {
-    private readonly IStatusService _statusService;
-
-    public StatusCategoriesController(
-        IStatusService statusService
-        )
-    {
-        _statusService = statusService;
-    }
-
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyCollection<StatusCategoryViewModel>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Gets()
-    {
-        var res = await _statusService.GetStatusCategoryViewModels();
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Maybe<GetAllStatusCategoriesQuery>
+        .From(new GetAllStatusCategoriesQuery())
+        .Binding(query => Mediator.Send(query))
+        .Match(Ok, NotFound);
 }

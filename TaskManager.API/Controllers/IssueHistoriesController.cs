@@ -2,20 +2,14 @@
 
 [Route("api/issues/{issueId}/[controller]")]
 [ApiController]
-public class IssueHistoriesController : BaseController
+public class IssueHistoriesController(IMediator mediator)
+    : ApiController(mediator)
 {
-    private readonly IIssueService _issueService;
-
-    public IssueHistoriesController(IIssueService issueService)
-    {
-        _issueService = issueService;
-    }
-
     [HttpGet]
-    [ProducesResponseType(typeof(IReadOnlyCollection<IssueHistoryViewModel>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<IssueHistoryViewModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Get(Guid issueId)
-    {
-        var res = await _issueService.GetHistoriesByIssueId(issueId);
-        return CustomResult(res, HttpStatusCode.OK);
-    }
+        => await Maybe<GetIssueHistoriesByIssueIdQuery>
+        .From(new GetIssueHistoriesByIssueIdQuery(issueId))
+        .Binding(query => Mediator.Send(query))
+        .Match(Ok, NotFound);
 }

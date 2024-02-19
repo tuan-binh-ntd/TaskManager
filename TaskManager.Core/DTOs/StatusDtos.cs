@@ -10,24 +10,11 @@ public class CreateStatusDto
     public bool AllowAnyStatus { get; set; }
 }
 
-public class UpdateStatusDto : BaseDto<UpdateStatusDto, Status>
+public class UpdateStatusDto
 {
     public string? Name { get; set; } = string.Empty;
     public string? Description { get; set; } = string.Empty;
     //Relationship
     public Guid? StatusCategoryId { get; set; }
     public bool AllowAnyStatus { get; set; }
-
-    public override void Register(TypeAdapterConfig config)
-    {
-        base.Register(config);
-
-        config.NewConfig<UpdateStatusDto, Status>()
-            .IgnoreIf((src, dest) => string.IsNullOrWhiteSpace(src.Name), dest => dest.Name)
-            .IgnoreIf((src, dest) => src.StatusCategoryId == null, dest => dest.StatusCategoryId!)
-            .Ignore(dest => dest.Id)
-            .Ignore(dest => dest.CreationTime)
-            .Ignore(dest => dest.ModificationTime!)
-            .IgnoreNullValues(true);
-    }
 }

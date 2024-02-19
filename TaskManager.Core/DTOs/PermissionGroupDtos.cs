@@ -31,8 +31,3 @@ public class UpdatePermissionGroupDto
     public IReadOnlyCollection<Guid> UserIds { get; set; } = new List<Guid>();
 }
 
-public class PermissionGroupDto
-{
-    public bool ViewPermission { get; set; }
-    public bool EditPermission { get; set; }
-}

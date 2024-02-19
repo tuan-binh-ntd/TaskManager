@@ -6,3 +6,10 @@ public class StatusCategoryNullException : Exception
     public StatusCategoryNullException()
         : base(_message) { }
 }
+
+public class StatusNullException : Exception
+{
+    private const string _message = "The an instance of Status is null!";
+    public StatusNullException()
+        : base(_message) { }
+}

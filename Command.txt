@@ -4,66 +4,13 @@
 	dotnet tool update --global dotnet-ef
 
 - Create migrations to DB
-	Add-Migration -Name Initial-Create -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Project-And-Backlog-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-IsFavourite-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-IssueType-And-Sprint-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Drop-LeaderId-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Drop-AppUserId-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Unique-Constraint-Code-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Many-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-ProjectId-FK-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Name-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-AllowNull-Some-Cols -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Level-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name AllowNull-Some-Col-To-Issue-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Drop-CreatorUserId-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Code-Col-To-Issue-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Unique-Constranits-To-Issue-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-ProjectConfiguration-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Workflow-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-StatusId-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-DefaultAssigneeId-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-IsStart-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Team-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Priority-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-PriorityId-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name AllowNull-ProjectId-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Version-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Change-Version-Name-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Icon-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Notification-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Filter-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Permission-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-ProjectId-Col-To-AppRole-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Change-Name-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Description-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-PermissionGroup-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-ViewPermission-And-EditPermission-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Permission-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Type-And-Size-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Code-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-VersionIssue-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Label-And-LabelIssue-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-IsMain-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-ProjectId-Col-To-Label-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-PermissionGroup-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-IsMain-Col-To-PermissionGroup-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Configuration-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Color-And-Description-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-CreatorUserId-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Remove-UserFilter-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Remove-Permission-And-PermissionRole-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Alter-Configuration-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-UserNotification-Tbl -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-Descrption-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
-	Add-Migration -Name Add-AllowAnyStatus-Col -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
+	Add-Migration -Name Initial-Create -OutputDir "Data\Migrations" -Context AppDbContext -Project src\TaskManager.Persistence -StartupProject src\TaskManager.API
 
 - Remove migration to DB
-	Remove-Migration -Context AppDbContext -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
+	Remove-Migration -Context AppDbContext -Project src\TaskManager.Persistence -StartupProject src\TaskManager.API
 
 - Update migration to DB
-	Update-Database -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
+	Update-Database -Project src\TaskManager.Persistence -StartupProject src\TaskManager.API
 
 - Drop DB
-	Drop-Database -Project src\TaskManager.Infrastructure -StartupProject src\TaskManager.API
+	Drop-Database -Project src\TaskManager.Persistence -StartupProject src\TaskManager.API

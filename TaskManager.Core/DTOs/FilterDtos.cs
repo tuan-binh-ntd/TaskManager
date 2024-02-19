@@ -65,23 +65,23 @@ public class FilterConfiguration
         string query = @"AND
             (
         ";
-        List<string> querys = new();
+        List<string> querys = [];
 
-        if (Project?.SprintIds is not null && Project.SprintIds.Any())
+        if (Project?.SprintIds is not null && Project.SprintIds.Count != 0)
         {
             string sprintQuery = @$"
                 SprintId IN ({string.Join(",", Project.SprintIds.Select(x => $"'{x}'"))})
             ";
             querys.Add(sprintQuery);
         }
-        if (Project?.BacklogIds is not null && Project.BacklogIds.Any())
+        if (Project?.BacklogIds is not null && Project.BacklogIds.Count != 0)
         {
             string backlogQuery = $@"
                 BacklogId IN ({string.Join(",", Project.BacklogIds.Select(x => $"'{x}'"))})
             ";
             querys.Add(backlogQuery);
         }
-        if (querys.Any())
+        if (querys.Count != 0)
         {
             query = $@"{query} {string.Join(" OR ", querys.Select(x => x))}
                 )
@@ -94,7 +94,7 @@ public class FilterConfiguration
 
     private string IssueTypeCriteriaQuery()
     {
-        if (Type?.IssueTypeIds is not null && Type.IssueTypeIds.Any())
+        if (Type?.IssueTypeIds is not null && Type.IssueTypeIds.Count != 0)
         {
             return @$"
                 AND
@@ -107,7 +107,7 @@ public class FilterConfiguration
 
     private string StatusCriteriaQuery()
     {
-        if (Status?.StatusIds is not null && Status.StatusIds.Any())
+        if (Status?.StatusIds is not null && Status.StatusIds.Count != 0)
         {
             return @$"
                 AND
@@ -121,13 +121,13 @@ public class FilterConfiguration
     private string AssigneeCriteriaQuery()
     {
         string query = "AND";
-        List<string> querys = new();
+        List<string> querys = [];
 
         if (Assginee is null)
         {
             return string.Empty;
         }
-        if (Assginee?.UserIds is not null && Assginee.UserIds.Any())
+        if (Assginee?.UserIds is not null && Assginee.UserIds.Count != 0)
         {
             string inQuery = @$"
                 AssigneeId IN ({string.Join(",", Assginee.UserIds.Select(x => $"'{x}'"))})
@@ -148,7 +148,7 @@ public class FilterConfiguration
             ";
             querys.Add(nullQuery);
         }
-        if (querys.Any())
+        if (querys.Count != 0)
         {
             query = $"{query} {string.Join(" OR ", querys.Select(x => x))}";
         }
@@ -164,25 +164,25 @@ public class FilterConfiguration
         }
         else if (Created?.MoreThan is MoreThan moreThan)
         {
-            if (moreThan.Unit.Equals(CoreConstants.MinutesUnit))
+            if (moreThan.Unit.Equals(FilterConstants.MinutesUnit))
             {
                 query += @$"
                     DATEDIFF(MINUTE , i.CreationTime, GETDATE())
                 ";
             }
-            else if (moreThan.Unit.Equals(CoreConstants.HoursUnit))
+            else if (moreThan.Unit.Equals(FilterConstants.HoursUnit))
             {
                 query += @$"
                     DATEDIFF(HOUR , i.CreationTime, GETDATE())
                 ";
             }
-            else if (moreThan.Unit.Equals(CoreConstants.DaysUnit))
+            else if (moreThan.Unit.Equals(FilterConstants.DaysUnit))
             {
                 query += @$"
                     DATEDIFF(DAY , i.CreationTime, GETDATE())
                 ";
             }
-            else if (moreThan.Unit.Equals(CoreConstants.WeekUnit))
+            else if (moreThan.Unit.Equals(FilterConstants.WeekUnit))
             {
                 query += @$"
                     DATEDIFF(WEEK , i.CreationTime, GETDATE())
@@ -210,25 +210,25 @@ public class FilterConfiguration
         }
         else if (DueDate?.MoreThan is MoreThan moreThan)
         {
-            if (moreThan.Unit.Equals(CoreConstants.MinutesUnit))
+            if (moreThan.Unit.Equals(FilterConstants.MinutesUnit))
             {
                 query += @$"
                     DATEDIFF(MINUTE , DueDate, GETDATE())
                 ";
             }
-            else if (moreThan.Unit.Equals(CoreConstants.HoursUnit))
+            else if (moreThan.Unit.Equals(FilterConstants.HoursUnit))
             {
                 query += @$"
                     DATEDIFF(HOUR , DueDate, GETDATE())
                 ";
             }
-            else if (moreThan.Unit.Equals(CoreConstants.DaysUnit))
+            else if (moreThan.Unit.Equals(FilterConstants.DaysUnit))
             {
                 query += @$"
                     DATEDIFF(DAY , DueDate, GETDATE())
                 ";
             }
-            else if (moreThan.Unit.Equals(CoreConstants.WeekUnit))
+            else if (moreThan.Unit.Equals(FilterConstants.WeekUnit))
             {
                 query += @$"
                     DATEDIFF(WEEK , DueDate, GETDATE())
@@ -250,7 +250,7 @@ public class FilterConfiguration
     private string FixVersionsCriteriaQuery()
     {
         string query = "AND";
-        List<string> querys = new();
+        List<string> querys = [];
 
         if (FixVersions is null)
         {
@@ -263,17 +263,18 @@ public class FilterConfiguration
             ";
             querys.Add(nullQuery);
         }
-        if (FixVersions.VersionIds is not null && FixVersions.VersionIds.Any())
+        if (FixVersions.VersionIds is not null && FixVersions.VersionIds.Count != 0)
         {
             string inQuery = $@"
                 li.VersionId IN ({string.Join(",", FixVersions.VersionIds.Select(x => $"'{x}'"))})
             ";
             querys.Add(inQuery);
         }
-        if (querys.Any())
+        if (querys.Count == 0)
         {
-            query = $"{query} {string.Join(" OR ", querys.Select(x => x))}";
+            return query.Equals("AND") ? string.Empty : query;
         }
+        query = $"{query} {string.Join(" OR ", querys.Select(x => x))}";
         return query.Equals("AND") ? string.Empty : query;
     }
 
@@ -284,7 +285,7 @@ public class FilterConfiguration
         {
             return string.Empty;
         }
-        if (Labels.LabelIds is not null && Labels.LabelIds.Any())
+        if (Labels.LabelIds is not null && Labels.LabelIds.Count != 0)
         {
             query += $@"
                 LabelId IN ({string.Join(",", Labels.LabelIds.Select(x => $"'{x}'"))})
@@ -300,7 +301,7 @@ public class FilterConfiguration
         {
             return string.Empty;
         }
-        if (Priority.PriorityIds is not null && Priority.PriorityIds.Any())
+        if (Priority.PriorityIds is not null && Priority.PriorityIds.Count != 0)
         {
             query += $@"
                 PriorityId IN ({string.Join(",", Priority.PriorityIds.Select(x => $"'{x}'"))})
@@ -312,13 +313,16 @@ public class FilterConfiguration
     private string ReporterCriteriaQuery()
     {
         string query = "AND";
-        List<string> querys = new();
+        List<string> querys = [];
 
         if (Reporter is null)
         {
             return string.Empty;
         }
-        if (Reporter?.UserIds is not null && Reporter.UserIds.Any())
+        if (Reporter?.UserIds is null || Reporter.UserIds.Count == 0)
+        {
+        }
+        else
         {
             string inQuery = @$"
                 ReporterId IN ({string.Join(",", Reporter.UserIds.Select(x => $"'{x}'"))})
@@ -332,7 +336,7 @@ public class FilterConfiguration
             ";
             querys.Add(equalQuery);
         }
-        if (querys.Any())
+        if (querys.Count != 0)
         {
             query = $"{query} {string.Join(" OR ", querys.Select(x => x))}";
         }
@@ -342,7 +346,7 @@ public class FilterConfiguration
     private string ResolutionCriteriaQuery()
     {
         string query = "AND";
-        List<string> querys = new();
+        List<string> querys = [];
 
         if (Resolution is null)
         {
@@ -362,10 +366,11 @@ public class FilterConfiguration
             ";
             querys.Add(equalQuery);
         }
-        if (querys.Any())
+        if (querys.Count == 0)
         {
-            query = $"{query} {string.Join(" OR ", querys.Select(x => x))}";
+            return query.Equals("AND") ? string.Empty : query;
         }
+        query = $"{query} {string.Join(" OR ", querys.Select(x => x))}";
         return query.Equals("AND") ? string.Empty : query;
     }
 
@@ -378,25 +383,25 @@ public class FilterConfiguration
         }
         else if (Resolved?.MoreThan is MoreThan moreThan)
         {
-            if (moreThan.Unit.Equals(CoreConstants.MinutesUnit))
+            if (moreThan.Unit.Equals(FilterConstants.MinutesUnit))
             {
                 query += @$"
                     DATEDIFF(MINUTE , CompleteDate, GETDATE())
                 ";
             }
-            else if (moreThan.Unit.Equals(CoreConstants.HoursUnit))
+            else if (moreThan.Unit.Equals(FilterConstants.HoursUnit))
             {
                 query += @$"
                     DATEDIFF(HOUR , CompleteDate, GETDATE())
                 ";
             }
-            else if (moreThan.Unit.Equals(CoreConstants.DaysUnit))
+            else if (moreThan.Unit.Equals(FilterConstants.DaysUnit))
             {
                 query += @$"
                     DATEDIFF(DAY , CompleteDate, GETDATE())
                 ";
             }
-            else if (moreThan.Unit.Equals(CoreConstants.WeekUnit))
+            else if (moreThan.Unit.Equals(FilterConstants.WeekUnit))
             {
                 query += @$"
                     DATEDIFF(WEEK , CompleteDate, GETDATE())
@@ -418,13 +423,16 @@ public class FilterConfiguration
     private string SprintsCriteriaQuery()
     {
         string query = "AND";
-        List<string> querys = new();
+        List<string> querys = [];
 
         if (Sprints is null)
         {
             return string.Empty;
         }
-        if (Sprints.SprintIds is not null && Sprints.SprintIds.Any())
+        if (Sprints.SprintIds is null || Sprints.SprintIds.Count == 0)
+        {
+        }
+        else
         {
             string inQuery = @$"SprintId IN ({string.Join(",", Sprints.SprintIds.Select(x => $"'{x}'"))})";
             querys.Add(inQuery);
@@ -436,7 +444,7 @@ public class FilterConfiguration
             ";
             querys.Add(equalQuery);
         }
-        if (querys.Any())
+        if (querys.Count != 0)
         {
             query = $"{query} {string.Join(" OR ", querys.Select(x => x))}";
         }
@@ -450,7 +458,8 @@ public class FilterConfiguration
         {
             return string.Empty;
         }
-        else if (StatusCategory.StatusCategoryIds is not null && StatusCategory.StatusCategoryIds.Any())
+        else if (StatusCategory.StatusCategoryIds is not null
+            && StatusCategory.StatusCategoryIds.Count != 0)
         {
             query += @$"
                 StatusCategoryId IN ({string.Join(",", StatusCategory.StatusCategoryIds.Select(x => $"'{x}'"))})
@@ -468,25 +477,25 @@ public class FilterConfiguration
         }
         else if (Updated?.MoreThan is MoreThan moreThan)
         {
-            if (moreThan.Unit.Equals(CoreConstants.MinutesUnit))
+            if (moreThan.Unit.Equals(FilterConstants.MinutesUnit))
             {
                 query += @$"
                     DATEDIFF(MINUTE , i.ModificationTime, GETDATE())
                 ";
             }
-            else if (moreThan.Unit.Equals(CoreConstants.HoursUnit))
+            else if (moreThan.Unit.Equals(FilterConstants.HoursUnit))
             {
                 query += @$"
                     DATEDIFF(HOUR , i.ModificationTime, GETDATE())
                 ";
             }
-            else if (moreThan.Unit.Equals(CoreConstants.DaysUnit))
+            else if (moreThan.Unit.Equals(FilterConstants.DaysUnit))
             {
                 query += @$"
                     DATEDIFF(DAY , i.ModificationTime, GETDATE())
                 ";
             }
-            else if (moreThan.Unit.Equals(CoreConstants.WeekUnit))
+            else if (moreThan.Unit.Equals(FilterConstants.WeekUnit))
             {
                 query += @$"
                     DATEDIFF(WEEK , i.ModificationTime, GETDATE())

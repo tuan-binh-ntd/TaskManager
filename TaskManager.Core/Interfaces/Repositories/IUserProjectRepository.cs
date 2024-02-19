@@ -1,18 +1,19 @@
 ﻿namespace TaskManager.Core.Interfaces.Repositories;
 
-public interface IUserProjectRepository : IRepository<UserProject>
+public interface IUserProjectRepository
 {
-    UserProject Add(UserProject userProject);
+    Task<object> GetMembersByProjectIdAsync(Guid projectId, PaginationInput paginationInput);
+    Task<MemberProjectViewModel?> GetMemberProjectViewModelByIdAsync(Guid id);
+    Task<Guid> GetLeaderIdByProjectIdAsync(Guid projectId);
+    Task UpdateIsFavouriteColAsync(Guid projectId, Guid userId, bool isFavourite);
+    Task<bool> GetIsFavouriteColAsync(Guid projectId, Guid userId);
+    Task<IReadOnlyCollection<Guid>> GetProjectIdsByUserIdAsync(Guid userId);
+    Task<IReadOnlyCollection<UserProject>> GetUserProjectsByPermissionGroupIdAsync(Guid permissionGroupId);
+    Task UpdatePermissionGroupIdAsync(Guid oldValue, Guid newValue);
+    Task<Guid> GetUserIdById(Guid memberId);
+    Task<UserProject?> GetByIdAsync(Guid id);
+    void Insert(UserProject userProject);
     void Update(UserProject userProject);
-    UserProject? Get(Guid projectId, Guid userId);
-    Task<object> GetMemberProjects(Guid projectId, PaginationInput paginationInput);
-    Task<UserProject?> GetMember(Guid id);
-    Task<MemberProjectViewModel?> GetMemberProject(Guid id);
-    Task<IReadOnlyCollection<Guid>> GetByUserId(Guid userId);
-    void Delete(UserProject userProject);
-    Task<UserProject?> GetById(Guid id);
-    Task<Guid> GetLeaderIdByProjectId(Guid projectId);
-    Task UpdateIsFavouriteCol(Guid projectId, Guid userId, bool isFavourite);
-    Task<bool> GetIsFavouriteCol(Guid projectId, Guid userId);
-    Task<IReadOnlyCollection<Guid>> GetProjectIdsByUserId(Guid userId);
+    void Remove(UserProject userProject);
+    void InsertRange(IReadOnlyCollection<UserProject> userProjects);
 }

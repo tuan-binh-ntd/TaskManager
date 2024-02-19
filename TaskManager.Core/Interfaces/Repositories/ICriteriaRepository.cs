@@ -1,6 +1,6 @@
 ﻿namespace TaskManager.Core.Interfaces.Repositories;
 
-public interface ICriteriaRepository : IRepository<Criteria>
+public interface ICriteriaRepository
 {
-    Task<IReadOnlyCollection<Criteria>> Gets();
+    Task<IReadOnlyCollection<Criteria>> GetCriteriasAsync();
 }
