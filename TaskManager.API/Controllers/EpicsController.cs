@@ -1,8 +1,4 @@
-﻿using TaskManager.Application.Epics.Commands.Create;
-using TaskManager.Application.Epics.Commands.Delete;
-using TaskManager.Application.Epics.Commands.Update;
-
-namespace TaskManager.API.Controllers;
+﻿namespace TaskManager.API.Controllers;
 
 [Route("api/projects/{projectId:guid}/[controller]")]
 [ApiController]

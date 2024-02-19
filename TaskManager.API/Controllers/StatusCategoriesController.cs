@@ -1,6 +1,4 @@
-﻿using TaskManager.Application.StatusCategories.Queries.GetAll;
-
-namespace TaskManager.API.Controllers;
+﻿namespace TaskManager.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

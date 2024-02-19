@@ -1,10 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using TaskManager.Application.Statuses.Commands.Create;
-using TaskManager.Application.Statuses.Commands.Delete;
-using TaskManager.Application.Statuses.Commands.Update;
-using TaskManager.Application.Statuses.Queries.GetStatusesByProjectId;
-
-namespace TaskManager.API.Controllers;
+﻿namespace TaskManager.API.Controllers;
 
 [Route("api/projects/{projectId}/[controller]")]
 [ApiController]

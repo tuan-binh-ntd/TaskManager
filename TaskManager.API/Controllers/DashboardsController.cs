@@ -1,8 +1,4 @@
-﻿using TaskManager.Application.Dashboards.Queries.GetIssueNumOfAssigneeDashboard;
-using TaskManager.Application.Dashboards.Queries.GetIssuesInProjectDashboard;
-using TaskManager.Application.Dashboards.Queries.GetIssueViewModelDashboard;
-
-namespace TaskManager.API.Controllers;
+﻿namespace TaskManager.API.Controllers;
 
 [Route("api/projects/{projectId:guid}/[controller]")]
 [ApiController]

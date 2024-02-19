@@ -2,20 +2,20 @@
 
 public class PresenceTracker
 {
-    private static readonly Dictionary<Guid, List<string>> _onlineUsers = new();
+    private static readonly Dictionary<Guid, List<string>> _onlineUsers = [];
 
     public Task<bool> UserConnected(Guid userId, string connectionId)
     {
         var isOnline = false;
         lock (_onlineUsers)
         {
-            if (_onlineUsers.ContainsKey(userId))
+            if (_onlineUsers.TryGetValue(userId, out var value))
             {
-                _onlineUsers[userId].Add(connectionId);
+                value.Add(connectionId);
             }
             else
             {
-                _onlineUsers.Add(userId, new List<string> { connectionId });
+                _onlineUsers.Add(userId, [connectionId]);
                 isOnline = true;
             }
         }
@@ -26,9 +26,9 @@ public class PresenceTracker
         var isOffline = false;
         lock (_onlineUsers)
         {
-            if (!_onlineUsers.ContainsKey(userId)) return Task.FromResult(isOffline);
-            _onlineUsers[userId].Remove(connectionId);
-            if (_onlineUsers[userId].Count == 0)
+            if (!_onlineUsers.TryGetValue(userId, out var value)) return Task.FromResult(isOffline);
+            value.Remove(connectionId);
+            if (value.Count == 0)
             {
                 _onlineUsers.Remove(userId);
                 isOffline = true;
@@ -61,7 +61,7 @@ public class PresenceTracker
 
     public IReadOnlyCollection<string> GetConnectionsForUserIds(IReadOnlyCollection<Guid> userIds)
     {
-        List<string> connectionIds = new();
+        List<string> connectionIds = [];
         lock (_onlineUsers)
         {
             foreach (var userId in userIds)

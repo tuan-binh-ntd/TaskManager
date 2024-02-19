@@ -1,9 +1,3 @@
-using TaskManager.Application.Users.Commands.ChangePassword;
-using TaskManager.Application.Users.Commands.SignIn;
-using TaskManager.Application.Users.Commands.SignUp;
-using TaskManager.Application.Users.Commands.Update;
-using TaskManager.Application.Users.Commands.UploadPhoto;
-
 namespace TaskManager.API.Controllers;
 
 [ApiController]

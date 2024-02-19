@@ -1,9 +1,4 @@
-﻿using TaskManager.Application.Priorities.Commands.Create;
-using TaskManager.Application.Priorities.Commands.Delete;
-using TaskManager.Application.Priorities.Commands.Update;
-using TaskManager.Application.Priorities.Queries.GetPrioritiesByProjectId;
-
-namespace TaskManager.API.Controllers;
+﻿namespace TaskManager.API.Controllers;
 
 [Route("api/projects/{projectId:guid}/[controller]")]
 [ApiController]

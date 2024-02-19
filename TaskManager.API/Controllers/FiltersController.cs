@@ -1,10 +1,4 @@
-﻿using TaskManager.Application.Filters.Commands.Create;
-using TaskManager.Application.Filters.Commands.Delete;
-using TaskManager.Application.Filters.Queries.GetFilterViewModelsByUserId;
-using TaskManager.Application.Filters.Queries.GetIssuesByConfiguration;
-using TaskManager.Application.Filters.Queries.GetIssuesByFilterConfiguration;
-
-namespace TaskManager.API.Controllers;
+﻿namespace TaskManager.API.Controllers;
 
 [ApiController]
 public class FiltersController(IMediator mediator)

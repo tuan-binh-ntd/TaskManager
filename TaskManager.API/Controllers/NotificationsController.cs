@@ -1,8 +1,4 @@
-﻿using TaskManager.Application.NotificationIssueEvents.Commands.Create;
-using TaskManager.Application.NotificationIssueEvents.Commands.Delete;
-using TaskManager.Application.NotificationIssueEvents.Commands.Update;
-
-namespace TaskManager.API.Controllers;
+﻿namespace TaskManager.API.Controllers;
 
 [ApiController]
 public class NotificationsController(IMediator mediator) : ApiController(mediator)

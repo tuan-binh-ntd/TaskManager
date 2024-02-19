@@ -1,6 +1,4 @@
-﻿using TaskManager.Application.UserProjects.Commands.Create;
-
-namespace TaskManager.API.Controllers;
+﻿namespace TaskManager.API.Controllers;
 
 [Route("api/projects/{projectId:guid}/[controller]")]
 [ApiController]

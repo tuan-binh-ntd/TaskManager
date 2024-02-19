@@ -1,9 +1,4 @@
-﻿using TaskManager.Application.IssueTypes.Commands.Create;
-using TaskManager.Application.IssueTypes.Commands.Delete;
-using TaskManager.Application.IssueTypes.Commands.Update;
-using TaskManager.Application.IssueTypes.Queries.GetIssueTypesByProjectId;
-
-namespace TaskManager.API.Controllers;
+﻿namespace TaskManager.API.Controllers;
 
 [Route("api/projects/{projectId:guid}/[controller]")]
 [ApiController]
