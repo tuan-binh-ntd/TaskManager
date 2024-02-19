@@ -27,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaskManager.Application", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaskManager.Persistence", "TaskManager.Persistence\TaskManager.Persistence.csproj", "{93F54457-A0FD-4059-995D-C28484DFE4E3}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{D3A9A30E-9090-4F5D-B7FD-6B8F3A94C2FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{93F54457-A0FD-4059-995D-C28484DFE4E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{93F54457-A0FD-4059-995D-C28484DFE4E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{93F54457-A0FD-4059-995D-C28484DFE4E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3A9A30E-9090-4F5D-B7FD-6B8F3A94C2FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3A9A30E-9090-4F5D-B7FD-6B8F3A94C2FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3A9A30E-9090-4F5D-B7FD-6B8F3A94C2FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3A9A30E-9090-4F5D-B7FD-6B8F3A94C2FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

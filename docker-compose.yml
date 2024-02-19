@@ -6,11 +6,3 @@ services:
     build:
       context: .
       dockerfile: TaskManager.API/Dockerfile
-    container_name: taskmanager.api
-    ports:
-      - "8080:80"
-    networks:
-      - taskmanager-net
-networks:
-  taskmanager-net:
-    driver: bridge
